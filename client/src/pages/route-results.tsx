@@ -17,6 +17,7 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCity, setSelectedCity] = useState<string>('all');
   const [checkpoints, setCheckpoints] = useState<string[]>([]);
   const [showCheckpointForm, setShowCheckpointForm] = useState<boolean>(false);
   const [newCheckpoint, setNewCheckpoint] = useState<string>('');
