@@ -125,10 +125,19 @@ export default function RouteResults() {
   const uniqueCities = uniquePois.length > 0 ? Array.from(new Set(uniquePois.map(poi => {
     if (poi.address) {
       const parts = poi.address.split(',');
-      return parts.length >= 2 ? parts[parts.length - 2].trim() : '';
+      if (parts.length >= 2) {
+        // Get the city part (usually second to last before state/country)
+        let cityPart = parts[parts.length - 2].trim();
+        
+        // Remove state/zip codes and clean up
+        cityPart = cityPart.replace(/\s+\d{5}.*$/, ''); // Remove zip codes
+        cityPart = cityPart.replace(/\s+(TX|CA|NY|FL|AZ|CO|NV|NM|OK|LA|GA|TN|AL|SC|NC|VA|MD|PA|OH|MI|IL|IN|WI|MN|IA|MO|AR|MS|KY|WV|DE|NJ|CT|RI|MA|VT|NH|ME|AK|HI|WA|OR|ID|MT|WY|UT|ND|SD|NE|KS)\s*$/i, ''); // Remove state abbreviations
+        
+        return cityPart;
+      }
     }
     return '';
-  }).filter(city => city.length > 0))).slice(0, 8) : [];
+  }).filter(city => city.length > 0 && city.length < 30))).slice(0, 8) : []; // Filter out very long strings
 
   const filteredPois = uniquePois.filter(poi => {
     const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
@@ -487,8 +496,8 @@ export default function RouteResults() {
 
                 {/* Places Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredPois.map((poi) => (
-                    <PoiCard key={poi.id} poi={poi} />
+                  {filteredPois.map((poi, index) => (
+                    <PoiCard key={poi.placeId || poi.id || `poi-${index}`} poi={poi} />
                   ))}
                 </div>
                 
