@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { generateGoogleMapsUrl } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 const routeSchema = z.object({
   startCity: z.string().min(1, "Please enter a starting city"),
@@ -19,6 +19,7 @@ type RouteFormData = z.infer<typeof routeSchema>;
 export default function RouteForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const form = useForm<RouteFormData>({
     resolver: zodResolver(routeSchema),
@@ -35,12 +36,15 @@ export default function RouteForm() {
       // Simulate processing time for better UX
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const googleMapsUrl = generateGoogleMapsUrl(data.startCity, data.endCity);
-      window.open(googleMapsUrl, '_blank');
+      // Store route data for the results page
+      localStorage.setItem('currentRoute', JSON.stringify(data));
+      
+      // Navigate to route results page
+      setLocation(`/route?start=${encodeURIComponent(data.startCity)}&end=${encodeURIComponent(data.endCity)}`);
       
       toast({
         title: "Route planned!",
-        description: "Opening Google Maps with your route...",
+        description: "Preparing your route with embedded map...",
       });
     } catch (error) {
       toast({
