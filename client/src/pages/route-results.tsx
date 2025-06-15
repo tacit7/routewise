@@ -121,40 +121,35 @@ export default function RouteResults() {
     index === self.findIndex(p => p.placeId === poi.placeId)
   );
 
-  // Extract cities and apply filters
-  const uniqueCities = uniquePois.length > 0 ? Array.from(new Set(uniquePois.map(poi => {
-    if (poi.address) {
-      const parts = poi.address.split(',');
-      if (parts.length >= 2) {
-        // Get the city part (second to last part in most address formats)
-        let cityPart = parts[parts.length - 2].trim();
-        
-        // Remove common address artifacts
-        cityPart = cityPart.replace(/^\d+\s+/, ''); // Remove leading numbers
-        cityPart = cityPart.replace(/\s+(Ave|Avenue|St|Street|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Way|Pkwy|Parkway|Pl|Place|Ct|Court)\b.*$/i, ''); // Remove street suffixes and everything after
-        cityPart = cityPart.replace(/\s+\d{5}.*$/, ''); // Remove zip codes
-        cityPart = cityPart.replace(/\s+(TX|CA|NY|FL|AZ|CO|NV|NM|OK|LA|GA|TN|AL|SC|NC|VA|MD|PA|OH|MI|IL|IN|WI|MN|IA|MO|AR|MS|KY|WV|DE|NJ|CT|RI|MA|VT|NH|ME|AK|HI|WA|OR|ID|MT|WY|UT|ND|SD|NE|KS)\s*$/i, ''); // Remove state abbreviations
-        cityPart = cityPart.replace(/\s+(United States|USA|US)\s*$/i, ''); // Remove country
-        cityPart = cityPart.replace(/^(East|West|North|South)\s+/i, ''); // Remove directional prefixes that might be street indicators
-        
-        // If it looks like a street name or number, try the next part
-        if (/^\d+$/.test(cityPart) || /^(Main|First|Second|Third|Oak|Pine|Elm|Park|Center|Central|Downtown)\s*/i.test(cityPart)) {
-          if (parts.length >= 3) {
-            cityPart = parts[parts.length - 3].trim();
-            cityPart = cityPart.replace(/^\d+\s+/, '');
-            cityPart = cityPart.replace(/\s+(Ave|Avenue|St|Street|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Way|Pkwy|Parkway|Pl|Place|Ct|Court)\b.*$/i, '');
-          }
-        }
-        
-        return cityPart;
-      }
-    }
-    return '';
-  }).filter(city => city.length > 2 && city.length < 25 && !/^\d+$/.test(city)))).slice(0, 8) : []; // Filter out very short, long strings, or pure numbers
+  // Use actual route cities and checkpoints for filtering instead of parsing addresses
+  const routeCities = routeData ? [
+    routeData.startCity,
+    routeData.endCity,
+    ...checkpoints
+  ].map(city => city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()) : [];
+  
+  const uniqueCities = routeCities.filter((city, index, self) => self.indexOf(city) === index);
 
   const filteredPois = uniquePois.filter(poi => {
     const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
-    const cityMatch = selectedCity === 'all' || (poi.address?.toLowerCase().includes(selectedCity.toLowerCase()) || false);
+    
+    // For city filtering, check if the POI is from route places or checkpoint places
+    let cityMatch = selectedCity === 'all';
+    
+    if (!cityMatch) {
+      // If it's a checkpoint POI, check timeFromStart
+      if (poi.timeFromStart && poi.timeFromStart.startsWith('In ')) {
+        const poiCity = poi.timeFromStart.replace('In ', '').toLowerCase();
+        cityMatch = poiCity === selectedCity.toLowerCase();
+      } else {
+        // For route POIs, include them for start/end city selection
+        const routeCitiesLower = [routeData?.startCity.toLowerCase(), routeData?.endCity.toLowerCase()];
+        if (routeCitiesLower.includes(selectedCity.toLowerCase())) {
+          cityMatch = true;
+        }
+      }
+    }
+    
     return categoryMatch && cityMatch;
   });
 
