@@ -139,54 +139,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'san antonio': { lat: 29.4241, lng: -98.4936 },
         'fort worth': { lat: 32.7555, lng: -97.3308 },
         'el paso': { lat: 31.7619, lng: -106.4850 },
+        'amarillo': { lat: 35.2220, lng: -101.8313 },
+        'lubbock': { lat: 33.5779, lng: -101.8552 },
+        'waco': { lat: 31.5494, lng: -97.1467 },
+        'corpus christi': { lat: 27.8006, lng: -97.3964 },
         'phoenix': { lat: 33.4484, lng: -112.0740 },
         'tucson': { lat: 32.2226, lng: -110.9747 },
+        'flagstaff': { lat: 35.1983, lng: -111.6513 },
         'los angeles': { lat: 34.0522, lng: -118.2437 },
         'san francisco': { lat: 37.7749, lng: -122.4194 },
         'san diego': { lat: 32.7157, lng: -117.1611 },
+        'sacramento': { lat: 38.5816, lng: -121.4944 },
+        'fresno': { lat: 36.7378, lng: -119.7871 },
         'denver': { lat: 39.7392, lng: -104.9903 },
+        'colorado springs': { lat: 38.8339, lng: -104.8214 },
         'las vegas': { lat: 36.1699, lng: -115.1398 },
+        'reno': { lat: 39.5296, lng: -119.8138 },
         'albuquerque': { lat: 35.0844, lng: -106.6504 },
+        'santa fe': { lat: 35.6870, lng: -105.9378 },
         'oklahoma city': { lat: 35.4676, lng: -97.5164 },
         'tulsa': { lat: 36.1540, lng: -95.9928 },
         'new orleans': { lat: 29.9511, lng: -90.0715 },
+        'baton rouge': { lat: 30.4515, lng: -91.1871 },
         'atlanta': { lat: 33.7490, lng: -84.3880 },
+        'savannah': { lat: 32.0835, lng: -81.0998 },
         'nashville': { lat: 36.1627, lng: -86.7816 },
-        'memphis': { lat: 35.1495, lng: -90.0490 }
+        'memphis': { lat: 35.1495, lng: -90.0490 },
+        'knoxville': { lat: 35.9606, lng: -83.9207 },
+        'birmingham': { lat: 33.5186, lng: -86.8104 },
+        'montgomery': { lat: 32.3617, lng: -86.2792 },
+        'mobile': { lat: 30.6954, lng: -88.0399 },
+        'jacksonville': { lat: 30.3322, lng: -81.6557 },
+        'miami': { lat: 25.7617, lng: -80.1918 },
+        'orlando': { lat: 28.5383, lng: -81.3792 },
+        'tampa': { lat: 27.9506, lng: -82.4572 },
+        'tallahassee': { lat: 30.4518, lng: -84.2807 },
+        'charlotte': { lat: 35.2271, lng: -80.8431 },
+        'raleigh': { lat: 35.7796, lng: -78.6382 },
+        'charleston': { lat: 32.7765, lng: -79.9311 },
+        'columbia': { lat: 34.0007, lng: -81.0348 }
       };
 
       const startCoords = cityCoordinates[startCity.toLowerCase()];
       const endCoords = cityCoordinates[endCity.toLowerCase()];
 
       if (startCoords && endCoords) {
-        console.log(`Using known coordinates for ${startCity} to ${endCity} route`);
+        console.log(`Fetching route-specific places for ${startCity} to ${endCity}`);
+        
         // Generate points along the route and fetch places
-        const routePoints = placesService.generateRoutePoints(startCoords, endCoords, 3);
+        const routePoints = placesService.generateRoutePoints(startCoords, endCoords, 4);
         const allPlaces: InsertPoi[] = [];
 
         for (const point of routePoints) {
-          const placeTypes = ['restaurant', 'tourist_attraction', 'park'];
+          const placeTypes = ['restaurant', 'tourist_attraction', 'park', 'gas_station'];
           
           for (const type of placeTypes) {
-            const places = await placesService.searchNearbyPlaces(point.lat, point.lng, 20000, type);
+            const places = await placesService.searchNearbyPlaces(point.lat, point.lng, 25000, type);
             
-            for (const place of places.slice(0, 8)) {
+            for (const place of places.slice(0, 6)) {
+              // Skip if we already have this place
+              if (allPlaces.some(p => p.placeId === place.place_id)) continue;
+              
+              if (!place.name || !place.rating) continue;
+              
               try {
+                let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
+                
+                if (place.photos && place.photos.length > 0) {
+                  imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
+                }
+
                 const poi: InsertPoi = {
                   name: place.name,
                   description: placesService.generateDescription(place),
                   category: placesService.mapPlaceTypeToCategory(place.types),
-                  imageUrl: place.photos?.[0] ? await placesService.getPhotoUrl(place.photos[0].photo_reference, 600) : `https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&h=400&fit=crop`,
-                  address: place.vicinity || place.formatted_address || "Address not available",
-                  rating: (place.rating || 4.0).toString(),
-                  reviewCount: place.user_ratings_total || 100,
-                  priceLevel: place.price_level || 2,
-                  isOpen: place.opening_hours?.open_now ?? true,
+                  rating: place.rating.toFixed(1),
+                  reviewCount: place.user_ratings_total || 0,
                   timeFromStart: placesService.generateTimeFromStart(),
+                  imageUrl: imageUrl,
+                  placeId: place.place_id,
+                  address: place.formatted_address || place.vicinity || '',
+                  isOpen: place.opening_hours?.open_now || null,
+                  priceLevel: place.price_level || null
                 };
 
-                const storedPoi = await storage.createPoi(poi);
-                allPlaces.push(storedPoi);
+                allPlaces.push(poi);
               } catch (error) {
                 console.error(`Error processing place ${place.name}:`, error);
               }
@@ -194,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        console.log(`Found ${allPlaces.length} places along ${startCity} to ${endCity} route`);
+        console.log(`Found ${allPlaces.length} route-specific places for ${startCity} to ${endCity}`);
         return res.json(allPlaces);
       } else {
         console.log(`Unknown cities: ${startCity}, ${endCity}. Using general places.`);
