@@ -18,9 +18,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ apiKey: googleMapsApiKey || '' });
   });
 
-  // Get POIs for a specific route
+  // Get POIs for a specific route or checkpoint
   app.get("/api/pois", async (req, res) => {
-    const { start, end } = req.query;
+    const { start, end, checkpoint } = req.query;
+    
+    // If checkpoint parameter is provided, fetch places for that specific city
+    if (checkpoint && typeof checkpoint === 'string') {
+      return await getCheckpointPois(checkpoint, placesService, res);
+    }
     
     // If route parameters are provided, fetch places along that specific route
     if (start && end && typeof start === 'string' && typeof end === 'string') {
@@ -198,6 +203,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching route-relevant places:", error);
       return await getGeneralPois(placesService, res);
+    }
+  }
+
+  async function getCheckpointPois(checkpoint: string, placesService: GooglePlacesService | null, res: any) {
+    try {
+      if (!placesService) {
+        return res.status(503).json({ 
+          message: "Google Places API key is required for checkpoint places" 
+        });
+      }
+
+      console.log(`Fetching places for checkpoint: ${checkpoint}`);
+      
+      // Try to get coordinates for the checkpoint city
+      const checkpointCoords = await placesService.geocodeCity(checkpoint);
+      
+      if (!checkpointCoords) {
+        // Fall back to known city coordinates if geocoding fails
+        const knownCities: { [key: string]: { lat: number; lng: number } } = {
+          'austin': { lat: 30.2672, lng: -97.7431 },
+          'houston': { lat: 29.7604, lng: -95.3698 },
+          'dallas': { lat: 32.7767, lng: -96.7970 },
+          'san antonio': { lat: 29.4241, lng: -98.4936 },
+          'phoenix': { lat: 33.4484, lng: -112.0740 },
+          'tucson': { lat: 32.2226, lng: -110.9747 },
+          'flagstaff': { lat: 35.1983, lng: -111.6513 },
+          'albuquerque': { lat: 35.0844, lng: -106.6504 },
+          'santa fe': { lat: 35.6870, lng: -105.9378 },
+          'denver': { lat: 39.7392, lng: -104.9903 },
+          'las vegas': { lat: 36.1699, lng: -115.1398 },
+          'los angeles': { lat: 34.0522, lng: -118.2437 },
+          'san francisco': { lat: 37.7749, lng: -122.4194 },
+          'seattle': { lat: 47.6062, lng: -122.3321 },
+          'portland': { lat: 45.5152, lng: -122.6784 },
+          'chicago': { lat: 41.8781, lng: -87.6298 },
+          'new york': { lat: 40.7128, lng: -74.0060 },
+          'miami': { lat: 25.7617, lng: -80.1918 },
+          'orlando': { lat: 28.5383, lng: -81.3792 },
+          'atlanta': { lat: 33.7490, lng: -84.3880 },
+          'nashville': { lat: 36.1627, lng: -86.7816 }
+        };
+        
+        const cityKey = checkpoint.toLowerCase().trim();
+        const coords = knownCities[cityKey];
+        
+        if (!coords) {
+          console.log(`Unknown checkpoint city: ${checkpoint}`);
+          return res.json([]);
+        }
+        
+        console.log(`Using known coordinates for ${checkpoint}: ${coords.lat}, ${coords.lng}`);
+        const allPlaces: InsertPoi[] = [];
+        
+        // Search for places in the checkpoint city
+        const types = ['restaurant', 'tourist_attraction', 'park', 'museum', 'shopping_mall'];
+        
+        for (const type of types) {
+          const places = await placesService.searchNearbyPlaces(
+            coords.lat, 
+            coords.lng, 
+            15000, // 15km radius for city-specific search
+            type
+          );
+          
+          // Convert Google Places to our POI format
+          for (let j = 0; j < Math.min(places.length, 4); j++) {
+            const place = places[j];
+            
+            if (!place.name || !place.rating) continue;
+            
+            // Skip if we already have this place
+            if (allPlaces.some(p => p.placeId === place.place_id)) continue;
+            
+            let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
+            
+            if (place.photos && place.photos.length > 0) {
+              imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
+            }
+            
+            const poi: InsertPoi = {
+              name: place.name,
+              description: placesService.generateDescription(place),
+              category: placesService.mapPlaceTypeToCategory(place.types),
+              rating: place.rating.toFixed(1),
+              reviewCount: place.user_ratings_total || 0,
+              timeFromStart: `In ${checkpoint}`,
+              imageUrl: imageUrl,
+              placeId: place.place_id,
+              address: place.formatted_address || place.vicinity || '',
+              isOpen: place.opening_hours?.open_now || null,
+              priceLevel: place.price_level || null
+            };
+            
+            allPlaces.push(poi);
+          }
+        }
+        
+        console.log(`Found ${allPlaces.length} places for checkpoint ${checkpoint}`);
+        return res.json(allPlaces);
+      }
+      
+      // Use geocoded coordinates if available
+      const allPlaces: InsertPoi[] = [];
+      const types = ['restaurant', 'tourist_attraction', 'park', 'museum', 'shopping_mall'];
+      
+      for (const type of types) {
+        const places = await placesService.searchNearbyPlaces(
+          checkpointCoords.lat, 
+          checkpointCoords.lng, 
+          15000, // 15km radius
+          type
+        );
+        
+        // Convert Google Places to our POI format
+        for (let j = 0; j < Math.min(places.length, 4); j++) {
+          const place = places[j];
+          
+          if (!place.name || !place.rating) continue;
+          
+          // Skip if we already have this place
+          if (allPlaces.some(p => p.placeId === place.place_id)) continue;
+          
+          let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
+          
+          if (place.photos && place.photos.length > 0) {
+            imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
+          }
+          
+          const poi: InsertPoi = {
+            name: place.name,
+            description: placesService.generateDescription(place),
+            category: placesService.mapPlaceTypeToCategory(place.types),
+            rating: place.rating.toFixed(1),
+            reviewCount: place.user_ratings_total || 0,
+            timeFromStart: `In ${checkpoint}`,
+            imageUrl: imageUrl,
+            placeId: place.place_id,
+            address: place.formatted_address || place.vicinity || '',
+            isOpen: place.opening_hours?.open_now || null,
+            priceLevel: place.price_level || null
+          };
+          
+          allPlaces.push(poi);
+        }
+      }
+      
+      console.log(`Found ${allPlaces.length} places for checkpoint ${checkpoint}`);
+      return res.json(allPlaces);
+      
+    } catch (error) {
+      console.error(`Error fetching checkpoint places for ${checkpoint}:`, error);
+      return res.json([]);
     }
   }
 

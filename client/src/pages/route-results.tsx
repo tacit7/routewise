@@ -46,6 +46,32 @@ export default function RouteResults() {
     enabled: !!routeData, // Only run query when we have route data
   });
 
+  // Fetch POIs for checkpoint cities
+  const { data: checkpointPois, isLoading: checkpointPoisLoading } = useQuery<Poi[]>({
+    queryKey: ["/api/checkpoint-pois", checkpoints],
+    queryFn: async () => {
+      if (checkpoints.length === 0) return [];
+      
+      const allCheckpointPois: Poi[] = [];
+      
+      // Fetch places for each checkpoint
+      for (const checkpoint of checkpoints) {
+        try {
+          const response = await fetch(`/api/pois?checkpoint=${encodeURIComponent(checkpoint)}`);
+          if (response.ok) {
+            const checkpointPlaces: Poi[] = await response.json();
+            allCheckpointPois.push(...checkpointPlaces);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch places for checkpoint ${checkpoint}:`, error);
+        }
+      }
+      
+      return allCheckpointPois;
+    },
+    enabled: checkpoints.length > 0,
+  });
+
   useEffect(() => {
     // Get route data from URL parameters or localStorage
     const searchParams = new URLSearchParams(window.location.search);
@@ -87,23 +113,31 @@ export default function RouteResults() {
     ? `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&waypoints=${encodeURIComponent(waypoints)}&mode=driving`
     : `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
+  // Combine route POIs and checkpoint POIs
+  const allPois = [...(pois || []), ...(checkpointPois || [])];
+  
+  // Remove duplicates based on placeId
+  const uniquePois = allPois.filter((poi, index, self) => 
+    index === self.findIndex(p => p.placeId === poi.placeId)
+  );
+
   // Extract cities and apply filters
-  const uniqueCities = pois ? Array.from(new Set(pois.map(poi => {
+  const uniqueCities = uniquePois.length > 0 ? Array.from(new Set(uniquePois.map(poi => {
     if (poi.address) {
       const parts = poi.address.split(',');
       return parts.length >= 2 ? parts[parts.length - 2].trim() : '';
     }
     return '';
-  }).filter(city => city.length > 0))).slice(0, 6) : [];
+  }).filter(city => city.length > 0))).slice(0, 8) : [];
 
-  const filteredPois = pois ? pois.filter(poi => {
+  const filteredPois = uniquePois.filter(poi => {
     const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
     const cityMatch = selectedCity === 'all' || (poi.address?.toLowerCase().includes(selectedCity.toLowerCase()) || false);
     return categoryMatch && cityMatch;
-  }) : [];
+  });
 
   const handleSaveRoute = async () => {
-    if (!routeData || !pois) return;
+    if (!routeData || uniquePois.length === 0) return;
     
     try {
       const response = await fetch('/api/routes', {
@@ -114,7 +148,8 @@ export default function RouteResults() {
         body: JSON.stringify({
           startCity: routeData.startCity,
           endCity: routeData.endCity,
-          poisIds: pois.map(poi => poi.id),
+          poisIds: uniquePois.map(poi => poi.id),
+          checkpoints: checkpoints,
         }),
       });
 
@@ -122,9 +157,10 @@ export default function RouteResults() {
         throw new Error('Failed to save route');
       }
 
+      const checkpointText = checkpoints.length > 0 ? ` with ${checkpoints.length} checkpoint${checkpoints.length > 1 ? 's' : ''}` : '';
       toast({
         title: "Route Saved!",
-        description: `Your route from ${routeData.startCity} to ${routeData.endCity} has been saved with ${pois.length} places.`,
+        description: `Your route from ${routeData.startCity} to ${routeData.endCity}${checkpointText} has been saved with ${uniquePois.length} places.`,
       });
     } catch (error) {
       toast({
@@ -201,7 +237,10 @@ export default function RouteResults() {
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-blue-100">Total Places Found</div>
-                  <div className="text-3xl font-bold">{pois?.length || 0}</div>
+                  <div className="text-3xl font-bold">{uniquePois.length}</div>
+                  {checkpoints.length > 0 && (
+                    <div className="text-xs text-blue-200">Including checkpoint places</div>
+                  )}
                 </div>
               </div>
             </div>
