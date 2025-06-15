@@ -52,7 +52,8 @@ export default function RouteResults() {
     );
   }
 
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
+  // For now, create a fallback that opens Google Maps in a new tab since we need Maps API key
+  const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -90,36 +91,41 @@ export default function RouteResults() {
           </div>
         </div>
 
-        {/* Google Maps Embed */}
+        {/* Interactive Map Section */}
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-4 border-b border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-800">Interactive Route Map</h2>
             <p className="text-slate-600 text-sm mt-1">
-              Use the map below to explore your route and get detailed directions
+              Click below to view your full route with turn-by-turn directions in Google Maps
             </p>
           </div>
           
-          <div className="relative" style={{ height: '600px' }}>
-            <iframe
-              src={googleMapsEmbedUrl}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Route Map"
-            />
+          <div className="p-8 text-center" style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="max-w-md">
+              <div className="mb-6">
+                <i className="fas fa-map-marked-alt text-6xl text-blue-500 mb-4" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-3">
+                View Full Route in Google Maps
+              </h3>
+              <p className="text-slate-600 mb-6">
+                Get detailed turn-by-turn directions, real-time traffic updates, and explore your route interactively.
+              </p>
+              <Button
+                onClick={() => window.open(googleMapsDirectUrl, '_blank')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+              >
+                <i className="fas fa-external-link-alt mr-3" />
+                Open Route in Google Maps
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
           <Button
-            onClick={() => {
-              const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
-              window.open(googleMapsUrl, '_blank');
-            }}
+            onClick={() => window.open(googleMapsDirectUrl, '_blank')}
             className="bg-primary hover:bg-blue-700 text-white"
           >
             <i className="fas fa-route mr-2" />
@@ -135,28 +141,105 @@ export default function RouteResults() {
           </Button>
         </div>
 
-        {/* Note about Places */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <i className="fas fa-info-circle text-blue-500 mt-0.5" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
-                Discover Amazing Stops
-              </h3>
-              <div className="mt-2 text-sm text-blue-700">
-                <p>
-                  Don't forget to check out the curated stops and attractions we've discovered along popular routes. 
-                  <button 
-                    onClick={() => setLocation('/')}
-                    className="font-medium underline hover:no-underline ml-1"
-                  >
-                    View suggested stops
-                  </button>
+        {/* Things to Do Section */}
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <h2 className="text-2xl font-bold text-slate-800 mb-4">
+              Things to Do Along Your Route
+            </h2>
+            <p className="text-slate-600 mb-8">
+              Discover amazing stops, restaurants, and attractions along your journey. All places are sourced from real Google Places data.
+            </p>
+
+            {poisLoading && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+                    <Skeleton className="w-full h-48" />
+                    <div className="p-6 space-y-3">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <div className="flex justify-between">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!poisLoading && (!pois || pois.length === 0) && (
+              <div className="text-center py-12">
+                <div className="mb-4">
+                  <i className="fas fa-map-marker-alt text-gray-400 text-4xl" />
+                </div>
+                <h3 className="text-lg font-medium text-slate-800 mb-2">No Places Found</h3>
+                <p className="text-slate-600">
+                  Unable to load places data. Please check if the Google Places API is properly configured.
                 </p>
               </div>
-            </div>
+            )}
+
+            {pois && pois.length > 0 && (
+              <>
+                {/* Category Filters */}
+                <div className="flex flex-wrap gap-2 mb-8">
+                  <button className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                    All Places ({pois.length})
+                  </button>
+                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                    Restaurants ({pois.filter(p => p.category === 'restaurant').length})
+                  </button>
+                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                    Attractions ({pois.filter(p => p.category === 'attraction').length})
+                  </button>
+                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                    Parks ({pois.filter(p => p.category === 'park').length})
+                  </button>
+                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                    Historic ({pois.filter(p => p.category === 'historic').length})
+                  </button>
+                </div>
+
+                {/* Places Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pois.map((poi) => (
+                    <PoiCard key={poi.id} poi={poi} />
+                  ))}
+                </div>
+
+                {/* Summary Stats */}
+                <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {pois.filter(p => p.category === 'restaurant').length}
+                    </div>
+                    <div className="text-sm text-blue-700 font-medium">Restaurants</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {pois.filter(p => p.category === 'park').length}
+                    </div>
+                    <div className="text-sm text-green-700 font-medium">Parks</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {pois.filter(p => p.category === 'attraction').length}
+                    </div>
+                    <div className="text-sm text-purple-700 font-medium">Attractions</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-amber-600">
+                      {pois.filter(p => parseFloat(p.rating) >= 4.5).length}
+                    </div>
+                    <div className="text-sm text-amber-700 font-medium">Highly Rated</div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
