@@ -339,7 +339,7 @@ export default function RouteResults() {
               Amazing Places Along Your Route
             </h2>
 
-            {poisLoading && (
+            {(poisLoading || checkpointPoisLoading) && (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="space-y-3">
@@ -351,7 +351,7 @@ export default function RouteResults() {
               </div>
             )}
 
-            {!poisLoading && (!pois || pois.length === 0) && (
+            {!poisLoading && !checkpointPoisLoading && uniquePois.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🗺️</div>
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">No Places Found</h3>
@@ -361,8 +361,18 @@ export default function RouteResults() {
               </div>
             )}
 
-            {pois && pois.length > 0 && (
+            {uniquePois.length > 0 && (
               <>
+                {/* Loading indicator for checkpoint places */}
+                {checkpoints.length > 0 && checkpointPoisLoading && (
+                  <div className="mb-4 text-center">
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
+                      Loading places from your checkpoints...
+                    </div>
+                  </div>
+                )}
+
                 {/* City Filters */}
                 {uniqueCities.length > 0 && (
                   <div className="mb-6">
@@ -376,10 +386,10 @@ export default function RouteResults() {
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                         }`}
                       >
-                        All Cities ({pois.length})
+                        All Cities ({uniquePois.length})
                       </button>
                       {uniqueCities.map((city) => {
-                        const cityCount = pois.filter(poi => poi.address?.toLowerCase().includes(city.toLowerCase())).length;
+                        const cityCount = uniquePois.filter(poi => poi.address?.toLowerCase().includes(city.toLowerCase())).length;
                         return (
                           <button 
                             key={city}
@@ -420,7 +430,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Restaurants ({pois.filter(p => p.category === 'restaurant').length})
+                      Restaurants ({uniquePois.filter(p => p.category === 'restaurant').length})
                     </button>
                     <button 
                       onClick={() => setSelectedCategory('attraction')}
@@ -430,7 +440,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Attractions ({pois.filter(p => p.category === 'attraction').length})
+                      Attractions ({uniquePois.filter(p => p.category === 'attraction').length})
                     </button>
                     <button 
                       onClick={() => setSelectedCategory('park')}
@@ -440,7 +450,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Parks ({pois.filter(p => p.category === 'park').length})
+                      Parks ({uniquePois.filter(p => p.category === 'park').length})
                     </button>
                     <button 
                       onClick={() => setSelectedCategory('scenic')}
@@ -450,7 +460,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Scenic ({pois.filter(p => p.category === 'scenic').length})
+                      Scenic ({uniquePois.filter(p => p.category === 'scenic').length})
                     </button>
                     <button 
                       onClick={() => setSelectedCategory('market')}
@@ -460,7 +470,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Markets ({pois.filter(p => p.category === 'market').length})
+                      Markets ({uniquePois.filter(p => p.category === 'market').length})
                     </button>
                     <button 
                       onClick={() => setSelectedCategory('historic')}
@@ -470,7 +480,7 @@ export default function RouteResults() {
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      Historic ({pois.filter(p => p.category === 'historic').length})
+                      Historic ({uniquePois.filter(p => p.category === 'historic').length})
                     </button>
                   </div>
                 </div>
@@ -492,25 +502,25 @@ export default function RouteResults() {
                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-blue-700">
-                      {pois.filter(p => p.category === 'restaurant').length}
+                      {uniquePois.filter(p => p.category === 'restaurant').length}
                     </div>
                     <div className="text-sm text-blue-700 font-medium">Restaurants</div>
                   </div>
                   <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-green-700">
-                      {pois.filter(p => p.category === 'attraction').length}
+                      {uniquePois.filter(p => p.category === 'attraction').length}
                     </div>
                     <div className="text-sm text-green-700 font-medium">Attractions</div>
                   </div>
                   <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-purple-700">
-                      {pois.filter(p => p.category === 'park').length}
+                      {uniquePois.filter(p => p.category === 'park').length}
                     </div>
                     <div className="text-sm text-purple-700 font-medium">Parks & Nature</div>
                   </div>
                   <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-amber-700">
-                      {pois.filter(p => parseFloat(p.rating) >= 4.5).length}
+                      {uniquePois.filter(p => parseFloat(p.rating) >= 4.5).length}
                     </div>
                     <div className="text-sm text-amber-700 font-medium">Highly Rated</div>
                   </div>
