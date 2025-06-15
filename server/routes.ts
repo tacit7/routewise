@@ -177,7 +177,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'charlotte': { lat: 35.2271, lng: -80.8431 },
         'raleigh': { lat: 35.7796, lng: -78.6382 },
         'charleston': { lat: 32.7765, lng: -79.9311 },
-        'columbia': { lat: 34.0007, lng: -81.0348 }
+        'columbia': { lat: 34.0007, lng: -81.0348 },
+        'new york': { lat: 40.7128, lng: -74.0060 },
+        'new york city': { lat: 40.7128, lng: -74.0060 },
+        'brooklyn': { lat: 40.6782, lng: -73.9442 },
+        'queens': { lat: 40.7282, lng: -73.7949 },
+        'manhattan': { lat: 40.7831, lng: -73.9712 },
+        'bronx': { lat: 40.8448, lng: -73.8648 },
+        'staten island': { lat: 40.5795, lng: -74.1502 },
+        'boston': { lat: 42.3601, lng: -71.0589 },
+        'philadelphia': { lat: 39.9526, lng: -75.1652 },
+        'washington': { lat: 38.9072, lng: -77.0369 },
+        'washington dc': { lat: 38.9072, lng: -77.0369 },
+        'baltimore': { lat: 39.2904, lng: -76.6122 },
+        'richmond': { lat: 37.5407, lng: -77.4360 },
+        'virginia beach': { lat: 36.8529, lng: -75.9780 },
+        'norfolk': { lat: 36.8508, lng: -76.2859 },
+        'detroit': { lat: 42.3314, lng: -83.0458 },
+        'cleveland': { lat: 41.4993, lng: -81.6944 },
+        'cincinnati': { lat: 39.1031, lng: -84.5120 },
+        'columbus': { lat: 39.9612, lng: -82.9988 },
+        'pittsburgh': { lat: 40.4406, lng: -79.9959 },
+        'buffalo': { lat: 42.8864, lng: -78.8784 },
+        'rochester': { lat: 43.1566, lng: -77.6088 },
+        'syracuse': { lat: 43.0481, lng: -76.1474 },
+        'albany': { lat: 42.6526, lng: -73.7562 },
+        'milwaukee': { lat: 43.0389, lng: -87.9065 },
+        'madison': { lat: 43.0731, lng: -89.4012 },
+        'minneapolis': { lat: 44.9778, lng: -93.2650 },
+        'saint paul': { lat: 44.9537, lng: -93.0900 },
+        'des moines': { lat: 41.5868, lng: -93.6250 },
+        'kansas city': { lat: 39.0997, lng: -94.5786 },
+        'saint louis': { lat: 38.6270, lng: -90.1994 },
+        'little rock': { lat: 34.7465, lng: -92.2896 },
+        'jackson': { lat: 32.2988, lng: -90.1848 },
+        'louisville': { lat: 38.2527, lng: -85.7585 },
+        'indianapolis': { lat: 39.7684, lng: -86.1581 },
+        'fort wayne': { lat: 41.0793, lng: -85.1394 }
       };
 
       const startCoords = cityCoordinates[startCity.toLowerCase()];
@@ -257,30 +293,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const checkpointCoords = await placesService.geocodeCity(checkpoint);
       
       if (!checkpointCoords) {
-        // Fall back to known city coordinates if geocoding fails
-        const knownCities: { [key: string]: { lat: number; lng: number } } = {
-          'austin': { lat: 30.2672, lng: -97.7431 },
-          'houston': { lat: 29.7604, lng: -95.3698 },
-          'dallas': { lat: 32.7767, lng: -96.7970 },
-          'san antonio': { lat: 29.4241, lng: -98.4936 },
-          'phoenix': { lat: 33.4484, lng: -112.0740 },
-          'tucson': { lat: 32.2226, lng: -110.9747 },
-          'flagstaff': { lat: 35.1983, lng: -111.6513 },
-          'albuquerque': { lat: 35.0844, lng: -106.6504 },
-          'santa fe': { lat: 35.6870, lng: -105.9378 },
-          'denver': { lat: 39.7392, lng: -104.9903 },
-          'las vegas': { lat: 36.1699, lng: -115.1398 },
-          'los angeles': { lat: 34.0522, lng: -118.2437 },
-          'san francisco': { lat: 37.7749, lng: -122.4194 },
-          'seattle': { lat: 47.6062, lng: -122.3321 },
-          'portland': { lat: 45.5152, lng: -122.6784 },
-          'chicago': { lat: 41.8781, lng: -87.6298 },
-          'new york': { lat: 40.7128, lng: -74.0060 },
-          'miami': { lat: 25.7617, lng: -80.1918 },
-          'orlando': { lat: 28.5383, lng: -81.3792 },
-          'atlanta': { lat: 33.7490, lng: -84.3880 },
-          'nashville': { lat: 36.1627, lng: -86.7816 }
-        };
+        // Use the same comprehensive city database
+        const knownCities = cityCoordinates;
         
         const cityKey = checkpoint.toLowerCase().trim();
         const coords = knownCities[cityKey];
