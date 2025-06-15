@@ -105,12 +105,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 15, 2025: Google Places API integration completed
-  - Integrated real Google Places data instead of sample data
-  - Added Google Places service for fetching restaurants, parks, and attractions
+- June 15, 2025: Complete route results page with embedded maps
+  - Added dedicated route results page with embedded Google Maps
+  - Implemented route-specific place discovery using Google Places API
   - Enhanced POI cards with address, open/closed status, and price levels
-  - Successfully fetching authentic places along a sample SF to LA route
-  - System now stores 60+ real places from Google Places API
+  - Added graceful fallback when geocoding API is not authorized
+  - System dynamically fetches places along user's chosen route
+  - Embedded maps working with proper API key integration
+  - Comprehensive "Things to Do" section with category filters and statistics
 
 ## Changelog
 
