@@ -105,13 +105,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 15, 2025: Complete route-specific place discovery system
+- June 15, 2025: Complete route saving and place collection system
   - Implemented intelligent route-specific place discovery using known city coordinates
   - System now finds authentic places along actual route paths (90+ real locations per route)
   - Added comprehensive US city coordinate database for major travel destinations
-  - Enhanced route results page with improved navigation options
-  - Real places fetched along route points: Austin→Dallas, San Antonio→Houston working perfectly
-  - Graceful fallback system for unknown cities to general authentic places
+  - Complete route saving functionality: save entire routes with all discovered places
+  - "Add to My Places" buttons on each location for building personal collections
+  - Saved routes display on home page with quick access and management options
+  - Category filtering system working perfectly for restaurants, attractions, parks
   - Complete Google Places API integration with real business data, photos, and ratings
 
 ## Changelog

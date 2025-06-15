@@ -197,27 +197,73 @@ export default function RouteResults() {
           </Button>
           
           <Button
+            onClick={() => {
+              if (!routeData || !pois) return;
+              
+              const route = {
+                id: Date.now().toString(),
+                name: `${routeData.startCity} to ${routeData.endCity}`,
+                startCity: routeData.startCity,
+                endCity: routeData.endCity,
+                places: pois,
+                createdAt: new Date().toISOString(),
+                placesCount: pois.length
+              };
+              
+              const savedRoutes = JSON.parse(localStorage.getItem('myRoutes') || '[]');
+              
+              // Check if route already exists
+              const existingRoute = savedRoutes.find((r: any) => 
+                r.startCity.toLowerCase() === routeData.startCity.toLowerCase() && 
+                r.endCity.toLowerCase() === routeData.endCity.toLowerCase()
+              );
+              
+              if (existingRoute) {
+                toast({
+                  title: "Route already saved",
+                  description: `${route.name} is already in your saved routes.`,
+                });
+                return;
+              }
+              
+              savedRoutes.push(route);
+              localStorage.setItem('myRoutes', JSON.stringify(savedRoutes));
+              
+              toast({
+                title: "Route saved!",
+                description: `${route.name} with ${pois.length} places has been saved.`,
+              });
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <i className="fas fa-bookmark mr-2" />
+            Save This Route
+          </Button>
+          
+          <Button
             variant="outline"
             onClick={() => {
               const savedPlaces = JSON.parse(localStorage.getItem('myPlaces') || '[]');
-              if (savedPlaces.length === 0) {
+              const savedRoutes = JSON.parse(localStorage.getItem('myRoutes') || '[]');
+              
+              if (savedPlaces.length === 0 && savedRoutes.length === 0) {
                 toast({
-                  title: "No saved places",
-                  description: "Add some places to your collection first!",
+                  title: "No saved items",
+                  description: "Save some places or routes to your collection first!",
                 });
               } else {
                 toast({
-                  title: "My Places",
-                  description: `You have ${savedPlaces.length} saved places`,
+                  title: "My Collection",
+                  description: `${savedPlaces.length} places, ${savedRoutes.length} routes saved`,
                 });
-                // Could navigate to a dedicated "My Places" page in the future
                 console.log('Saved places:', savedPlaces);
+                console.log('Saved routes:', savedRoutes);
               }
             }}
             className="border-blue-300 text-blue-700 hover:bg-blue-50"
           >
             <i className="fas fa-heart mr-2" />
-            My Places ({JSON.parse(localStorage.getItem('myPlaces') || '[]').length})
+            My Collection ({JSON.parse(localStorage.getItem('myPlaces') || '[]').length + JSON.parse(localStorage.getItem('myRoutes') || '[]').length})
           </Button>
           
           <Button
