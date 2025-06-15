@@ -79,6 +79,8 @@ export default function RouteResults() {
 
 
 
+
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -307,7 +309,7 @@ export default function RouteResults() {
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
-                    All Places ({pois.length})
+                    All Places ({pois?.length || 0})
                   </button>
                   <button 
                     onClick={() => setSelectedCategory('restaurant')}
