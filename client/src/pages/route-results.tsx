@@ -120,51 +120,53 @@ export default function RouteResults() {
           </div>
           
           <div className="relative" style={{ height: '500px' }}>
-            {mapsApiLoading ? (
-              <div className="flex items-center justify-center h-full bg-gray-50">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-slate-600">Loading map...</p>
-                </div>
-              </div>
-            ) : mapsApiData?.apiKey ? (
-              <div className="w-full h-full">
-                <iframe
-                  src={googleMapsEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Route Map"
-                  className="w-full h-full rounded-lg"
-                  onError={() => console.log('Map iframe failed to load')}
-                  onLoad={() => console.log('Map iframe loaded successfully')}
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-full bg-gray-50 border-2 border-dashed border-gray-300">
-                <div className="text-center max-w-md px-6">
-                  <div className="mb-6">
-                    <i className="fas fa-map-marked-alt text-6xl text-blue-500 mb-4" />
+            <div className="w-full h-full bg-gradient-to-br from-blue-50 to-slate-100 rounded-lg border-2 border-dashed border-blue-200 flex items-center justify-center">
+              <div className="text-center max-w-lg px-8">
+                <div className="mb-8">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <i className="fas fa-route text-white text-3xl" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <i className="fas fa-check text-white text-sm" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 mb-3">
-                    Map Configuration Required
-                  </h3>
-                  <p className="text-slate-600 mb-6">
-                    Embedded maps need API configuration. Click below for full directions.
-                  </p>
-                  <Button
-                    onClick={() => window.open(googleMapsDirectUrl, '_blank')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-                  >
-                    <i className="fas fa-external-link-alt mr-3" />
-                    Open Route in Google Maps
-                  </Button>
                 </div>
+                
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">
+                  Route from {routeData.startCity} to {routeData.endCity}
+                </h3>
+                
+                <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-slate-200">
+                  <div className="flex items-center justify-between text-sm text-slate-600 mb-3">
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 text-green-600 mr-2" />
+                      <span className="font-medium">{routeData.startCity}</span>
+                    </div>
+                    <div className="flex-1 border-t border-dashed border-slate-300 mx-4"></div>
+                    <div className="flex items-center">
+                      <Flag className="h-4 w-4 text-red-600 mr-2" />
+                      <span className="font-medium">{routeData.endCity}</span>
+                    </div>
+                  </div>
+                  <p className="text-slate-600 text-sm">
+                    Click below to view turn-by-turn directions and real-time traffic updates
+                  </p>
+                </div>
+                
+                <Button
+                  onClick={() => window.open(googleMapsDirectUrl, '_blank')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
+                >
+                  <i className="fas fa-external-link-alt mr-3" />
+                  Open Interactive Route in Google Maps
+                </Button>
+                
+                <p className="text-slate-500 text-sm mt-4">
+                  Get live traffic updates, alternate routes, and step-by-step navigation
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
 

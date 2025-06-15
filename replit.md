@@ -105,13 +105,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 15, 2025: Complete route results page with embedded maps
-  - Added dedicated route results page with embedded Google Maps
-  - Implemented route-specific place discovery using Google Places API
-  - Enhanced POI cards with address, open/closed status, and price levels
-  - Added graceful fallback when geocoding API is not authorized
-  - System dynamically fetches places along user's chosen route
-  - Embedded maps working with proper API key integration
+- June 15, 2025: Route results page with Google API integration
+  - Added dedicated route results page with route visualization
+  - Implemented Google Places API integration for authentic place data
+  - Enhanced POI cards with real addresses, ratings, photos, and business hours
+  - Added graceful fallback handling for API permission limitations
+  - System fetches 60+ authentic places from Google Places API
+  - Identified and addressed Maps Embed API permission requirements
   - Comprehensive "Things to Do" section with category filters and statistics
 
 ## Changelog
