@@ -103,7 +103,16 @@ RouteWise is a full-stack web application designed to help users plan memorable 
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- June 15, 2025: Google Places API integration completed
+  - Integrated real Google Places data instead of sample data
+  - Added Google Places service for fetching restaurants, parks, and attractions
+  - Enhanced POI cards with address, open/closed status, and price levels
+  - Successfully fetching authentic places along a sample SF to LA route
+  - System now stores 60+ real places from Google Places API
+
 ## Changelog
 
-Changelog:
-- June 15, 2025. Initial setup
+- June 15, 2025. Initial setup with sample data
+- June 15, 2025. Google Places API integration with real place data
