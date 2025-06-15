@@ -17,6 +17,10 @@ export const pois = pgTable("pois", {
   reviewCount: integer("review_count").notNull(),
   timeFromStart: text("time_from_start").notNull(), // e.g., "2.5 hours in"
   imageUrl: text("image_url").notNull(),
+  placeId: text("place_id"),
+  address: text("address"),
+  priceLevel: integer("price_level"),
+  isOpen: boolean("is_open"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

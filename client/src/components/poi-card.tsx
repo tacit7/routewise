@@ -1,4 +1,4 @@
-import { Star, ArrowRight } from "lucide-react";
+import { Star, ArrowRight, MapPin, Clock } from "lucide-react";
 import type { Poi } from "@shared/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 
@@ -27,7 +27,28 @@ export default function PoiCard({ poi }: PoiCardProps) {
         </div>
         
         <h4 className="text-xl font-semibold text-slate-800 mb-2">{poi.name}</h4>
-        <p className="text-slate-600 mb-4">{poi.description}</p>
+        <p className="text-slate-600 mb-3">{poi.description}</p>
+        
+        {poi.address && (
+          <div className="flex items-center text-slate-500 text-sm mb-2">
+            <MapPin className="h-3 w-3 mr-1" />
+            <span className="truncate">{poi.address}</span>
+          </div>
+        )}
+        
+        {poi.isOpen !== null && (
+          <div className="flex items-center text-sm mb-3">
+            <Clock className="h-3 w-3 mr-1" />
+            <span className={poi.isOpen ? "text-green-600" : "text-red-600"}>
+              {poi.isOpen ? "Open now" : "Closed"}
+            </span>
+            {poi.priceLevel && (
+              <span className="ml-2 text-slate-500">
+                {"$".repeat(poi.priceLevel)}
+              </span>
+            )}
+          </div>
+        )}
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
