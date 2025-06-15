@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
 import PoiCard from "@/components/poi-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 interface RouteData {
   startCity: string;
@@ -16,6 +17,7 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { toast } = useToast();
 
   // Fetch Google Maps API key
   const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{ apiKey: string }>({
@@ -192,6 +194,30 @@ export default function RouteResults() {
           >
             <i className="fas fa-route mr-2" />
             Open in Google Maps
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => {
+              const savedPlaces = JSON.parse(localStorage.getItem('myPlaces') || '[]');
+              if (savedPlaces.length === 0) {
+                toast({
+                  title: "No saved places",
+                  description: "Add some places to your collection first!",
+                });
+              } else {
+                toast({
+                  title: "My Places",
+                  description: `You have ${savedPlaces.length} saved places`,
+                });
+                // Could navigate to a dedicated "My Places" page in the future
+                console.log('Saved places:', savedPlaces);
+              }
+            }}
+            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+          >
+            <i className="fas fa-heart mr-2" />
+            My Places ({JSON.parse(localStorage.getItem('myPlaces') || '[]').length})
           </Button>
           
           <Button

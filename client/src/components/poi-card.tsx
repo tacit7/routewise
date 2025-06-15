@@ -1,6 +1,8 @@
-import { Star, ArrowRight, MapPin, Clock } from "lucide-react";
+import { Star, ArrowRight, MapPin, Clock, Heart, Plus } from "lucide-react";
 import type { Poi } from "@shared/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PoiCardProps {
   poi: Poi;
@@ -9,6 +11,31 @@ interface PoiCardProps {
 export default function PoiCard({ poi }: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
+  const [isAdded, setIsAdded] = useState(false);
+  const { toast } = useToast();
+
+  const handleAddPlace = () => {
+    // Save to localStorage for persistence
+    const savedPlaces = JSON.parse(localStorage.getItem('myPlaces') || '[]');
+    const isAlreadySaved = savedPlaces.some((p: Poi) => p.id === poi.id);
+    
+    if (isAlreadySaved) {
+      toast({
+        title: "Already saved",
+        description: `${poi.name} is already in your places.`,
+      });
+      return;
+    }
+
+    savedPlaces.push(poi);
+    localStorage.setItem('myPlaces', JSON.stringify(savedPlaces));
+    setIsAdded(true);
+    
+    toast({
+      title: "Place added!",
+      description: `${poi.name} has been added to your places.`,
+    });
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
@@ -50,7 +77,7 @@ export default function PoiCard({ poi }: PoiCardProps) {
           </div>
         )}
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-1">
             <Star className="h-4 w-4 text-accent fill-current" />
             <span className="font-medium">{poi.rating}</span>
@@ -60,6 +87,29 @@ export default function PoiCard({ poi }: PoiCardProps) {
             View Details <ArrowRight className="h-4 w-4 ml-1" />
           </button>
         </div>
+
+        {/* Add to Places Button */}
+        <button
+          onClick={handleAddPlace}
+          disabled={isAdded}
+          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+            isAdded
+              ? 'bg-green-100 text-green-700 border border-green-200'
+              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+          }`}
+        >
+          {isAdded ? (
+            <>
+              <Heart className="h-4 w-4 mr-2 fill-current" />
+              Added to My Places
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4 mr-2" />
+              Add to My Places
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
