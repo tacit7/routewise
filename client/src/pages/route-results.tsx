@@ -87,6 +87,23 @@ export default function RouteResults() {
     ? `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&waypoints=${encodeURIComponent(waypoints)}&mode=driving`
     : `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
+  // Extract cities and apply filters
+  const uniqueCities = pois ? Array.from(new Set(pois.map(poi => {
+    if (poi.address) {
+      const parts = poi.address.split(',');
+      return parts.length >= 2 ? parts[parts.length - 2].trim() : '';
+    }
+    return '';
+  }).filter(city => city.length > 0))).slice(0, 6) : [];
+
+  const filteredPois = pois ? pois.filter(poi => {
+    const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
+    const cityMatch = selectedCity === 'all' || (poi.address?.toLowerCase().includes(selectedCity.toLowerCase()) || false);
+    return categoryMatch && cityMatch;
+  }) : [];
+
+
+
 
 
 
@@ -414,7 +431,7 @@ export default function RouteResults() {
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
-                    All Places ({pois?.length || 0})
+                    All Places ({pois.length})
                   </button>
                   <button 
                     onClick={() => setSelectedCategory('restaurant')}
