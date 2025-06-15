@@ -105,14 +105,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 15, 2025: Route results page with Google API integration
-  - Added dedicated route results page with route visualization
-  - Implemented Google Places API integration for authentic place data
-  - Enhanced POI cards with real addresses, ratings, photos, and business hours
-  - Added graceful fallback handling for API permission limitations
-  - System fetches 60+ authentic places from Google Places API
-  - Identified and addressed Maps Embed API permission requirements
-  - Comprehensive "Things to Do" section with category filters and statistics
+- June 15, 2025: Complete route-specific place discovery system
+  - Implemented intelligent route-specific place discovery using known city coordinates
+  - System now finds authentic places along actual route paths (90+ real locations per route)
+  - Added comprehensive US city coordinate database for major travel destinations
+  - Enhanced route results page with improved navigation options
+  - Real places fetched along route points: Austin→Dallas, San Antonio→Houston working perfectly
+  - Graceful fallback system for unknown cities to general authentic places
+  - Complete Google Places API integration with real business data, photos, and ratings
 
 ## Changelog
 
