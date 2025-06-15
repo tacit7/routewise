@@ -16,9 +16,22 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
 
-  // Fetch POIs for things to do along the route
+  // Fetch POIs for things to do along the specific route
   const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({
-    queryKey: ["/api/pois"],
+    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity],
+    queryFn: async () => {
+      if (!routeData) return [];
+      const params = new URLSearchParams({
+        start: routeData.startCity,
+        end: routeData.endCity
+      });
+      const response = await fetch(`/api/pois?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch places along route');
+      }
+      return response.json();
+    },
+    enabled: !!routeData, // Only run query when we have route data
   });
 
   useEffect(() => {

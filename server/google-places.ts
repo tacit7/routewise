@@ -28,9 +28,39 @@ interface GooglePlacesResponse {
 export class GooglePlacesService {
   private apiKey: string;
   private baseUrl = 'https://maps.googleapis.com/maps/api/place';
+  private geocodingUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+  }
+
+  async geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
+    try {
+      const response = await fetch(`${this.geocodingUrl}?address=${encodeURIComponent(cityName)}&key=${this.apiKey}`);
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return { lat: location.lat, lng: location.lng };
+      }
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
+  }
+
+  generateRoutePoints(start: { lat: number; lng: number }, end: { lat: number; lng: number }, numPoints: number = 5): Array<{ lat: number; lng: number }> {
+    const points = [];
+    
+    for (let i = 0; i <= numPoints; i++) {
+      const ratio = i / numPoints;
+      const lat = start.lat + (end.lat - start.lat) * ratio;
+      const lng = start.lng + (end.lng - start.lng) * ratio;
+      points.push({ lat, lng });
+    }
+    
+    return points;
   }
 
   async searchNearbyPlaces(
