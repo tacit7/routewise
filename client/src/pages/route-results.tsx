@@ -76,9 +76,15 @@ export default function RouteResults() {
     );
   }
 
-  // Generate URLs for both embedded map and direct link
-  const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
+  // Generate URLs for both embedded map and direct link with checkpoints
+  const waypoints = checkpoints.length > 0 ? checkpoints.join('|') : '';
+  const googleMapsDirectUrl = checkpoints.length > 0 
+    ? `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${checkpoints.map(c => encodeURIComponent(c)).join('/')}/${encodeURIComponent(routeData.endCity)}`
+    : `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
+  
+  const googleMapsEmbedUrl = checkpoints.length > 0
+    ? `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&waypoints=${encodeURIComponent(waypoints)}&mode=driving`
+    : `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
 
 
@@ -226,13 +232,14 @@ export default function RouteResults() {
           <div className="relative rounded-lg overflow-hidden border border-slate-200" style={{ height: '500px' }}>
             {mapsApiData?.apiKey ? (
               <iframe
+                key={`map-${checkpoints.length}`}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 loading="lazy"
                 allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps/embed/v1/directions?key=${mapsApiData.apiKey}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`}
+                src={googleMapsEmbedUrl}
               />
             ) : (
               <div className="w-full h-full bg-slate-100 flex items-center justify-center">
