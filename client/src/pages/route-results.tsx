@@ -17,6 +17,9 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [checkpoints, setCheckpoints] = useState<string[]>([]);
+  const [showCheckpointForm, setShowCheckpointForm] = useState<boolean>(false);
+  const [newCheckpoint, setNewCheckpoint] = useState<string>('');
   const { toast } = useToast();
 
   // Fetch Google Maps API key
@@ -104,16 +107,110 @@ export default function RouteResults() {
       {/* Route Info */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
-          <div className="flex items-center justify-center space-x-4 text-lg">
-            <div className="flex items-center text-secondary">
-              <MapPin className="h-5 w-5 mr-2" />
-              <span className="font-medium">{routeData.startCity}</span>
+          <div className="text-center mb-4">
+            <h2 className="text-xl font-semibold text-slate-800 mb-2">Main Route</h2>
+            <div className="flex items-center justify-center space-x-4 text-lg">
+              <div className="flex items-center text-secondary">
+                <MapPin className="h-5 w-5 mr-2" />
+                <span className="font-medium">{routeData.startCity}</span>
+              </div>
+              <div className="text-slate-400">→</div>
+              <div className="flex items-center text-accent">
+                <Flag className="h-5 w-5 mr-2" />
+                <span className="font-medium">{routeData.endCity}</span>
+              </div>
             </div>
-            <div className="text-slate-400">→</div>
-            <div className="flex items-center text-accent">
-              <Flag className="h-5 w-5 mr-2" />
-              <span className="font-medium">{routeData.endCity}</span>
+          </div>
+          
+          {/* Checkpoints Section */}
+          <div className="border-t border-slate-200 pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-slate-700">Main Checkpoints</h3>
+              <Button
+                onClick={() => setShowCheckpointForm(!showCheckpointForm)}
+                variant="outline"
+                size="sm"
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                <i className="fas fa-plus mr-2" />
+                Add Checkpoint
+              </Button>
             </div>
+            
+            {showCheckpointForm && (
+              <div className="mb-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCheckpoint}
+                    onChange={(e) => setNewCheckpoint(e.target.value)}
+                    placeholder="Enter checkpoint city (e.g., Houston, Dallas)"
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        if (newCheckpoint.trim()) {
+                          setCheckpoints([...checkpoints, newCheckpoint.trim()]);
+                          setNewCheckpoint('');
+                          setShowCheckpointForm(false);
+                          toast({
+                            title: "Checkpoint added",
+                            description: `${newCheckpoint.trim()} added to your route`,
+                          });
+                        }
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={() => {
+                      if (newCheckpoint.trim()) {
+                        setCheckpoints([...checkpoints, newCheckpoint.trim()]);
+                        setNewCheckpoint('');
+                        setShowCheckpointForm(false);
+                        toast({
+                          title: "Checkpoint added",
+                          description: `${newCheckpoint.trim()} added to your route`,
+                        });
+                      }
+                    }}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {checkpoints.length > 0 && (
+              <div className="space-y-2">
+                {checkpoints.map((checkpoint, index) => (
+                  <div key={index} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-md">
+                    <div className="flex items-center">
+                      <i className="fas fa-map-marker-alt text-blue-600 mr-2" />
+                      <span className="text-sm font-medium text-slate-800">{checkpoint}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setCheckpoints(checkpoints.filter((_, i) => i !== index));
+                        toast({
+                          title: "Checkpoint removed",
+                          description: `${checkpoint} removed from your route`,
+                        });
+                      }}
+                      className="text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <i className="fas fa-times text-sm" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {checkpoints.length === 0 && (
+              <p className="text-sm text-slate-500 text-center py-2">
+                No checkpoints added. Add important stops along your route.
+              </p>
+            )}
           </div>
         </div>
 
