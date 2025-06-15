@@ -154,13 +154,26 @@ export default function RouteResults() {
                   </p>
                 </div>
                 
-                <Button
-                  onClick={() => window.open(googleMapsDirectUrl, '_blank')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
-                >
-                  <i className="fas fa-external-link-alt mr-3" />
-                  Open Interactive Route in Google Maps
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => window.open(googleMapsDirectUrl, '_blank')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg w-full"
+                  >
+                    <i className="fas fa-route mr-3" />
+                    Get Turn-by-Turn Directions
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const searchUrl = `https://www.google.com/search?q=driving+directions+from+${encodeURIComponent(routeData.startCity)}+to+${encodeURIComponent(routeData.endCity)}`;
+                      window.open(searchUrl, '_blank');
+                    }}
+                    variant="outline"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50 px-6 py-2 w-full"
+                  >
+                    <i className="fas fa-search mr-2" />
+                    Search Route Options
+                  </Button>
+                </div>
                 
                 <p className="text-slate-500 text-sm mt-4">
                   Get live traffic updates, alternate routes, and step-by-step navigation
