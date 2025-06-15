@@ -17,7 +17,7 @@ export default function RouteResults() {
   const [routeData, setRouteData] = useState<RouteData | null>(null);
 
   // Fetch Google Maps API key
-  const { data: mapsApiData } = useQuery<{ apiKey: string }>({
+  const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{ apiKey: string }>({
     queryKey: ["/api/maps-key"],
   });
 
@@ -120,29 +120,40 @@ export default function RouteResults() {
           </div>
           
           <div className="relative" style={{ height: '500px' }}>
-            {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
-              <iframe
-                src={googleMapsEmbedUrl}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Route Map"
-                className="w-full h-full"
-              />
-            ) : (
+            {mapsApiLoading ? (
               <div className="flex items-center justify-center h-full bg-gray-50">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-slate-600">Loading map...</p>
+                </div>
+              </div>
+            ) : mapsApiData?.apiKey ? (
+              <div className="w-full h-full">
+                <iframe
+                  src={googleMapsEmbedUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Route Map"
+                  className="w-full h-full rounded-lg"
+                  onError={() => console.log('Map iframe failed to load')}
+                  onLoad={() => console.log('Map iframe loaded successfully')}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gray-50 border-2 border-dashed border-gray-300">
                 <div className="text-center max-w-md px-6">
                   <div className="mb-6">
                     <i className="fas fa-map-marked-alt text-6xl text-blue-500 mb-4" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-800 mb-3">
-                    View Full Route in Google Maps
+                    Map Configuration Required
                   </h3>
                   <p className="text-slate-600 mb-6">
-                    Get detailed turn-by-turn directions, real-time traffic updates, and explore your route interactively.
+                    Embedded maps need API configuration. Click below for full directions.
                   </p>
                   <Button
                     onClick={() => window.open(googleMapsDirectUrl, '_blank')}
