@@ -123,15 +123,24 @@ export default function RouteResults() {
           </div>
           
           <div className="relative rounded-lg overflow-hidden border border-slate-200" style={{ height: '500px' }}>
-            <iframe
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-              src={`https://www.google.com/maps/embed/v1/directions?key=${mapsApiKey}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`}
-            />
+            {mapsApiData?.apiKey ? (
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/directions?key=${mapsApiData.apiKey}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`}
+              />
+            ) : (
+              <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-slate-600">Loading map...</p>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Route Summary Card */}
