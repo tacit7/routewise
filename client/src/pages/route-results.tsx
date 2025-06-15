@@ -15,6 +15,7 @@ interface RouteData {
 export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Fetch Google Maps API key
   const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{ apiKey: string }>({
@@ -248,29 +249,70 @@ export default function RouteResults() {
               <>
                 {/* Category Filters */}
                 <div className="flex flex-wrap gap-2 mb-8">
-                  <button className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                  <button 
+                    onClick={() => setSelectedCategory('all')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === 'all' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
                     All Places ({pois.length})
                   </button>
-                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                  <button 
+                    onClick={() => setSelectedCategory('restaurant')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === 'restaurant' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
                     Restaurants ({pois.filter(p => p.category === 'restaurant').length})
                   </button>
-                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                  <button 
+                    onClick={() => setSelectedCategory('attraction')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === 'attraction' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
                     Attractions ({pois.filter(p => p.category === 'attraction').length})
                   </button>
-                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                  <button 
+                    onClick={() => setSelectedCategory('park')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === 'park' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
                     Parks ({pois.filter(p => p.category === 'park').length})
                   </button>
-                  <button className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200">
+                  <button 
+                    onClick={() => setSelectedCategory('historic')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === 'historic' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
                     Historic ({pois.filter(p => p.category === 'historic').length})
                   </button>
                 </div>
 
                 {/* Places Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pois.map((poi) => (
+                  {(selectedCategory === 'all' ? pois : pois.filter(poi => poi.category === selectedCategory)).map((poi) => (
                     <PoiCard key={poi.id} poi={poi} />
                   ))}
                 </div>
+                
+                {selectedCategory !== 'all' && pois.filter(poi => poi.category === selectedCategory).length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-slate-600">No places found in this category. Try selecting a different filter.</p>
+                  </div>
+                )}
 
                 {/* Summary Stats */}
                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
