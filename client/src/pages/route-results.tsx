@@ -17,7 +17,6 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedCity, setSelectedCity] = useState<string>('all');
   const { toast } = useToast();
 
   // Fetch Google Maps API key
@@ -78,36 +77,7 @@ export default function RouteResults() {
   const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
   const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
-  // Extract unique cities from POIs for city filtering
-  const uniqueCities: string[] = [];
-  if (pois) {
-    const citySet = new Set<string>();
-    pois.forEach(poi => {
-      const address = poi.address || '';
-      const parts = address.split(',');
-      if (parts.length >= 2) {
-        const city = parts[parts.length - 2].trim();
-        if (city && city !== 'Unknown') {
-          citySet.add(city);
-        }
-      }
-    });
-    citySet.forEach(city => uniqueCities.push(city));
-  }
 
-  // Apply both category and city filters
-  const filteredPois = pois ? pois.filter(poi => {
-    const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
-    
-    if (selectedCity === 'all') {
-      return categoryMatch;
-    }
-    
-    const poiAddress = poi.address || '';
-    const cityMatch = poiAddress.toLowerCase().includes(selectedCity.toLowerCase());
-    
-    return categoryMatch && cityMatch;
-  }) : [];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -327,47 +297,8 @@ export default function RouteResults() {
 
             {pois && pois.length > 0 && (
               <>
-                {/* City Filters */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by City:</h3>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <button 
-                      onClick={() => setSelectedCity('all')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCity === 'all' 
-                          ? 'bg-green-600 text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      All Cities ({pois.length})
-                    </button>
-                    {uniqueCities.slice(0, 6).map((city) => {
-                      const cityCount = pois.filter(poi => {
-                        const poiAddress = poi.address || '';
-                        return poiAddress.toLowerCase().includes(city.toLowerCase());
-                      }).length;
-                      
-                      return (
-                        <button 
-                          key={city}
-                          onClick={() => setSelectedCity(city)}
-                          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                            selectedCity === city 
-                              ? 'bg-green-600 text-white' 
-                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                          }`}
-                        >
-                          {city} ({cityCount})
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
                 {/* Category Filters */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by Category:</h3>
-                  <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 justify-center mb-8">
                   <button 
                     onClick={() => setSelectedCategory('all')}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -422,14 +353,14 @@ export default function RouteResults() {
 
                 {/* Places Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredPois.map((poi) => (
+                  {(selectedCategory === 'all' ? pois : pois.filter(poi => poi.category === selectedCategory)).map((poi) => (
                     <PoiCard key={poi.id} poi={poi} />
                   ))}
                 </div>
                 
-                {filteredPois.length === 0 && (
+                {selectedCategory !== 'all' && pois.filter(poi => poi.category === selectedCategory).length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-slate-600">No places found with the selected filters. Try adjusting your city or category selection.</p>
+                    <p className="text-slate-600">No places found in this category. Try selecting a different filter.</p>
                   </div>
                 )}
 
