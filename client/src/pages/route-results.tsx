@@ -48,37 +48,37 @@ export default function RouteResults() {
 
   useEffect(() => {
     // Get route data from URL parameters or localStorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const start = urlParams.get('start');
-    const end = urlParams.get('end');
+    const searchParams = new URLSearchParams(window.location.search);
+    const start = searchParams.get('start');
+    const end = searchParams.get('end');
     
     if (start && end) {
       setRouteData({ startCity: start, endCity: end });
     } else {
-      // Fallback to localStorage if no URL params
-      const savedRoute = localStorage.getItem('currentRoute');
-      if (savedRoute) {
-        setRouteData(JSON.parse(savedRoute));
+      // Try to get from localStorage as fallback
+      const savedData = localStorage.getItem('routeData');
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          setRouteData(parsed);
+        } catch {
+          // If parsing fails, redirect to home
+          setLocation('/');
+        }
       } else {
-        // No route data found, redirect to home
         setLocation('/');
       }
     }
   }, [setLocation]);
 
+  // Don't render anything until we have route data
   if (!routeData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading your route...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  // Generate URLs for both embedded map and direct link with checkpoints
-  const waypoints = checkpoints.length > 0 ? checkpoints.join('|') : '';
+  // Prepare waypoints for Google Maps embed
+  const waypoints = checkpoints.join('|');
+  
   const googleMapsDirectUrl = checkpoints.length > 0 
     ? `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${checkpoints.map(c => encodeURIComponent(c)).join('/')}/${encodeURIComponent(routeData.endCity)}`
     : `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
@@ -102,11 +102,58 @@ export default function RouteResults() {
     return categoryMatch && cityMatch;
   }) : [];
 
+  const handleSaveRoute = async () => {
+    if (!routeData || !pois) return;
+    
+    try {
+      const response = await fetch('/api/routes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startCity: routeData.startCity,
+          endCity: routeData.endCity,
+          poisIds: pois.map(poi => poi.id),
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to save route');
+      }
 
+      toast({
+        title: "Route Saved!",
+        description: `Your route from ${routeData.startCity} to ${routeData.endCity} has been saved with ${pois.length} places.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save route. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
+  const addCheckpoint = () => {
+    if (newCheckpoint.trim() && !checkpoints.includes(newCheckpoint.trim())) {
+      setCheckpoints([...checkpoints, newCheckpoint.trim()]);
+      setNewCheckpoint('');
+      setShowCheckpointForm(false);
+      toast({
+        title: "Checkpoint Added",
+        description: `Added ${newCheckpoint.trim()} to your route`,
+      });
+    }
+  };
 
-
+  const removeCheckpoint = (checkpoint: string) => {
+    setCheckpoints(checkpoints.filter(c => c !== checkpoint));
+    toast({
+      title: "Checkpoint Removed",
+      description: `Removed ${checkpoint} from your route`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -122,286 +169,144 @@ export default function RouteResults() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
-            <h1 className="text-xl font-semibold text-slate-800">Your Route</h1>
-            <div></div>
+            
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={handleSaveRoute}
+                disabled={!pois || pois.length === 0}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Save Route
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Route Info */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
-          <div className="text-center mb-4">
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Main Route</h2>
-            <div className="flex items-center justify-center space-x-4 text-lg">
-              <div className="flex items-center text-secondary">
-                <MapPin className="h-5 w-5 mr-2" />
-                <span className="font-medium">{routeData.startCity}</span>
-              </div>
-              <div className="text-slate-400">→</div>
-              <div className="flex items-center text-accent">
-                <Flag className="h-5 w-5 mr-2" />
-                <span className="font-medium">{routeData.endCity}</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Route Info Card */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold mb-2">Main Route</h1>
+                  <div className="flex items-center text-blue-100">
+                    <MapPin className="h-5 w-5 mr-2" />
+                    <span className="text-lg">{routeData.startCity}</span>
+                    <ArrowLeft className="h-5 w-5 mx-3 rotate-180" />
+                    <Flag className="h-5 w-5 mr-2" />
+                    <span className="text-lg">{routeData.endCity}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-blue-100">Total Places Found</div>
+                  <div className="text-3xl font-bold">{pois?.length || 0}</div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          {/* Checkpoints Section */}
-          <div className="border-t border-slate-200 pt-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-slate-700">Main Checkpoints</h3>
-              <Button
-                onClick={() => setShowCheckpointForm(!showCheckpointForm)}
-                variant="outline"
-                size="sm"
-                className="text-blue-600 border-blue-300 hover:bg-blue-50"
-              >
-                <i className="fas fa-plus mr-2" />
-                Add Checkpoint
-              </Button>
-            </div>
-            
-            {showCheckpointForm && (
-              <div className="mb-4 p-4 bg-slate-50 rounded-lg">
-                <div className="flex gap-2">
+
+            {/* Checkpoints Section */}
+            <div className="p-6 border-b border-slate-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-800">Checkpoints</h3>
+                <Button
+                  onClick={() => setShowCheckpointForm(!showCheckpointForm)}
+                  variant="outline"
+                  size="sm"
+                >
+                  {showCheckpointForm ? 'Cancel' : 'Add Checkpoint'}
+                </Button>
+              </div>
+
+              {showCheckpointForm && (
+                <div className="mb-4 flex gap-2">
                   <input
                     type="text"
                     value={newCheckpoint}
                     onChange={(e) => setNewCheckpoint(e.target.value)}
-                    placeholder="Enter checkpoint city (e.g., Houston, Dallas)"
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        if (newCheckpoint.trim()) {
-                          setCheckpoints([...checkpoints, newCheckpoint.trim()]);
-                          setNewCheckpoint('');
-                          setShowCheckpointForm(false);
-                          toast({
-                            title: "Checkpoint added",
-                            description: `${newCheckpoint.trim()} added to your route`,
-                          });
-                        }
-                      }
-                    }}
+                    placeholder="Enter city or landmark"
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyPress={(e) => e.key === 'Enter' && addCheckpoint()}
                   />
-                  <Button
-                    onClick={() => {
-                      if (newCheckpoint.trim()) {
-                        setCheckpoints([...checkpoints, newCheckpoint.trim()]);
-                        setNewCheckpoint('');
-                        setShowCheckpointForm(false);
-                        toast({
-                          title: "Checkpoint added",
-                          description: `${newCheckpoint.trim()} added to your route`,
-                        });
-                      }
-                    }}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
+                  <Button onClick={addCheckpoint} size="sm">
                     Add
                   </Button>
                 </div>
-              </div>
-            )}
-            
-            {checkpoints.length > 0 && (
-              <div className="space-y-2">
-                {checkpoints.map((checkpoint, index) => (
-                  <div key={index} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-md">
-                    <div className="flex items-center">
-                      <i className="fas fa-map-marker-alt text-blue-600 mr-2" />
-                      <span className="text-sm font-medium text-slate-800">{checkpoint}</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setCheckpoints(checkpoints.filter((_, i) => i !== index));
-                        toast({
-                          title: "Checkpoint removed",
-                          description: `${checkpoint} removed from your route`,
-                        });
-                      }}
-                      className="text-slate-400 hover:text-red-500 transition-colors"
+              )}
+
+              {checkpoints.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {checkpoints.map((checkpoint, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
                     >
-                      <i className="fas fa-times text-sm" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {checkpoints.length === 0 && (
-              <p className="text-sm text-slate-500 text-center py-2">
-                No checkpoints added. Add important stops along your route.
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Interactive Map Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-800">Interactive Route Map</h2>
-            <p className="text-slate-600 text-sm mt-1">
-              Explore your route with turn-by-turn directions below
-            </p>
-          </div>
-          
-          <div className="relative rounded-lg overflow-hidden border border-slate-200" style={{ height: '500px' }}>
-            {mapsApiData?.apiKey ? (
-              <iframe
-                key={`map-${checkpoints.length}`}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src={googleMapsEmbedUrl}
-              />
-            ) : (
-              <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-slate-600">Loading map...</p>
+                      <span>{checkpoint}</span>
+                      <button
+                        onClick={() => removeCheckpoint(checkpoint)}
+                        className="ml-2 text-blue-600 hover:text-blue-800"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Route Summary Card */}
-          <div className="mt-6 bg-white rounded-lg p-6 shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between text-sm text-slate-600 mb-3">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 text-green-600 mr-2" />
-                <span className="font-medium">{routeData.startCity}</span>
-              </div>
-              <div className="flex-1 border-t border-dashed border-slate-300 mx-4"></div>
-              <div className="flex items-center">
-                <Flag className="h-4 w-4 text-red-600 mr-2" />
-                <span className="font-medium">{routeData.endCity}</span>
-              </div>
+              ) : (
+                <p className="text-slate-500 text-sm">No checkpoints added. Add strategic stops to customize your route.</p>
+              )}
             </div>
-            <p className="text-slate-600 text-sm text-center">
-              Interactive map with turn-by-turn directions • Click and drag to explore your route
-            </p>
+
+            {/* Google Maps Embed */}
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-800">Route Map</h3>
+                <a
+                  href={googleMapsDirectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Open in Google Maps →
+                </a>
+              </div>
+              
+              {mapsApiLoading ? (
+                <Skeleton className="w-full h-96" />
+              ) : mapsApiData?.apiKey ? (
+                <div className="w-full h-96 rounded-lg overflow-hidden border border-slate-200">
+                  <iframe
+                    src={googleMapsEmbedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Route Map"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-96 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <p className="text-slate-600">Unable to load map. Please check your connection.</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            onClick={() => window.open(googleMapsDirectUrl, '_blank')}
-            className="bg-primary hover:bg-blue-700 text-white"
-          >
-            <i className="fas fa-route mr-2" />
-            Open in Google Maps
-          </Button>
-          
-          <Button
-            onClick={() => {
-              if (!routeData || !pois) return;
-              
-              const route = {
-                id: Date.now().toString(),
-                name: `${routeData.startCity} to ${routeData.endCity}`,
-                startCity: routeData.startCity,
-                endCity: routeData.endCity,
-                places: pois,
-                createdAt: new Date().toISOString(),
-                placesCount: pois.length
-              };
-              
-              const savedRoutes = JSON.parse(localStorage.getItem('myRoutes') || '[]');
-              
-              // Check if route already exists
-              const existingRoute = savedRoutes.find((r: any) => 
-                r.startCity.toLowerCase() === routeData.startCity.toLowerCase() && 
-                r.endCity.toLowerCase() === routeData.endCity.toLowerCase()
-              );
-              
-              if (existingRoute) {
-                toast({
-                  title: "Route already saved",
-                  description: `${route.name} is already in your saved routes.`,
-                });
-                return;
-              }
-              
-              savedRoutes.push(route);
-              localStorage.setItem('myRoutes', JSON.stringify(savedRoutes));
-              
-              toast({
-                title: "Route saved!",
-                description: `${route.name} with ${pois.length} places has been saved.`,
-              });
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            <i className="fas fa-bookmark mr-2" />
-            Save This Route
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => {
-              const savedPlaces = JSON.parse(localStorage.getItem('myPlaces') || '[]');
-              const savedRoutes = JSON.parse(localStorage.getItem('myRoutes') || '[]');
-              
-              if (savedPlaces.length === 0 && savedRoutes.length === 0) {
-                toast({
-                  title: "No saved items",
-                  description: "Save some places or routes to your collection first!",
-                });
-              } else {
-                toast({
-                  title: "My Collection",
-                  description: `${savedPlaces.length} places, ${savedRoutes.length} routes saved`,
-                });
-                console.log('Saved places:', savedPlaces);
-                console.log('Saved routes:', savedRoutes);
-              }
-            }}
-            className="border-blue-300 text-blue-700 hover:bg-blue-50"
-          >
-            <i className="fas fa-heart mr-2" />
-            My Collection ({JSON.parse(localStorage.getItem('myPlaces') || '[]').length + JSON.parse(localStorage.getItem('myRoutes') || '[]').length})
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => setLocation('/')}
-            className="border-slate-300 text-slate-700 hover:bg-slate-50"
-          >
-            Plan Another Route
-          </Button>
-        </div>
-
-        {/* Things to Do Section */}
-        <div className="mt-8">
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h2 className="text-2xl font-bold text-slate-800 mb-4">
-              Things to Do Along Your Route
+          {/* POIs Display */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+            <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
+              Amazing Places Along Your Route
             </h2>
-            <p className="text-slate-600 mb-8">
-              Discover amazing stops, restaurants, and attractions along your journey. All places are sourced from real Google Places data.
-            </p>
 
             {poisLoading && (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
-                    <Skeleton className="w-full h-48" />
-                    <div className="p-6 space-y-3">
-                      <Skeleton className="h-4 w-20" />
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-2/3" />
-                      <div className="flex justify-between">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-4 w-20" />
-                      </div>
-                    </div>
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
                   </div>
                 ))}
               </div>
@@ -409,107 +314,163 @@ export default function RouteResults() {
 
             {!poisLoading && (!pois || pois.length === 0) && (
               <div className="text-center py-12">
-                <div className="mb-4">
-                  <i className="fas fa-map-marker-alt text-gray-400 text-4xl" />
-                </div>
-                <h3 className="text-lg font-medium text-slate-800 mb-2">No Places Found</h3>
-                <p className="text-slate-600">
-                  Unable to load places data. Please check if the Google Places API is properly configured.
+                <div className="text-6xl mb-4">🗺️</div>
+                <h3 className="text-xl font-semibold text-slate-700 mb-2">No Places Found</h3>
+                <p className="text-slate-600 max-w-md mx-auto">
+                  We couldn't find any places along this route. Try a different route or check back later as we add more locations.
                 </p>
               </div>
             )}
 
             {pois && pois.length > 0 && (
               <>
+                {/* City Filters */}
+                {uniqueCities.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by City:</h3>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      <button 
+                        onClick={() => setSelectedCity('all')}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                          selectedCity === 'all' 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        All Cities ({pois.length})
+                      </button>
+                      {uniqueCities.map((city) => {
+                        const cityCount = pois.filter(poi => poi.address?.toLowerCase().includes(city.toLowerCase())).length;
+                        return (
+                          <button 
+                            key={city}
+                            onClick={() => setSelectedCity(city)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                              selectedCity === city 
+                                ? 'bg-green-600 text-white' 
+                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            }`}
+                          >
+                            {city} ({cityCount})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Category Filters */}
-                <div className="flex flex-wrap gap-2 justify-center mb-8">
-                  <button 
-                    onClick={() => setSelectedCategory('all')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === 'all' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    All Places ({pois.length})
-                  </button>
-                  <button 
-                    onClick={() => setSelectedCategory('restaurant')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === 'restaurant' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Restaurants ({pois.filter(p => p.category === 'restaurant').length})
-                  </button>
-                  <button 
-                    onClick={() => setSelectedCategory('attraction')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === 'attraction' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Attractions ({pois.filter(p => p.category === 'attraction').length})
-                  </button>
-                  <button 
-                    onClick={() => setSelectedCategory('park')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === 'park' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Parks ({pois.filter(p => p.category === 'park').length})
-                  </button>
-                  <button 
-                    onClick={() => setSelectedCategory('historic')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === 'historic' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Historic ({pois.filter(p => p.category === 'historic').length})
-                  </button>
+                <div className="mb-8">
+                  <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by Category:</h3>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    <button 
+                      onClick={() => setSelectedCategory('all')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'all' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      All Categories ({filteredPois.length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('restaurant')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'restaurant' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Restaurants ({pois.filter(p => p.category === 'restaurant').length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('attraction')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'attraction' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Attractions ({pois.filter(p => p.category === 'attraction').length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('park')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'park' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Parks ({pois.filter(p => p.category === 'park').length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('scenic')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'scenic' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Scenic ({pois.filter(p => p.category === 'scenic').length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('market')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'market' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Markets ({pois.filter(p => p.category === 'market').length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectedCategory('historic')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        selectedCategory === 'historic' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Historic ({pois.filter(p => p.category === 'historic').length})
+                    </button>
+                  </div>
                 </div>
 
                 {/* Places Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {(selectedCategory === 'all' ? pois : pois.filter(poi => poi.category === selectedCategory)).map((poi) => (
+                  {filteredPois.map((poi) => (
                     <PoiCard key={poi.id} poi={poi} />
                   ))}
                 </div>
                 
-                {selectedCategory !== 'all' && pois.filter(poi => poi.category === selectedCategory).length === 0 && (
+                {filteredPois.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-slate-600">No places found in this category. Try selecting a different filter.</p>
+                    <p className="text-slate-600">No places found with the selected filters. Try adjusting your city or category selection.</p>
                   </div>
                 )}
 
                 {/* Summary Stats */}
                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-blue-700">
                       {pois.filter(p => p.category === 'restaurant').length}
                     </div>
                     <div className="text-sm text-blue-700 font-medium">Restaurants</div>
                   </div>
                   <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {pois.filter(p => p.category === 'park').length}
-                    </div>
-                    <div className="text-sm text-green-700 font-medium">Parks</div>
-                  </div>
-                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600">
+                    <div className="text-2xl font-bold text-green-700">
                       {pois.filter(p => p.category === 'attraction').length}
                     </div>
-                    <div className="text-sm text-purple-700 font-medium">Attractions</div>
+                    <div className="text-sm text-green-700 font-medium">Attractions</div>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-purple-700">
+                      {pois.filter(p => p.category === 'park').length}
+                    </div>
+                    <div className="text-sm text-purple-700 font-medium">Parks & Nature</div>
                   </div>
                   <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-amber-600">
+                    <div className="text-2xl font-bold text-amber-700">
                       {pois.filter(p => parseFloat(p.rating) >= 4.5).length}
                     </div>
                     <div className="text-sm text-amber-700 font-medium">Highly Rated</div>
