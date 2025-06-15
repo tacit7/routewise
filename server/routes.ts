@@ -5,12 +5,18 @@ import { GooglePlacesService, SAMPLE_ROUTE_COORDINATES } from "./google-places";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const googleApiKey = process.env.GOOGLE_PLACES_API_KEY;
+  const googlePlacesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
   let placesService: GooglePlacesService | null = null;
 
-  if (googleApiKey) {
-    placesService = new GooglePlacesService(googleApiKey);
+  if (googlePlacesApiKey) {
+    placesService = new GooglePlacesService(googlePlacesApiKey);
   }
+
+  // Serve Google Maps API key to frontend
+  app.get("/api/maps-key", (req, res) => {
+    res.json({ apiKey: googleMapsApiKey || '' });
+  });
 
   // Get POIs for a specific route
   app.get("/api/pois", async (req, res) => {
@@ -35,14 +41,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Fetching places along route: ${startCity} → ${endCity}`);
       
-      // Get coordinates for start and end cities
+      // Try to get coordinates for start and end cities
       const startCoords = await placesService.geocodeCity(startCity);
       const endCoords = await placesService.geocodeCity(endCity);
       
       if (!startCoords || !endCoords) {
-        return res.status(400).json({ 
-          message: "Could not find coordinates for one or both cities" 
-        });
+        console.log("Geocoding failed, falling back to general places");
+        // Fallback to general places if geocoding fails
+        return await getGeneralPois(placesService, res);
       }
 
       // Generate points along the route

@@ -16,6 +16,11 @@ export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
 
+  // Fetch Google Maps API key
+  const { data: mapsApiData } = useQuery<{ apiKey: string }>({
+    queryKey: ["/api/maps-key"],
+  });
+
   // Fetch POIs for things to do along the specific route
   const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({
     queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity],
@@ -65,8 +70,9 @@ export default function RouteResults() {
     );
   }
 
-  // For now, create a fallback that opens Google Maps in a new tab since we need Maps API key
+  // Generate URLs for both embedded map and direct link
   const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -109,29 +115,45 @@ export default function RouteResults() {
           <div className="p-6 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-800">Interactive Route Map</h2>
             <p className="text-slate-600 text-sm mt-1">
-              Click below to view your full route with turn-by-turn directions in Google Maps
+              Explore your route with turn-by-turn directions below
             </p>
           </div>
           
-          <div className="p-8 text-center" style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="max-w-md">
-              <div className="mb-6">
-                <i className="fas fa-map-marked-alt text-6xl text-blue-500 mb-4" />
+          <div className="relative" style={{ height: '500px' }}>
+            {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
+              <iframe
+                src={googleMapsEmbedUrl}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Route Map"
+                className="w-full h-full"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gray-50">
+                <div className="text-center max-w-md px-6">
+                  <div className="mb-6">
+                    <i className="fas fa-map-marked-alt text-6xl text-blue-500 mb-4" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-3">
+                    View Full Route in Google Maps
+                  </h3>
+                  <p className="text-slate-600 mb-6">
+                    Get detailed turn-by-turn directions, real-time traffic updates, and explore your route interactively.
+                  </p>
+                  <Button
+                    onClick={() => window.open(googleMapsDirectUrl, '_blank')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+                  >
+                    <i className="fas fa-external-link-alt mr-3" />
+                    Open Route in Google Maps
+                  </Button>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-slate-800 mb-3">
-                View Full Route in Google Maps
-              </h3>
-              <p className="text-slate-600 mb-6">
-                Get detailed turn-by-turn directions, real-time traffic updates, and explore your route interactively.
-              </p>
-              <Button
-                onClick={() => window.open(googleMapsDirectUrl, '_blank')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-              >
-                <i className="fas fa-external-link-alt mr-3" />
-                Open Route in Google Maps
-              </Button>
-            </div>
+            )}
           </div>
         </div>
 

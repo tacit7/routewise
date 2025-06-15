@@ -36,12 +36,19 @@ export class GooglePlacesService {
 
   async geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
     try {
-      const response = await fetch(`${this.geocodingUrl}?address=${encodeURIComponent(cityName)}&key=${this.apiKey}`);
+      // Add more specific location formatting for better geocoding results
+      const formattedCity = cityName.includes(',') ? cityName : `${cityName}, USA`;
+      const response = await fetch(`${this.geocodingUrl}?address=${encodeURIComponent(formattedCity)}&key=${this.apiKey}`);
       const data = await response.json();
+      
+      console.log(`Geocoding ${formattedCity}: status = ${data.status}`);
       
       if (data.status === 'OK' && data.results.length > 0) {
         const location = data.results[0].geometry.location;
+        console.log(`Found coordinates: ${location.lat}, ${location.lng}`);
         return { lat: location.lat, lng: location.lng };
+      } else {
+        console.error(`Geocoding failed for ${formattedCity}:`, data.status, data.error_message);
       }
       return null;
     } catch (error) {
