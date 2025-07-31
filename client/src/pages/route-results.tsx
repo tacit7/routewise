@@ -1,10 +1,11 @@
 import { useLocation } from "wouter";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { ArrowLeft, MapPin, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
 import PoiCard from "@/components/poi-card";
+import ItineraryComponent from "@/components/itinerary-component-enhanced";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,56 @@ interface RouteData {
   endCity: string;
 }
 
+// Helper function to extract city from POI data
+const extractCityFromPoi = (poi: Poi): string | null => {
+  // For checkpoint POIs, use timeFromStart
+  if (poi.timeFromStart && poi.timeFromStart.startsWith('In ')) {
+    return poi.timeFromStart.replace('In ', '').toLowerCase().trim();
+  }
+  
+  // For route POIs, try to extract city from address
+  if (poi.address) {
+    // Split address and look for city, state pattern
+    const addressParts = poi.address.split(',').map(part => part.trim());
+    
+    // Look for a part that contains a state abbreviation (2 uppercase letters)
+    const statePattern = /\b[A-Z]{2}\b/;
+    const stateIndex = addressParts.findIndex(part => statePattern.test(part));
+    
+    if (stateIndex > 0) {
+      // City should be the part before the state
+      const cityPart = addressParts[stateIndex - 1];
+      // Remove any numbers or street suffixes to get just the city name
+      const cityMatch = cityPart.match(/([A-Za-z\s]+)/);
+      if (cityMatch) {
+        const city = cityMatch[1].trim().toLowerCase();
+        // Filter out obvious street names
+        if (!city.match(/\b(street|road|avenue|drive|boulevard|lane|way|place|court|circle)\b/i)) {
+          return city;
+        }
+      }
+    }
+    
+    // Fallback: look for common city names in the address
+    const commonCities = [
+      'austin', 'dallas', 'houston', 'san antonio', 'fort worth', 'el paso',
+      'arlington', 'corpus christi', 'plano', 'lubbock', 'irving', 'garland',
+      'amarillo', 'grand prairie', 'brownsville', 'pasadena', 'mesquite',
+      'mckinney', 'carrollton', 'beaumont', 'abilene', 'round rock', 'richardson',
+      'midland', 'lewisville', 'college station', 'pearland', 'denton', 'sugar land'
+    ];
+    
+    const addressLower = poi.address.toLowerCase();
+    for (const city of commonCities) {
+      if (addressLower.includes(city)) {
+        return city;
+      }
+    }
+  }
+  
+  return null;
+};
+
 export default function RouteResults() {
   const [, setLocation] = useLocation();
   const [routeData, setRouteData] = useState<RouteData | null>(null);
@@ -20,6 +71,7 @@ export default function RouteResults() {
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [checkpoints, setCheckpoints] = useState<string[]>([]);
   const [showCheckpointForm, setShowCheckpointForm] = useState<boolean>(false);
+  const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
   const [newCheckpoint, setNewCheckpoint] = useState<string>('');
   const { toast } = useToast();
 
@@ -72,6 +124,86 @@ export default function RouteResults() {
     enabled: checkpoints.length > 0,
   });
 
+  // Combine route POIs and checkpoint POIs
+  const allPois = [...(pois || []), ...(checkpointPois || [])];
+  
+  // Remove duplicates based on placeId
+  const uniquePois = allPois.filter((poi, index, self) => 
+    index === self.findIndex(p => p.placeId === poi.placeId)
+  );
+
+  // Generate available cities from actual POI data instead of hardcoded route cities
+  const availableCities = useMemo(() => {
+    const citySet = new Set<string>();
+    
+    // Add route cities
+    if (routeData) {
+      citySet.add(routeData.startCity.toLowerCase());
+      citySet.add(routeData.endCity.toLowerCase());
+    }
+    
+    // Add checkpoint cities
+    checkpoints.forEach(checkpoint => {
+      citySet.add(checkpoint.toLowerCase());
+    });
+    
+    // Debug: log some POI data to understand the structure
+    if (uniquePois.length > 0) {
+      console.log('Sample POI data:', uniquePois.slice(0, 3).map(poi => ({
+        name: poi.name,
+        address: poi.address,
+        timeFromStart: poi.timeFromStart,
+        extractedCity: extractCityFromPoi(poi)
+      })));
+    }
+    
+    // Add cities extracted from POI data
+    uniquePois.forEach(poi => {
+      const city = extractCityFromPoi(poi);
+      if (city) {
+        citySet.add(city);
+      }
+    });
+    
+    const cities = Array.from(citySet).map(city => 
+      city.charAt(0).toUpperCase() + city.slice(1)
+    ).sort();
+    
+    console.log('Available cities:', cities);
+    return cities;
+  }, [uniquePois, routeData, checkpoints]);
+
+  const filteredPois = uniquePois.filter(poi => {
+    const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
+    
+    // City filtering
+    let cityMatch = selectedCity === 'all';
+    
+    if (!cityMatch && selectedCity !== 'all') {
+      const poiCity = extractCityFromPoi(poi);
+      
+      if (poiCity) {
+        cityMatch = poiCity === selectedCity.toLowerCase();
+      } else {
+        // If we can't determine the POI's city, include it for route cities
+        const routeCitiesLower = [
+          routeData?.startCity.toLowerCase(), 
+          routeData?.endCity.toLowerCase()
+        ].filter(Boolean);
+        
+        cityMatch = routeCitiesLower.includes(selectedCity.toLowerCase());
+      }
+    }
+    
+    return categoryMatch && cityMatch;
+  });
+
+  const handleUpdateSelectedPois = (selectedIds: number[]) => {
+    setSelectedPoiIds(selectedIds);
+    // You can add logic here to recalculate route if needed
+    console.log('Selected POI IDs:', selectedIds);
+  };
+
   useEffect(() => {
     // Get route data from URL parameters or localStorage
     const searchParams = new URLSearchParams(window.location.search);
@@ -112,46 +244,6 @@ export default function RouteResults() {
   const googleMapsEmbedUrl = checkpoints.length > 0
     ? `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&waypoints=${encodeURIComponent(waypoints)}&mode=driving`
     : `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
-
-  // Combine route POIs and checkpoint POIs
-  const allPois = [...(pois || []), ...(checkpointPois || [])];
-  
-  // Remove duplicates based on placeId
-  const uniquePois = allPois.filter((poi, index, self) => 
-    index === self.findIndex(p => p.placeId === poi.placeId)
-  );
-
-  // Use actual route cities and checkpoints for filtering instead of parsing addresses
-  const routeCities = routeData ? [
-    routeData.startCity,
-    routeData.endCity,
-    ...checkpoints
-  ].map(city => city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()) : [];
-  
-  const uniqueCities = routeCities.filter((city, index, self) => self.indexOf(city) === index);
-
-  const filteredPois = uniquePois.filter(poi => {
-    const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
-    
-    // For city filtering, check if the POI is from route places or checkpoint places
-    let cityMatch = selectedCity === 'all';
-    
-    if (!cityMatch) {
-      // If it's a checkpoint POI, check timeFromStart
-      if (poi.timeFromStart && poi.timeFromStart.startsWith('In ')) {
-        const poiCity = poi.timeFromStart.replace('In ', '').toLowerCase();
-        cityMatch = poiCity === selectedCity.toLowerCase();
-      } else {
-        // For route POIs, include them for start/end city selection
-        const routeCitiesLower = [routeData?.startCity.toLowerCase(), routeData?.endCity.toLowerCase()];
-        if (routeCitiesLower.includes(selectedCity.toLowerCase())) {
-          cityMatch = true;
-        }
-      }
-    }
-    
-    return categoryMatch && cityMatch;
-  });
 
   const handleSaveRoute = async () => {
     if (!routeData || uniquePois.length === 0) return;
@@ -232,6 +324,17 @@ export default function RouteResults() {
                 Save Route
               </Button>
             </div>
+
+          {/* Itinerary Component */}
+          {uniquePois.length > 0 && (
+            <ItineraryComponent
+              startCity={routeData.startCity}
+              endCity={routeData.endCity}
+              checkpoints={checkpoints}
+              pois={uniquePois}
+              onUpdateSelectedPois={handleUpdateSelectedPois}
+            />
+          )}
           </div>
         </div>
       </header>
@@ -391,7 +494,7 @@ export default function RouteResults() {
                 )}
 
                 {/* City Filters */}
-                {uniqueCities.length > 0 && (
+                {availableCities.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by City:</h3>
                     <div className="flex flex-wrap gap-2 justify-center">
@@ -405,8 +508,14 @@ export default function RouteResults() {
                       >
                         All Cities ({uniquePois.length})
                       </button>
-                      {uniqueCities.map((city) => {
-                        const cityCount = uniquePois.filter(poi => poi.address?.toLowerCase().includes(city.toLowerCase())).length;
+                      {availableCities.map((city) => {
+                        const cityCount = uniquePois.filter(poi => {
+                          const poiCity = extractCityFromPoi(poi);
+                          return poiCity === city.toLowerCase() || 
+                                 (routeData?.startCity.toLowerCase() === city.toLowerCase() && !poiCity) ||
+                                 (routeData?.endCity.toLowerCase() === city.toLowerCase() && !poiCity);
+                        }).length;
+                        
                         return (
                           <button 
                             key={city}

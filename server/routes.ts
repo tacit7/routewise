@@ -2,12 +2,14 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { GooglePlacesService, SAMPLE_ROUTE_COORDINATES } from "./google-places";
+import { NominatimService } from "./nominatim-service";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const googlePlacesApiKey = process.env.GOOGLE_PLACES_API_KEY;
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
   let placesService: GooglePlacesService | null = null;
+  const nominatimService = new NominatimService(); // Always available, no API key needed
 
   if (googlePlacesApiKey) {
     placesService = new GooglePlacesService(googlePlacesApiKey);
@@ -16,6 +18,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve Google Maps API key to frontend
   app.get("/api/maps-key", (req, res) => {
     res.json({ apiKey: googleMapsApiKey || '' });
+  });
+
+  // Free Places Autocomplete endpoint (using OpenStreetMap Nominatim)
+  app.get("/api/places/autocomplete", async (req, res) => {
+    const { input, types } = req.query;
+    
+    if (!input || typeof input !== 'string') {
+      return res.status(400).json({ message: "Input parameter is required" });
+    }
+    
+    try {
+      // Use free Nominatim service for city autocomplete
+      const suggestions = await nominatimService.searchCities(input, 8);
+      
+      // Transform to match frontend expectations
+      const predictions = suggestions.map(suggestion => ({
+        place_id: suggestion.place_id,
+        description: suggestion.description,
+        main_text: suggestion.main_text,
+        secondary_text: suggestion.secondary_text,
+      }));
+      
+      res.json({ predictions });
+    } catch (error) {
+      console.error('Error fetching autocomplete suggestions:', error);
+      res.status(500).json({ message: 'Failed to fetch suggestions' });
+    }
+  });
+
+  // Premium Google Places Autocomplete endpoint (fallback if needed)
+  app.get("/api/places/autocomplete/google", async (req, res) => {
+    const { input, types } = req.query;
+    
+    if (!input || typeof input !== 'string') {
+      return res.status(400).json({ message: "Input parameter is required" });
+    }
+    
+    if (!googlePlacesApiKey) {
+      return res.status(503).json({ message: "Google Places API key not configured" });
+    }
+    
+    try {
+      const baseUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      const params = new URLSearchParams({
+        input: input,
+        key: googlePlacesApiKey,
+        language: 'en'
+      });
+      
+      // Add types filter if provided (e.g., '(cities)' for cities only)
+      if (types && typeof types === 'string') {
+        params.append('types', types);
+      }
+      
+      const response = await fetch(`${baseUrl}?${params}`);
+      const data = await response.json();
+      
+      if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+        console.error('Google Places Autocomplete API error:', data.status, data.error_message);
+        return res.status(500).json({ message: 'Failed to fetch suggestions' });
+      }
+      
+      // Transform to match frontend expectations
+      const predictions = data.predictions?.map((prediction: any) => ({
+        place_id: prediction.place_id,
+        description: prediction.description,
+        main_text: prediction.structured_formatting?.main_text || prediction.description,
+        secondary_text: prediction.structured_formatting?.secondary_text || '',
+      })) || [];
+      
+      res.json({ predictions });
+    } catch (error) {
+      console.error('Error fetching Google autocomplete suggestions:', error);
+      res.status(500).json({ message: 'Failed to fetch suggestions' });
+    }
   });
 
   // Get POIs for a specific route or checkpoint

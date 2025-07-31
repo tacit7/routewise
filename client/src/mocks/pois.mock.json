@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Fairmont San Francisco",
+    "description": "A historic luxury hotel with panoramic views of the city.",
+    "location": {
+      "lat": 37.7925,
+      "lng": -122.4102
+    }
+  },
+  {
+    "name": "Boudro's on the Riverwalk",
+    "description": "A Texas bistro on San Antonio's famous Riverwalk.",
+    "location": {
+      "lat": 29.4241,
+      "lng": -98.4916
+    }
+  }
+  // ... add more POIs as needed, based on your actual API responses
+]

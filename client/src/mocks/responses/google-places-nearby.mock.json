@@ -1,0 +1,1039 @@
+{
+  "html_attributions": [],
+  "next_page_token": "ATKogpfUwI1K7BNqlIwKJ83EqCrCnB6YTIWvDBCbutFUzu2AebtsECJ2k_DEa_pCqlfI5AXZ_-VX7r-DanHjhZavLoOLNs9C5MbWYcPRvd0qNKBhsjEKcRnxJtLiTETV5WYfxdK3ci-m9HUvB9TiQNJMuOuvoxYcd3KT1v4L55qbJgE3XA0XWhrhz0ySQrrxR1eGbc9tXu928_NdSL_AeEZZS_8PaGXnF-IWxOm5RwsxzIHoYqVIHIccoxUZub-iVLu5WFAeu9T89Rhk8QE_d3j1RMet17qrjAGh526MWH5CVedctRPVIfJg2wiH9cVvxbHrUTEsfIMxEz4iCEL-EQvmtHl6h73etjSNoGe16u31dBu2C5mA6nnOVdKh7KZzp3VdJ3XkS-TduqKURdJXUjLBQLPrWL-24ugRAKuTOLzc1oIKYA8X4cB8",
+  "results": [
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7409696,
+          "lng": -96.81532
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.74564395000002,
+            "lng": -96.8133819697085
+          },
+          "southwest": {
+            "lat": 32.73911495000002,
+            "lng": -96.81607993029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "Dallas Zoo",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3072,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/116388591433440459020\">Rafa Chapa</a>"
+          ],
+          "photo_reference": "ATKogpcwTJJLaPLPzf1_Q_0J2DYxhXxS9Dlr9lNXC9tja3Vf89ygtB0RY_lujc0R3Hj3rVeVrkP38lvfheDgKTmAQ1NRKPD9D4QEYdusNKJ6dyq2dsamF1wf4KyX3OoATWoLEcUsJ_DzL_cxmUKse1VbjVDxFrhbs-szebkNPfvrCUVLsJOOL3l0VFdk-WmKGpeclr9CPHd8i2VJEgskYNY5CF5rAJBsNCHfmZHPwc_54ohW5XsfSf0HZKUSyhTHrXsjK7IRZHBFRIYMurYPu8VMsEPeAyGYhCBObVHLf6KDHNWYjurFcZhEHPDums9i61xN4jMVImhpScuA6U5VC2XB9i2IjTD5sDgCVNx7lkzKg4W80Au-ZR101fHcvVBNc9mMCnEKDf3UuKKaCGJux48HdaCNLks1jzEkfXgMR2WZHOJpVnC7HcLT2BTddV9Sfmy59cteAQWe5ZstiyF1ZvFjZlPMmBAatHQdqyfxcIB_E2FFWhzka7DCye3fCo6t5J-ewQzHtTQe9LD0WMHIcXdMilVend21fl9_-1uW-2O5n1KYvKPc9kJF8d06LYqqqrq9J8uxMPk3wa3IjlO7AiJXKO3DwqRCYFjViIxkvt3jI4zeWuCxQpO_bhs421f8X-xf4NtSYg",
+          "width": 4080
+        }
+      ],
+      "place_id": "ChIJgaB_eJaZToYR0shi9YM_K-E",
+      "plus_code": {
+        "compound_code": "P5RM+9V Dallas, TX, USA",
+        "global_code": "8645P5RM+9V"
+      },
+      "rating": 4.5,
+      "reference": "ChIJgaB_eJaZToYR0shi9YM_K-E",
+      "scope": "GOOGLE",
+      "types": [
+        "zoo",
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 22779,
+      "vicinity": "650 South R.L. Thornton Freeway, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7787249,
+          "lng": -96.8064507
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7802638302915,
+            "lng": -96.80515671970849
+          },
+          "southwest": {
+            "lat": 32.7775658697085,
+            "lng": -96.80785468029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
+      "icon_background_color": "#7B9EB0",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/monument_pinlet",
+      "name": "John F. Kennedy Memorial Plaza",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 4000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/116739967538148943147\">Matt Kieffer</a>"
+          ],
+          "photo_reference": "ATKogpcsKFNW0bjsc_1FDzMIbIPGSYeyjRkZS0PbDLGyAt7Mx_mRaZ6XD8TcOCNjYmA4c1_jQABzZyw6jVGusIKO8E4RVk1tx4otYXdlw3pkq31mMu7J_ky-44UdCCES-e0d-hAyAyLzI8gY7Z99BObbS-19UWH5ereusNBMsn9XmZlKq_rD11vdi8MdauZOLVR-TEWZV2XrxiwMWn1zenW0yIm69HFxO7v3A2OiMEYfJXUQkyxv6GNzO_24ct2N039pNtznIJVF8F8SRxPN-Ez9kZxjHK7p-sxZSYUZJsWw7aI4YOZFcfjpOcRyvd2aZZZTEbM7OKh7eYM19DjtRkadUhHaoXUKWuVYWOi05etEZJRN4mfwR1CW0WS6SAxge2TX_BPwqiWQ-yE3J286sbHpPyllKe5293I-jJ2ugFXNupSOVeSPH25m1MmsvFnS-sFSAGd2rTyGLRDEFuDtQ2tXHhB8Lcu2XQy-4K5MliQ4q7PQIjmYq304s4CYyYtGhZ3SuadLMJpm8mFZRslReOGmuNJiazWpI4upuCHgNTviyxKwPR99TEoEJNVhPXYPVcdvPMAbOwuNqESABYPm0vKdDJor5D0u3JK2MBB60UoOuPBfHnqeIRKyQG5WVv0P6NpVJ-ICEQ",
+          "width": 6000
+        }
+      ],
+      "place_id": "ChIJE_JdWRaZToYR0o3-Vndx750",
+      "plus_code": {
+        "compound_code": "Q5HV+FC Dallas, TX, USA",
+        "global_code": "8645Q5HV+FC"
+      },
+      "rating": 4.5,
+      "reference": "ChIJE_JdWRaZToYR0o3-Vndx750",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 4711,
+      "vicinity": "646 Main Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.8236184,
+          "lng": -96.71662359999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.8276216,
+            "lng": -96.71015040000002
+          },
+          "southwest": {
+            "lat": 32.81900960000001,
+            "lng": -96.7196572
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "The Dallas Arboretum and Botanical Garden",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2252,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/105726482695595407907\">Mark Craig</a>"
+          ],
+          "photo_reference": "ATKogpeo_yg8nK-Rklw5UYYbVsE-iba-CrVcr_Y7XVonN0Nyej-gEmWIPiAhbqxcDxQGL8Pstm5krue9ZNsRM67rOq89sEaOOtHEEDbniS5x1kRcOD5qjuBzNYP0YpBeQLqht7njWmZeaU1fNArm6CuYElmdkCxFA5kDSohVfe4-WAXB_QksECphs5hfjFSwJffh-9DAsXNWKrpVXK4Emg1tsZWgUD0oDh9-TFVwjEYGugLJ8tMLRLjIylkWCjDgxYFILL1jsF8qNT7_owZ_TLuXwAz3rWVjjleGw89Bhi1IulHlk57RtHcXoqnY0n0BdtBXyqnk9_a0UBKYXojW4sZMit_GoervGfyio4V9Ppzla0ZzzHBLPqrGXLEis9Gq4tBfAIx2_VMz0mORTaFj4Pz3Zje_C5JtU1kcOg3CPHBGtC5FEDOmMmtZp7o7r-5L7daPwr6gHs-QEcU_q-9uS-EiLQgBePg9lzThOjjqKArpWYuEmySjYCNk3bf-5LfvVPEBBa-JDR_5pD0zdTF4VLBlZ1VeLPU_-Aw97ki5YdO3N_xfPruuOzSDLc2JXlbVqFi0xtnmL7lf1RaFGPvFkBmwx8rlC40oy4lOxO3AjOO45PqQ4ocy9y4aTLLtJZqkBveSaS6L6zWh",
+          "width": 4000
+        }
+      ],
+      "place_id": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
+      "plus_code": {
+        "compound_code": "R7FM+C9 Dallas, TX, USA",
+        "global_code": "8645R7FM+C9"
+      },
+      "rating": 4.7,
+      "reference": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 25518,
+      "vicinity": "8525 Garland Road, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7788184,
+          "lng": -96.8082993
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7800247802915,
+            "lng": -96.8066590197085
+          },
+          "southwest": {
+            "lat": 32.7773268197085,
+            "lng": -96.80935698029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Dealey Plaza",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/116800855297671873552\">Lucas Elias</a>"
+          ],
+          "photo_reference": "ATKogpcMLNhJ8w2A8UMwfN_xmB2rOCMPjDQ9QN2ERZCm0quCM2ivprkee9huasmMxUq0xXWwLIwuLuUFO_r9QpwgoMBb8t-tAV00yDLdmmld2mDTUUHQfGU1zFFW3ec7pl3-tQLUbrRZ5xLgXU56ffTtMwXBitFThgo-eIEQqy3yfp2zw5iqmG0KwEq8bnWvEx6-h_-Svuw1lOl3_8Nspj92mX5xFyUheTqbL4lS9Ot-Yc3qgpfapniq-oVT1Yjsp-BKoekPJeYjmIolJmb1EHVSY_24rOytHy-RJGOXGpCqbqVSaS6YcefuzgO34WFHRZIBNi5cYpGp7Qfk59rnoHvjumpCZ1KeIheALXTm1OAS5a709GHDLvaU2BkCkfGF-MfA_3Jnv9WNeAXdgTGcy2hs-vOCpwyUPbd2DaVu4nbsjvDK5nRJRi8stXoUG7l_fjSfYfr7ZU3lLRQx0WkOhjpxzKamDe3K7SsoEiCquc6cP0fUcxXpfajnlUBT5kPCPH4YYNdzd-u8yZEKeo8VZYOIq-5sn-mrVIT20k1R7I_JwMlasCBjWFnvMZaMWgm0YoDG03_HYKdjvHgHr_3z_JwdeZnT719kIhzYrUWWlVsG5ssHz1u4LqbXZojlcK-vvQP3jzlu7pHq",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
+      "plus_code": {
+        "compound_code": "Q5HR+GM Dallas, TX, USA",
+        "global_code": "8645Q5HR+GM"
+      },
+      "rating": 4.6,
+      "reference": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 5934,
+      "vicinity": "400 Main Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.8411176,
+          "lng": -96.77822619999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.84299055,
+            "lng": -96.77711461970848
+          },
+          "southwest": {
+            "lat": 32.84024115000001,
+            "lng": -96.77981258029149
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
+      "icon_background_color": "#13B5C7",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/museum_pinlet",
+      "name": "George W. Bush Presidential Center",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/117571279609147319283\">Andy Jewett</a>"
+          ],
+          "photo_reference": "ATKogpeo9X3rmyETcHAy1OtH4VkCsiqe_bokgHSgCEKqvJ8iAd4J3sFmlw2ulyUhO1tLQY2KMX63BGC8rNEcft9X9u_UH1eU5ywzZDS20OvpLSJj2hnpeiCcW9d3_s4UZnYWAyLDL-Zwgh3MhZhiKPcW1Z4ahpk0hsQNYlNqNoSrQhMT90SpN-QOCKcJK-B-z4uGjPlXGO5T85-kDh-8nZoRxAjSHqjA3UXrY1BVlhb2csPKgIcD1D1hTkNiShhowEX2W58KCSscepHEDmkITVrLt9U_d5CiYFcAgd8HsV5SE0W8s7dLqCY-c5eIGuXcuE4ilsH71pSIDBgVKumPr48q-FIfnrwctqZsGAlZRE-Bi3lktRxW8UH9fGsIBgE52vZF97mKZ4cmFT2z9WNO73xBeWpaKu_diIZsCHQBkDIyU9Hoc4SeNggd1VQwl3lGCYUuiRw9GTzZ9mTuL_QMb4WOt3xKrpx0Qj1VKOue-3Ctjd3aEdRGbdPvS6ywFs1GCRDF3fgGMn_F4CFjTgVjXkFPB5AugXnuAN1hri__rTcj_znptV6nfpZ3iL61R_91wJm-dff0RI0_1or8Bv9eB-cGPPwgNhddExaBQY_nLkOO9_paa5VJPAutAaDjPHTIef6b2d0HTQ",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
+      "plus_code": {
+        "compound_code": "R6RC+CP Dallas, TX, USA",
+        "global_code": "8645R6RC+CP"
+      },
+      "rating": 4.5,
+      "reference": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
+      "scope": "GOOGLE",
+      "types": [
+        "museum",
+        "tourist_attraction",
+        "park",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1005,
+      "vicinity": "2943 SMU Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7893644,
+          "lng": -96.8016184
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.79203555,
+            "lng": -96.79889354999997
+          },
+          "southwest": {
+            "lat": 32.78681455000001,
+            "lng": -96.80375815000004
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Klyde Warren Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 2756,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/101645393419411890565\">Agent 8</a>"
+          ],
+          "photo_reference": "ATKogpe075vL9LXzuimeW431-qiq_WK0w24O-DcGes23JZwbXD89xOENaR8MAsmqSo8F7LQPUXOFvrzmrasYEAydlgw4QOeeNA0X1WQhKkrVBzyDiF5TQ3ZxwJ5ixHJhHiqGLliWKhfyGLNaRyB6rsIB6iPvGoc5a1OQIJPMdcr5_f6IOfqJjh21B8PtU3fmLhoQjqUDoc3tDzF6csZHggGDe7sn_QLfN0LLbNro5lXnQjfb7JHiy6NldbffMY0j3L0lL_zW3ot7e11KA23MAeESAZWlDUp2e4dUcJnH51rkaD4w4yzRvdtOTe3Zj7jO8EYpaR-Apu2Mybyn0VDOaZ74NRq9wR6iI5REZ83zcgUwt6-W7AjxWLIoPr_fTBXnrGoX9UwplsUaYdBh-Wi-_WSL-BCvBnS7DZd_6VcUkV8mAhSh1uBlirvZTSz6BQiMY5pDEjb6ph2_Avetqo_wiwIPXOQBbAnORW7DYBNW9TBeg1usGknPIzHfwuuoCH2OJuRv58alVNmxCWqqQXTgUmBlnBW91WiOJtjKbosBXjfx9hloeruwUWxrlaIMk-lgYzWojTzTX-3LtSnaQ0U8CY30zB593EIbn3gQ7GE6lfcfp3PrDL6U2sZGHGAn43TET94xu2NpGy1r",
+          "width": 2450
+        }
+      ],
+      "place_id": "ChIJZf6cwiSZToYRas-lbLGASVA",
+      "plus_code": {
+        "compound_code": "Q5QX+P9 Dallas, TX, USA",
+        "global_code": "8645Q5QX+P9"
+      },
+      "rating": 4.7,
+      "reference": "ChIJZf6cwiSZToYRas-lbLGASVA",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 17909,
+      "vicinity": "2012 Woodall Rodgers Freeway, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.77275279999999,
+          "lng": -96.78654399999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7742036302915,
+            "lng": -96.7851566697085
+          },
+          "southwest": {
+            "lat": 32.7715056697085,
+            "lng": -96.7878546302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "City Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 6144,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/106681202681354726441\">Emil Matias</a>"
+          ],
+          "photo_reference": "ATKogpfdwe-NRjsLZu8EY8VioFfhMBBQbZkbh6xx9Xu12TqOULaLKiRvP-ekMRd6br6nKE5H2tDzoDvy1awrNcTq-IMJJjyAKbSUCA5dDp7lONrYSwY7uMp_jlImiare9M5IwzviGqqZKGCM7I2wMFHtLaiwWodTQNsmGBLlA7LAOKdJgTbuzXAjwx0bElN7ex3B7ZuW7UWjRd0lv4jekkQ4iw4UbwBuJQmEpOR6SpVhBsiWhKcy7HqUmEQNdp5GI_4dn8-6357O-o9e0ww9dALS9Arw9GAqXodZ2tgtfVtaAb7H9Dh51Yf7pXdd-9RVxXpEOw9q6VAUADJGD21NEjgYos2E4apnPsAFzOPHt5leeynTWUBkEMdgjvQF89SZkcxsOKuCp5MSCApHgVqeqtzbrl1UTDYqaQ2yAJnarXiDd8dAPp0qKNuyKrtzDev9JIVcJz95v0AcG4BoFRRw15dXFQw_dzuhDml2HRNXc5BpMI2d622hhigHjO6yac_24aqeRGjetVGfjjSdZdImqdQG7MflppN1zojZ7YNrNKROPnVqq3t8L6_z74P9eZhRmFP-5zBIHme29_AMUFVvI0T18IIK5qOXJc9qkF4Q4Hweo5Yi6EScwygWY8rU77VwpIA40YmF50Uv",
+          "width": 8160
+        }
+      ],
+      "place_id": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
+      "plus_code": {
+        "compound_code": "Q6F7+49 Dallas, TX, USA",
+        "global_code": "8645Q6F7+49"
+      },
+      "rating": 4.6,
+      "reference": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "museum",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1328,
+      "vicinity": "1515 South Harwood Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7766323,
+          "lng": -96.80119859999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7780468802915,
+            "lng": -96.80000291970849
+          },
+          "southwest": {
+            "lat": 32.77534891970851,
+            "lng": -96.80270088029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Pioneer Plaza",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3456,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114660717085752617659\">Kim-Trang Nguyen</a>"
+          ],
+          "photo_reference": "ATKogpfq-YdNmlSSPzu0Iw-Wewa_liN4mHgSFilKCjq9JQPkdfthqHJnQsK-2Q2wRYQ8aAcvKU-h5ixy8-QeggnHpdsXkdhyCEnsei2jShwOHeCIOUGDo3ZPVoz8pz6Rb7KgmQoseWoM9b5qqH7SczHRYcE08bj3XRznL06r0hNNBu7rpq0spYsWSYG6MfkrX3AYi5eJ5Z6P18nCVK-FEIrfsW6yQ5k63jbe-f3LSoJUd4RRAi0lNVKdC5JJ5yt-hiyoBEwQjqelg2_3Lf_Q62HmEns7_h0t-CLIBOqqTmt9QDt0p2_DHm4mbE2Z8seKYugH3wNhp3Re09g2mG1MnRmTgk6Sz6Wf-ktC5z4XHQmrDdqt108OBQYhB7ZbRBl9SvuorFZoyRosg4isrQExHgd655gojItUZNq4Got7f-VsaonXxyEO_0XWkozLCsa0Hf9Q9mw0uuOzy5Gapg3GoT0LB_Gaipm-35IwDuQa_V4vWM7VSwdyc1Ovk4T70Q2nJ9eFEW5k8Nd_5wDbzQfEJBjF_HeZoshvjiUptdcHOaFgDn8-jZCk44OX5XOA9i5vsto_EOtwDGrrhlzt7rMhriQ_vrBulmO6p5nhJW4K2Gdnu7AHnAbvlXUgRq_t-71XAdBOtDMcOw",
+          "width": 4608
+        }
+      ],
+      "place_id": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
+      "plus_code": {
+        "compound_code": "Q5GX+MG Dallas, TX, USA",
+        "global_code": "8645Q5GX+MG"
+      },
+      "rating": 4.6,
+      "reference": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 4487,
+      "vicinity": "1428 Young Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7782181,
+          "lng": -96.75927089999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.78760945000001,
+            "lng": -96.74695864999998
+          },
+          "southwest": {
+            "lat": 32.77060645,
+            "lng": -96.77135924999999
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Fair Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 4032,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/102034392453661473124\">J Weems</a>"
+          ],
+          "photo_reference": "ATKogpfeunZ1qFZjAionLETQi8t3dUvUNcB_NxbbT6juhnTx_OLYZZn7Iij7PmKmQHNAMFZVPF_-qWYO48KXtW-LbpHYp4FJwtWHyYa7JJnPl1NcA6mq-9TK230ihxi0UYP-xu5qHaxohnYxyBd3eW6KZDRPKoNiCEPq8f-MY9lRkRkuU3r5wM9qNlF083mY0-Tl8KmZt8BtUsmY48NJMvw7Wi-NZbSSYcqwbTjujG4yrtDA8egAhx5Gitfsx2xlW4RwbZtLPERvudIYvBgaS2lRQLcpLjtgnv6kMP_1dBbEPK0bjLQFEOs-SxXvhIckNROLLGZ11JuZ_WPCEf_b4VWOxejF6L0B3BpBDJfaRCzqkOLcx_Qg1nLp15XVgveML4L8NPqeGk7ETyPyxrIARDWv9c9I-K5qBlCWIA-gKrwRRhF_zq7RquKA8e3OZ_eMZ9-tV4Fm6VCZ6EVFnellyjJWaqFnJolxBE3wqVyM1xtoburCQN3GAKtl9UNOwEb-v-uCIIuZuY7f-oSh35DCr2vQ9Lbjoh3ibFRAJdJfT2xwU-iMNNqZOoiR26hszcuIhGk-EoqX-ueB_0f83NgZLUC0DnmNm2upTj7wrPJAqS6AfBTHgpaKWR8JvRF3ubQvyVn_gymo4w",
+          "width": 3024
+        }
+      ],
+      "place_id": "ChIJ12JIoZeYToYRRJHugtx3QgY",
+      "plus_code": {
+        "compound_code": "Q6HR+77 Dallas, TX, USA",
+        "global_code": "8645Q6HR+77"
+      },
+      "price_level": 0,
+      "rating": 4.5,
+      "reference": "ChIJ12JIoZeYToYRRJHugtx3QgY",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 16477,
+      "vicinity": "3809 Grand Avenue, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7036486,
+          "lng": -96.70531
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.70521533029149,
+            "lng": -96.7041377697085
+          },
+          "southwest": {
+            "lat": 32.7025173697085,
+            "lng": -96.7068357302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Trinity River Audubon Center",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 431,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/107249040236262904865\">Trinity River Audubon Center</a>"
+          ],
+          "photo_reference": "ATKogpcVaQdLZuPiXnglCPQH1qp_oyz7dA93PPE6GrnIAz_9TsThkd8m_yewbuUHYKmTU7oCvdPpAgqrIkrnvvrzFoJoHXMHt7qId0YXXb273747Oe6PoIqkHo79wy1-NtTUNeRTvbxEe9bCa-tQtlomr6IKEk1XgZz7c2yUCctEVr_MwLnzhJzwHHtyNx12n5fhlPc59zfPezjUtfooee89Ti-vaFrEbf_3mr3ODBJsf_-ctGxyeHkbbskz3VSFQGBe1YkVPuxuarkm_jg3qWl629OzpB5Oin8gj87CYY_qQYEMlqNIAbFm0qNTfHVI9wle5Jpvxrd07l4",
+          "width": 647
+        }
+      ],
+      "place_id": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
+      "plus_code": {
+        "compound_code": "P73V+FV Dallas, TX, USA",
+        "global_code": "8645P73V+FV"
+      },
+      "rating": 4.6,
+      "reference": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 662,
+      "vicinity": "6500 South Great Trinity Forest Way, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7811695,
+          "lng": -96.7948469
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.78252758029149,
+            "lng": -96.79315485
+          },
+          "southwest": {
+            "lat": 32.77982961970849,
+            "lng": -96.79648505
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Main Street Garden Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 846,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/100041358449158047663\">Jason Cuellar</a>"
+          ],
+          "photo_reference": "ATKogpeFjwUexwlSchikkUoULWLjAErrnbppqY6qTi4PoOS3lyoaeXN_PIh3Uro6xcEndKOsvH9TclE59_r4-eYkmr-hnwVvOv1oNqy83vwZ8cePNltTRLbJu2CUzdgb99XWkFQCL8iLXwIQELZFfWH5tcc2UsBIFtfUJRpOCc2UJr2-RYfmtu_khuR957Qdc0YOAYGuzefHcvkkLb34QatXdj39IBuIlO9GBMR2Hcg5FvJsVor69CgJ-x_iIhBjuD-sxk7l_igz6Ju7iAoyzn6DTXPFdUXcSMShVrbJfGKRX5CV5bEHqZ0PyxufBb1A-p_E7tmAHTgGY-w1PM8gp97CMihCp9AiUk5aqjUzZutikuNmrkxsLb4Rxo9DX9wXH6TunwQSsuYq-bXDYVkkzdaS9kjsCgr8HCoXxtY7E0po5-B1bpiWsHYI-1tiEgayF9MBYbi0_DAq4mvOrofUv17zkaZfosT1ngZIDC8uATcP_uA5XJnvUQ29JwmNME-18L0SOYeM-rpv9JBfAHch7Xu3qOAAh3MktoT1Ex3KLLodEIWEuasDcAfmBRXjb4MPAg8tlyoSGkwQapFsAGVqakZbDDl5uryZic7A872knC58LKv7aQ0mYrHcAZOoQz7tYw01",
+          "width": 564
+        }
+      ],
+      "place_id": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
+      "plus_code": {
+        "compound_code": "Q6J4+F3 Dallas, TX, USA",
+        "global_code": "8645Q6J4+F3"
+      },
+      "rating": 4.5,
+      "reference": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 2342,
+      "vicinity": "1902 Main Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.9173035,
+          "lng": -96.89209389999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.91889768029149,
+            "lng": -96.89064446970849
+          },
+          "southwest": {
+            "lat": 32.9161997197085,
+            "lng": -96.89334243029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Farmers Branch Historical Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 2518,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/105357574211655252461\">Farmers Branch Historical Park</a>"
+          ],
+          "photo_reference": "ATKogpcApjIyXQSMw8QDSFCQMJNBR8MpnQcNwzfFmbmxUGZBF1hxRO6tzODnbeKOhzrI_0QiSqHyPBJbTrKY7RRJMSP0cl02TaJ11tgBdP5CScpPx2l-kS_FIjfatOyZ5Y86pAnZ3IWt2PpK36MTTLVBrb7ut2RYEPDT1LtSmdrwBOcftmJTw2KJjRnJfuqZB6npbt6xRkJ4J8xpuNXh2BM0QfXTrchISWcIeP1fF1aDSUdHoRQmK3234XnmXPyykOMHcC5YHN-fPMeoifYve6CsnaJPUZSUu1_TrqApCQQ59Hmo6g-D6OjohYcrKVc3TfsIrBjRgE0ZTQw",
+          "width": 3116
+        }
+      ],
+      "place_id": "ChIJca__DrwnTIYRQJEQo0vZDN0",
+      "plus_code": {
+        "compound_code": "W485+W5 Farmers Branch, TX, USA",
+        "global_code": "8645W485+W5"
+      },
+      "rating": 4.7,
+      "reference": "ChIJca__DrwnTIYRQJEQo0vZDN0",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 632,
+      "vicinity": "2540 Farmers Branch Lane, Farmers Branch"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7829966,
+          "lng": -96.7982236
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7840783802915,
+            "lng": -96.79680251970849
+          },
+          "southwest": {
+            "lat": 32.7813804197085,
+            "lng": -96.79950048029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#13B5C7",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "Thanks-Giving Square",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 1248,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114144713469905302706\">Thanks-Giving Square</a>"
+          ],
+          "photo_reference": "ATKogpfKO5Gt7qAX_BPgIB_9wnYGf3ee9xCu0MJ94g1_Sg4vJwbfp3Q1dWXiCyszLEFK4B_G_pyoNGhy5tiQisredfbLOtVqDmd9_wDVW49qxvpMoCneOkZ83WOi2pUQwoVRYo-cnhQda-YV0aQMVKc9oVQj6CQQTYf1BX5acXKtHvmtVQGnIvehy53wfEBdgMC8zG4I7RWkH-59vXmoWDr1DfAATXaUZy1UssGmry7n-GNYPNJAZ6oPB7cNwaC91OqgsK5lJvLG8d_esdIABH9m16qwP5YK5AkyZz-ZEUw2dNryYgjE4smNiMxLa-YI42zIzKgGHU9jW-4",
+          "width": 2519
+        }
+      ],
+      "place_id": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
+      "plus_code": {
+        "compound_code": "Q6M2+5P Dallas, TX, USA",
+        "global_code": "8645Q6M2+5P"
+      },
+      "rating": 4.6,
+      "reference": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "church",
+        "place_of_worship",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1168,
+      "vicinity": "1627 Pacific Avenue, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7751527,
+          "lng": -96.75973800000001
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7769124802915,
+            "lng": -96.75881251970851
+          },
+          "southwest": {
+            "lat": 32.7742145197085,
+            "lng": -96.76151048029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Texas Discovery Gardens at Fair Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 1000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/105845434105767880722\">Texas Discovery Gardens at Fair Park</a>"
+          ],
+          "photo_reference": "ATKogpea2QTHMpK2kqX2tx8RfELMkP4tcYqM6XgBmKiP8Ua-duEWxbzJ8k33vpbtXQbSW5hXVmFXPm4tVu_sXHrA12VO3is61ATSIh_emtF0g5WhwUnw24yRiqB35MhvWfuh-Afti31fe3o0EC8_jyyGJN5iDSEV5O4kd-k2pV84Ebi2Z54PhbTe2J9neTKvd-XP_hpvzdoPGYiasKMsMx1sR1aGUP0lhXXphgj8G2y-m5d2Js0xIqhkhBoyNrmX2XpSHJ5o1dvPdZXrFf4jU9SjjG-h6pObAWx3QDEJeswgc34b4FTGr0VjkDsFy1M-0D8IFjr-aUvQDKk",
+          "width": 1778
+        }
+      ],
+      "place_id": "ChIJH51ghJCYToYRNpUGVzRnZtI",
+      "plus_code": {
+        "compound_code": "Q6GR+34 Dallas, TX, USA",
+        "global_code": "8645Q6GR+34"
+      },
+      "rating": 4.6,
+      "reference": "ChIJH51ghJCYToYRNpUGVzRnZtI",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "amusement_park",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1864,
+      "vicinity": "3601 Martin Luther King Junior Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.6194734,
+          "lng": -96.9837294
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.62075918029149,
+            "lng": -96.97140465000003
+          },
+          "southwest": {
+            "lat": 32.61806121970849,
+            "lng": -96.98783764999999
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Cedar Hill State Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/104051482289129192769\">Farouq Mahfuz</a>"
+          ],
+          "photo_reference": "ATKogpcCB0tVoUv_KA_RkNxpRQPUpBWcTphLDBpBEXTY-IyE54bmfsMGf4NlyhAjGE0NrbW3AaOg9ATBANy9T6sqtKcegrQePyLMQzA-7qy1JD3nB7H3IGwYcoO6Tt802K2HmQ5Mr1nhp-r08mZqxRlZsVQeEGYjeikgRRSU-hs9t8mEOO5GQ54qhBI49mJPLVFnWShntBMhorsSh6vtBn4G6tv-cmYDgXa1Zo0TMRn8QOMr-O9SLW-w5uht8lZ9MVbKcEcz5R-RgVIoRKnbp1EKYCLZJE0nyzJLKVxNCftu2uDm5I6qCMy98YsKG_6CtNOJS-aaPmxwDOhYvYOTfjB0wNpsaUOUHuPqWJ5RBPeNf4DXd74I0Ag3ge3x0GCZKHtCAHV0ZcmvVHi4MDhc6MBQQ7wUk1jkmKkUC9jyj6o1A4DH6KT1HyEa4l1lPOHOXGtGcBbnOpllQ_RsCO1c-gKx2yveo6b0Jwo1evmhK35PIF9iaRV5bhDfNvC0mZNZWgoX5d9Vlzn9qk0L7TEl5YkDeppD9TQjL7mFclvCcL02UNQ-I1MGWWJlt3zJJZbMIgwHtcqwHZpuWPqonJC-MSqYf4-LtkeBJyzRVgdAfZDMcfM0ZYgwmZiNDQHtWKUUAYTj",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "plus_code": {
+        "compound_code": "J298+QG Cedar Hill, TX, USA",
+        "global_code": "8645J298+QG"
+      },
+      "rating": 4.5,
+      "reference": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 3779,
+      "vicinity": "1570 Farm to Market Road 1382, Cedar Hill"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.90013,
+          "lng": -96.77556
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.9017962802915,
+            "lng": -96.77441526970851
+          },
+          "southwest": {
+            "lat": 32.8990983197085,
+            "lng": -96.77711323029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#7B9EB0",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "North Haven Gardens",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/107553184210121124904\">Brittany Pedigo</a>"
+          ],
+          "photo_reference": "ATKogpe4fPSdd7d78ABoyxWMbnYdRqGUurELscsPisXjvumbW0g1_yQeHYkXwHMJbGPGi7Bkihh48rhyA3WUNzzWS8xQz8AaZ7Rb_R5h7nAsRWmIAE0LJzHvTUa8TwFpRSYJooFYbfYZqSfQK1NVUzA_y8WZ6gGJEbG1UgfmEylkKhNWJwb_9gxL6vhVnwFYuw5V5AjhQPALqL4nUlVOgtVWHdc8dKJvTf5AUx86eLg97YXnQCrxLgwhMBg2AEhy5GI1VnqtL_NxDr29qrljKr9Vn2ytE6pLzKZdB-1cCkSSF7CER6zqzoyBn7yh51VD5IEG4sAcf5lSr2vxnh1ENaEYjFwGTmvh5NMnl0Id24SYNKcSpovAz9a2aTfpdrWT9g7_JJ-tiraMfaq8wdejdU5aKjgOQUzwgKg4RPBzECjhJPBUAHQy6lBv7wQkKUhACDvmHUmPoIacvHhBXC--7l42aMkCAHJU3ODG4mQxgHUsxXeH2h64inmyMt1ogSRu39uB00PHBLUc_EPKezQ2k0t2ZJSvFRKDnrQB1GEPW0O9VKR-97AJxjM71p01sNkSLOWUDjnoloq3Vf55RKPajta6s9ni9Nn_KIt8pZ7gle5udzFRi24vxM5x3zcIkFkBTpm8JLGMoSyh",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "plus_code": {
+        "compound_code": "W62F+3Q Dallas, TX, USA",
+        "global_code": "8645W62F+3Q"
+      },
+      "price_level": 3,
+      "rating": 4.7,
+      "reference": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 899,
+      "vicinity": "7700 Northaven Road, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.85784809999999,
+          "lng": -96.7144113
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.86486625000001,
+            "lng": -96.711758
+          },
+          "southwest": {
+            "lat": 32.85119965000001,
+            "lng": -96.72075759999998
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Norbuck Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 2952,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/102888938745057128661\">Nalasi Mendy</a>"
+          ],
+          "photo_reference": "ATKogpeBZkCxFkpPunyYs5nUjoBnOQG3_6HTZB3U2rOztNz_wgoF2_X0SXP4j5a_PoidMZmn0FJQqz8YHvo_BcQy2ML6Hl7k1xysu0gz_uhCdArOazahLfkdd5eJo6W7yS8qUod_roVmWQihAGyAkdQNgejttiKSVC71zvVObUIkOBSclPM5ezT--95LBZQgDi5oEOLOlmE604ZuCa12RZSAHa6SDifSi075vS8oNkLfbbujec8u1d1Sgca8LXkzv9s72Y0JWKRbT5H-TJFFEox3kDqCIdyqzOzGVnOVAcMHFyAcZmMd6Z36TWMxTHZ8bng6YJle9pH8Kg7Z-oK_DwFKcNdg0jeR95aZ53Uz2uT-hfn5QNFMub8x5i-A0ZzTecPHLI0AbDJu3EAf24tX8u4ewOmcevQC-4lDjN4CWgvBDARxGsb4aZ-EBQV_IQ0UpbjAhxw6tvNqUxOd-shmlmNc-BWE9F9P9c5cyMHr5LFsNqTscab1M-vl3vwZWwT9ao-BgnmT6VIP1cSCf27SvIQzTXl5qG0kr7IcE3rardRNuFJXcDiOF1lIVVpf-5qLPPoyGJqwuX7qCb3wM18mv6e0T-gjvQBAfIsmkGOtdbkJHQbNls_HFK6apUvwgEdOo847OAmWUE4X",
+          "width": 5248
+        }
+      ],
+      "place_id": "ChIJyUp9NVKgToYR65eZ97F4neo",
+      "plus_code": {
+        "compound_code": "V75P+46 Dallas, TX, USA",
+        "global_code": "8645V75P+46"
+      },
+      "rating": 4.4,
+      "reference": "ChIJyUp9NVKgToYR65eZ97F4neo",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 522,
+      "vicinity": "200 North Buckner Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.8268333,
+          "lng": -96.8011782
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.8282048302915,
+            "lng": -96.79972651970849
+          },
+          "southwest": {
+            "lat": 32.82550686970851,
+            "lng": -96.80242448029149
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Lakeside Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 4000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/111532420734731905675\">Brad Hall</a>"
+          ],
+          "photo_reference": "ATKogpe2F2Dz0QgpzTzoeb3SYrrxA7dIsV4EoA4URZ01rJJcE9qCzLcvvoer20ev0CRg0su1lBQqNDJ0Yf8JA9qFbGV28Nq7o1fVm3UswsjCY6Q59nDI7aFFKYR4Vmj60YD3Exd2U1SNB541N82dRDVxzF8BgYXscndX7lz9X7mXYvwE3EAmYTLL81eMeJJska1YnMj4ojbp55jkuv5OTQomG0W-6LloaTpF-UQ5Axkd2wNqa_3RciaXmHNm5t261BFZdrdFHXrWyAKGPKj0mkYqeVCAx7YsXF3tA6Q5zNgZW_w3o7P_MUjB1803seG_3UoURFxHv9-mHRT1o9TMfRVaDC3VrwNVm1ubSzZ6ol2mkC3LytutXPdnnLDTZEu1zcy-CLOahgv2kuHXXTjl4DF3B96x5f0nqqtBLmsPvKSqGpsyga_ILibk1k0L2bY_isCgdmKmwAVfMJW3qzfWxVoyfW-DfBXUOE3mzYHNW5_gcLAiU9-nF11Zx9PPg81mMxzQM8pQNN6iSy2210MnwwhkibvFtbz7PpxQNTbH5p9eFsLt1ltabbtzefMhqQF2HmiiBAwjDk4qv4ce4qrIIwJfaDt2TvtMMkCotHesMpy-OwVKTrBO8Ztywr-Zi_xwO05ZG45jhw",
+          "width": 3000
+        }
+      ],
+      "place_id": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "plus_code": {
+        "compound_code": "R5GX+PG Dallas, TX, USA",
+        "global_code": "8645R5GX+PG"
+      },
+      "rating": 4.7,
+      "reference": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 964,
+      "vicinity": "4601 Lakeside Drive, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.6930718,
+          "lng": -96.79168229999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.6948382302915,
+            "lng": -96.7904347697085
+          },
+          "southwest": {
+            "lat": 32.6921402697085,
+            "lng": -96.79313273029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Nomamiukor Dora I",
+      "place_id": "ChIJoV7orp-XToYR7WTvrWrhfSw",
+      "plus_code": {
+        "compound_code": "M6V5+68 Dallas, TX, USA",
+        "global_code": "8645M6V5+68"
+      },
+      "reference": "ChIJoV7orp-XToYR7WTvrWrhfSw",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "vicinity": "4500 South Lancaster Road #140, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.832566,
+          "lng": -96.7785114
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.83352728029149,
+            "lng": -96.7778063197085
+          },
+          "southwest": {
+            "lat": 32.83082931970849,
+            "lng": -96.78050428029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Glencoe Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/102383517303626037461\">Michael “Mike”</a>"
+          ],
+          "photo_reference": "ATKogpfKpNvLyMm1bNKLlTdNHTJETzCilpA5WiNi1YlXSluvZ1ySQoOVAMDJXqVqSkZ_D0MRYKLIwzMiY3Nsp5AJtuk-eoko6j-FOh4_shqO4vwA9OFNhx_QkZyXDnx6kDZFIXvHvE5vsXa0-8J8Srw9Qx8JxrWmMKJ3kQrg_r8jShALWZIAffLu5V4Gwpi1iFqD2tSnzeMbA80hiCCnvMrGTjZ_SWTLM5n2zCHePFv20pBd3OIkoeUd35CML0Tw22sxDH6Ea9RxTjbkLbtGT7lTfDEwBFKrFWv_W3zYkrT2QuGG2l6XyB0CvGoTt2Ui-3szFNmOLAk4WyNS5ZNbTl2P6JNR8S1A68vaauCwH0loQ5CHr_innWW4KNq9AWJfrV4TQL5LWUfnRS6bh5RLcA-nu_RyRaoK9bb4I-0y0DZlXwm_VFxcBd5Qfiuk9s2DB8JCQxn00UXKymQIMvIPbk2diyjRZUEW0vMw1Var6I5PSfcuGYjfqj5ZHTb84UX6_JKDlTZcVaH5lYfvgqpRc6UYe7mdb7uUjXTUJx7hqEgvCZtYKzEC_s5jgENKZRoGlDXAEtRwlO29bNXi2vBrdmUCVzn3dqpEhGS571FPja5y8KgifE3iLxMJay6SPuHGzGuM",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "plus_code": {
+        "compound_code": "R6MC+2H Dallas, TX, USA",
+        "global_code": "8645R6MC+2H"
+      },
+      "rating": 4.5,
+      "reference": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 569,
+      "vicinity": "3700 Glencoe Street, Dallas"
+    }
+  ],
+  "status": "OK"
+}
