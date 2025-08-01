@@ -169,6 +169,33 @@ export const handlers = [
     });
   }),
 
+  // Google Maps Tiles API (Vector Tiles)
+  http.get('https://maps.googleapis.com/maps/vt', ({ request }) => {
+    const url = new URL(request.url);
+    const pb = url.searchParams.get('pb');
+    
+    console.log(`🎭 MSW: Intercepted Google Maps tiles request - RETURNING MOCK TILE IMAGE`);
+    
+    // Create a simple 256x256 placeholder tile image (1x1 pixel PNG, stretched)
+    // This is a base64 encoded 1x1 transparent PNG
+    const transparentPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+    
+    // Convert base64 to binary
+    const binaryString = atob(transparentPng);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    return new Response(bytes, {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=86400', // Cache for 1 day like real tiles
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }),
+
   // Health Check Endpoint
   http.get('/api/health', () => {
     console.log('🎭 MSW: Intercepted /api/health request - RETURNING MOCK DATA');
