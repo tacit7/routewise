@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Flag, Clock, Route, CheckCircle, Navigation } from 'lucide-react';
+import { MapPin, Flag, Clock, Route, CheckCircle, Navigation, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,6 +12,8 @@ interface ItineraryComponentProps {
   checkpoints: string[];
   pois: Poi[];
   onUpdateSelectedPois: (selectedIds: number[]) => void;
+  onSaveRoute: () => void;
+  poisCount: number;
 }
 
 interface RouteData {
@@ -41,7 +43,9 @@ export default function ItineraryComponent({
   endCity, 
   checkpoints, 
   pois, 
-  onUpdateSelectedPois 
+  onUpdateSelectedPois,
+  onSaveRoute,
+  poisCount
 }: ItineraryComponentProps) {
   const [selectedPoiIds, setSelectedPoiIds] = useState<Set<number>>(new Set());
   const [poisWithDistances, setPoisWithDistances] = useState<Poi[]>([]);
@@ -317,16 +321,28 @@ export default function ItineraryComponent({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Route className="h-5 w-5" />
-          Your Complete Itinerary
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {routeData ? 
-            `${routeData.distance} • ${routeData.duration} • ${selectedPoiIds.size} stops selected` :
-            `Journey from ${startCity} to ${endCity} • ${selectedPoiIds.size} stops selected`
-          }
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Route className="h-5 w-5" />
+              Your Complete Itinerary
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              {routeData ? 
+                `${routeData.distance} • ${routeData.duration} • ${selectedPoiIds.size} stops selected` :
+                `Journey from ${startCity} to ${endCity} • ${selectedPoiIds.size} stops selected`
+              }
+            </p>
+          </div>
+          <Button
+            onClick={onSaveRoute}
+            disabled={poisCount === 0}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save Route
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -351,43 +367,52 @@ export default function ItineraryComponent({
           {/* City Route */}
           <div>
             <h3 className="font-medium mb-4">Main Route</h3>
-            <div className="space-y-4">
-              {cityStops.map((stop, index) => (
-                <div key={`city-${index}`} className="relative">
-                  {index < cityStops.length - 1 && (
-                    <div className="absolute left-6 top-12 w-0.5 h-16 bg-blue-300"></div>
-                  )}
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                      {index === 0 ? (
-                        <MapPin className="h-6 w-6 text-blue-600" />
-                      ) : index === cityStops.length - 1 ? (
-                        <Flag className="h-6 w-6 text-green-600" />
-                      ) : (
-                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-grow">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-semibold">{stop.name}</h4>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
+            <div className="overflow-x-auto pb-4">
+              <div className="flex items-start justify-between min-w-full">
+                {cityStops.map((stop, index) => (
+                  <div key={`city-${index}`} className="flex items-start flex-1">
+                    {/* Stop */}
+                    <div className="flex flex-col items-center">
+                      {/* Icon */}
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center z-10">
+                        {index === 0 ? (
+                          <MapPin className="h-6 w-6 text-blue-600" />
+                        ) : index === cityStops.length - 1 ? (
+                          <Flag className="h-6 w-6 text-green-600" />
+                        ) : (
+                          <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                        )}
+                      </div>
+                      
+                      {/* Stop Info */}
+                      <div className="mt-3 text-center max-w-[150px]">
+                        <h4 className="font-semibold text-sm">{stop.name}</h4>
+                        <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-1">
+                          <Clock className="h-3 w-3" />
                           <span>{stop.estimatedTime}</span>
                         </div>
+                        <p className="text-xs text-muted-foreground mt-1">{stop.description}</p>
                       </div>
-                      <p className="text-sm text-muted-foreground">{stop.description}</p>
-                      {stop.travelTimeToNext && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                          <Route className="h-4 w-4" />
-                          <span>Drive {stop.travelTimeToNext} to next stop</span>
-                        </div>
-                      )}
                     </div>
+                    
+                    {/* Connector Line */}
+                    {index < cityStops.length - 1 && (
+                      <div className="flex-1 flex items-center px-2 mt-6">
+                        <div className="w-full h-0.5 bg-blue-300 relative">
+                          {stop.travelTimeToNext && (
+                            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground bg-white px-1">
+                                <Route className="h-3 w-3" />
+                                <span>{stop.travelTimeToNext}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 

@@ -327,17 +327,12 @@ export default function RouteResults() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
-            
-            <div className="flex items-center space-x-3">
-              <Button
-                onClick={handleSaveRoute}
-                disabled={!pois || pois.length === 0}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                Save Route
-              </Button>
-            </div>
+          </div>
+        </div>
+      </header>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
           {/* Itinerary Component */}
           {uniquePois.length > 0 && (
             <ItineraryComponent
@@ -346,14 +341,10 @@ export default function RouteResults() {
               checkpoints={checkpoints}
               pois={uniquePois}
               onUpdateSelectedPois={handleUpdateSelectedPois}
+              onSaveRoute={handleSaveRoute}
+              poisCount={uniquePois.length}
             />
           )}
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
           {/* Route Info Card */}
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
@@ -534,7 +525,7 @@ export default function RouteResults() {
                 )}
 
                 {/* Category Filters */}
-                <div className="mb-8">
+                {/* <div className="mb-8">
                   <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by Category:</h3>
                   <div className="flex flex-wrap gap-2 justify-center">
                     <button 
