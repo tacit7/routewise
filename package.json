@@ -5,13 +5,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
+    "dev:no-msw": "NODE_ENV=development MSW_DISABLED=true tsx server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "msw:init": "msw init client/public --save"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
@@ -120,5 +122,10 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+  },
+  "msw": {
+    "workerDirectory": [
+      "client/public"
+    ]
   }
 }

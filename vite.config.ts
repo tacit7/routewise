@@ -34,4 +34,8 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  define: {
+    // Pass MSW_DISABLED environment variable to client
+    'import.meta.env.VITE_MSW_DISABLED': JSON.stringify(process.env.MSW_DISABLED || 'false'),
+  },
 });

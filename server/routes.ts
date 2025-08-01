@@ -32,6 +32,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Cache stats endpoint (development only)
+  if (process.env.NODE_ENV === 'development') {
+    app.get("/api/cache-stats", async (req, res) => {
+      const { getCacheStats } = await import('./dev-api-cache');
+      res.json({
+        ...getCacheStats(),
+        mswDisabled: process.env.MSW_DISABLED === 'true',
+        timestamp: new Date().toISOString()
+      });
+    });
+  }
+
   // Serve Google Maps API key to frontend
   app.get("/api/maps-key", (req, res) => {
     res.json({ apiKey: googleMapsApiKey || '' });

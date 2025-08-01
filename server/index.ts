@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import { registerRoutes } from "./routes";
 import { registerAuthRoutes } from "./auth-routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { devApiCacheMiddleware } from "./dev-api-cache";
 
 // Load environment variables from both current directory and parent directory
 config({ path: '.env' }); // Load from frontend/.env
@@ -13,6 +14,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Add development API caching middleware (especially useful when MSW is disabled)
+app.use(devApiCacheMiddleware);
 
 
 app.use((req, res, next) => {
