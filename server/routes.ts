@@ -11,9 +11,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let placesService: GooglePlacesService | null = null;
   const nominatimService = new NominatimService(); // Always available, no API key needed
 
+  console.log('🔧 Environment check:');
+  console.log('  - Google Places API Key:', googlePlacesApiKey ? 'configured' : 'missing');
+  console.log('  - Google Maps API Key:', googleMapsApiKey ? 'configured' : 'missing');
+
   if (googlePlacesApiKey) {
     placesService = new GooglePlacesService(googlePlacesApiKey);
   }
+
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      services: {
+        nominatim: 'available',
+        googlePlaces: placesService ? 'available' : 'unavailable',
+        googleMaps: googleMapsApiKey ? 'available' : 'unavailable'
+      }
+    });
+  });
 
   // Serve Google Maps API key to frontend
   app.get("/api/maps-key", (req, res) => {

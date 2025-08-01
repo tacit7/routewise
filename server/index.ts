@@ -1,10 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
+import { config } from "dotenv";
 import { registerRoutes } from "./routes";
+import { registerAuthRoutes } from "./auth-routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+// Load environment variables from both current directory and parent directory
+config({ path: '.env' }); // Load from frontend/.env
+config({ path: '../.env' }); // Load from project root .env
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -37,6 +46,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register authentication routes
+  registerAuthRoutes(app);
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -56,10 +68,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
+  // Serve the app on port 3001 for development, or from environment variable in production
   // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
   server.listen({
     port,
     host: "0.0.0.0",

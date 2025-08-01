@@ -3,7 +3,10 @@ import { users, pois, type User, type InsertUser, type Poi, type InsertPoi } fro
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  linkGoogleAccount(userId: number, googleId: string): Promise<void>;
   getAllPois(): Promise<Poi[]>;
   getPoiById(id: number): Promise<Poi | undefined>;
   createPoi(poi: InsertPoi): Promise<Poi>;
@@ -40,9 +43,39 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.googleId === googleId,
+    );
+  }
+
+  async linkGoogleAccount(userId: number, googleId: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.googleId = googleId;
+      this.users.set(userId, user);
+    }
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      email: insertUser.email || null,
+      googleId: insertUser.googleId || null,
+      fullName: insertUser.fullName || null,
+      avatar: insertUser.avatar || null,
+      provider: insertUser.provider || 'local',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
     this.users.set(id, user);
     return user;
   }

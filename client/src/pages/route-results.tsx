@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
 import PoiCard from "@/components/poi-card";
 import ItineraryComponent from "@/components/itinerary-component-enhanced";
+import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
@@ -200,8 +201,20 @@ export default function RouteResults() {
 
   const handleUpdateSelectedPois = (selectedIds: number[]) => {
     setSelectedPoiIds(selectedIds);
-    // You can add logic here to recalculate route if needed
     console.log('Selected POI IDs:', selectedIds);
+  };
+
+  const handlePoiClick = (poi: Poi) => {
+    console.log('POI clicked:', poi.name);
+    // Could show details modal or scroll to POI card
+  };
+
+  const handlePoiSelect = (poiId: number, selected: boolean) => {
+    if (selected) {
+      setSelectedPoiIds(prev => [...prev, poiId]);
+    } else {
+      setSelectedPoiIds(prev => prev.filter(id => id !== poiId));
+    }
   };
 
   useEffect(() => {
@@ -416,40 +429,26 @@ export default function RouteResults() {
               )}
             </div>
 
-            {/* Google Maps Embed */}
+            {/* Interactive Google Maps Component */}
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-800">Route Map</h3>
-                <a
-                  href={googleMapsDirectUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  Open in Google Maps →
-                </a>
+                <h3 className="text-lg font-semibold text-slate-800">Interactive Route Map</h3>
+                <div className="text-sm text-slate-600">
+                  Click POI markers to view details
+                </div>
               </div>
               
-              {mapsApiLoading ? (
-                <Skeleton className="w-full h-96" />
-              ) : mapsApiData?.apiKey ? (
-                <div className="w-full h-96 rounded-lg overflow-hidden border border-slate-200">
-                  <iframe
-                    src={googleMapsEmbedUrl}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Route Map"
-                  />
-                </div>
-              ) : (
-                <div className="w-full h-96 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <p className="text-slate-600">Unable to load map. Please check your connection.</p>
-                </div>
-              )}
+              <InteractiveMap
+                startCity={routeData.startCity}
+                endCity={routeData.endCity}
+                checkpoints={checkpoints}
+                pois={uniquePois}
+                selectedPoiIds={selectedPoiIds}
+                onPoiClick={handlePoiClick}
+                onPoiSelect={handlePoiSelect}
+                height="500px"
+                className="w-full"
+              />
             </div>
           </div>
 

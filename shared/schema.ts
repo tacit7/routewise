@@ -6,6 +6,13 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email").unique(),
+  googleId: text("google_id").unique(),
+  fullName: text("full_name"),
+  avatar: text("avatar"),
+  provider: text("provider").default("local"), // 'local', 'google', etc.
+  createdAt: text("created_at").default("now()"),
+  updatedAt: text("updated_at").default("now()"),
 });
 
 export const pois = pgTable("pois", {
@@ -26,6 +33,11 @@ export const pois = pgTable("pois", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  email: true,
+  googleId: true,
+  fullName: true,
+  avatar: true,
+  provider: true,
 });
 
 export const insertPoiSchema = createInsertSchema(pois).omit({

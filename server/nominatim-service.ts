@@ -2,10 +2,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { saveMockResponse } from "./saveMockResponse";
 
+// ES modules equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 interface NominatimPlace {
   place_id: number;
@@ -86,10 +87,8 @@ export class NominatimService {
       }
 
       const data: NominatimPlace[] = await response.json();
-      fs.writeFileSync(
-        path.join(__dirname, "nominatim-search-places.mock.json"),
-        JSON.stringify(data, null, 2)
-      );
+      console.log(data);
+      saveMockResponse("nominatim-search-places.mock.json", data);
       return this.transformToSuggestions(data);
     } catch (error) {
       console.error("Nominatim search error:", error);
