@@ -28,6 +28,7 @@ if (import.meta.env.DEV && !isMswDisabled) {
     console.log('   • /api/pois/:id - Individual POI details');
     console.log('   • https://maps.googleapis.com/.../GeocodeService.Search - Google Maps geocoding');
     console.log('   • https://maps.googleapis.com/maps/vt - Google Maps tiles (images)');
+    console.log('   • https://maps.googleapis.com/$rpc/.../GetViewportInfo - Google Maps viewport RPC');
     console.log('💡 MSW: Use "npm run dev:no-msw" to disable mocking and use real APIs');
   }).catch((error) => {
     console.error('❌ MSW: Failed to start Mock Service Worker:', error);

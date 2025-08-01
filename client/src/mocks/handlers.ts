@@ -196,6 +196,62 @@ export const handlers = [
     });
   }),
 
+  // Google Maps Internal RPC - GetViewportInfo
+  http.post('https://maps.googleapis.com/$rpc/google.internal.maps.mapsjs.v1.MapsJsInternalService/GetViewportInfo', async ({ request }) => {
+    const requestBody = await request.json();
+    
+    console.log(`🎭 MSW: Intercepted Google Maps GetViewportInfo RPC - RETURNING MOCK VIEWPORT DATA`);
+    
+    // Parse viewport bounds from request body
+    // Format: [[[sw_lat, sw_lng], [ne_lat, ne_lng]], zoom, ...]
+    const viewportBounds = requestBody[0] || [];
+    const zoomLevel = requestBody[1] || 7;
+    const language = requestBody[3] || 'en-US';
+    
+    let swBounds = { lat: 32.0, lng: -97.5 }; // Default Dallas area
+    let neBounds = { lat: 33.5, lng: -96.0 };
+    
+    if (viewportBounds.length >= 2) {
+      swBounds = { lat: viewportBounds[0][0], lng: viewportBounds[0][1] };
+      neBounds = { lat: viewportBounds[1][0], lng: viewportBounds[1][1] };
+    }
+    
+    // Create mock RPC response matching Google's internal format
+    const mockResponse = [
+      null, // Status/error field
+      [
+        [
+          // Viewport region data
+          [
+            [swBounds.lat, swBounds.lng], // Southwest bounds
+            [neBounds.lat, neBounds.lng]   // Northeast bounds
+          ],
+          zoomLevel,
+          null,
+          language,
+          0,
+          "m@742000000", // Map version
+          0,
+          0,
+          null,
+          null,
+          null,
+          2
+        ]
+      ],
+      null // Additional metadata
+    ];
+    
+    console.log(`🎭 MSW: Returning mock viewport for bounds SW: ${swBounds.lat.toFixed(4)}, ${swBounds.lng.toFixed(4)} NE: ${neBounds.lat.toFixed(4)}, ${neBounds.lng.toFixed(4)}`);
+    
+    return HttpResponse.json(mockResponse, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }),
+
   // Health Check Endpoint
   http.get('/api/health', () => {
     console.log('🎭 MSW: Intercepted /api/health request - RETURNING MOCK DATA');
