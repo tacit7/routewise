@@ -19,8 +19,15 @@ if (import.meta.env.DEV && !isMswDisabled) {
     quiet: false,
   }).then(() => {
     console.log('🚀 MSW: Mock Service Worker started successfully');
-    console.log('📡 MSW: Intercepting API requests for development');
-    console.log('💡 MSW: Use "npm run dev:no-msw" to disable mocking');
+    console.log('🎭 MSW: Now intercepting and mocking these API endpoints:');
+    console.log('   • /api/health - Server health status');
+    console.log('   • /api/maps-key - Google Maps API key');
+    console.log('   • /api/places/autocomplete - City search (free)');
+    console.log('   • /api/places/autocomplete/google - City search (premium)');
+    console.log('   • /api/pois - Points of interest (all variants)');
+    console.log('   • /api/pois/:id - Individual POI details');
+    console.log('   • https://maps.googleapis.com/.../GeocodeService.Search - Google Maps geocoding');
+    console.log('💡 MSW: Use "npm run dev:no-msw" to disable mocking and use real APIs');
   }).catch((error) => {
     console.error('❌ MSW: Failed to start Mock Service Worker:', error);
   });

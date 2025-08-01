@@ -1,6 +1,30 @@
 import { http, HttpResponse } from 'msw';
 import type { InsertPoi } from '@shared/schema';
 
+// Helper function to generate mock coordinates for addresses
+function getMockCoordinatesForAddress(address: string): { lat: number; lng: number } {
+  // Hash the address to get consistent coordinates for the same address
+  let hash = 0;
+  for (let i = 0; i < address.length; i++) {
+    const char = address.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use hash to generate coordinates within Dallas area
+  // Dallas bounds: lat 32.6-32.9, lng -96.9 to -96.6
+  const latBase = 32.7; // Dallas center lat
+  const lngBase = -96.8; // Dallas center lng
+  
+  const latOffset = ((hash % 1000) / 10000) * 0.3; // ±0.15 degree variation
+  const lngOffset = (((hash >> 10) % 1000) / 10000) * 0.3; // ±0.15 degree variation
+  
+  return {
+    lat: latBase + latOffset,
+    lng: lngBase + lngOffset
+  };
+}
+
 // Mock data generators
 const generateMockPoi = (overrides: Partial<InsertPoi> = {}): InsertPoi => {
   const categories = ['restaurant', 'attraction', 'park', 'museum', 'shopping'] as const;
@@ -54,9 +78,100 @@ const generateMockPoi = (overrides: Partial<InsertPoi> = {}): InsertPoi => {
 
 // API Handlers
 export const handlers = [
+  // Google Maps GeocodeService.Search API
+  http.get('https://maps.googleapis.com/maps/api/js/GeocodeService.Search', ({ request }) => {
+    const url = new URL(request.url);
+    const address = url.searchParams.get('4s'); // Google uses '4s' parameter for address
+    const callback = url.searchParams.get('callback');
+    
+    console.log(`🎭 MSW: Intercepted Google Maps GeocodeService.Search - RETURNING MOCK COORDINATES for "${address}"`);
+    
+    if (!address) {
+      const errorResponse = {
+        results: [],
+        status: 'INVALID_REQUEST'
+      };
+      const jsonpResponse = callback ? `${callback}(${JSON.stringify(errorResponse)});` : JSON.stringify(errorResponse);
+      return new Response(jsonpResponse, {
+        headers: { 'Content-Type': 'application/javascript' }
+      });
+    }
+    
+    // Generate mock coordinates for the address
+    const coordinates = getMockCoordinatesForAddress(address);
+    
+    // Create realistic geocoding response
+    const mockResponse = {
+      results: [
+        {
+          address_components: [
+            {
+              long_name: address.split(',')[0] || address,
+              short_name: address.split(',')[0] || address,
+              types: ['street_address']
+            },
+            {
+              long_name: 'Dallas',
+              short_name: 'Dallas',
+              types: ['locality', 'political']
+            },
+            {
+              long_name: 'Dallas County',
+              short_name: 'Dallas County',
+              types: ['administrative_area_level_2', 'political']
+            },
+            {
+              long_name: 'Texas',
+              short_name: 'TX',
+              types: ['administrative_area_level_1', 'political']
+            },
+            {
+              long_name: 'United States',
+              short_name: 'US',
+              types: ['country', 'political']
+            }
+          ],
+          formatted_address: `${address}, Dallas, TX, USA`,
+          geometry: {
+            location: {
+              lat: coordinates.lat,
+              lng: coordinates.lng
+            },
+            location_type: 'ROOFTOP',
+            viewport: {
+              northeast: {
+                lat: coordinates.lat + 0.001,
+                lng: coordinates.lng + 0.001
+              },
+              southwest: {
+                lat: coordinates.lat - 0.001,
+                lng: coordinates.lng - 0.001
+              }
+            }
+          },
+          place_id: `mock_place_${Math.random().toString(36).substr(2, 9)}`,
+          plus_code: {
+            compound_code: `${Math.random().toString(36).substr(2, 4).toUpperCase()}+${Math.random().toString(36).substr(2, 2).toUpperCase()} Dallas, TX, USA`,
+            global_code: `864F${Math.random().toString(36).substr(2, 4).toUpperCase()}+${Math.random().toString(36).substr(2, 2).toUpperCase()}`
+          },
+          types: ['street_address']
+        }
+      ],
+      status: 'OK'
+    };
+    
+    // Return JSONP response if callback is provided, otherwise JSON
+    const jsonpResponse = callback ? `${callback}(${JSON.stringify(mockResponse)});` : JSON.stringify(mockResponse);
+    console.log(`🎭 MSW: Returning mock coordinates lat: ${coordinates.lat.toFixed(6)}, lng: ${coordinates.lng.toFixed(6)}`);
+    
+    return new Response(jsonpResponse, {
+      headers: { 'Content-Type': 'application/javascript' }
+    });
+  }),
+
   // Health Check Endpoint
   http.get('/api/health', () => {
-    console.log('🔍 MSW: Intercepted /api/health request');
+    console.log('🎭 MSW: Intercepted /api/health request - RETURNING MOCK DATA');
     
     return HttpResponse.json({
       status: 'ok',
@@ -71,7 +186,7 @@ export const handlers = [
 
   // Google Maps API Key Endpoint  
   http.get('/api/maps-key', () => {
-    console.log('🔍 MSW: Intercepted /api/maps-key request');
+    console.log('🎭 MSW: Intercepted /api/maps-key request - RETURNING MOCK API KEY');
     
     return HttpResponse.json({
       apiKey: 'mock-google-maps-api-key-for-development'
@@ -83,7 +198,7 @@ export const handlers = [
     const url = new URL(request.url);
     const input = url.searchParams.get('input');
     
-    console.log('🔍 MSW: Intercepted /api/places/autocomplete request, input:', input);
+    console.log(`🎭 MSW: Intercepted /api/places/autocomplete request - RETURNING MOCK CITIES for "${input}"`);
     
     if (!input) {
       return HttpResponse.json(
@@ -120,7 +235,7 @@ export const handlers = [
     const url = new URL(request.url);
     const input = url.searchParams.get('input');
     
-    console.log('🔍 MSW: Intercepted /api/places/autocomplete/google request, input:', input);
+    console.log(`🎭 MSW: Intercepted /api/places/autocomplete/google request - RETURNING MOCK PREMIUM CITIES for "${input}"`);
     
     if (!input) {
       return HttpResponse.json(
@@ -156,7 +271,17 @@ export const handlers = [
     const end = url.searchParams.get('end');
     const checkpoint = url.searchParams.get('checkpoint');
     
-    console.log('🔍 MSW: Intercepted /api/pois request', { start, end, checkpoint });
+    let logMessage = '🎭 MSW: Intercepted /api/pois request - RETURNING MOCK POI DATA';
+    
+    if (checkpoint) {
+      logMessage += ` for checkpoint "${checkpoint}"`;
+    } else if (start && end) {
+      logMessage += ` for route "${start}" → "${end}"`;
+    } else {
+      logMessage += ' (general POIs)';
+    }
+    
+    console.log(logMessage);
 
     // Mock POI data generation
     let poisCount = 12; // Default number of POIs
@@ -193,6 +318,7 @@ export const handlers = [
     // Add some delay to simulate network request
     return new Promise(resolve => {
       setTimeout(() => {
+        console.log(`🎭 MSW: Returning ${mockPois.length} mock POIs (fake data generated by MSW)`);
         resolve(HttpResponse.json(mockPois));
       }, Math.random() * 500 + 200); // 200-700ms delay
     });
@@ -201,7 +327,7 @@ export const handlers = [
   // Get POI by ID
   http.get('/api/pois/:id', ({ params }) => {
     const { id } = params;
-    console.log('🔍 MSW: Intercepted /api/pois/:id request, id:', id);
+    console.log(`🎭 MSW: Intercepted /api/pois/${id} request - RETURNING MOCK POI DATA for ID ${id}`);
     
     const poiId = parseInt(id as string);
     if (isNaN(poiId)) {
