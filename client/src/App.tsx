@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/components/auth-context";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import RouteResults from "@/pages/route-results";
+import InterestsDemo from "@/pages/interests-demo";
+import InterestsPage from "@/pages/interests";
 import NotFound from "@/pages/not-found";
 import TripIndicator from "@/components/trip-indicator";
 
@@ -26,9 +28,11 @@ function AuthenticatedRouter() {
     <Switch>
       {/* Authenticated users go to dashboard, non-authenticated to landing page */}
       <Route path="/" component={isAuthenticated ? Dashboard : Home} />
-      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
+      <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
       <Route path="/plan" component={Home} />
       <Route path="/route" component={RouteResults} />
+      <Route path="/interests-demo" component={InterestsDemo} />
       <Route component={NotFound} />
     </Switch>
   );

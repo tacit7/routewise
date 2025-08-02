@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,6 +28,33 @@ export default function RouteForm() {
       endCity: "",
     },
   });
+
+  // Check for pre-filled route request from interests page
+  useEffect(() => {
+    const routeRequest = localStorage.getItem('routeRequest');
+    if (routeRequest) {
+      try {
+        const { startLocation, endLocation, timestamp } = JSON.parse(routeRequest);
+        
+        // Only use the request if it's recent (within last 5 minutes)
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          form.setValue('startCity', startLocation);
+          form.setValue('endCity', endLocation);
+          
+          toast({
+            title: "Route pre-filled!",
+            description: "We've filled in the trip details from your interest selection.",
+          });
+        }
+        
+        // Clear the request after using it
+        localStorage.removeItem('routeRequest');
+      } catch (error) {
+        console.error('Failed to parse route request:', error);
+        localStorage.removeItem('routeRequest');
+      }
+    }
+  }, [form, toast]);
 
   const onSubmit = async (data: RouteFormData) => {
     setIsLoading(true);

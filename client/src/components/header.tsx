@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, User, LogOut, Settings, Menu, X } from "lucide-react";
+import { Route, User, LogOut, Settings, Menu, X, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,12 +17,14 @@ import {
 import { useAuth } from '@/components/auth-context';
 import { LoginForm } from '@/components/login-form';
 import { RegisterForm } from '@/components/register-form';
+import { useLocation } from 'wouter';
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
   const handleAuthSuccess = () => {
     setAuthDialogOpen(false);
@@ -50,12 +52,23 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-slate-600 hover:text-primary transition-colors">
-                Discover
-              </a>
-              <a href="#" className="text-slate-600 hover:text-primary transition-colors">
-                My Trips
-              </a>
+              {isAuthenticated && (
+                <button 
+                  onClick={() => setLocation("/interests")}
+                  className="text-slate-600 hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  <Compass className="h-4 w-4" />
+                  Discover
+                </button>
+              )}
+              {isAuthenticated && (
+                <button 
+                  onClick={() => setLocation("/dashboard")}
+                  className="text-slate-600 hover:text-primary transition-colors"
+                >
+                  My Trips
+                </button>
+              )}
               <a href="#" className="text-slate-600 hover:text-primary transition-colors">
                 Help
               </a>
@@ -124,12 +137,29 @@ export default function Header() {
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-slate-200 py-4">
               <nav className="flex flex-col space-y-3">
-                <a href="#" className="text-slate-600 hover:text-primary transition-colors px-2 py-2">
-                  Discover
-                </a>
-                <a href="#" className="text-slate-600 hover:text-primary transition-colors px-2 py-2">
-                  My Trips
-                </a>
+                {isAuthenticated && (
+                  <button 
+                    onClick={() => {
+                      setLocation("/interests");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-slate-600 hover:text-primary transition-colors px-2 py-2 text-left flex items-center gap-2"
+                  >
+                    <Compass className="h-4 w-4" />
+                    Discover
+                  </button>
+                )}
+                {isAuthenticated && (
+                  <button 
+                    onClick={() => {
+                      setLocation("/dashboard");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-slate-600 hover:text-primary transition-colors px-2 py-2 text-left"
+                  >
+                    My Trips
+                  </button>
+                )}
                 <a href="#" className="text-slate-600 hover:text-primary transition-colors px-2 py-2">
                   Help
                 </a>
