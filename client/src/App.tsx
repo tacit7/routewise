@@ -7,7 +7,7 @@ import { AuthProvider } from "@/components/auth-context";
 import Home from "@/pages/home";
 import RouteResults from "@/pages/route-results";
 import NotFound from "@/pages/not-found";
-import MswTestPanel from "@/components/msw-test-panel";
+import TripIndicator from "@/components/trip-indicator";
 
 function Router() {
   return (
@@ -26,8 +26,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
-          {/* MSW Test Panel - only in development */}
-          {import.meta.env.DEV && <MswTestPanel />}
+          <TripIndicator />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
