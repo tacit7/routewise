@@ -179,7 +179,7 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                               Stop #{index + 1}
                             </span>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColor}`}>
-                              <i className={`${categoryIcon} mr-1`} />
+                              <i key={`category-icon-${place.id}`} className={`${categoryIcon} mr-1`} />
                               {place.category}
                             </span>
                           </div>
@@ -191,19 +191,19 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                           <div className="flex items-center text-sm text-gray-600 space-x-4 mb-2">
                             {place.rating && (
                               <div className="flex items-center">
-                                <Star className="h-3 w-3 text-yellow-500 fill-current mr-1" />
+                                <Star key={`star-${place.id}`} className="h-3 w-3 text-yellow-500 fill-current mr-1" />
                                 <span>{place.rating}</span>
                               </div>
                             )}
                             {place.timeFromStart && (
                               <div className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
+                                <Clock key={`clock-${place.id}`} className="h-3 w-3 mr-1" />
                                 <span>{place.timeFromStart}</span>
                               </div>
                             )}
                             {place.address && (
                               <div className="flex items-center">
-                                <MapPin className="h-3 w-3 mr-1" />
+                                <MapPin key={`mappin-${place.id}`} className="h-3 w-3 mr-1" />
                                 <span className="truncate max-w-xs">{place.address}</span>
                               </div>
                             )}
@@ -224,9 +224,9 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                               className="text-gray-400 hover:text-gray-600 transition-colors"
                             >
                               {isExpanded ? (
-                                <ChevronUp className="h-5 w-5" />
+                                <ChevronUp key={`chevron-up-${place.id}`} className="h-5 w-5" />
                               ) : (
-                                <ChevronDown className="h-5 w-5" />
+                                <ChevronDown key={`chevron-down-${place.id}`} className="h-5 w-5" />
                               )}
                             </button>
                           )}
@@ -234,7 +234,7 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                             onClick={() => removeFromTrip(place.id)}
                             className="text-red-500 hover:text-red-700 transition-colors"
                           >
-                            <Trash2 className="h-5 w-5" />
+                            <Trash2 key={`trash-${place.id}`} className="h-5 w-5" />
                           </button>
                         </div>
                       </div>
