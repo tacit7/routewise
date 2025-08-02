@@ -36,19 +36,19 @@ export function useFirstTimeUser() {
       setIsFirstVisit(false);
       setHasCompletedOnboarding(true);
 
-      // If user hasn't selected any interests, enable all by default
-      if (!hasInterestsConfigured) {
-        await enableAllInterests();
-      }
+      // Don't automatically enable all interests - let user choose manually
+      // This allows for the desired behavior where all interests start unmarked
 
-      // Preload suggested trips for better UX
-      preloadSuggestedTrips();
+      // Preload suggested trips for better UX (only if interests are configured)
+      if (hasInterestsConfigured) {
+        preloadSuggestedTrips();
+      }
 
     } catch (error) {
       console.error("Failed to complete onboarding:", error);
       throw error;
     }
-  }, [hasInterestsConfigured, enableAllInterests, preloadSuggestedTrips]);
+  }, [hasInterestsConfigured, preloadSuggestedTrips]);
 
   /**
    * Skip onboarding and mark as completed
