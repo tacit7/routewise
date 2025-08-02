@@ -12,6 +12,7 @@ import {
   useSuggestedTrips, 
   useUserInterests
 } from "@/hooks/use-interests";
+import { useFirstTimeUser } from "@/hooks/use-first-time-user";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Route, CheckCircle, Settings } from "lucide-react";
 
@@ -23,6 +24,7 @@ const Dashboard = () => {
   // Use our new interests hooks
   const { trips: suggestedTrips, isLoading: isLoadingSuggested, isError: hasTripsError } = useSuggestedTrips(4);
   const { enabledInterestNames, isLoading: isLoadingInterests } = useUserInterests();
+  const { shouldShowFirstTimeExperience, hasInterestsConfigured } = useFirstTimeUser();
 
   const handlePlanRoadTrip = () => {
     setLocation("/");
@@ -48,7 +50,7 @@ const Dashboard = () => {
   };
 
   // Show loading while checking data
-  if (isLoadingSuggested && isLoadingInterests) {
+  if (isLoadingSuggested || isLoadingInterests) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -61,8 +63,8 @@ const Dashboard = () => {
       <Header />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
+        <div className="text-center flex-shrink-0">
           {/* Top Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
             <Button 
@@ -82,27 +84,32 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Personalize Section */}
-          <section className="mb-12">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
-                <CheckCircle className="w-5 h-5 text-white" />
+          {/* Personalize Section - Only show for first-time users or users without interests */}
+          {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
+            <section className="mb-12">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
-            </div>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">Tell us what you're into to get tailored recommendations.</p>
-            
-            <Button 
-              onClick={handleCustomizeInterests}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
-            >
-              Customize Interests
-            </Button>
-          </section>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">Tell us what you're into to get tailored recommendations.</p>
+              
+              <Button 
+                onClick={handleCustomizeInterests}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+              >
+                Customize Interests
+              </Button>
+            </section>
+          )}
         </div>
 
+        {/* Spacer to push Suggested Trips to bottom */}
+        <div className="flex-grow"></div>
+
         {/* Suggested Trips Section */}
-        <section className="text-center">
+        <section className="text-center flex-shrink-0">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
           
           {hasTripsError ? (
@@ -145,7 +152,7 @@ const Dashboard = () => {
           ) : suggestedTrips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {suggestedTrips.map((trip) => (
-                <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <div className="relative h-48">
                     <img 
                       src={trip.imageUrl} 
@@ -153,12 +160,12 @@ const Dashboard = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
                     <p className="text-sm text-gray-600 mb-2">
                       {trip.startLocation} to {trip.endLocation}
                     </p>
-                    <p className="text-sm text-gray-700 mb-4 overflow-hidden" style={{
+                    <p className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow" style={{
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical'
@@ -167,7 +174,7 @@ const Dashboard = () => {
                     </p>
                     <Button 
                       onClick={() => handleStartTrip(trip)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
                     >
                       Start This Trip
                     </Button>
