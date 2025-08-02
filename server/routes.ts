@@ -4,6 +4,21 @@ import { storage } from "./storage";
 import { GooglePlacesService, SAMPLE_ROUTE_COORDINATES } from "./google-places";
 import { NominatimService } from "./nominatim-service";
 import { tripService } from "./trip-service";
+import { interestsService } from "./interests-service";
+import { suggestedTripsService } from "./suggested-trips-service";
+import { AuthMiddleware } from "./auth-middleware";
+import { 
+  validateSchema, 
+  checkUserOwnership, 
+  validateInterestCategories,
+  rateLimitSuggestedTrips 
+} from "./interests-middleware";
+import { 
+  updateUserInterestsSchema,
+  suggestedTripsQuerySchema,
+  userIdParamSchema,
+  tripIdParamSchema 
+} from "./interests-validation";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -731,6 +746,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch POI" });
     }
   });
+
+  // ===== INTERESTS MANAGEMENT ENDPOINTS =====
+
+  // Get all available interest categories
+  app.get("/api/interests/categories", async (req, res) => {
+    try {
+      const categories = await interestsService.getInterestCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching interest categories:", error);
+      res.status(500).json({ message: "Failed to fetch interest categories" });
+    }
+  });
+
+  // Get user's interests (requires authentication)
+  app.get("/api/users/:id/interests", 
+    AuthMiddleware.authenticate,
+    validateSchema(userIdParamSchema, 'params'),
+    checkUserOwnership,
+    async (req, res) => {
+      try {
+        const userId = parseInt(req.params.id);
+        const interests = await interestsService.getUserInterests(userId);
+        res.json(interests);
+      } catch (error) {
+        console.error("Error fetching user interests:", error);
+        res.status(500).json({ message: "Failed to fetch user interests" });
+      }
+    }
+  );
+
+  // Update user's interests (requires authentication)
+  app.put("/api/users/:id/interests", 
+    AuthMiddleware.authenticate,
+    validateSchema(userIdParamSchema, 'params'),
+    validateSchema(updateUserInterestsSchema, 'body'),
+    checkUserOwnership,
+    validateInterestCategories(),
+    async (req, res) => {
+      try {
+        const userId = parseInt(req.params.id);
+        const { interests, enableAll } = req.body;
+
+        let updatedInterests;
+        if (enableAll === true) {
+          updatedInterests = await interestsService.enableAllInterestsForUser(userId);
+        } else {
+          updatedInterests = await interestsService.updateUserInterests(userId, interests);
+        }
+
+        res.json(updatedInterests);
+      } catch (error) {
+        console.error("Error updating user interests:", error);
+        res.status(500).json({ message: "Failed to update user interests" });
+      }
+    }
+  );
+
+  // Get suggested trips based on user interests (requires authentication)
+  app.get("/api/trips/suggested", 
+    AuthMiddleware.authenticate,
+    validateSchema(suggestedTripsQuerySchema, 'query'),
+    rateLimitSuggestedTrips(),
+    async (req, res) => {
+      try {
+        const userId = (req as any).user?.id;
+        const limit = parseInt(req.query.limit as string) || 5;
+
+        const suggestedTrips = await suggestedTripsService.getSuggestedTripsWithRateLimit(userId, limit);
+        res.json(suggestedTrips);
+      } catch (error) {
+        console.error("Error fetching suggested trips:", error);
+        res.status(500).json({ message: "Failed to fetch suggested trips" });
+      }
+    }
+  );
+
+  // Get specific suggested trip by ID
+  app.get("/api/trips/suggested/:id", 
+    AuthMiddleware.optionalAuth,
+    validateSchema(tripIdParamSchema, 'params'),
+    async (req, res) => {
+      try {
+        const tripId = req.params.id;
+        const userId = (req as any).user?.id; // Optional for anonymous users
+        
+        const trip = await suggestedTripsService.getSuggestedTripById(tripId, userId);
+        
+        if (!trip) {
+          return res.status(404).json({ message: "Suggested trip not found" });
+        }
+
+        res.json(trip);
+      } catch (error) {
+        console.error("Error fetching suggested trip:", error);
+        res.status(500).json({ message: "Failed to fetch suggested trip" });
+      }
+    }
+  );
 
   // ===== TRIP MANAGEMENT ENDPOINTS =====
 
