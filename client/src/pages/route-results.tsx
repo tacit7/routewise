@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Flag, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -67,6 +67,8 @@ export default function RouteResults() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
+  const [hoveredPoi, setHoveredPoi] = useState<Poi | null>(null);
+  const [isMapVisible, setIsMapVisible] = useState(true);
   const { toast } = useToast();
 
   // Fetch Google Maps API key
@@ -178,6 +180,10 @@ export default function RouteResults() {
     }
   };
 
+  const handlePoiHover = (poi: Poi | null) => {
+    setHoveredPoi(poi);
+  };
+
   useEffect(() => {
     // Get route data from URL parameters or localStorage
     const searchParams = new URLSearchParams(window.location.search);
@@ -280,249 +286,204 @@ export default function RouteResults() {
               poisCount={uniquePois.length}
             />
           )}
-          {/* Route Info Card */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold mb-2">Main Route</h1>
-                  <div className="flex items-center text-blue-100">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    <span className="text-lg">{routeData.startCity}</span>
-                    <ArrowLeft className="h-5 w-5 mx-3 rotate-180" />
-                    <Flag className="h-5 w-5 mr-2" />
-                    <span className="text-lg">{routeData.endCity}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-blue-100">Total Places Found</div>
-                  <div className="text-3xl font-bold">{uniquePois.length}</div>
-                </div>
-              </div>
-            </div>
-
-
-            {/* Interactive Google Maps Component */}
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-800">Interactive Route Map</h3>
-                <div className="text-sm text-slate-600">
-                  Click POI markers to view details
-                </div>
-              </div>
-              
-              <InteractiveMap
-                startCity={routeData.startCity}
-                endCity={routeData.endCity}
-                checkpoints={[]}
-                pois={uniquePois}
-                selectedPoiIds={selectedPoiIds}
-                onPoiClick={handlePoiClick}
-                onPoiSelect={handlePoiSelect}
-                height="500px"
-                className="w-full"
-              />
-            </div>
+          {/* Map Toggle Button */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setIsMapVisible(!isMapVisible)}
+              className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              <MapIcon className="h-4 w-4 mr-2" />
+              {isMapVisible ? 'Hide Map' : 'Show Map'}
+            </button>
           </div>
 
-          {/* POIs Display */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-            <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
-              Amazing Places Along Your Route
-            </h2>
-
-            {poisLoading && (
-              <div className="space-y-6">
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                  <p className="text-lg font-medium text-slate-700">Discovering amazing places...</p>
-                  <p className="text-sm text-slate-500 mt-1">This may take a few moments</p>
-                </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="space-y-3">
-                      <Skeleton className="h-48 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
+          {/* Main Content - Side by Side Layout */}
+          <div className={`grid gap-8 ${isMapVisible ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
+            {/* Left Column - Sticky Map */}
+            {isMapVisible && (
+              <div className="lg:sticky lg:top-8 lg:h-screen">
+                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-full">
+                  <div className="p-4 border-b border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-slate-800">Interactive Route Map</h3>
+                      <div className="text-sm text-slate-600">
+                        {hoveredPoi ? `Viewing: ${hoveredPoi.name}` : 'Hover over cards to explore'}
+                      </div>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div className="h-full">
+                    <InteractiveMap
+                      startCity={routeData.startCity}
+                      endCity={routeData.endCity}
+                      checkpoints={[]}
+                      pois={uniquePois}
+                      selectedPoiIds={selectedPoiIds}
+                      hoveredPoi={hoveredPoi}
+                      onPoiClick={handlePoiClick}
+                      onPoiSelect={handlePoiSelect}
+                      height="calc(100vh - 200px)"
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
             )}
 
-            {!poisLoading && uniquePois.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🗺️</div>
-                <h3 className="text-xl font-semibold text-slate-700 mb-2">No Places Found</h3>
-                <p className="text-slate-600 max-w-md mx-auto">
-                  We couldn't find any places along this route. Try a different route or check back later as we add more locations.
-                </p>
+            {/* Right Column - POI Cards */}
+            <div className="space-y-6">
+              {/* Route Info Header */}
+              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h1 className="text-2xl font-bold mb-2">Main Route</h1>
+                      <div className="flex items-center text-blue-100">
+                        <MapPin className="h-5 w-5 mr-2" />
+                        <span className="text-lg">{routeData.startCity}</span>
+                        <ArrowLeft className="h-5 w-5 mx-3 rotate-180" />
+                        <Flag className="h-5 w-5 mr-2" />
+                        <span className="text-lg">{routeData.endCity}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-blue-100">Total Places Found</div>
+                      <div className="text-3xl font-bold">{uniquePois.length}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
 
-            {uniquePois.length > 0 && (
-              <>
+              {/* POIs Display */}
+              <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
+                  Amazing Places Along Your Route
+                </h2>
 
-                {/* City Filters */}
-                {availableCities.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by City:</h3>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      <button 
-                        onClick={() => setSelectedCity('all')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                          selectedCity === 'all' 
-                            ? 'bg-green-600 text-white' 
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        All Cities ({uniquePois.length})
-                      </button>
-                      {availableCities.map((city) => {
-                        const cityCount = uniquePois.filter(poi => {
-                          const poiCity = extractCityFromPoi(poi);
-                          return poiCity === city.toLowerCase() || 
-                                 (routeData?.startCity.toLowerCase() === city.toLowerCase() && !poiCity) ||
-                                 (routeData?.endCity.toLowerCase() === city.toLowerCase() && !poiCity);
-                        }).length;
-                        
-                        return (
+                {poisLoading && (
+                  <div className="space-y-6">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                      <p className="text-lg font-medium text-slate-700">Discovering amazing places...</p>
+                      <p className="text-sm text-slate-500 mt-1">This may take a few moments</p>
+                    </div>
+                    <div className="grid gap-6">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="space-y-3">
+                          <Skeleton className="h-48 w-full" />
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-4 w-1/2" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!poisLoading && uniquePois.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🗺️</div>
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">No Places Found</h3>
+                    <p className="text-slate-600 max-w-md mx-auto">
+                      We couldn't find any places along this route. Try a different route or check back later as we add more locations.
+                    </p>
+                  </div>
+                )}
+
+                {uniquePois.length > 0 && (
+                  <>
+                    {/* City Filters */}
+                    {availableCities.length > 0 && (
+                      <div className="mb-6">
+                        <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by City:</h3>
+                        <div className="flex flex-wrap gap-2 justify-center">
                           <button 
-                            key={city}
-                            onClick={() => setSelectedCity(city)}
+                            onClick={() => setSelectedCity('all')}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                              selectedCity === city 
+                              selectedCity === 'all' 
                                 ? 'bg-green-600 text-white' 
                                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                             }`}
                           >
-                            {city} ({cityCount})
+                            All Cities ({uniquePois.length})
                           </button>
-                        );
-                      })}
+                          {availableCities.map((city) => {
+                            const cityCount = uniquePois.filter(poi => {
+                              const poiCity = extractCityFromPoi(poi);
+                              return poiCity === city.toLowerCase() || 
+                                     (routeData?.startCity.toLowerCase() === city.toLowerCase() && !poiCity) ||
+                                     (routeData?.endCity.toLowerCase() === city.toLowerCase() && !poiCity);
+                            }).length;
+                            
+                            return (
+                              <button 
+                                key={city}
+                                onClick={() => setSelectedCity(city)}
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                  selectedCity === city 
+                                    ? 'bg-green-600 text-white' 
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                }`}
+                              >
+                                {city} ({cityCount})
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Places Cards */}
+                    <div className="space-y-6">
+                      {filteredPois.map((poi, index) => (
+                        <div
+                          key={poi.placeId || poi.id || `poi-${index}`}
+                          onMouseEnter={() => handlePoiHover(poi)}
+                          onMouseLeave={() => handlePoiHover(null)}
+                          className="transition-transform hover:scale-[1.02]"
+                        >
+                          <PoiCard poi={poi} />
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                    
+                    {filteredPois.length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-slate-600">No places found with the selected filters. Try adjusting your city or category selection.</p>
+                      </div>
+                    )}
+
+                    {/* Summary Stats */}
+                    <div className="mt-8 grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-blue-700">
+                          {uniquePois.filter(p => p.category === 'restaurant').length}
+                        </div>
+                        <div className="text-sm text-blue-700 font-medium">Restaurants</div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-700">
+                          {uniquePois.filter(p => p.category === 'attraction').length}
+                        </div>
+                        <div className="text-sm text-green-700 font-medium">Attractions</div>
+                      </div>
+                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-700">
+                          {uniquePois.filter(p => p.category === 'park').length}
+                        </div>
+                        <div className="text-sm text-purple-700 font-medium">Parks & Nature</div>
+                      </div>
+                      <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-amber-700">
+                          {uniquePois.filter(p => parseFloat(p.rating) >= 4.5).length}
+                        </div>
+                        <div className="text-sm text-amber-700 font-medium">Highly Rated</div>
+                      </div>
+                    </div>
+                  </>
                 )}
+              </div>
+            </div>
 
-                {/* Category Filters */}
-                {/* <div className="mb-8">
-                  <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">Filter by Category:</h3>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <button 
-                      onClick={() => setSelectedCategory('all')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'all' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      All Categories ({filteredPois.length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('restaurant')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'restaurant' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Restaurants ({uniquePois.filter(p => p.category === 'restaurant').length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('attraction')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'attraction' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Attractions ({uniquePois.filter(p => p.category === 'attraction').length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('park')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'park' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Parks ({uniquePois.filter(p => p.category === 'park').length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('scenic')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'scenic' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Scenic ({uniquePois.filter(p => p.category === 'scenic').length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('market')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'market' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Markets ({uniquePois.filter(p => p.category === 'market').length})
-                    </button>
-                    <button 
-                      onClick={() => setSelectedCategory('historic')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCategory === 'historic' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      Historic ({uniquePois.filter(p => p.category === 'historic').length})
-                    </button>
-                  </div>
-                </div>
-
-                {/* Places Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredPois.map((poi, index) => (
-                    <PoiCard key={poi.placeId || poi.id || `poi-${index}`} poi={poi} />
-                  ))}
-                </div>
-                
-                {filteredPois.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-slate-600">No places found with the selected filters. Try adjusting your city or category selection.</p>
-                  </div>
-                )}
-
-                {/* Summary Stats */}
-                <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-700">
-                      {uniquePois.filter(p => p.category === 'restaurant').length}
-                    </div>
-                    <div className="text-sm text-blue-700 font-medium">Restaurants</div>
-                  </div>
-                  <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-700">
-                      {uniquePois.filter(p => p.category === 'attraction').length}
-                    </div>
-                    <div className="text-sm text-green-700 font-medium">Attractions</div>
-                  </div>
-                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {uniquePois.filter(p => p.category === 'park').length}
-                    </div>
-                    <div className="text-sm text-purple-700 font-medium">Parks & Nature</div>
-                  </div>
-                  <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-amber-700">
-                      {uniquePois.filter(p => parseFloat(p.rating) >= 4.5).length}
-                    </div>
-                    <div className="text-sm text-amber-700 font-medium">Highly Rated</div>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>
