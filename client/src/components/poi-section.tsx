@@ -6,6 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function PoiSection() {
   const { data: pois, isLoading, error } = useQuery<Poi[]>({
     queryKey: ["/api/pois"],
+    // The default queryFn from queryClient will be used
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes (renamed from cacheTime in TanStack Query v5)
   });
 
   return (

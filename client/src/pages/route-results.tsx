@@ -74,6 +74,9 @@ export default function RouteResults() {
   // Fetch Google Maps API key
   const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{ apiKey: string }>({
     queryKey: ["/api/maps-key"],
+    // The default queryFn from queryClient will be used
+    staleTime: 1000 * 60 * 30, // 30 minutes - API key doesn't change often
+    gcTime: 1000 * 60 * 60, // 1 hour
   });
 
   // Fetch POIs for things to do along the specific route
