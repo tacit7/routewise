@@ -1,732 +1,521 @@
 {
   "html_attributions": [],
-  "next_page_token": "ATKogpfXje7AO6FvLkVUPOPu2VSRPsd2yN13Zmy8qagO284XG_BA3B2Z1oGIp0IY94v7QnKDT1_MYkQm1wMF3I3TOGR2rVAtnS8ZYSFJytNULSNaefzwwHgKjhrHqcQnMuibOddF49J5-akinJTC3ThCgtRM8PUWvggRzl7O994PEJYgKqzsjBEC6ts-frVixlrS2sC-EPEvq0FFPByE8IGzpEVowB5PeN4aiA5ZdG5Gx0hfheHqTmriTPGmuDahGz2n6fqDaeHP4gFiWEjNh0kJW73ztZL1jjemT0baOOshc2PiSlZrc4LHJp_FzbLJTlz5qmW2n_3twgwceJOboMGYa0XPSyIfYiPLHVdokhO9frKd45LFDKbeesA1_CA2cGBVqRmmoTQxft5Twr3zltMSJJq7xqj3riqc0_bC2P01yyrEDKSrTn6I",
+  "next_page_token": "ATKogpe0u4RMws-u9WO7elR1UHmvw7-QFA_xzAWbwElzT1furJEwn6coOylS31H8PA43g3Enb8vVDQMUTCQOnp4H6-ALsEHXTm3Id0GrPaa7hzeqnuEIVlVi9jboRkN0aecB0YBYfQ4DfqZwgOXCp_lvVpB9zOWjm8pRviSDQyH9L3sVBEn4HgkE5FsJPdrUb-uVIBCkiYsgOdl2IZ0A61Ddm6QvE2l9JFVsmgz2Wiw1nGp-xb-nizNN06U8pa3EJmqk6LJhcCXkW4HtWbiyYhP5UWIbf3I_FNDorevi7WT_WsXgyg7m8OSt7ZrO4qPVebL6KiTNNoLBwEBottYR6ZKkOLAzmADb8t7u6HFU9gVikXeeAsOXp8nkP1p8A-LZ3JVPM0o19U2LJynaadrlEXfxNW2m92F6QAseofx8icZlnOGlwbwvHu2S",
   "results": [
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.7409696,
-          "lng": -96.81532
+          "lat": 29.4441917,
+          "lng": -98.710372
         },
         "viewport": {
           "northeast": {
-            "lat": 32.74564395000002,
-            "lng": -96.8133819697085
+            "lat": 29.4455943802915,
+            "lng": -98.7090655697085
           },
           "southwest": {
-            "lat": 32.73911495000002,
-            "lng": -96.81607993029151
+            "lat": 29.4428964197085,
+            "lng": -98.7117635302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
+      "icon_background_color": "#909CE1",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
+      "name": "Sun Retreats San Antonio West",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3335,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114749726971972853256\">Sun Retreats San Antonio West</a>"
+          ],
+          "photo_reference": "ATKogpdZaFKJLqorxYxyJ1X2tHRyWVdBT5CpCvC62fLeZYOr2sq8KbNRTK2vXo5pfUmIZkslAMTuRI5dM6h9lgBYwrWFNpyPHskJvvuJ0Bd6qT4KFlieNZc6q4sEw5buQf3ko80jegy1Fq3bIjPiaR0AJjIGRxno4T3tjOp7M1K-10BQRJ0kP5mQiOhJkPP27rnVmKph3R9SvPEFRybeO4Mym0UjF3kY7VP7Q49VRSw5Vmrwsz1aEwDVgwkOPfQVHFyZh7W29VuFexkBIh35qHR0ITcvK1KLC_dYpnwdmbK8LaTkbWuO5f0M5rIGlg4QVHYgsqt0LqU4EgE",
+          "width": 5000
+        }
+      ],
+      "place_id": "ChIJs_KmwqVDXIYRT9xjuFZu5q8",
+      "plus_code": {
+        "compound_code": "C7VQ+MV San Antonio, TX, USA",
+        "global_code": "76X3C7VQ+MV"
+      },
+      "rating": 4.4,
+      "reference": "ChIJs_KmwqVDXIYRT9xjuFZu5q8",
+      "scope": "GOOGLE",
+      "types": [
+        "rv_park",
+        "campground",
+        "park",
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 487,
+      "vicinity": "1120 West Loop 1604 North, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.4340752,
+          "lng": -98.42252040000001
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.43631649999999,
+            "lng": -98.42105226970848
+          },
+          "southwest": {
+            "lat": 29.4333281,
+            "lng": -98.4237502302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/camping-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/camping_pinlet",
+      "name": "San Antonio / Alamo KOA Holiday",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 607,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/116158384851979463799\">San Antonio / Alamo KOA Holiday</a>"
+          ],
+          "photo_reference": "ATKogpfmTLxglBKnZ0qs-Bl3EbU3EvNKkiyHuyRc2GpwublStawqnIRCTZwULsia1G7CJi05u0VsoxBM7whCyRx_JaUMQymN8LcrzHzQ_oR7CYaLx_JnoIF2zFgb5EioZWDgqFSuyJIiX264f67OQF2b9urmOKla2huGgdJAEep5xpJf_9hpVGEOfqMK4bM5uplvg1ZmVTyMmzSO0XW7qVaj05jkOQZbWKhgdwakC9MleVHaFy7yj699o5jPAGLVu1rxflF3T8ec-qdsRs0q82AJ70crt4Y5hQoba8m5GH4_j9pu8mmK-c_v5aLbXqqxZE2_olP1KqNleB0",
+          "width": 1080
+        }
+      ],
+      "place_id": "ChIJRZ-DQCH0XIYRXzKhlDmu5j8",
+      "plus_code": {
+        "compound_code": "CHMG+JX San Antonio, TX, USA",
+        "global_code": "76X3CHMG+JX"
+      },
+      "rating": 4.6,
+      "reference": "ChIJRZ-DQCH0XIYRXzKhlDmu5j8",
+      "scope": "GOOGLE",
+      "types": [
+        "campground",
+        "rv_park",
+        "park",
+        "lodging",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "user_ratings_total": 1866,
+      "vicinity": "602 Gembler Road, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.4576699,
+          "lng": -98.45743960000001
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.46157535,
+            "lng": -98.45314074999999
+          },
+          "southwest": {
+            "lat": 29.45635235,
+            "lng": -98.46352415
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "San Antonio Botanical Garden",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2268,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/108538257044620313801\">Doug Burns</a>"
+          ],
+          "photo_reference": "ATKogpeq_fK-lTaNH4JWQaOJ5WuPS0odlUHxEVohoayrPZuHI-ZpqTAdWzTP3Cb4eWtZ06gjuuzYAYrlSEKqAJ-15MclzPCT9WlCOIT5GlEmEt6_Sn0QcQ_cY1lqRtB0vRqV200feY4i1nf1rM-_WD0hqQmxC5xtbXpZdrT9j23UKhQRkpPaBqlhpXivge83BNadCjbPUdIhzRfz-85KlktS-MvqYRhtIMV-tAiMyL1KW2iGdVpstsvs5L2661exvqXTvbeu48IjlEOm5JOyGO92ObUtHCpwLr5wZl66eLkch49MdjQ4yqfSwVXroS7KWQHm1jEEu2NtjEEp9qby2yqYPGpa7M1PTZhwOgDbzWVVdP1AA4Ys0zd_wxR4zl1dbHU9czRtt61kWoanZvv2DeJiOsUGkX8f0zXMCm9JzTLrrDvqtcNB9GPBfMklm9aHapLtmL1-9nrCCm-9IV2ecq6rrO_5ftO9bJ4GQEH_4JJlEQeRmJ2fOwRcOFOOf5DQVsK3nzFrp9BXL8OQw2Sh_jmvm1TghFDjimTkg8MU06NyGv0ui-uuiVjjr1EYhoagLb9gr9ESXYUBl5mHQCmBJtBDw1FKycuxFYkT_m8xF3W1fgSKUfEGziG6PQKeN8PRrN6bWY2neA",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJZeWSYrz1XIYR7_h51WlHYSQ",
+      "plus_code": {
+        "compound_code": "FG5V+32 San Antonio, TX, USA",
+        "global_code": "76X3FG5V+32"
+      },
+      "rating": 4.7,
+      "reference": "ChIJZeWSYrz1XIYR7_h51WlHYSQ",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 7718,
+      "vicinity": "555 Funston Place, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.56304499999999,
+          "lng": -98.45422789999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.5644593302915,
+            "lng": -98.45281826970849
+          },
+          "southwest": {
+            "lat": 29.5617613697085,
+            "lng": -98.4555162302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "McAllister Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 1080,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/103193866959510489554\">Jessica Pape</a>"
+          ],
+          "photo_reference": "ATKogpdOwssJnPhOcjkosdH1Ll258I-Sy-DBV5cnFlABTDsvdvPwP2dkLEmj7QNluQ-yhvw31hXEeKXikw4vE-c8qX3tdG56_Xp7tHJh9Os55glW7NF5x-c5ZpL8dFmYYOBAbQdDcPRyG-X5hLwyYQnEkdpKsER3PvKaJd95QOeY-wqLXm4pmdpRFU_PeaVD0YDbMlvn65xJspNXOT4Vok0EtjTXifsnlpwCKMbEMXYRDbPs7Wm3Ro8mScngXZXVlMHiIVJGlna9I8bNrNFw4rxx_uVXbjY3SfPep2T83LIYsHASJfpuGd3VGF1jBsFed4WixO-a58m1GoerFe1lZabX8_fcNz6RR2hjgRm4YSkBuek4X_P0-Jud6nEHs2cGajCmLiyVD89BtMrsZzwUcDysugBGF8eW__JnIyTbd4KtwLGT4HepFK-VmQ417GTbcijYaL_ENyOJ35ZLR7cY2wFXfPiMgSfGZpzpYHldg93kE6hDS7_vz7XZST9mbhg96bENIpGoIOmzPQEIgIhffwAuhuLzKpLFLEOll1rKfsYAWnhUvzi8H6mQfKtcW6teWig3iXVrVoX2Z7Ke0S0OhnWb6EWWxII_4OVptsbzYsVpPwLRbxXScde0YzahnK1zHEL0",
+          "width": 1920
+        }
+      ],
+      "place_id": "ChIJJa-WcPyKXIYRnxDWa8VT-hk",
+      "plus_code": {
+        "compound_code": "HG7W+68 San Antonio, TX, USA",
+        "global_code": "76X3HG7W+68"
+      },
+      "rating": 4.7,
+      "reference": "ChIJJa-WcPyKXIYRnxDWa8VT-hk",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 4727,
+      "vicinity": "13102 Jones Maltsberger Road, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.42019040000001,
+          "lng": -98.4871807
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.4215608302915,
+            "lng": -98.4858066197085
+          },
+          "southwest": {
+            "lat": 29.4188628697085,
+            "lng": -98.4885045802915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Hemisfair",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 1827,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/117693626748283891259\">Hemisfair</a>"
+          ],
+          "photo_reference": "ATKogpecUEN2G0TT1xANRATllcRGD7zNM-nZKozAC2mfNsE3WbsaDSgxBC8XcgDsa8AXBmnfq-OwuKKXykC3DAzccZqG8qQDHYsquOHy0Ek7lRGqBc1goCGWl8G5vbM1A-XgUNCsOSd_xk14opPoNQFEutuhZe87cGS_qNniYgKK8mnKU-7Yx_MQkpdoajjkFM1m14rz9ORBUzqMolxLDaUfX-Oxv21oKbA_b1A35dpg_-IGjB2Z6UfavPg-2bKJGFAKA7wf19WLZreqSvlsccJc-Esou7JaHF4coEz_nCA6iGpygkzVjnjJIV_uU8fBSuiBPsgcjpQ_56A",
+          "width": 3000
+        }
+      ],
+      "place_id": "ChIJ4TFB4alYXIYReAd1dzacGR8",
+      "plus_code": {
+        "compound_code": "CGC7+34 San Antonio, TX, USA",
+        "global_code": "76X3CGC7+34"
+      },
+      "rating": 4.7,
+      "reference": "ChIJ4TFB4alYXIYReAd1dzacGR8",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 15970,
+      "vicinity": "San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.53512,
+          "lng": -98.64075679999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.5364376802915,
+            "lng": -98.63942411970851
+          },
+          "southwest": {
+            "lat": 29.5337397197085,
+            "lng": -98.64212208029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "O. P. Schnabel Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3130,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/106478497478116371063\">John Rangel</a>"
+          ],
+          "photo_reference": "ATKogpcKXJVir6_Im3T56Lc12G1renMc23w3KJRt9_j6_1wtw990kk2rrXLvpb4IBSBaqnQdpOKrfckp1BJ4b5nrTkctXFyy7LO1JFWu7Q3Xqt-VGmUbBAI_jbJzAiUWtEWNTsezGOt8Y-DYg7_cXaHO-dKBeXE2cElfDF2ckbewYVMMxawXr5uh3Ztm067zdI5cp72Q8SO_AA4RWaxvmHPUF5C0KAUCp034rr91GjSMVYYlENkIKOO61nKoVYeMi0hTNWA9uDxsdMiqQcPI5gkZbD5d_gI6298uqAyTkxfSi3tMvjtQGEAkaM95ExIOCX3yZfyVODveEeKwwlFUBHSnAdsOqxnN8MJe9eBcs_W8VneWju_8DTkACany331ynFtXMYlloQIjJy2lVi8uipIwMfZEA04iPQMAWqtY03KkReni2TvENROR76doFMjpRg0I3_FtoSk2D_JTp3gHlo-y0KIbYmRpdrmxAebMFnZuZIRTsm0ZXzZf8YXJfnkWWsOiVDKErNZpiODxUaL42ucEkGMkDolCPtja9SSe8fyrn6Dgo4p2gED1Z30dIJ24rmBzUr7A4BXsHqq1fH0b4FVgtuF1BZi4wdNmE9RALA3UGUJBCRLO7UEIhqVBfA93e_Gdu-biH3db",
+          "width": 2827
+        }
+      ],
+      "place_id": "ChIJ2w2aH8FnXIYRcXjRqeCnVuk",
+      "plus_code": {
+        "compound_code": "G9P5+2M San Antonio, TX, USA",
+        "global_code": "76X3G9P5+2M"
+      },
+      "rating": 4.7,
+      "reference": "ChIJ2w2aH8FnXIYRcXjRqeCnVuk",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 3369,
+      "vicinity": "9606 Bandera Road, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.3513155,
+          "lng": -98.47139179999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.3527545302915,
+            "lng": -98.47003296970848
+          },
+          "southwest": {
+            "lat": 29.3500565697085,
+            "lng": -98.47273093029149
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-      "icon_background_color": "#4DB546",
+      "icon_background_color": "#7B9EB0",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "Dallas Zoo",
+      "name": "Mission Park Funeral Chapels South, Cemeteries & Crematories",
       "opening_hours": {
         "open_now": false
       },
+      "photos": [
+        {
+          "height": 340,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/106722784555505379232\">Mission Park Funeral Chapels South, Cemeteries &amp; Crematories</a>"
+          ],
+          "photo_reference": "ATKogpdl_sx-5k_p1XBUHTKM4Hp0UiUKyqp9ovGGGICXXULkvqFZ7S-myZw2dDnV9jbtSON433SkoWjPrjlsND3Zyq104ML2MU3niIcgg_t5YF0SKdE7UYhyVdrEM2LSJImMKtXpmvMRlddyiWkpmcGmkYH4plkhb2P3dR67jTHLGlb2CT5t2mGUKe5_hB8Is6JSFkQ0uD4cYVq2VuScZ7EoueBXVyKouxWIL0jqmE2U3DoRFmy9cUE1OM2YHDpFLBu5SkygK_WhsSdpiujSp4Ee4fJRf-TY7xvxM-qXFf3_jnlApVkmZFK3cRdpRXBXjw_gV2C2xrtScbo",
+          "width": 520
+        }
+      ],
+      "place_id": "ChIJtYndzu73XIYRN_GRQqc_odA",
+      "plus_code": {
+        "compound_code": "9G2H+GC San Antonio, TX, USA",
+        "global_code": "76X39G2H+GC"
+      },
+      "rating": 3.7,
+      "reference": "ChIJtYndzu73XIYRN_GRQqc_odA",
+      "scope": "GOOGLE",
+      "types": [
+        "funeral_home",
+        "cemetery",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 223,
+      "vicinity": "1700 Southeast Military Drive, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.6222465,
+          "lng": -98.57253279999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.6235790302915,
+            "lng": -98.5711505697085
+          },
+          "southwest": {
+            "lat": 29.6208810697085,
+            "lng": -98.5738485302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Eisenhower Park",
       "photos": [
         {
           "height": 3072,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/116388591433440459020\">Rafa Chapa</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/100029211398111863846\">Patrick T</a>"
           ],
-          "photo_reference": "ATKogpeabal2DPBJlK-hH2Znd1nD-OAanClTfX0ERBXULn9GDaW49EjAye79DODJubIAQAJZ_oKhcWYKFg79pEFlgBquKMcE5xtpTsuatiND1o6rmptVNbKKA8gveN0YldkTUXccYV_aqHNtXcHySDltDAUMxH-szBucN43yhEkS0HQjFMxGVZDVNbQ1cDYrpb89y5xWw9nwQE6Ib1mP0O1z8fddJL9BmAAZwls-9x4kowSzBKuHn2B6plvJoRKJASv0I_015J-Ne1sjgsjZ6rzRoGcfnlvExNfwgiJ9CjHQZiA7vGZDhCQI0N-d4-ZbEnAOPMXumlo0SDUEAuZTcRglt2yS5nL7xvSBBf0PR_WPlwVq0X3vjHOtquSy6JLDRpwkqpBQrBb3qNZJxoYF4yOvHKeWxjjsPIl8fnWd_BSqNQCpwjBgZdjKTfJEkbt1o43mf4DPLRrcL3yNOvzN-0uEZGzMzOT-5ngSYRbycOmRF-IzCW3yh9FZOA9_qw6HyjezXXwzJHbiADRDGUQDj69vhMFceVPDg3Bet6maV4132xlkOeBQpk9t-DtPvXoawQ8gElV0ps8SRND1RY96IzrwsoQDE-fV-njAh3HHbSzaDPaXmpU-Q1lfnFvzEFh5MSDmrzR71g",
+          "photo_reference": "ATKogpe7Dxm_0Psi5bKNbBP9h5_q-UDqiLyA6c6qw6MPSu6gTaH_MgjWJBv_HbBgAUe1CSbVu06Tj25nZM4mfBijbkmV2uXTVof3OFw81nDaFl-o5wEOO5bP-vr_MQjTI_Co7HnuPVQSG7w8WSrWRW120FKc7GUQMgqpz4VELUuAm2bJfs6ImbAjJKicHGA5qpkzJGcP0sw0LSAiE5m6h531EQEL5wrUipGnONQRydLW69xw3MB39uSKOA3jA7MU_cbblMvFCnTQSsP1R3Xzt_eWxuXz5FumcBK1Bx9kZe0qAOHgs9dOibgPqxKiFzKRuwaLA4xqDUZ7v9-Y1hUFzB0tVgYyCaZKrrSisNWWQ70IIexGxU4MQXsUWpYTc03VgNZrbnMpU8Cy_fjEXRncL4Dt4Kqkz5hABdP6zrq0Qeh2wRo18BwTlf99g7tok1KTNLS_FqiP8rGN79kjEgO0rpR0GpuFjG5syeCTHljGNAYyWLMw0lCdSkS3b9DXNmU-1hV-P3Gmyt16DWNOg5iC6jR45--meP8ICiDgFLn6RTXYKavC-NCym7k0rxtQVj62AIm3bqHCRb0bCGKkM-uPK6owfVvr1pJGjG3cD-MXwjeGVNs059F3sYSqHIKciNZYnbZSl8kMFw",
           "width": 4080
         }
       ],
-      "place_id": "ChIJgaB_eJaZToYR0shi9YM_K-E",
+      "place_id": "ChIJk3FcBgpkXIYRAT5TsKpsfYY",
       "plus_code": {
-        "compound_code": "P5RM+9V Dallas, TX, USA",
-        "global_code": "8645P5RM+9V"
+        "compound_code": "JCCG+VX San Antonio, TX, USA",
+        "global_code": "76X3JCCG+VX"
+      },
+      "rating": 4.8,
+      "reference": "ChIJk3FcBgpkXIYRAT5TsKpsfYY",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1842,
+      "vicinity": "19399 Northwest Military Highway, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.4471114,
+          "lng": -98.69056700000002
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.4485425302915,
+            "lng": -98.68910786970851
+          },
+          "southwest": {
+            "lat": 29.4458445697085,
+            "lng": -98.69180583029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
+      "icon_background_color": "#909CE1",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
+      "name": "Admiralty RV Resort by QRV",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 1534,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/100816058732732210013\">Admiralty RV Resort by QRV</a>"
+          ],
+          "photo_reference": "ATKogpdW6Hm-WUOKz7-RJFGj1wRFrPcDcbjtyj7HQmdX2eIeyl5sqJXQjArRnFgirVBRPkmOjAIq3uWrQP2wY0aJxg-B6UivKcSJswcHQDpPFUu533SXMO1IMqOqLE24HII5YGIWa8e1UiPrinAeWof9upRQUGVWAtZXGRHyK6dZ7i5CDcbISsWX-HnzeS1onC7O157TUMeIGJpWKRWdrQf7pqPeBK5atEdbdkSbwvcsM2Jb0_jfJPAaBJUvIwxhQ8FKnQeiCF16Pu02Uyl2ErstfZGuQzOfYJ277Wh_Ez7OX-DTZx3nsGUjCHa3t-1c0gnaN5D8qp3vGT4",
+          "width": 2048
+        }
+      ],
+      "place_id": "ChIJ34imDRBDXIYRRiH2ipCpqGU",
+      "plus_code": {
+        "compound_code": "C8W5+RQ San Antonio, TX, USA",
+        "global_code": "76X3C8W5+RQ"
       },
       "rating": 4.5,
-      "reference": "ChIJgaB_eJaZToYR0shi9YM_K-E",
+      "reference": "ChIJ34imDRBDXIYRRiH2ipCpqGU",
       "scope": "GOOGLE",
       "types": [
-        "zoo",
-        "tourist_attraction",
+        "rv_park",
+        "campground",
         "park",
+        "lodging",
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 22791,
-      "vicinity": "650 South R.L. Thornton Freeway, Dallas"
+      "user_ratings_total": 631,
+      "vicinity": "1485 North Ellison Drive, San Antonio"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.7787249,
-          "lng": -96.8064507
+          "lat": 29.4621943,
+          "lng": -98.4734067
         },
         "viewport": {
           "northeast": {
-            "lat": 32.7802638302915,
-            "lng": -96.80515671970849
+            "lat": 29.46359673029149,
+            "lng": -98.47229671970851
           },
           "southwest": {
-            "lat": 32.7775658697085,
-            "lng": -96.80785468029151
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
-      "icon_background_color": "#7B9EB0",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/monument_pinlet",
-      "name": "John F. Kennedy Memorial Plaza",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 4000,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/116739967538148943147\">Matt Kieffer</a>"
-          ],
-          "photo_reference": "ATKogpfzo2UybZSpTb_BKhm11ElONUqolNeGelafe_mpNX7Kg_cwe_iFU7oXCZ5oXCCMu2NT0kP4I_CgNEEvJ6et0CR3-4BG34zL_3DQ7Dwmy7BVcti9BMC34IaP_U9RQ2TNXaHmzPZCx2eus2SJL-bvI4wX-CaHnPYAoxlASOjR1SBT6sGCWHy3B4Fr1z2hlgi1ESjFTGimyA0mW-6FwvXLDd5cA4pQNWCRGEx1xDIRnQDx_JHw-W6GlNiQo3MLMl1dxX0UUt-RbrR5fNVYhUyfM74JM2cGchWIYobEXBtPlQS9wvB_GiuiwQQf-71xRB2DeO9lM6lWxGXJ5n3vFlZlWYUbM-bq-yXV6xCXUDjVc1jMfNlx8b02aP5wxBAijnJUlHTL63Sso7JX9NZ-S76Q6wFTHNZt8VldHqxu0pGTVDOspqN62fMMnZfa16KD9t00R3NNnZFmU68lCnLfUDaW_AeZUsHdCW5IDq5foeHCSkzYUu34Eod3Z2GI24QOd93-b8nJ4KWOKTcHjFVaeAQ5PXzW4y62yrkpfmLcSr6H3_SANPFvZpfESRIEHxun3pzo3YUrGrdjloSs5mDZTisvWIg3saRHJv0vN1V-ZJGIhHtY91rMzKtQYQgJBCNqIcj5lo-73A",
-          "width": 6000
-        }
-      ],
-      "place_id": "ChIJE_JdWRaZToYR0o3-Vndx750",
-      "plus_code": {
-        "compound_code": "Q5HV+FC Dallas, TX, USA",
-        "global_code": "8645Q5HV+FC"
-      },
-      "rating": 4.5,
-      "reference": "ChIJE_JdWRaZToYR0o3-Vndx750",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 4712,
-      "vicinity": "646 Main Street, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.8236184,
-          "lng": -96.71662359999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.8276216,
-            "lng": -96.71015040000002
-          },
-          "southwest": {
-            "lat": 32.81900960000001,
-            "lng": -96.7196572
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "The Dallas Arboretum and Botanical Garden",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 2252,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105726482695595407907\">Mark Craig</a>"
-          ],
-          "photo_reference": "ATKogpflUHSeH5gxr-4N-bQESGQr9vxpiJqwNdMVdqibL2dM1gaABsDOJRUfRcG_3yw9sDeiasJ0VO64cB6QZ27ar3YVNl2fzEQIAsDi8siB2Izvrqh6SLGenFYVZTSJA8FclHXBE-btwEGIdgsWcaSJAgI3WSBz4seLYqKczsL2t6q-DCf9eCrvcSrxAG6kaNPHMT5VDEnJ_cvDInX3FvpXSDwDdnfgnrBAqmYArPR5iepS21aCH3TDLg_648yDAom82S6PkJ0bxiUWACMGAFi0MCQfdMXrwmABF1KUB6ejxVcd8LZCWm-FFL8B6_U9TihoFYWn1Shx3estLiCVkPWUAoVhsENjqVDK9AoEWUWpFBakFe0gl337WnlGiC-JnFqNNT3GjqeGyiTjEoElLqHjeblb9A1BzghNJPN3M0snRYtZu7C4obp2PrUwjqc3vzgjb8KbkRFWi88g8Cme8qvReoKC53mdvkAoqHBObFQNkPTxJUOB3d67uGrWLrLF6nIH7X72d5utZPmHHDZY3SFsHq17tOiwuDE1frku2riij-vKDJhTFC8oi21xqeEHrU_kp1QXUyRCMv15TcpHCStXsJDSxfil9oacz-Q-xC0xOjwufJ5XjETHk-CVI4N9p4nuUjDisN2K",
-          "width": 4000
-        }
-      ],
-      "place_id": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
-      "plus_code": {
-        "compound_code": "R7FM+C9 Dallas, TX, USA",
-        "global_code": "8645R7FM+C9"
-      },
-      "rating": 4.7,
-      "reference": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 25524,
-      "vicinity": "8525 Garland Road, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7788184,
-          "lng": -96.8082993
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.7800247802915,
-            "lng": -96.8066590197085
-          },
-          "southwest": {
-            "lat": 32.7773268197085,
-            "lng": -96.80935698029151
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Dealey Plaza",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/116800855297671873552\">Lucas Elias</a>"
-          ],
-          "photo_reference": "ATKogpcCW-AZ6x_mKuxmiMRKnULvS8_1ZY2jKsd0PE7B5AaVMOnUdCLaUx6aki0DbvCzhrBg1MnSaGhWpHBmHeYpRyptOSAMlFspXIz9M_9hAhrl_Oi__WHjz1Ewg6RGFbROeqsEibkYTZy72UvxlPwSjUb0e3F_Vye5Eobiws-C_Kf-f2kJCizxI_ZvDULY0trgMx8_UaXtrTgKzInuKp419lAsw4qfx1eJyRMhabKDMgxDhxV5ucpjEuo8_B0GUvzmoco6ZM03aWWm79M4mOe5b5LhWnKUyHhqWKrbibLE6PL7hl8znly7wwkNyqvWHruyK-bcyuhPqR6xsjp1OhTQ12ZYWGR0sL6nDwQnw_AFXdSv2O7jmA3PWpFGx54DoJLj50ZsCHljEmfL-mcg1BLv6x4ZNEQqI3cU1W7iKsPHqIfqWdqm0SdGyoZxIHBFqF5oWsdm2KNrYX0sGB6IdPZRANGGZupyKglDCy_FSYXycTbvxNM6psBqxDYHWdf1IU5PCMlM7hZJfG0H2FYYSh9IkwD0YMnJ8lXGDwtresmKBADfm9h0l4vh-UfLLLebeun50T2M-F9zT0CaLKwvu-keTe6FHkNmRAqow2tjntUpdjWBVoLFLpT0auIqPahWHp8vGejAdXIv",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
-      "plus_code": {
-        "compound_code": "Q5HR+GM Dallas, TX, USA",
-        "global_code": "8645Q5HR+GM"
-      },
-      "rating": 4.6,
-      "reference": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 5937,
-      "vicinity": "400 Main Street, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.8411176,
-          "lng": -96.77822619999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.84299055,
-            "lng": -96.77711461970848
-          },
-          "southwest": {
-            "lat": 32.84024115000001,
-            "lng": -96.77981258029149
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
-      "icon_background_color": "#13B5C7",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/museum_pinlet",
-      "name": "George W. Bush Presidential Center",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/117571279609147319283\">Andy Jewett</a>"
-          ],
-          "photo_reference": "ATKogpeMj3OFnpjaE-v6-VLEUqvylszGG2av5qwgCV_WcSaJJUIM9gNPKxe0ztn4uuv-akg4PUZA7nl6Z6a2YWKnSqlP5kWM643492YHFIhG6r6hXnO9cqbLBvM46vJSvuijrdOoa89xklS9iGJRk0PtsyStWEHuzpdD77JcdKOJIWQNBBlzWZbeG6xgte0RBWdTJ6MpxcfQI1TwfsP4bUReeH7aMl20pm6jdw1-DPcylHfS6Kb0WHySkd6Yy78NF6Oly1KkSxlOrnleFhdhCEwi1M-rVN5RR0E0K3TQjCZPpcEUerR11bj0eCsdqUyshrPS0aJTaoLH0hOK1mQfcdrPkrtMMvBqO1VMA8bYI8zDSdWQSp_NYPRkxEX3GgHJtVqTFdSCTSgnd6jB8DHwhI02cpptc0K-WALiE4SD-0PUuRgxFkwIxZBPiZXCD5TOc_uRADGtfrZfhvGZT45lw75f6npL5d6A4w6WEXpeKr9NxLJ_WkPpwVf75N9G3hvxliCmt220eHRJz7p_ocSIbduakSwnp8fGucCVEU8EpLp-ekOvUtDBWP-KCHrCAXKehqKvzzk1g8lTqw0ktCwZ02sM0DohSnxsdtk3O5mG93nEJDzFK50cDnD70bsCGsLVZBFN0-WR2g",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
-      "plus_code": {
-        "compound_code": "R6RC+CP Dallas, TX, USA",
-        "global_code": "8645R6RC+CP"
-      },
-      "rating": 4.5,
-      "reference": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
-      "scope": "GOOGLE",
-      "types": [
-        "museum",
-        "tourist_attraction",
-        "park",
-        "restaurant",
-        "food",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1007,
-      "vicinity": "2943 SMU Boulevard, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7893644,
-          "lng": -96.8016184
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.79203555,
-            "lng": -96.79889354999997
-          },
-          "southwest": {
-            "lat": 32.78681455000001,
-            "lng": -96.80375815000004
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Klyde Warren Park",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 2756,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/101645393419411890565\">Agent 8</a>"
-          ],
-          "photo_reference": "ATKogpfzoV4G4fRl9mXgIc6xs3qlBFBqKcOIxcwq0KhrDbguofis69CihftzedvLQa06y7ZmkkowldE6Ieyu1df5OJnFLy6VvxrKxXDtuf5wRp1Rw2FTnpXVDWqF-rfjjiKsdCnd_deFaxImYEObHCLdk2WnC4hRWoirhl5FIrVgXYlsxRYG1rq0Tvt_IDaogz4O8Rf3VlBFMGSwKcsxXaCM3EZTR0D0J-F186CPx-uPXQ57pHAq8aIPm-FFShiuKYzxt8KMfNt66q0fkYBNwAbZFJ9JaHgrCoxtNZh8Ix54OqykjCjgz3MPyMD5F9fzpjWLK10EPssh1tNtPEWbuKxeUWU3jloiTDVy0t97QorNi6rQKyob0XRvuyjZvu1VOhUM9Kra9_c5rLwJIYPJw7roLQePBDM0T-mDrBFXHHikv_FSc2cTsmzP5WvuxHZWngGN3C7UAPeO0Xzo91nloc2P5TKmnLqEAHQ1p75rxggCWYLJ9uOUSiNYkhAyUmqjJ4RwldiG2Wfmxu7ZySYUI-SWdp0uRIx-QXY_tY_3RXZzOvl2xNYRGZyl3K2mM55qnDttoy9Tf5xjO61scBpwW_bTagQBngtiLgTQh7F33V8m97VGY0C1bAcSWVpdyMWD1aWOXftME92O",
-          "width": 2450
-        }
-      ],
-      "place_id": "ChIJZf6cwiSZToYRas-lbLGASVA",
-      "plus_code": {
-        "compound_code": "Q5QX+P9 Dallas, TX, USA",
-        "global_code": "8645Q5QX+P9"
-      },
-      "rating": 4.7,
-      "reference": "ChIJZf6cwiSZToYRas-lbLGASVA",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 17921,
-      "vicinity": "2012 Woodall Rodgers Freeway, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.77275279999999,
-          "lng": -96.78654399999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.7742036302915,
-            "lng": -96.7851566697085
-          },
-          "southwest": {
-            "lat": 32.7715056697085,
-            "lng": -96.7878546302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "City Park",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 6144,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/106681202681354726441\">Emil Matias</a>"
-          ],
-          "photo_reference": "ATKogpesIEHp7WaJsjtOzgvgXgB452FoHRLWPQ3_Vl2AtLuouwpdpH1Aw4ZHPSWH517MLCCfjn0ummpPjaTrhM7Jib5GOEEeoyqNkPF8nlBdlOVLxROjKviR2EARmIL1L5Sfh5XLIN3b_0iFpSinKFOLl05wtiA41LKou2zWaeT4mmBXzpkamVJ1pm8lQVbeknu7omK02XcR0ICLWWl5GAdh2Xem-UcDLvflhrYBn8W1xbHn-aZjjj8Ga9UTX7UTuecb9wdoml5V6wSf3zglVFwpeW1m6J3rKbT5rU83D7SmOsp6LIggv-qO_Id1O9v0K3gE7CCV-CyAJitKLFCV7UdX5viKdsY25ZZISF8bl_PYSwpAxp_oYpKODwhZyzg2vncanUHasqYavthaco3exHRdsXiZ-LdHXCswUOgCvIhIeCdvC64pYqngBagQBodn4ikmmoDFvWaujB0Y7wc75NtB8osgRDHWz5XpnfYIcxo8WRNsEiftI9ur6M-Yoh9Lu_gHDu8kDn17PuxnS1-IyWxYxgYdMdKNBn10mzjOm-LFK7zQexUTMfntR7ib9r2QGYSERUf023SrcV7cdFBOnWC67le3hWa5hsXyPZChquzpYztIKvROmnHiva7zrGzP-OeCLhbsRyEu",
-          "width": 8160
-        }
-      ],
-      "place_id": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
-      "plus_code": {
-        "compound_code": "Q6F7+49 Dallas, TX, USA",
-        "global_code": "8645Q6F7+49"
-      },
-      "rating": 4.6,
-      "reference": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "museum",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1328,
-      "vicinity": "1515 South Harwood Street, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7766323,
-          "lng": -96.80119859999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.7780468802915,
-            "lng": -96.80000291970849
-          },
-          "southwest": {
-            "lat": 32.77534891970851,
-            "lng": -96.80270088029151
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Pioneer Plaza",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3456,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/114660717085752617659\">Kim-Trang Nguyen</a>"
-          ],
-          "photo_reference": "ATKogpfElea-yv7-hQ9qbN586clqyXHeRQP7gwhCWqOsNEJb4opzMdPCbhDcKYcbyaj1BEnvxuz4_Wk__tTRgObgFZ27SBohp_stEFalcKjuIjlRfs16kI8EeBCA9Dtk2PkMNkdvfh1nY5m5TrV6xphcqjfoeGp5PaBDyq3cbXCOBIaX5S25ghg_ulRiFU0mdT9qaE5J7RF8XOAcTFcqTSSVm15OI6b_g-2zgYI5qXEq3wJM_uMwhKZtV3JFFfW67mfl-ERnVBVjdCQ2kHkETL25Eo_fYEW-b6xtQQa8pby3EtLjP4sDQVgxl0vpD8v8f8Nyk7TKTf9oQxRO3fYs3KjBr5Br3lh5oCdgs-YdkaKyK386si6RfIPg1t-dqSLJThwnF5OjvaKUuXwBwKTLeYnLxstnag2D4PfdXmqRSv9rbMBqftPpNP7ylm5gmbX5LCYZ6pjedkKjX5qOWg6HiFgUqS-HPY885CNBiu4K9hUv8oCs3ZMk8dhnPSMoD135eSVL7X0-2B_W3JLhCMi9AF3XkMD-AEpScjhWrxUotJPF6fvyNMByBqRyNfcO1F_VrtMmDcUQzRg7oZPqW3sB4OOF3ZOBl4YqP7Fgk8U7TDH9QrZE01tzpLNXZZxvUexpuYomo8Tx6Q",
-          "width": 4608
-        }
-      ],
-      "place_id": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
-      "plus_code": {
-        "compound_code": "Q5GX+MG Dallas, TX, USA",
-        "global_code": "8645Q5GX+MG"
-      },
-      "rating": 4.6,
-      "reference": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 4490,
-      "vicinity": "1428 Young Street, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7782181,
-          "lng": -96.75927089999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.78760945000001,
-            "lng": -96.74695864999998
-          },
-          "southwest": {
-            "lat": 32.77060645,
-            "lng": -96.77135924999999
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Fair Park",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 4032,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/102034392453661473124\">J Weems</a>"
-          ],
-          "photo_reference": "ATKogpf8SM-C_NTmY0eS62sMr_l30QzYKcRTFRCtXdEdYgflbqCKjY1UrFXbfYTsxevM3a9e5LQPuZslQu1HbUSJSw_SAqiCqQVHBPsbxZK3FO2T6UvSkhfHxD2K52nNFC_dURIl9i2I0xL9CZmddDYdPkRCk7xLsXRPOKEwQLAn4l6oJcZYA4aBPH0cK9GoAlZ6P4G2GZg54WKnK6P4kwR1WI07pwm1LV4hFHFMBwDxqKrOmphQYba08t_muWYTTWgZsAmSD8vkFZOT3DYWtopktOxGTd0aQq9pQgtYmC6u_SmMDj5cBJ_fU5hYfvEbsLfaKMSwsPUFFI7mUNvTKGGIioNpt4KNpv9IYWnn1Vxh1kBVQkEpvv2VBZn8u1A69vVajgc9tNlKAhG8lBvRHw90RkJEGfNLimxM4wtB1n5k7aXWZGBAurNVmUMZ4j2-l6JTXtlwJypxvI8mVHi15vzWWf_bz9Qib7N8RVitMXtjHyR4oC8g9IzsiXapKsiMnJeh_ZY4TZMxf7PKDzTKlJN6FLFWnLvLPPXm0wp9itYnKAO6tXEV6yiviVvaxH9Fa8FzdqKkVG_0SGBaFb11uDkoQzZIuKEJaekgo0Bu8f18q8v4yrNI3xErCC9_2un1W-MxJhrBFg",
-          "width": 3024
-        }
-      ],
-      "place_id": "ChIJ12JIoZeYToYRRJHugtx3QgY",
-      "plus_code": {
-        "compound_code": "Q6HR+77 Dallas, TX, USA",
-        "global_code": "8645Q6HR+77"
-      },
-      "price_level": 0,
-      "rating": 4.5,
-      "reference": "ChIJ12JIoZeYToYRRJHugtx3QgY",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 16481,
-      "vicinity": "3809 Grand Avenue, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7036486,
-          "lng": -96.70531
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.70521533029149,
-            "lng": -96.7041377697085
-          },
-          "southwest": {
-            "lat": 32.7025173697085,
-            "lng": -96.7068357302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Trinity River Audubon Center",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 431,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/107249040236262904865\">Trinity River Audubon Center</a>"
-          ],
-          "photo_reference": "ATKogpegtrDH_T5XNxkMfWlL85qb1y1NGEQODpobFKvbC3dmYQIwUy9TqexbRkz5i4E_4geyNWhE7Nd-bS1VAamTBCjuYCV-qnzrAPxCYW_QU02kFpEbcq7CzdSJX_jGTY4uUXghVLyLQHQy--vwouh1l88GJg-ja8Q3Xfr372p4luilfoUUXJ3G3U_8Qpy-kJIvzz7Co5Z4c1raC0Qeglgoq0K6YHQ_p8dRbcJ1UshiWoshfUJYzvlg2qa9Ti2-0WyK_1diN-iXKupbcuPg3iEtWtDzui68rLZ6rtL3_o1g0B_KWAy8tYuWMDy4hl1bvj3UprZojUzN-aA",
-          "width": 647
-        }
-      ],
-      "place_id": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
-      "plus_code": {
-        "compound_code": "P73V+FV Dallas, TX, USA",
-        "global_code": "8645P73V+FV"
-      },
-      "rating": 4.6,
-      "reference": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 662,
-      "vicinity": "6500 South Great Trinity Forest Way, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7811695,
-          "lng": -96.7948469
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.78252758029149,
-            "lng": -96.79315485
-          },
-          "southwest": {
-            "lat": 32.77982961970849,
-            "lng": -96.79648505
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Main Street Garden Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 846,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/100041358449158047663\">Jason Cuellar</a>"
-          ],
-          "photo_reference": "ATKogpd1vRmFXs_OijHoi0ZZWGLVGn3t6o76ogWuVDAlRQeKAWBKerHL0gl8uck6hQxIM4707Ynp_-8TnEV-95J14U8oEJGOX_z7atw_pxVvN9oMwX5oAva3qvLO-F1PdQDmHb5wfEPpIKVaQekaSuCvX1FCXjM6YBOLNrsCTXemy_Ut8IDy5_3P6l0pFK8Y-LSgFGDkwosHlMg13himjlrt5LQ_h9NKeiwfDhwWaXqItMPN3ove54zpP-a68ftL8CzDiB6AvFaE-lTVYI5M0yzOK13VcF3nxXxAs_-Y00vFWrTT7r9WQRiDR-zWVZEatqvIe698yTdZJqMNR853FtVvthJj82J8sAsceAh03wn_dw7xlUexr5BWMnvkEMB9Hhs1XU3Ue4tv09z70zjAKNia-rfrUIdIDdz05qk4-uIlFpE9kcb0Inb87QHUXbJuNJkJ4rCRXdfm9KWn6_4OYLXwgHaeotubh_Cj3kCyN1zou0Nt1Qmp-migHiwO0nvklLuv2oR5P2_yCWRCvmwFy1Er3wGs5-S0L7zIc97qn4q1e1A5xe-MZ__hX_X6p7ci8CcvluRGyF7_eaH8-ZwKRRv-yGvaIfY2FCp-2J5zzWDTcM6EGAJEjiMzuhDEhvwxnQKa",
-          "width": 564
-        }
-      ],
-      "place_id": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
-      "plus_code": {
-        "compound_code": "Q6J4+F3 Dallas, TX, USA",
-        "global_code": "8645Q6J4+F3"
-      },
-      "rating": 4.5,
-      "reference": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 2343,
-      "vicinity": "1902 Main Street, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.9173035,
-          "lng": -96.89209389999999
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.91889768029149,
-            "lng": -96.89064446970849
-          },
-          "southwest": {
-            "lat": 32.9161997197085,
-            "lng": -96.89334243029151
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Farmers Branch Historical Park",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 2518,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105357574211655252461\">Farmers Branch Historical Park</a>"
-          ],
-          "photo_reference": "ATKogpfNh_IeiRnHQ0Lxyi2AMzb9QtoJB6xFtk3a7Lms5vuRjONvQlTQZckDrl9l3mBzIYc3mFtoot5vvfasZGnOpR0jvs_LiL2A1-hzNYg5gM1GfXXWVcz6lFI6JX8N4jLGw9sFKrm4SAa7JpYxp2UmD6qgyLOjc9FOAYE84-xFDzPI_gGWk8zMhs4-ix_AHfshMSD7dlDi5eYk9ch8kgdjEXR80KN-XNOhkubmhabdR9EEhYfV8UJEXK9sxDQ-g6ytS8a16oALOI-KdusF-fTHUq9FDMAXtJvvYQnWcrcqBAYYY_w-e5YSHqhpCqM3fJJDS0CnHxA5tN0",
-          "width": 3116
-        }
-      ],
-      "place_id": "ChIJca__DrwnTIYRQJEQo0vZDN0",
-      "plus_code": {
-        "compound_code": "W485+W5 Farmers Branch, TX, USA",
-        "global_code": "8645W485+W5"
-      },
-      "rating": 4.7,
-      "reference": "ChIJca__DrwnTIYRQJEQo0vZDN0",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 633,
-      "vicinity": "2540 Farmers Branch Lane, Farmers Branch"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7829966,
-          "lng": -96.7982236
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.7840783802915,
-            "lng": -96.79680251970849
-          },
-          "southwest": {
-            "lat": 32.7813804197085,
-            "lng": -96.79950048029151
+            "lat": 29.4608987697085,
+            "lng": -98.47499468029152
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-      "icon_background_color": "#13B5C7",
+      "icon_background_color": "#7B9EB0",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "Thanks-Giving Square",
+      "name": "Kiddie Park",
       "opening_hours": {
         "open_now": false
       },
       "photos": [
         {
-          "height": 1248,
+          "height": 3265,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/114144713469905302706\">Thanks-Giving Square</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/114129370332953171774\">M Mendiola</a>"
           ],
-          "photo_reference": "ATKogpdMXJQjv0ucDVHETuRNpe0oAEuloUjBMPhvVoxgd7KzTJ6GQJRKzY7iWs155ID7KxNHXOHnzjSZiIveaEChLrPV-iN_1IC2ex9KU3lMOqRu8-03EHMQKQHcmO7vliIo9sWWIHRTlv1-jPP7Uo-oOBNTbB2quhKHZ_-Q5wVSD-cXY9Xtzj1yCysHgPGVEaBi6e-b-VcDFmrlQwzbRVKQ9p-FZvD6Gr2igRTg3Yk8r2uzKk3ftwrhhRLrcEY98E43wGQEtYj7jnOkFGGSLfa_tDOB2WQg-zQQT0KMhll6Qu-cETY8Zy2IWgOeGA7gAY9czX-XwCyuM0Y",
-          "width": 2519
+          "photo_reference": "ATKogpdYDd5zCrTzYoqfjvE7yciaqjhuY2gbMVpMHUKW8Jt0L8GJblAkz0MAlaDoray_hUzOKF4WZxHlUXABE1AznX1pC4td2I6PegXDwkR9bInBd2QuaAuvNmg0M2EmDkGLqEWChm0Pgr84rcLvBCfuF7P4S5aqSAcyuRbydCIfVr5jG5gSsWmJY90UmB7NBzrhdmHUDemQ-OS9eW4IyZkyydxNRaXoLaqUsbNGePvAA3AC4wlmmUs8ISC4oZW5-1-1yjIpBljSgnT1KM4uX1ccHJwls8kg7y09aTKEXg_bjfBfR-VZBlUbOw3Ssy2dBymZ4QRoKz-v0xNzaAW-Kl7duUL9qf-naUENXyHKULEgbnNMK_0o56l46IhsdmsgrlKPxvNy3KhVBg2N2v1TixyYtr7XPegOcYgNtVAh7QFCy4AVcrkBudvTRApKmu2I5DkKrmIShSQzVrBq-aqf232iOChLoUniRAvA9V9HaAX4wRilbHFXIvnce_T8XHM0OlEfwzDuNK3AjufGNqJMnOKHEFfsWnV0UYfhRlWHPiEaz1Zwa9LWgHiFUr_cHGH4Ar8dN1AVI57ouSLNhcx2X_6wjzACcWGBYK8sMEEWtOk7e8hOeDMB55TIq4ibVV_c9PeD0x1GmSNN",
+          "width": 4898
         }
       ],
-      "place_id": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
+      "place_id": "ChIJq6IWIZL1XIYRconiPYiBuRU",
       "plus_code": {
-        "compound_code": "Q6M2+5P Dallas, TX, USA",
-        "global_code": "8645Q6M2+5P"
+        "compound_code": "FG6G+VJ San Antonio, TX, USA",
+        "global_code": "76X3FG6G+VJ"
       },
-      "rating": 4.6,
-      "reference": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "church",
-        "place_of_worship",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1170,
-      "vicinity": "1627 Pacific Avenue, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.7751527,
-          "lng": -96.75973800000001
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.7769124802915,
-            "lng": -96.75881251970851
-          },
-          "southwest": {
-            "lat": 32.7742145197085,
-            "lng": -96.76151048029152
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Texas Discovery Gardens at Fair Park",
-      "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 1000,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105845434105767880722\">Texas Discovery Gardens at Fair Park</a>"
-          ],
-          "photo_reference": "ATKogpeGPp9vUsvflZ0IwRvZhrX1UCwlNnwuEcKgIXw295tCMtMKR6SWZVe-vSfhqXNOIyHPgSTk3x1vW1jjOED1GPUC1K9IzPjA2K7PtOvhMqy1wIm7sB86cg9W6RNhLLnJeORod5XMvMu5aO39FDbvsaM5dqriQ3kKw-7QaxYUcR18P8HTXua9-5MViT0218oQFGVYNDMR1xdwlBEuxV67suYjZNLRFJZ0mtNsZ58QLgi-MUySKIIL9fnTaaM_7Oo1aSCJ83H97I2YF2OmzZfZaW6o4UxC0uygZbN3Z4g1G43QOhUF8qVkbmnXfPXFjSxFnVpyKQDpul4",
-          "width": 1778
-        }
-      ],
-      "place_id": "ChIJH51ghJCYToYRNpUGVzRnZtI",
-      "plus_code": {
-        "compound_code": "Q6GR+34 Dallas, TX, USA",
-        "global_code": "8645Q6GR+34"
-      },
-      "rating": 4.6,
-      "reference": "ChIJH51ghJCYToYRNpUGVzRnZtI",
+      "rating": 4.3,
+      "reference": "ChIJq6IWIZL1XIYRconiPYiBuRU",
       "scope": "GOOGLE",
       "types": [
         "amusement_park",
@@ -735,207 +524,258 @@
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 1864,
-      "vicinity": "3601 Martin Luther King Junior Boulevard, Dallas"
+      "user_ratings_total": 1421,
+      "vicinity": "3903 North Saint Mary's Street, San Antonio"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.6194734,
-          "lng": -96.9837294
+          "lat": 29.3680926,
+          "lng": -98.47635439999999
         },
         "viewport": {
           "northeast": {
-            "lat": 32.62075918029149,
-            "lng": -96.97140465000003
+            "lat": 29.3694190302915,
+            "lng": -98.47502471970851
           },
           "southwest": {
-            "lat": 32.61806121970849,
-            "lng": -96.98783764999999
+            "lat": 29.3667210697085,
+            "lng": -98.47772268029152
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
       "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Cedar Hill State Park",
+      "name": "Mission County Park",
       "opening_hours": {
         "open_now": false
       },
       "photos": [
         {
-          "height": 3024,
+          "height": 3072,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/104051482289129192769\">Farouq Mahfuz</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/104702312563130009232\">Jacob Aalfs</a>"
           ],
-          "photo_reference": "ATKogpeY6ntgzx1wyDPa6J0nV5WHjMwn9LqI0zqEH1jfxXwVTqg49rhO-pQFI-Qa5X6DmnXRCWb6p0pzNb_s132XFdjFdqTYDzmMgRIlWTNRffgpNMOiz3szLPiZLWa0JliJfZmEJRWgtjHOaWxVEqCrAWatngOxJpIyukHsfu8utFknm2OzRI-HJeuBMsC4iacXCs6QSZVeaJjybIZLe6XRxBqCiyJdoo6NQ9iNCQwMn9IFrBV7M0VoTsmbwLM9xmdWDvrgDRzd8QkJheotjza6SS80mXqLaBO50pWWoDrUdMkfLln90B3XKkqM6aTU-8ikYeNsmcyZbu9Z3jMaHkmymKk2lWq4NQid_uszkiR4brLyR-O4YOv28Q2w8Jnfhqtcq33MpystAn7tq3IuOdyz45ecn_homVb2XCvP4MMtocyB1OVl6oldOGbEcjkP3VabvIz-rZ3WSEEjlyKuy19xeGxNXqts6k6LrzHZiJoBShhSNFoqpFf1-Crrb1wxJVdmLoovl0n-5WQVs180ckSON-AIOLn1M9aJzBJMo92qkeAvvojcRGhYu4eAnosNWjFqeVWk6yp-HnaqKSlVKd2Z6S00KzaTHPDo5RCw06K5a8eCgVU-ZTylzsTGlTFjyy-E",
-          "width": 4032
+          "photo_reference": "ATKogpdO8yYWMMmakfka8Wwsb7_IDYRQhvqzT_VPkHjxGnP3QC4OpuYsQvKZifmuXoLWhRE4UBKWRGkb0uzEw16p_IXlFATS0bkK2l6eAB5mbrJ4P2Y14LPTMJaw9zeapbmzhiCbl4RhqRozO_Il9HB_k5YVTSRwBTU5Eh8rJjYzBgpuIeLl4SVW7IR9TbUHQtH4GiSJg6TNpJUDy3g5MjYFb96nEjC6lY380JZUxBAVLJ8zMaiHcqxkkQCbde6mJnvTGjpQvXqD2z0GzB2VlkfWQPT_NURFxyTIJTnGAVcrTodhFl41IeRsNSSs1duO9u4PAIHBZisqg8k_2C1T_2JlHVru03RzzUBrI4MYVtaDKMPm-f4eGLyJpYtUsasHJGZilwXV92B2TsTQoMJxfL61qPLxm37zMdMCxLASLToOfneIfz_7yXYT7XS2In4nIsDzZ-p6bACZTSmj1JuysLKue2tlf5YusLAVENK7dYBHgkx0a6SxAEAruympxp5hGr3PfMlQFOeNTh5Os68W7QrXugEyre4g17nvgIfzjAk2nW7PZFlcZM84sItqKBqd0ybnlcABFgGmObpVUrAwbtkzzxd38aD9ISn0tMqBur2XrQeiSi2fln6YsncCCtZDEsJK9is1ow",
+          "width": 4080
         }
       ],
-      "place_id": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "place_id": "ChIJzyyzh9r3XIYRw0A8D9tgwmM",
       "plus_code": {
-        "compound_code": "J298+QG Cedar Hill, TX, USA",
-        "global_code": "8645J298+QG"
+        "compound_code": "9G9F+6F San Antonio, TX, USA",
+        "global_code": "76X39G9F+6F"
       },
-      "rating": 4.5,
-      "reference": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "rating": 4.7,
+      "reference": "ChIJzyyzh9r3XIYRw0A8D9tgwmM",
       "scope": "GOOGLE",
       "types": [
         "park",
+        "tourist_attraction",
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 3782,
-      "vicinity": "1570 Farm to Market Road 1382, Cedar Hill"
+      "user_ratings_total": 1120,
+      "vicinity": "6030 Padre Drive, San Antonio"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.90013,
-          "lng": -96.77556
+          "lat": 29.45910009999999,
+          "lng": -98.47149119999999
         },
         "viewport": {
           "northeast": {
-            "lat": 32.9017962802915,
-            "lng": -96.77441526970851
+            "lat": 29.4604518302915,
+            "lng": -98.46964985
           },
           "southwest": {
-            "lat": 32.8990983197085,
-            "lng": -96.77711323029152
+            "lat": 29.4577538697085,
+            "lng": -98.47287244999998
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Brackenridge Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3072,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/115002694968909007411\">Marlin Andre Aranguren</a>"
+          ],
+          "photo_reference": "ATKogpcejO9dih8vrHFOfjdDdnA5aRFzqQUbNqo8ebISvPBwAeZ-yZwkA3dFbrCFHP0IcNHtd8ltDiVp7WLfj7VhQNkPq4ethvMjay8os_9l7TtNkiXngDH4Lgjjy58CcUStpE9Oi0DDSHWl-vGs4LsSpvzVIT3uIme884-ipaCMMqWPDp8YX9B8V24y6eogFnVg5yUmoonIhRqKlFsPVXlaJcffKFHT3tDeWQ1oeDZt1bZwq1uJx1NzthoPaV6ji7BNjJ4CwAraNJq95oekKg0Vjc27u8dSHnVXM1PEX8hseSPJmHRNr9ZrhOD1hcMsI98PhxFkpB9CJdZkXX98EUOd705SxUUb-GV7RPA1S_c__yUadCRPbGoFML7CeVnEmMtWigxj5XnRW4zjNXZr9HWQLALkyBKQ0gRVHNjgom64rZM3XYDSlDQjlgsdwJQqB6TAUI8iCqxPhp_cgwUoph-soS9Za7TdEGxfD8Z6LaPDaQC8aHWOT9rzIKbyWt6c4VoFaHnkSqYVddOjTXjuRQTj9IDHgr7dSzacLQy8I_FIdXiyosKGPTt3KFsXBcsITZjFI3-xro2ZsliwaSaloaFePSHdb1-_WG4qZ6UiPACK5oNzHxYmAi_EYv8HnBQPNdMErCK4Mg",
+          "width": 4080
+        }
+      ],
+      "place_id": "ChIJg_vYhlZfXIYRjmhOU7EV3_o",
+      "plus_code": {
+        "compound_code": "FG5H+JC San Antonio, TX, USA",
+        "global_code": "76X3FG5H+JC"
+      },
+      "rating": 4.7,
+      "reference": "ChIJg_vYhlZfXIYRjmhOU7EV3_o",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 16858,
+      "vicinity": "3700 North Saint Mary's Street, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.544209,
+          "lng": -98.3304261
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.5456948302915,
+            "lng": -98.3290701197085
+          },
+          "southwest": {
+            "lat": 29.5429968697085,
+            "lng": -98.33176808029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Live Oak Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 4160,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114048495781456399426\">M Thail</a>"
+          ],
+          "photo_reference": "ATKogpeDNXGxpqA-dL-G4nK_bKbEFX9XwMI9Ao2pvvY3yWpXjnPhAs9-cPgb7XjBCn1ncbrDq2LnKCh-0qyU4cfqYMOZSMy3Xvh7Sg4w9RVHppAsg4pFnpaemZM63YEoRF7ipxHeiVozqQ0TLLF6FzZM9yo3biNvjiZA5YJyUGeommwrEEeBpJDzJYI4fm07uKlbNnMPjPBnrKEMYbPyEOuxy9Ek0_ipuPyDrrgQo8r5ezR3bGNpvCGLpMS2ie1L3AwwyaqNaq7VL07RxvQn1oJG1iTFR9mXP52FESbLA2f6OcMV9Gaigx1D1dVzHLAIDrCSQFATOuQoOQ1QDgf_XQGECKrpECJY1ebtJ2tcClALirt1oME7JhkvJaZZr_GJ4KMSiOJOVK29hT-UyzCOMD0NQqc67mRRXhycABGJBo8obGaYSZIM_trK4FwiSuy-D5VLg5YqDdZyT-e0BnQf3JNYLf_BWA2pQeXUnCqM0qsKwTIP2sgddUeDFBgSnO70gJsQFrnDBpYlPE4V3Rl3Qah5VmFPZlwIN-03SzobZJqil6Ko0bbYOwT3HKTH_2SDKXIDbD7-O2Nu1i2JlSaOvHZAY1Y411soMkF1aYVtUuvTQu36rbx-SJf5xEYt29PbMCqw2F-j4l7V",
+          "width": 2340
+        }
+      ],
+      "place_id": "ChIJCToxbEeNXIYRqHPnuRwB_m0",
+      "plus_code": {
+        "compound_code": "GMV9+MR Live Oak, TX, USA",
+        "global_code": "76X3GMV9+MR"
+      },
+      "rating": 4.7,
+      "reference": "ChIJCToxbEeNXIYRqHPnuRwB_m0",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 2226,
+      "vicinity": "18001 Park Drive, Live Oak"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.5520368,
+          "lng": -98.4341086
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.5535539302915,
+            "lng": -98.4325844197085
+          },
+          "southwest": {
+            "lat": 29.5508559697085,
+            "lng": -98.43528238029151
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
       "icon_background_color": "#7B9EB0",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "North Haven Gardens",
+      "name": "North East Sports Park",
       "opening_hours": {
         "open_now": false
       },
       "photos": [
         {
-          "height": 3024,
+          "height": 2268,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/107553184210121124904\">Brittany Pedigo</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/117017487243926800843\">Bonnie J</a>"
           ],
-          "photo_reference": "ATKogpf7xcvSivp7m6IxG4ChiHzYpSliJlAtIn9lwtjphHAa7zJtU8mf0Ay7SUhtUz8rtWkT4MQHGrWDVri8D3XZAR1y_RyfEA1toNfYXGygGeWjpWvqn-jUAWnEUbiyh_7Wq6MmuCDntOojxbETYvuncq1gaHEiLKa5b1X8cWNNNm853M836hQDbP_X8FWF_vAzVpmIXjCPRXADX3kxG5Hl0GGRAJghM_YpNfpdPIW2zFCWlUu81wCcPBS16gDwyNlAbskStfLu-Jr2UjxrxX3uOfJqBKYlrCX2QFWZr95-xEfuGGPCFjwnbyx-Fxib_FJ4sNulNF7hUqoWs40DMsRULJBYByQc9ZCca-SE_c6mUwJ2rCTU32v0apRQ_DZUwxj02YK2pbfqrI9zCSJANPGhvoyqexIna2OzNWKyD68SRxD70Ck2Ua1f5Io1SeN_6GR3NQzfj22SATGcVfsei3p8VWZJdtHYrNY6mQDTv1TVdkVWN1DABdKz1NlK5_J1FhyzQXjeSiDsYts7jyWWZUWGgS5Kiy8BRRybYP1w2YmaIFcZ_TRlVsdZ0p25q_riECSKJ8f0Oycxqri2a2rev8XWi7LfWIB4QkdP8YDyr6bK3vN13YKucZKzN1gvY1YVtnnxD1ZcHs6b",
+          "photo_reference": "ATKogpdrcK0Gps4oG4mul8ErFr-XejrJ1DdDA9aHof7ij9RhJKHoL4asy1CuPqhx1ufLdgz_xuaXOrBh75pTwHWdYd01qzzID5xejxXvBc8vbm30RG9lKDeMoVdaSx-oAlgLgbhE4sbVjMtt9ai_5lFdtXBnYWPy71oJvUbt2QVjXw48Ao-ZlBMr_1VQ6uiiNirT4k_atyFKW1wZVkkgH-HKTjKTCslwb019mH-wjf068bpbAqd_lSkJHw0lyO9GbxtmGRVqK2m4SV3saRydHux2Az8cvhSF-9S_gEYuoZ3I_GcwTVAlqtx5yX2Z02ke1P_9rrMkYY4zYSrqGtqVlm8pgqAWTqHFVu0umfIi2okhpEeGA5Eako_hhRYIE5d1nAS60KrUJCXwQmrz128MGY75cUeurLS3eBTnqUqoTWAYZEKf0tjcEVh5b2ARExOaplVzXjEkoKvfEtJOIAkgF2YJQWRbVSrgbMerqoBEQ6KCB0g7oGWPaOz5KCGYPfKaa3gvBRHbrjU35MOGrtmFP1sbteMHvlSizJicLZ_UVEncE6_YUvvqMCrOVK9wwC2cuJD4bEdm0qVfK9UNYJIF6Zbm8VWFMX5AtmczOdWgmMTxInfG4kT1JUQWaytAYNzxd69q7fV0zmWI",
           "width": 4032
         }
       ],
-      "place_id": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "place_id": "ChIJi6v5ixuLXIYRrtbtMrKRrWA",
       "plus_code": {
-        "compound_code": "W62F+3Q Dallas, TX, USA",
-        "global_code": "8645W62F+3Q"
+        "compound_code": "HH28+R9 San Antonio, TX, USA",
+        "global_code": "76X3HH28+R9"
       },
-      "price_level": 3,
-      "rating": 4.7,
-      "reference": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "rating": 4.5,
+      "reference": "ChIJi6v5ixuLXIYRrtbtMrKRrWA",
       "scope": "GOOGLE",
       "types": [
         "park",
         "point_of_interest",
-        "store",
         "establishment"
       ],
-      "user_ratings_total": 899,
-      "vicinity": "7700 Northaven Road, Dallas"
+      "user_ratings_total": 140,
+      "vicinity": "12001 Wetmore Road, San Antonio"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.85784809999999,
-          "lng": -96.7144113
+          "lat": 29.48244979999999,
+          "lng": -98.4803977
         },
         "viewport": {
           "northeast": {
-            "lat": 32.86486625000001,
-            "lng": -96.711758
+            "lat": 29.4838055802915,
+            "lng": -98.4784466197085
           },
           "southwest": {
-            "lat": 32.85119965000001,
-            "lng": -96.72075759999998
+            "lat": 29.4811076197085,
+            "lng": -98.48114458029151
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
       "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Norbuck Park",
+      "name": "Olmos Basin Park",
       "opening_hours": {
-        "open_now": false
-      },
-      "photos": [
-        {
-          "height": 2952,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/102888938745057128661\">Nalasi Mendy</a>"
-          ],
-          "photo_reference": "ATKogpdS3qw5BQ2OnASLVlYO_JRBFd2F-GzS0UmPPwqVX0a5Khj0K4PJKueIR_MfbVywtRQBgFwJyrpzgZ0Sh6U8GkcUWlNnE3ghvu3lA4EqIcXCvGvKD6DlSc4AfBU88cjIddZVmlfNp9xObUK2Jx1bn1c7MPic3fO0VJe0R2AYbdZnDeZ4cU6e_r2ZDbgo3pRoeuLqUo5Xcr7F30YKDyUsH8neWbxsTfCI2z-w8GdPT45dt6PBF64Yo3KwjzTr-kRNYVt4yns0Ap4nuJpqJUrz3zjXFbiIVotaT1IUhey3aqoyZU7URWCpXXFykfRbCi62EDi6lC2g0lFnOE86_194O-1iiHTO3KzkjCQy2W4kjJP6BiMKzbqhZAlg_ay5sqKVIXDBdTakeKey9yo1eCfHalfVZpQ7elLtjO1sdBmuHgS2nRGyUaA9M7w0toWscHFwgA-Pn9XU5DrnpHUH2jpgKzSVt4ljlZZBsG5Xr25_WoVq8JmE_d2y6m15-DuqKe2Khgt0nGCvhyzbCq_OcByNyb1HRz4IuyA4LgbiSjncRvmFZfXVKflWqq-eoIjKWohRcudysOX2u7olLIfcA_EdoanPpNeOraN1qR4DvQjES0RyS-5fI24eGwtKa4i1neGzjxASHRTL",
-          "width": 5248
-        }
-      ],
-      "place_id": "ChIJyUp9NVKgToYR65eZ97F4neo",
-      "plus_code": {
-        "compound_code": "V75P+46 Dallas, TX, USA",
-        "global_code": "8645V75P+46"
-      },
-      "rating": 4.4,
-      "reference": "ChIJyUp9NVKgToYR65eZ97F4neo",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 523,
-      "vicinity": "200 North Buckner Boulevard, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.8268333,
-          "lng": -96.8011782
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.8282048302915,
-            "lng": -96.79972651970849
-          },
-          "southwest": {
-            "lat": 32.82550686970851,
-            "lng": -96.80242448029149
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Lakeside Park",
-      "opening_hours": {
-        "open_now": false
+        "open_now": true
       },
       "photos": [
         {
           "height": 4000,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/111532420734731905675\">Brad Hall</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/113061235474614452619\">Gary Owen</a>"
           ],
-          "photo_reference": "ATKogpcWa5-FegF2pOcwsbS8fI0qEzselSn6Q-y7HiJjF4-LwLA195Iqepy3Xc6n7GtShA660uNnGN-xs-Ju3jSn3KEmrhMCL4jGuioQ5HSGUwEFrUukUbuyx_68CbZTsSnLqK_jHFEMZXkXwSJjHuaH4NeMIfXkDl9-9ztuYj3u__kWeaerLEzMCV8ZMtOzlqL20JuTEZ8KEEIeBMlYqGqK8lCYgIqxSXLYb4nMZdk14dTkUEgHLJMURsPf0CJyOOsRNgUEoajcKC_iEVaUqfb-ALYErUD3IdM87y0M8aL_FcU9nYzRMoW8STSCQJwmNxHy_Hog9W99YGTwpPeVv_36YHRTPJJvcORH02ma2zbcQ25_McOT29gRJIbxSJIPCg79LJopirCT0eTPZLNmSGbmf7ZjPi-IMsWQ0ztyeXfzOhOo3p8bi4zcJVdZ2FXAX61Sx3PLMPXB0PRRuu_x4pSC9Rd5xGIXL_683-0It7_UYdVv5gWsIM7ZgLEf0LXcDg4asb8RAa4M0LhNWf0vMzyqKBYLKW9-C4IwdZvyiMfFYDeqRR2NEpBgX0-nxQU0N72KXu8uUfqrdOwFqJF0No0UnrvvEXRYByr5e5IB2R-nE2CjDmn4Ha3bZPbKuNbjamn1KZ7J9w",
+          "photo_reference": "ATKogpcZwvR9efS_AjQuayzxdys58DxF-T49rGgPRrILmWRV5MtMiSLleEnlTNX84uvuyQ0R5gpxAAzKRmvuvfLARow3B42441ouU0Ws2y9LO_YIUkHAbS1zGIUbC8UM5Z4hECH1Sm75fA2u3XIPyWBErwLBBoIITr8a-81eAEnX9XxtgjlMHGGvyDJ_Zu4HGD5XQy0GQ2PXdx9EDJ5R9IO5_JySPpR09M-vROUCSvjdnxhc6V0yLkrgozExo8UPTeQ_avHbjqx6-ZiOKIWW0DDZroQvMVpte9ZC-0OCKIC9EClNpd1XbjJbW4MmtdmoXfUxqDyYDIyqYuAcghOeQsR5Rpum9lr9zuDXy8Xu7_UL9YVxCYtT4vWm8yC6sr4P5ADB2af2fm--ZLrUrYs_3QmKkOuKxL3Sf0mLu9DHoQQZsbkMgM7N9rxHMjnwl60CyTYxZG0p-kMqvtjvMi2_0-mvzVAxID8tVlIT203PX3QufmhhBRYe6lufSm5SUxAuyVmglog67I888SHxuCMhlCX0hXUulAfwd9zWfQ5g5eLUTsfjGvm9BSDyJR6i0iTD3_nP9d4KGAxi3H2Es9zXRL1BDeQa6yemncqCeYD11_kzEi78WkhESyIDT6t9ES-nosZYdaVp2A",
           "width": 3000
         }
       ],
-      "place_id": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "place_id": "ChIJNzPTmodfXIYR93Q2cIxa8f0",
       "plus_code": {
-        "compound_code": "R5GX+PG Dallas, TX, USA",
-        "global_code": "8645R5GX+PG"
+        "compound_code": "FGJ9+XR San Antonio, TX, USA",
+        "global_code": "76X3FGJ9+XR"
       },
-      "rating": 4.7,
-      "reference": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "rating": 4.5,
+      "reference": "ChIJNzPTmodfXIYR93Q2cIxa8f0",
       "scope": "GOOGLE",
       "types": [
         "tourist_attraction",
@@ -943,87 +783,51 @@
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 964,
-      "vicinity": "4601 Lakeside Drive, Dallas"
+      "user_ratings_total": 1715,
+      "vicinity": "651 Devine Road, San Antonio"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 32.6930718,
-          "lng": -96.79168229999999
+          "lat": 29.4998264,
+          "lng": -98.615325
         },
         "viewport": {
           "northeast": {
-            "lat": 32.6948382302915,
-            "lng": -96.7904347697085
+            "lat": 29.50081668029149,
+            "lng": -98.61409461970848
           },
           "southwest": {
-            "lat": 32.6921402697085,
-            "lng": -96.79313273029152
+            "lat": 29.49811871970849,
+            "lng": -98.6167925802915
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
       "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Nomamiukor Dora I",
-      "place_id": "ChIJoV7orp-XToYR7WTvrWrhfSw",
-      "plus_code": {
-        "compound_code": "M6V5+68 Dallas, TX, USA",
-        "global_code": "8645M6V5+68"
-      },
-      "reference": "ChIJoV7orp-XToYR7WTvrWrhfSw",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "vicinity": "4500 South Lancaster Road #140, Dallas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 32.832566,
-          "lng": -96.7785114
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 32.83352728029149,
-            "lng": -96.7778063197085
-          },
-          "southwest": {
-            "lat": 32.83082931970849,
-            "lng": -96.78050428029151
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Glencoe Park",
+      "name": "Raymond Rimkus Park",
       "opening_hours": {
         "open_now": false
       },
       "photos": [
         {
-          "height": 3024,
+          "height": 2592,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/102383517303626037461\">Michael “Mike”</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/113515651579612937796\">Elia Moreno</a>"
           ],
-          "photo_reference": "ATKogpfQnrJnR-34jsjUBt--sn0hAm2xEpsPIkVc9b-Y6dzxmLrz8d9yQkXdxSUwYm2SKB6-K55kTzghkSvRUrBrK_oDPghwqhuhmiV044aD1rULvHldUl4e-zpww7Jnu3Gv4yReOvg2chisWi962XGPx6GiUaJ0SJcRLzk6eSBaxYtvu0ScjWSdj34NniCDePNLIZ6NwtqKfDQqUnMT8KOj447VL67hRJCPdYTZQcZX6J7dhO8jfSeQaNKIpfatffu484--YAigZPQhQE3swMGjIJbNM5au72vEJMe9HJ1U3MSwyfYjVqOpQIUIuTVvX4BCbJbQb7C2X_zwLmhk8ME6s_63PTMmvaCuYa-z9AUq4OAwy7mTrrG6z6OJFKXtjNuOEXALnSfQ4jyYcH3SR44A2fH7qUz5WfTdH2yOJlDDIEOaDEP28a1sQS7ek2UF3H-ZNX6g3yWMSjeABr5OkSdoiu2jjsS0R12Ob3HkrJ6JJYruCKz-76YZESxzjmTSlIN9KjadRf_wVJE_ukv6cM0IXdz2kdfDI_6mID5hXVyxB5PJHJLAX2T-mTFgS3TfE-WBkbo41M5Xrai9Efm44ON5mOb80d4rxhxoro0sPaw6w4NsvvQGG1kK7a5CtPFQqKVl",
-          "width": 4032
+          "photo_reference": "ATKogpeJUDrx4XgJlG6Ow_Idi2Lrlhy81If9y03plc4N7QUInxnxddhh1YbC8cfYdfRctNjb1eymavJRv6vcV307J8l3XFDO9U8SZYEVkf70HFkjCdAyJkiCLAi32G14BshjU1bV_4dB8z3pfjmh6vY-eth3NtRG3_V-6JIo-bKU745dSSlNwAfDWcS7Fo6jzQkLt4axcX8Ur4nJ11xcA2c0nWswlcHy9qbql-OqMfilbLTvW26Z3nhQGTe79-mkPh4bVZbgaqiuzukcIuav23o7okP0uDxfQSBomBpZInGWQijMQgQBquH7g2epBIkPVWREHPm7XGwmcafFP6lyelZFWhqS1CnaRbn36a9FknKn7U_FrQUgqKv60CEsqbWuiO2uUVaq7dAynow0fy6BrFQr3NHAstHtHhOcKy9pV79b3Z3dMqCV0S-rlZxv7uhvy9iIYlql0eftCIGWkZbj386wgVWdckjQMxfpNM3WXGbPhrdY5Cmhy419YwAEyyVgsOERJmQF7i1UObs3IuxtQwVjzin9ML4CeqyTNZK2_Lhfh8jDMA3YqDuhwCY0khIYBXwdWw15s2_sswLbXSstY7ZJp4MQExC1x2_Jwrhf60whuWRw4ZCTugDXqEtG_tnJ8fU59Flz_Jfm",
+          "width": 1944
         }
       ],
-      "place_id": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "place_id": "ChIJpeIVl4JdXIYRTEZCV3JsfEE",
       "plus_code": {
-        "compound_code": "R6MC+2H Dallas, TX, USA",
-        "global_code": "8645R6MC+2H"
+        "compound_code": "F9XM+WV Leon Valley, TX, USA",
+        "global_code": "76X3F9XM+WV"
       },
-      "rating": 4.5,
-      "reference": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "rating": 4.6,
+      "reference": "ChIJpeIVl4JdXIYRTEZCV3JsfEE",
       "scope": "GOOGLE",
       "types": [
         "park",
@@ -1031,8 +835,215 @@
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 569,
-      "vicinity": "3700 Glencoe Street, Dallas"
+      "user_ratings_total": 2274,
+      "vicinity": "6440 Evers Road, Leon Valley"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.55092479999999,
+          "lng": -98.5690867
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.55237308029149,
+            "lng": -98.56786671970849
+          },
+          "southwest": {
+            "lat": 29.54967511970849,
+            "lng": -98.57056468029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#7B9EB0",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "Wildlife Rescue & Rehabilitation, Inc",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 4080,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/109280036360433612928\">Vanessa Rogers</a>"
+          ],
+          "photo_reference": "ATKogpdc5HR8f6oWM6QzvoLcoH-SdSazqOnOa-8I715IW0s4zKsrqCTB5ieXGgJQStXzicwM2oKuCL8KT4nCK_XWVfGCwDsIYJ03eB7AT_tStUxEUaFRfeZRE-ABFAnFjo6ilqYTB3SbwDZE9uWARks7phzAIqMN5ys07aNqfpIHcaCvQlqjqSMqQmxnQEJEus00425mcIRPtxunAhCBVCSDFbW3kXbDrxPCG7Zr3LX_S5KqgnYCy9vrfeeK6I4cajiYYtxDBSMQwM8kxBPxa06Oz7ltk8qF5-2DO_wnyaOYlM70jQYBlknfEyOb2e9wuOdLjeTWg7m1r-D4XHH10YqURME6L36gAIy5qFm0MrkgZj7U_BD7U1jrmW9CtMcW8IHVAwzJRKTG88Em6vOIT6K2EMD0QyjsQblhTKKY-9m-QBd9feLP16VoOzdKPoce2wa_1ys_WWVgr6f2zJf5UmqDYH6w89dxOa1pnSQCmW3kdoTFwCEnFL-2_HyR2iA2o0zB1sZ6gfIsgonqlp9ywDcT-GwK3NcJ0-pYO1m1m6AQT5pF0NADKfTXF9i7RbvukwT6RTC3ZyYSFMtiarnMVx2Gj8l86eB9HKRqzBQ8lc7jg4JrBKhwWSPzDoDelgNTJpdMqMxCj7eM",
+          "width": 3072
+        }
+      ],
+      "place_id": "ChIJVVVVVZWDW4YR8CI1IY8pcv8",
+      "plus_code": {
+        "compound_code": "HC2J+99 San Antonio, TX, USA",
+        "global_code": "76X3HC2J+99"
+      },
+      "rating": 4.7,
+      "reference": "ChIJVVVVVZWDW4YR8CI1IY8pcv8",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 657,
+      "vicinity": "11902 Rustic Lane, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.3976616,
+          "lng": -98.4177424
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.3990214802915,
+            "lng": -98.41622101970849
+          },
+          "southwest": {
+            "lat": 29.3963235197085,
+            "lng": -98.4189189802915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Comanche Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2268,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/113823078423855521144\">Maia Torres-Diaz</a>"
+          ],
+          "photo_reference": "ATKogpfVAjaIEUPAmyxTboYO_AyC2-7M4h9XRz1iZDAyOWRVaYl1gFDaFaQyN8MzxKBQqQw1zx49ve82vY-APFjDNFho1FRRv-BjtFT9oPMo1R7AMlB54zu5dBmFDjX5ySh7tvUVvputgZfBNmVQ5gun6d-u_rt7bj2DOh3vVB9tEbuqiWs2-WvMT9uXbDqrcIBVGCLpFAkF6FQ-svEQnNa5QOWo916_N251RT8JcEGpud8sGOGRxVMe3k-E2tuKsIn4ZDuJYhwpBJKKz_fXqS5f8w6VCWzwLQCKiHaZmwFg2VSWf_yfSRBXqmpYvpGX1ewPpHcTh4DsMm7vvcdDY_KHPB8wEl346SHstUV3TbgJpONIiVtMX-bfgXWcNGHoROqH82k5FE34QRyJZoD8LT5ll7tYhBnX7IxXyt07yBvuItZVvvYPQsqIK42kW4wkJxM38kA4Y4rjbRTGwdNO2AbzQC5XlwCpSK0NYjPKdZ198NfELIxj2oTh-mecntXgNtEFi60Pa9gHYR2vsULRsW2Kn2R5WNwUBGaxuDWPG2p4gcTaH-8qetO3B8oagqkXrdMz0nRZabdDs5ShBD3RAL8Bra9uASbkUyoih66TvwU7gje1cxXaYpUfV5BPvjfDowLw",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJVY57gcL2XIYRYD9LCKBDk08",
+      "plus_code": {
+        "compound_code": "9HXJ+3W San Antonio, TX, USA",
+        "global_code": "76X39HXJ+3W"
+      },
+      "rating": 4.6,
+      "reference": "ChIJVY57gcL2XIYRYD9LCKBDk08",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 949,
+      "vicinity": "2600 Rigsby Avenue, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.3849079,
+          "lng": -98.4300153
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.3862548802915,
+            "lng": -98.42869706970849
+          },
+          "southwest": {
+            "lat": 29.3835569197085,
+            "lng": -98.43139503029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "South Side Lions Park East",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 4000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/110214685497553126974\">Edith Olvera</a>"
+          ],
+          "photo_reference": "ATKogpcdxxHLDaiGtLjjl4DO2uQb8eqTc5hmYH6MrqrW7S3Iufqa4ojdApnzhDqIrxxOX-FaXmruC8LbMDG8MtnUg49HliaCqfOgbPAOnaW0Lm_-pk3QssDw5bNAo9Q1jE6EZ8XFN9N-sLoAVUM8GcvtUINjmDmYseKGRZ9A__GM4fRrhLLJmdzziPpYm7Sr80fz9lbrZ6sz0dzK5kXm_U2bMd-d9f-A-Fy9S67lzly3FJrtn_9pJ0pF89Y2eJ0DvsfoYRSldgGUfo_l_E3QSvhi3hYUDv4Bu5k3EMJYMdv57sJ4iMB8f9cfRJKBrsCzGTeKCiwflq9KqpgGQo0xhDELoIi3czCv797qyNhtoYshcWgWHwkwjFPnjWy9zASiVK8GGxc-hgDjRZ_S3zER2Zszd9xWUXDG1WiTEatD1qcZ8Ty0T_8eHV_28lyJmvPqtaFy_aBT4N7n1kV9MsXejs7_AuguClzfPnbe_bmSCLWLcSNdU7cXN6FXlocSb_Ncp9zMr3Mh2FkkCeELkBLoeWfPTHNHiFcpU8yEwaxHtVdF6TtbNitqRJ9fXtnM3hlXNv1MYVFTJ0vIlSifcB-7I0cQYbf9dqrUJbcLlWdjCQidiSSGrfMmZGs6kp1KSfVvjSShLJ1-j_cZ",
+          "width": 3000
+        }
+      ],
+      "place_id": "ChIJwzlP6eH2XIYR_x1K3wiGRbE",
+      "plus_code": {
+        "compound_code": "9HM9+XX San Antonio, TX, USA",
+        "global_code": "76X39HM9+XX"
+      },
+      "rating": 4.5,
+      "reference": "ChIJwzlP6eH2XIYR_x1K3wiGRbE",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1776,
+      "vicinity": "4600 Pecan Valley Drive, San Antonio"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 29.3109559,
+          "lng": -98.49985509999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 29.3123064802915,
+            "lng": -98.49868001970849
+          },
+          "southwest": {
+            "lat": 29.3096085197085,
+            "lng": -98.5013779802915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Mitchell Lake Audubon Center",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114735602970373205174\">Mark Rein</a>"
+          ],
+          "photo_reference": "ATKogpffaJ26FqD1A2ueS_InMTxg0m1LOi7m5K95ILB3-eTc5i9JYv3EkFJOhVZaZj-9mif-9r3pLbus6LG0J9oZlKOnhooHjQYHOuhpPAvr7J2ri2TSN8fWEBj945avukpAUetaLPSIp_SRRtdL8YrkNPQxAWN6c594qQgG2rHFHwLeevAY-9dRv85KOT0LOW1TCo_8pNjo1IocexI4cfGw0wqjJMz5s_cGDRTEHU6KGkMwTIiaXgpGPjitzQFCGHjI7z1N9aB2jceUcCHF_8hZzocfGzhvyhpSoGZbQrb3NqiWJ5gVCInd2n89ZyEr5I4Rzl7eNFYIWXFPzvmthZlBv4hCKRLQUveUccH4O1ZOnVEqzZJjazr_8GiIZUWHpbOYJjRnnAK2PIVNtqm4JS53ijhYZ8PcTy-9sEa5EhEXokyxp6FCZZ0PKY_niWzHKzCfpXjhPf9htEjVvzlHo-LwqLSExIr0hT7xx2tcxj9tWr2Wcag1qNRINovN9-pQ9k6BRqN-KvzSQF8mGh3hoUXvygVuAs0xz2kH1sG05rNIzhkEuStIf2fpYEIRjpxZKBYEpv5LDZ6dZZEIjYv4osmf_bQDHjrZhylFDMsYz7oC1MU4wz1AuEeHo3oqIUmoZdGoA03lZQ",
+          "width": 4000
+        }
+      ],
+      "place_id": "ChIJ0_Kgc-pXXIYRL9r0pvryJ-4",
+      "plus_code": {
+        "compound_code": "8G62+93 San Antonio, TX, USA",
+        "global_code": "76X38G62+93"
+      },
+      "rating": 4.6,
+      "reference": "ChIJ0_Kgc-pXXIYRL9r0pvryJ-4",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 254,
+      "vicinity": "10750 Pleasanton Road, San Antonio"
     }
   ],
   "status": "OK"

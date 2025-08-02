@@ -1,14 +1,78 @@
+// Load environment variables FIRST, before any other imports
+import { config } from "dotenv";
+import { resolve } from "path";
+import { existsSync, readFileSync } from "fs";
+
+// Manual environment loading to ensure it works
+const envFiles = [
+  resolve(process.cwd(), '.env'),
+  resolve(process.cwd(), '..', '.env')
+];
+
+console.log('🔍 Loading environment variables manually...');
+envFiles.forEach(envFile => {
+  if (existsSync(envFile)) {
+    console.log(`📁 Found .env file: ${envFile}`);
+    
+    try {
+      // Load with dotenv
+      const result = config({ path: envFile, override: false });
+      if (result.error) {
+        console.log(`⚠️ Dotenv error:`, result.error.message);
+      } else {
+        console.log(`✅ Dotenv loaded successfully from: ${envFile}`);
+      }
+      
+      // Also manually parse to ensure we get the values
+      const envContent = readFileSync(envFile, 'utf8');
+      const lines = envContent.split('\n');
+      
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+          const [key, ...valueParts] = trimmed.split('=');
+          const value = valueParts.join('=');
+          
+          // Only set if not already set (don't override)
+          if (!process.env[key]) {
+            process.env[key] = value;
+          }
+          
+          // Log Google-related vars (without showing values)
+          if (key.includes('GOOGLE_')) {
+            console.log(`  ✅ ${key}: ${value ? 'SET' : 'EMPTY'}`);
+          }
+        }
+      });
+      
+    } catch (error) {
+      console.log(`❌ Error loading ${envFile}:`, error.message);
+    }
+  } else {
+    console.log(`⚠️ .env file not found: ${envFile}`);
+  }
+});
+
+// Verify final environment state
+console.log('🔍 Final Environment Variables:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- GOOGLE_CLIENT_ID exists:', !!process.env.GOOGLE_CLIENT_ID);
+console.log('- GOOGLE_CLIENT_SECRET exists:', !!process.env.GOOGLE_CLIENT_SECRET);
+console.log('- GOOGLE_REDIRECT_URI:', process.env.GOOGLE_REDIRECT_URI);
+if (process.env.GOOGLE_CLIENT_ID) {
+  console.log('- GOOGLE_CLIENT_ID length:', process.env.GOOGLE_CLIENT_ID.length);
+}
+if (process.env.GOOGLE_CLIENT_SECRET) {
+  console.log('- GOOGLE_CLIENT_SECRET length:', process.env.GOOGLE_CLIENT_SECRET.length);
+}
+
+// Now import other modules
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
-import { config } from "dotenv";
 import { registerRoutes } from "./routes";
 import { registerAuthRoutes } from "./auth-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { devApiCacheMiddleware } from "./dev-api-cache";
-
-// Load environment variables from both current directory and parent directory
-config({ path: '.env' }); // Load from frontend/.env
-config({ path: '../.env' }); // Load from project root .env
 
 const app = express();
 app.use(express.json());

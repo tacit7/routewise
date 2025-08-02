@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { GooglePlacesService, SAMPLE_ROUTE_COORDINATES } from "./google-places";
 import { NominatimService } from "./nominatim-service";
+import { tripService } from "./trip-service";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -36,9 +37,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   if (process.env.NODE_ENV === 'development') {
     app.get("/api/cache-stats", async (req, res) => {
       const { getCacheStats } = await import('./dev-api-cache');
+      const apiCacheStats = getCacheStats();
+      const placesServiceStats = placesService ? placesService.getCacheStats() : null;
+      
       res.json({
-        ...getCacheStats(),
+        apiCache: apiCacheStats,
+        placesServiceCache: placesServiceStats,
         mswDisabled: process.env.MSW_DISABLED === 'true',
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Clear cache endpoint
+    app.post("/api/clear-cache", async (req, res) => {
+      const { clearCache } = await import('./dev-api-cache');
+      clearCache();
+      if (placesService) {
+        placesService.clearCache();
+      }
+      res.json({ message: 'Cache cleared', timestamp: new Date().toISOString() });
+    });
+
+    // Test geocoding endpoint to demonstrate caching
+    app.get("/api/test-geocoding/:city", async (req, res) => {
+      if (!placesService) {
+        return res.status(503).json({ error: 'Google Places service not available' });
+      }
+      
+      const startTime = Date.now();
+      const result = await placesService.geocodeCity(req.params.city);
+      const endTime = Date.now();
+      
+      res.json({
+        city: req.params.city,
+        coordinates: result,
+        responseTime: `${endTime - startTime}ms`,
         timestamp: new Date().toISOString()
       });
     });
@@ -696,6 +729,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(poi);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch POI" });
+    }
+  });
+
+  // ===== TRIP MANAGEMENT ENDPOINTS =====
+
+  // Create a trip (requires authentication or allows anonymous public trips)
+  app.post("/api/trips", async (req, res) => {
+    try {
+      const { title, startCity, endCity, checkpoints, routeData, poisData, isPublic } = req.body;
+      
+      // Validate required fields
+      if (!startCity || !endCity) {
+        return res.status(400).json({ message: "Start city and end city are required" });
+      }
+
+      // Get user ID from authenticated request (may be null for anonymous users)
+      const userId = (req as any).user?.id || null;
+      
+      // Anonymous users can only create public trips
+      if (!userId && !isPublic) {
+        return res.status(401).json({ message: "Authentication required for private trips" });
+      }
+
+      const tripData = {
+        userId,
+        title: title || tripService.generateTripTitle(startCity, endCity, checkpoints || []),
+        startCity,
+        endCity,
+        checkpoints: checkpoints || [],
+        routeData: routeData || null,
+        poisData: poisData || [],
+        isPublic: isPublic || false
+      };
+
+      const trip = await tripService.createTrip(tripData);
+      res.status(201).json(trip);
+    } catch (error) {
+      console.error("Error creating trip:", error);
+      res.status(500).json({ message: "Failed to create trip" });
+    }
+  });
+
+  // Get trip by ID (public trips or user's own trips)
+  app.get("/api/trips/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trip ID" });
+      }
+
+      const userId = (req as any).user?.id;
+      let trip;
+
+      if (userId) {
+        // Authenticated user - can see their own trips or public trips
+        trip = await tripService.getTripById(id, userId);
+        if (!trip) {
+          trip = await tripService.getPublicTripById(id);
+        }
+      } else {
+        // Anonymous user - can only see public trips
+        trip = await tripService.getPublicTripById(id);
+      }
+
+      if (!trip) {
+        return res.status(404).json({ message: "Trip not found" });
+      }
+
+      res.json(trip);
+    } catch (error) {
+      console.error("Error fetching trip:", error);
+      res.status(500).json({ message: "Failed to fetch trip" });
+    }
+  });
+
+  // Get user's trips (requires authentication)
+  app.get("/api/trips", async (req, res) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 50;
+      const trips = await tripService.getUserTrips(userId, limit);
+      res.json(trips);
+    } catch (error) {
+      console.error("Error fetching user trips:", error);
+      res.status(500).json({ message: "Failed to fetch trips" });
+    }
+  });
+
+  // Get public trips
+  app.get("/api/trips/public/recent", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const trips = await tripService.getPublicTrips(limit);
+      res.json(trips);
+    } catch (error) {
+      console.error("Error fetching public trips:", error);
+      res.status(500).json({ message: "Failed to fetch public trips" });
+    }
+  });
+
+  // Update trip (requires authentication and ownership)
+  app.put("/api/trips/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trip ID" });
+      }
+
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const updateData = req.body;
+      const trip = await tripService.updateTrip(id, userId, updateData);
+      
+      if (!trip) {
+        return res.status(404).json({ message: "Trip not found or access denied" });
+      }
+
+      res.json(trip);
+    } catch (error) {
+      console.error("Error updating trip:", error);
+      res.status(500).json({ message: "Failed to update trip" });
+    }
+  });
+
+  // Delete trip (requires authentication and ownership)
+  app.delete("/api/trips/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid trip ID" });
+      }
+
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const deleted = await tripService.deleteTrip(id, userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Trip not found or access denied" });
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting trip:", error);
+      res.status(500).json({ message: "Failed to delete trip" });
+    }
+  });
+
+  // Search trips
+  app.get("/api/trips/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+
+      const userId = (req as any).user?.id;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const trips = await tripService.searchTrips(query, userId, limit);
+      res.json(trips);
+    } catch (error) {
+      console.error("Error searching trips:", error);
+      res.status(500).json({ message: "Failed to search trips" });
+    }
+  });
+
+  // Save current route as trip (convenience endpoint)
+  app.post("/api/trips/save-route", async (req, res) => {
+    try {
+      const { startCity, endCity, checkpoints, routeData, poisData, isPublic, title } = req.body;
+      
+      if (!startCity || !endCity) {
+        return res.status(400).json({ message: "Start city and end city are required" });
+      }
+
+      const userId = (req as any).user?.id || null;
+      
+      // Anonymous users can only create public trips
+      if (!userId && !isPublic) {
+        return res.status(401).json({ message: "Authentication required for private trips" });
+      }
+
+      const trip = await tripService.createTripFromRoute(
+        userId,
+        startCity,
+        endCity,
+        checkpoints || [],
+        routeData,
+        poisData || [],
+        isPublic || false
+      );
+
+      if (!trip) {
+        return res.status(400).json({ message: "Failed to create trip" });
+      }
+
+      res.status(201).json(trip);
+    } catch (error) {
+      console.error("Error saving route as trip:", error);
+      res.status(500).json({ message: "Failed to save route as trip" });
     }
   });
 

@@ -15,7 +15,8 @@ const CACHE_DURATIONS: Record<string, number> = {
   '/api/health': 30 * 1000,           // 30 seconds - health checks change frequently
   '/api/maps-key': 10 * 60 * 1000,    // 10 minutes - API keys rarely change
   '/api/places/autocomplete': 5 * 60 * 1000,  // 5 minutes - city data is stable
-  '/api/pois': 2 * 60 * 1000,         // 2 minutes - POI data can be updated
+  '/api/pois': 5 * 60 * 1000,         // 5 minutes - POI data is now cached at service level too
+  '/api/route': 10 * 60 * 1000,       // 10 minutes - route data with POIs
 };
 
 const DEFAULT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes default
@@ -113,7 +114,7 @@ export function getCacheStats() {
       const cacheDuration = getCacheDuration(new URL(entry.url, 'http://localhost').pathname);
       return now - entry.timestamp >= cacheDuration;
     }).length,
-    endpoints: [...new Set(entries.map(entry => new URL(entry.url, 'http://localhost').pathname))]
+    endpoints: Array.from(new Set(entries.map(entry => new URL(entry.url, 'http://localhost').pathname)))
   };
   
   return stats;

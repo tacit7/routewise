@@ -1,4 +1,11 @@
 import { users, pois, type User, type InsertUser, type Poi, type InsertPoi } from "@shared/schema";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+
+// Database connection
+const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/routewise";
+const client = postgres(connectionString);
+export const db = drizzle(client);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
