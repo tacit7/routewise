@@ -13,6 +13,15 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:performance": "node test/performance/run-performance-tests.js",
+    "test:performance:lighthouse": "node test/performance/run-performance-tests.js lighthouse",
+    "test:performance:load": "node test/performance/run-performance-tests.js load",
+    "test:performance:bundle": "node test/performance/run-performance-tests.js bundle",
+    "test:a11y": "playwright test test/accessibility/a11y.spec.ts",
+    "test:a11y:report": "playwright test test/accessibility/a11y.spec.ts --reporter=html",
+    "test:all": "npm run test && npm run test:e2e && npm run test:performance && npm run test:a11y",
     "msw:init": "msw init client/public --save"
   },
   "dependencies": {
@@ -87,6 +96,8 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.54.2",
     "@replit/vite-plugin-cartographer": "^0.2.7",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
@@ -112,6 +123,8 @@
     "drizzle-kit": "^0.30.4",
     "esbuild": "^0.25.0",
     "happy-dom": "^18.0.1",
+    "k6": "^0.0.0",
+    "lighthouse": "^12.8.1",
     "msw": "^2.10.4",
     "postcss": "^8.4.47",
     "supertest": "^7.1.4",
