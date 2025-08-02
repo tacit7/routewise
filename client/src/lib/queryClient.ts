@@ -48,10 +48,34 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: (failureCount, error) => {
+        // Don't retry on 401, 403, or 404 errors
+        if (error instanceof Error) {
+          const errorMessage = error.message.toLowerCase();
+          if (errorMessage.includes('401') || 
+              errorMessage.includes('403') || 
+              errorMessage.includes('404')) {
+            return false;
+          }
+        }
+        // Retry up to 2 times for other errors
+        return failureCount < 2;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
     mutations: {
-      retry: false,
+      retry: (failureCount, error) => {
+        // Don't retry mutations on client errors (4xx)
+        if (error instanceof Error) {
+          const errorMessage = error.message.toLowerCase();
+          if (errorMessage.includes('4')) {
+            return false;
+          }
+        }
+        // Retry once for server errors (5xx)
+        return failureCount < 1;
+      },
+      retryDelay: 1000,
     },
   },
 });

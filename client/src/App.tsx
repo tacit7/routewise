@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/components/auth-context";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
+import DashboardTest from "@/pages/dashboard-test";
 import RouteResults from "@/pages/route-results";
 import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
@@ -33,6 +34,7 @@ function AuthenticatedRouter() {
       <Route path="/plan" component={Home} />
       <Route path="/route" component={RouteResults} />
       <Route path="/interests-demo" component={InterestsDemo} />
+      <Route path="/dashboard-test" component={DashboardTest} />
       <Route component={NotFound} />
     </Switch>
   );
