@@ -1,5 +1,20 @@
-import { users, pois, type User, type InsertUser, type Poi, type InsertPoi } from "@shared/schema";
+import { 
+  users, 
+  pois, 
+  interestCategories,
+  userInterests,
+  type User, 
+  type InsertUser, 
+  type Poi, 
+  type InsertPoi,
+  type InterestCategory,
+  type InsertInterestCategory,
+  type UserInterest,
+  type InsertUserInterest,
+  type UpdateUserInterest
+} from "@shared/schema";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { eq, and, inArray } from "drizzle-orm";
 import postgres from "postgres";
 
 // Database connection
@@ -17,27 +32,136 @@ export interface IStorage {
   getAllPois(): Promise<Poi[]>;
   getPoiById(id: number): Promise<Poi | undefined>;
   createPoi(poi: InsertPoi): Promise<Poi>;
+  
+  // Interest categories
+  getAllInterestCategories(): Promise<InterestCategory[]>;
+  getInterestCategoryById(id: number): Promise<InterestCategory | undefined>;
+  getInterestCategoryByName(name: string): Promise<InterestCategory | undefined>;
+  createInterestCategory(category: InsertInterestCategory): Promise<InterestCategory>;
+  
+  // User interests  
+  getUserInterests(userId: number): Promise<(UserInterest & { category: InterestCategory })[]>;
+  getUserInterestsByCategory(userId: number, categoryIds: number[]): Promise<UserInterest[]>;
+  setUserInterests(userId: number, interests: InsertUserInterest[]): Promise<UserInterest[]>;
+  updateUserInterest(userId: number, categoryId: number, updates: UpdateUserInterest): Promise<UserInterest | undefined>;
+  deleteUserInterest(userId: number, categoryId: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private pois: Map<number, Poi>;
+  private interestCategories: Map<number, InterestCategory>;
+  private userInterests: Map<string, UserInterest>; // key: `${userId}-${categoryId}`
   private currentUserId: number;
   private currentPoiId: number;
+  private currentCategoryId: number;
+  private currentUserInterestId: number;
 
   constructor() {
     this.users = new Map();
     this.pois = new Map();
+    this.interestCategories = new Map();
+    this.userInterests = new Map();
     this.currentUserId = 1;
     this.currentPoiId = 1;
+    this.currentCategoryId = 1;
+    this.currentUserInterestId = 1;
     
-    // Initialize with sample POI data
+    // Initialize with sample data
     this.initializePois();
+    this.initializeInterestCategories();
   }
 
   private async initializePois() {
     // This will be populated with real Google Places data
     // The actual fetching happens in the routes when needed
+  }
+
+  private async initializeInterestCategories() {
+    // Initialize default interest categories matching POI types
+    const defaultCategories = [
+      { 
+        name: 'restaurants', 
+        displayName: 'Restaurants', 
+        description: 'Dining establishments and food venues',
+        iconName: 'utensils',
+        isActive: true 
+      },
+      { 
+        name: 'attractions', 
+        displayName: 'Tourist Attractions', 
+        description: 'Must-see attractions and points of interest',
+        iconName: 'camera',
+        isActive: true 
+      },
+      { 
+        name: 'parks', 
+        displayName: 'Parks & Nature', 
+        description: 'Parks, gardens, and natural areas',
+        iconName: 'tree',
+        isActive: true 
+      },
+      { 
+        name: 'scenic_spots', 
+        displayName: 'Scenic Spots', 
+        description: 'Beautiful views and scenic locations',
+        iconName: 'mountain',
+        isActive: true 
+      },
+      { 
+        name: 'historic_sites', 
+        displayName: 'Historic Sites', 
+        description: 'Historical landmarks and cultural sites',
+        iconName: 'landmark',
+        isActive: true 
+      },
+      { 
+        name: 'markets', 
+        displayName: 'Markets & Shopping', 
+        description: 'Shopping areas, markets, and stores',
+        iconName: 'shopping-bag',
+        isActive: true 
+      },
+      { 
+        name: 'outdoor_activities', 
+        displayName: 'Outdoor Activities', 
+        description: 'Outdoor recreation and adventure spots',
+        iconName: 'hiking',
+        isActive: true 
+      },
+      { 
+        name: 'cultural_sites', 
+        displayName: 'Cultural Sites', 
+        description: 'Museums, galleries, and cultural venues',
+        iconName: 'palette',
+        isActive: true 
+      },
+      { 
+        name: 'shopping', 
+        displayName: 'Shopping Centers', 
+        description: 'Malls, retail centers, and shopping districts',
+        iconName: 'store',
+        isActive: true 
+      },
+      { 
+        name: 'nightlife', 
+        displayName: 'Nightlife & Entertainment', 
+        description: 'Bars, clubs, and entertainment venues',
+        iconName: 'music',
+        isActive: true 
+      }
+    ];
+
+    for (const categoryData of defaultCategories) {
+      const id = this.currentCategoryId++;
+      const now = new Date();
+      const category: InterestCategory = {
+        id,
+        ...categoryData,
+        createdAt: now
+      };
+      this.interestCategories.set(id, category);
+    }
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -107,6 +231,108 @@ export class MemStorage implements IStorage {
     };
     this.pois.set(id, poi);
     return poi;
+  }
+
+  // Interest Categories Methods
+  async getAllInterestCategories(): Promise<InterestCategory[]> {
+    return Array.from(this.interestCategories.values()).filter(cat => cat.isActive);
+  }
+
+  async getInterestCategoryById(id: number): Promise<InterestCategory | undefined> {
+    return this.interestCategories.get(id);
+  }
+
+  async getInterestCategoryByName(name: string): Promise<InterestCategory | undefined> {
+    return Array.from(this.interestCategories.values()).find(cat => cat.name === name);
+  }
+
+  async createInterestCategory(insertCategory: InsertInterestCategory): Promise<InterestCategory> {
+    const id = this.currentCategoryId++;
+    const now = new Date();
+    const category: InterestCategory = {
+      id,
+      ...insertCategory,
+      description: insertCategory.description ?? null,
+      iconName: insertCategory.iconName ?? null,
+      isActive: insertCategory.isActive ?? true,
+      createdAt: now
+    };
+    this.interestCategories.set(id, category);
+    return category;
+  }
+
+  // User Interests Methods
+  async getUserInterests(userId: number): Promise<(UserInterest & { category: InterestCategory })[]> {
+    const userInterestsList = Array.from(this.userInterests.values())
+      .filter(ui => ui.userId === userId);
+    
+    return userInterestsList.map(ui => {
+      const category = this.interestCategories.get(ui.categoryId);
+      if (!category) {
+        throw new Error(`Category ${ui.categoryId} not found for user interest ${ui.id}`);
+      }
+      return { ...ui, category };
+    });
+  }
+
+  async getUserInterestsByCategory(userId: number, categoryIds: number[]): Promise<UserInterest[]> {
+    return Array.from(this.userInterests.values())
+      .filter(ui => ui.userId === userId && categoryIds.includes(ui.categoryId));
+  }
+
+  async setUserInterests(userId: number, interests: InsertUserInterest[]): Promise<UserInterest[]> {
+    // Clear existing interests for this user
+    const existingKeys = Array.from(this.userInterests.keys())
+      .filter(key => key.startsWith(`${userId}-`));
+    for (const key of existingKeys) {
+      this.userInterests.delete(key);
+    }
+
+    // Add new interests
+    const createdInterests: UserInterest[] = [];
+    const now = new Date();
+    
+    for (const interest of interests) {
+      const id = this.currentUserInterestId++;
+      const userInterest: UserInterest = {
+        id,
+        userId,
+        categoryId: interest.categoryId,
+        isEnabled: interest.isEnabled ?? true,
+        priority: interest.priority ?? 1,
+        createdAt: now,
+        updatedAt: now
+      };
+      
+      const key = `${userId}-${interest.categoryId}`;
+      this.userInterests.set(key, userInterest);
+      createdInterests.push(userInterest);
+    }
+
+    return createdInterests;
+  }
+
+  async updateUserInterest(userId: number, categoryId: number, updates: UpdateUserInterest): Promise<UserInterest | undefined> {
+    const key = `${userId}-${categoryId}`;
+    const existing = this.userInterests.get(key);
+    
+    if (!existing) {
+      return undefined;
+    }
+
+    const updated: UserInterest = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    this.userInterests.set(key, updated);
+    return updated;
+  }
+
+  async deleteUserInterest(userId: number, categoryId: number): Promise<boolean> {
+    const key = `${userId}-${categoryId}`;
+    return this.userInterests.delete(key);
   }
 }
 

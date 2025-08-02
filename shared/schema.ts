@@ -86,6 +86,28 @@ export const insertPoiSchema = createInsertSchema(pois).omit({
   id: true,
 });
 
+// Interest categories table - defines available interest types
+export const interestCategories = pgTable("interest_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(), // e.g., 'restaurants', 'attractions'
+  displayName: text("display_name").notNull(), // e.g., 'Restaurants', 'Tourist Attractions'
+  description: text("description"),
+  iconName: text("icon_name"), // Icon identifier for frontend
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User interests junction table - many-to-many relationship
+export const userInterests = pgTable("user_interests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  categoryId: integer("category_id").references(() => interestCategories.id, { onDelete: "cascade" }).notNull(),
+  isEnabled: boolean("is_enabled").default(true),
+  priority: integer("priority").default(1), // 1-5 scale for importance
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertTripSchema = createInsertSchema(trips).omit({
   id: true,
   createdAt: true,
@@ -98,6 +120,24 @@ export const updateTripSchema = createInsertSchema(trips).omit({
   createdAt: true,
 }).partial();
 
+export const insertInterestCategorySchema = createInsertSchema(interestCategories).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserInterestSchema = createInsertSchema(userInterests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateUserInterestSchema = createInsertSchema(userInterests).omit({
+  id: true,
+  userId: true,
+  categoryId: true,
+  createdAt: true,
+}).partial();
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertPoi = z.infer<typeof insertPoiSchema>;
@@ -105,3 +145,8 @@ export type Poi = typeof pois.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;
 export type UpdateTrip = z.infer<typeof updateTripSchema>;
 export type Trip = typeof trips.$inferSelect;
+export type InterestCategory = typeof interestCategories.$inferSelect;
+export type InsertInterestCategory = z.infer<typeof insertInterestCategorySchema>;
+export type UserInterest = typeof userInterests.$inferSelect;
+export type InsertUserInterest = z.infer<typeof insertUserInterestSchema>;
+export type UpdateUserInterest = z.infer<typeof updateUserInterestSchema>;
