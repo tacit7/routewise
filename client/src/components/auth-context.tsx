@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
   id: number;
@@ -38,13 +39,61 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   const isAuthenticated = user !== null;
 
-  // Check if user is authenticated on mount
+  // Check if user is authenticated on mount and handle OAuth redirects
   useEffect(() => {
+    handleOAuthRedirect();
     checkAuth();
   }, []);
+
+  const handleOAuthRedirect = (): void => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    const message = urlParams.get('message');
+
+    if (success === 'google_auth') {
+      toast({
+        title: "Welcome!",
+        description: message || "Successfully signed in with Google",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (error) {
+      let errorMessage = "Authentication failed";
+      
+      switch (error) {
+        case 'oauth_error':
+          errorMessage = "Google authentication was cancelled or failed";
+          break;
+        case 'missing_code':
+          errorMessage = "Authentication code was missing";
+          break;
+        case 'missing_state':
+          errorMessage = "Authentication state was missing";
+          break;
+        case 'auth_failed':
+          errorMessage = message || "Authentication failed";
+          break;
+        case 'server_error':
+          errorMessage = "Server error during authentication";
+          break;
+        default:
+          errorMessage = message || "Authentication failed";
+      }
+
+      toast({
+        title: "Authentication Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  };
 
   const checkAuth = async (): Promise<void> => {
     try {

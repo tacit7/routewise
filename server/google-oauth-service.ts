@@ -25,13 +25,48 @@ export class GoogleOAuthService {
   private readonly REDIRECT_URI: string;
 
   constructor() {
+    // Load environment variables properly
     this.CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
     this.CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
     this.REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/google/callback';
     
+    // Debug logging to see what's actually being loaded
+    console.log('🔍 GoogleOAuthService initialization (reloaded):');
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    console.log('- GOOGLE_CLIENT_ID length:', this.CLIENT_ID.length);
+    console.log('- GOOGLE_CLIENT_SECRET length:', this.CLIENT_SECRET.length);
+    console.log('- GOOGLE_REDIRECT_URI:', this.REDIRECT_URI);
+    console.log('- isConfigured():', this.isConfigured());
+    
     if (!this.CLIENT_ID || !this.CLIENT_SECRET) {
       console.warn('⚠️ Google OAuth credentials not configured');
+      console.log('- CLIENT_ID exists:', !!this.CLIENT_ID);
+      console.log('- CLIENT_SECRET exists:', !!this.CLIENT_SECRET);
+      console.log('- Available env vars:', Object.keys(process.env).filter(key => key.includes('GOOGLE')));
+    } else {
+      console.log('✅ Google OAuth credentials loaded successfully');
     }
+  }
+
+  /**
+   * Get current client ID (reading from env first, then fallback to constructor)
+   */
+  private getCurrentClientId(): string {
+    return process.env.GOOGLE_CLIENT_ID || this.CLIENT_ID;
+  }
+
+  /**
+   * Get current client secret (reading from env first, then fallback to constructor)
+   */
+  private getCurrentClientSecret(): string {
+    return process.env.GOOGLE_CLIENT_SECRET || this.CLIENT_SECRET;
+  }
+
+  /**
+   * Get current redirect URI (reading from env first, then fallback to constructor)
+   */
+  private getCurrentRedirectUri(): string {
+    return process.env.GOOGLE_REDIRECT_URI || this.REDIRECT_URI;
   }
 
   /**
@@ -39,8 +74,8 @@ export class GoogleOAuthService {
    */
   getAuthorizationUrl(): string {
     const params = new URLSearchParams({
-      client_id: this.CLIENT_ID,
-      redirect_uri: this.REDIRECT_URI,
+      client_id: this.getCurrentClientId(),
+      redirect_uri: this.getCurrentRedirectUri(),
       response_type: 'code',
       scope: 'openid email profile',
       access_type: 'offline',
@@ -71,11 +106,11 @@ export class GoogleOAuthService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          client_id: this.CLIENT_ID,
-          client_secret: this.CLIENT_SECRET,
+          client_id: this.getCurrentClientId(),
+          client_secret: this.getCurrentClientSecret(),
           code: code,
           grant_type: 'authorization_code',
-          redirect_uri: this.REDIRECT_URI,
+          redirect_uri: this.getCurrentRedirectUri(),
         }),
       });
 
@@ -261,7 +296,21 @@ export class GoogleOAuthService {
    * Check if Google OAuth is configured
    */
   isConfigured(): boolean {
-    return !!(this.CLIENT_ID && this.CLIENT_SECRET);
+    const currentClientId = this.getCurrentClientId();
+    const currentClientSecret = this.getCurrentClientSecret();
+    
+    const configured = !!(currentClientId && currentClientSecret);
+    
+    console.log('🔍 OAuth configuration check:');
+    console.log('- Constructor CLIENT_ID:', this.CLIENT_ID ? `SET (${this.CLIENT_ID.length} chars)` : 'EMPTY');
+    console.log('- Constructor CLIENT_SECRET:', this.CLIENT_SECRET ? `SET (${this.CLIENT_SECRET.length} chars)` : 'EMPTY');
+    console.log('- Env CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? `SET (${process.env.GOOGLE_CLIENT_ID.length} chars)` : 'EMPTY');
+    console.log('- Env CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? `SET (${process.env.GOOGLE_CLIENT_SECRET.length} chars)` : 'EMPTY');
+    console.log('- Current CLIENT_ID:', currentClientId ? `SET (${currentClientId.length} chars)` : 'EMPTY');
+    console.log('- Current CLIENT_SECRET:', currentClientSecret ? `SET (${currentClientSecret.length} chars)` : 'EMPTY');
+    console.log('- Final configured result:', configured);
+    
+    return configured;
   }
 }
 
