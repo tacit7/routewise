@@ -1,860 +1,82 @@
 {
   "html_attributions": [],
-  "next_page_token": "ATKogpe7A8UNbgS5NBEDFAbESoPI6NT2Yud5_lbmEbb6i57szfSDPgCxlnXJqBaCxCvomHg_03yYeHKi60t_Buv8_bY6YCk2Uhh2x2oi0l89TGGiJVWsaX3YbVQMW_EYYbvjUbbK1NnqIidhClZmyl7wKn7W5L0wCWwSEcfomrlTldBs2T1M1ulN15dq_H625oYZEV4Tw5zWTAERpAlbBPktIJ8imr4HsQe2zSSI7YYw0T7O4xW-1UzLWsw82bgkV-tHcmO2G8rSvPKml1WKqO1vbULGE0av2zk4aabrpwGXnXGn4ObVlyD0HDh3IGsnQGwuWXEtckxekBjghK5VxZPNQEaeuCLsSHPf9MIUgxPpPAHt5z9i2EbNCBNevrpduzi2BAGlWCFd45bh2JDvGqVeT0M3Xi5zITbvPbLmVGwVSdsM5Vt_e40b",
+  "next_page_token": "ATKogpfXje7AO6FvLkVUPOPu2VSRPsd2yN13Zmy8qagO284XG_BA3B2Z1oGIp0IY94v7QnKDT1_MYkQm1wMF3I3TOGR2rVAtnS8ZYSFJytNULSNaefzwwHgKjhrHqcQnMuibOddF49J5-akinJTC3ThCgtRM8PUWvggRzl7O994PEJYgKqzsjBEC6ts-frVixlrS2sC-EPEvq0FFPByE8IGzpEVowB5PeN4aiA5ZdG5Gx0hfheHqTmriTPGmuDahGz2n6fqDaeHP4gFiWEjNh0kJW73ztZL1jjemT0baOOshc2PiSlZrc4LHJp_FzbLJTlz5qmW2n_3twgwceJOboMGYa0XPSyIfYiPLHVdokhO9frKd45LFDKbeesA1_CA2cGBVqRmmoTQxft5Twr3zltMSJJq7xqj3riqc0_bC2P01yyrEDKSrTn6I",
   "results": [
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 34.0431803,
-          "lng": -118.7794824
+          "lat": 32.7409696,
+          "lng": -96.81532
         },
         "viewport": {
           "northeast": {
-            "lat": 34.04836785,
-            "lng": -118.7673747
+            "lat": 32.74564395000002,
+            "lng": -96.8133819697085
           },
           "southwest": {
-            "lat": 34.02761764999999,
-            "lng": -118.7835455
+            "lat": 32.73911495000002,
+            "lng": -96.81607993029151
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-      "icon_background_color": "#7B9EB0",
+      "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "Escondido Falls",
-      "photos": [
-        {
-          "height": 14928,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/110233164843326501288\">Everlast9</a>"
-          ],
-          "photo_reference": "ATKogpeaHC1RoW2AVpcr13jGVPQrkV6XPOXBSnza5rRcjWE6WMBrqy8k55sMEd5qWviYVoWI2phUi24m1pZnVgcJo6CuF11NMVh0ezJUo-tB1fTdeEEpvh72Q4lAK_Q9Ca9qNMVkqW6f1IsboA4XNJ_Uj3ZOYILHUdEg-q9y2dnucQwPZUtj-nzi5OGwPnVibZJKfTv9qlb3RHMrBwk6qDCpdEwMu7jn-K_g_jJ4hcAPffh50bl22LxfUPculUjtVw5XkNIrAFUVulV6mg_MAqZ4zDR2EJ_dqxw8jPXVWl4zEZ7UK1ibQ0Xnm2BjAyqxhv7ZDrSHpMPa0WGYlm0JjZ-jJ-1sG-8upUr97_qyBRdn9HbLqpXDVNtLctME0Zz_qUnyti325QjSk43PgiECFZTRRQncrNEetBG9VgW1ktnEx6g7quge7vxYs97FUvKGhsTgQVMcWlC41hdM5bVv5CbCZJ8J9VjEW6YVDrEXlzDb0kuL8dT9YV1iD2tjeIkytiSpOSXy61L3Z10BhObIrqhi4M8d93moC2tzvMGVvnlLjJ3k4NEYaI30MAbMVnxr8e2vLIHEqdJ2Qq2QgPolQnljocpqUeCT8fro2LcB4e13AAgalP7yjmvbg50Z1Q5V409wZS921g",
-          "width": 11200
-        }
-      ],
-      "place_id": "ChIJLxuJ87oY6IAR1s1YCxYFkos",
-      "plus_code": {
-        "compound_code": "26VC+76 Malibu, CA, USA",
-        "global_code": "856326VC+76"
-      },
-      "rating": 4.5,
-      "reference": "ChIJLxuJ87oY6IAR1s1YCxYFkos",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 829,
-      "vicinity": "Escondido Canyon Trail, Malibu"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.0979551,
-          "lng": -118.7314142
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.10233525,
-            "lng": -118.70096885
-          },
-          "southwest": {
-            "lat": 34.09649505,
-            "lng": -118.74156265
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Malibu Creek State Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/111745554670007736223\">Glenn Highcove</a>"
-          ],
-          "photo_reference": "ATKogpeWuzWP2w9wNGs1xzd3fkNyBodgTqaXDPATUCy1uWek2Y6v4jedgD6GeZ2blXx_yyUbgJ59eFzqsBOMhBYFl2O5T0RZEhbkBUsQTL2OXAspzUd3Sr6HpMPyQfXM-gA47AFuc04fKhslmbjJzn-15iq14KGT6HRURaC1crYJClrgyj8Blw4ji7DTYug9hIiVZiAaLaf2zpoQrY98EsxPsCjbHFts7PjuXhYUBkJnhnxI1uNb88WOHCZa8zZBQyctce0F9nEtroMdQNRgwpK6plYZFKeibcuYijn2qOGDm6V5Zk-qhOp34_GmBpwgCQiphk9fZfPEIDs9w1J2_k_WBy5Ob8yQpsdRaujKJTy4rgaviIdF700XhM70iBODFyWExcUC69onLsEyzeOvKt9zKFHEu3IQSlcI_rmOhrxUZSjeyTrqcwCYxu8vR6f4vIwY5SUCO_km5qION7h7VSwh6-6CKed0HL-lC46I8vs8qEULTiJtIqSTfXCsM-VO2WugZTTPlyNLYSqgibKR6su61MrY6-H2kzJRSVOcPorcUpsOAQdaVJKOzn37bmk1C6gc7_0o7d4J-CU5Fcf-ydjKbc0V6DEDmH1wz6xhowkkfQ0DwzVyKGAtZoLQRaHDmicxAbLfew",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJlx3KFc0h6IARIAENDLDVp-A",
-      "plus_code": {
-        "compound_code": "37X9+5C Calabasas, CA, USA",
-        "global_code": "856337X9+5C"
-      },
-      "rating": 4.7,
-      "reference": "ChIJlx3KFc0h6IARIAENDLDVp-A",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 3451,
-      "vicinity": "1925 Las Virgenes Road, Calabasas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.1025349,
-          "lng": -118.7038284
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.1039253302915,
-            "lng": -118.7024349697085
-          },
-          "southwest": {
-            "lat": 34.1012273697085,
-            "lng": -118.7051329302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "King Gillette Ranch, Mountains Recreation & Conservation Authority",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 673,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/112499755832009691861\">King Gillette Ranch, Mountains Recreation &amp; Conservation Authority</a>"
-          ],
-          "photo_reference": "ATKogpcuzwWxt_rLqHSLpvmKd0ajPdkgaqkWn1e-wyUo9vOaq65dhrmkIzxxR1Al5TrdJg8aGEzRCSnO1DpvNPNvNdqnKv1hqOwLL0WG6jwzicHn074JcIyiqg_Y9A0qTosH3TkiJ_ksFlwOtEWD8P0WDsOptSjwhXfYL0rfUtduwqx13KmUpxAUDYYsAz25kEv1G3zJWRD5DkgIVLrLopQXrL9OW05CJNQssMfimLITcOXlELpAccpMNVPkji0RyCY0h4WjtwrsR2u3-gxDzKPpuOhDqV4cztiIhCeQpgkPCXA3n6GHv_NZ2lYykCyUla-UYiboUe_YDY8",
-          "width": 1200
-        }
-      ],
-      "place_id": "ChIJT8LNUEQg6IARw1M4pQ-gxsI",
-      "plus_code": {
-        "compound_code": "473W+2F Calabasas, CA, USA",
-        "global_code": "8563473W+2F"
-      },
-      "rating": 4.6,
-      "reference": "ChIJT8LNUEQg6IARw1M4pQ-gxsI",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "parking",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 999,
-      "vicinity": "26800 Mulholland Highway, Calabasas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.2735471,
-          "lng": -118.6024108
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2751347302915,
-            "lng": -118.6009239697085
-          },
-          "southwest": {
-            "lat": 34.2724367697085,
-            "lng": -118.6036219302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Stoney Point Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 9000,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105545427636399043054\">Alex</a>"
-          ],
-          "photo_reference": "ATKogpcTT3bbl5QRqyXsuGZ2UKcDrVlgKcf1z5ATUMuGjU0Za2BuL69pisZhcRdFAmnHAF5OZ8o1-otcym2eSV4FYxKZ9C8GvS5sMC0i69U7sDVXHCijeydRlOMRqsr2leb3maYVdr54qBRLm0OVkF1SJog8gP53k7Pk_RZVgIzCcPMFoj183WFl874k2UDFcc45hBXpXyWKk_-miFuNVrJC9jGlAuyA_LcErNp_hF9gzz_KdhqM8IKrlhIRIZDWaRDyyDSjQ4jA9rFAlkgndGkVxBx0aOm_A02xzYozPU4AObAjPIF74adIwPO2XZGCQn2__yqttKCU1xsSyeVGgnyw2m7gTPX1pBJRsAK3wbMz_wwn6G1yPokvuEOarcvB-soNgroQbIY15Bmdc6x8G33Qa-BAD1T0LPCj86VaU7ucpeK-akBsDh_179V0HRrC7WyNH66NFaux7TkXFNaOz4TpT9ICeImT7CEsIIjcRtBzzga5Ky7pLV_-vWwwvEnqizHaLFWsKOTsmROM_Fd7nuIZVqKFNgD3GjR_OlayAaGSrFue45_KE5M4fzgPASWarlJgj7kzXi7k4byEZljzS8EJNibmkJoUz79Qe69qB4cUF5d2TDf4xB4kp2ForsWxHyzWF9nKIQ",
-          "width": 12000
-        }
-      ],
-      "place_id": "ChIJXRl6QkiDwoARDA8K00UGJng",
-      "plus_code": {
-        "compound_code": "79FX+C2 Chatsworth, Los Angeles, CA, USA",
-        "global_code": "856379FX+C2"
-      },
-      "rating": 4.6,
-      "reference": "ChIJXRl6QkiDwoARDA8K00UGJng",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1197,
-      "vicinity": "On Topanga Canyon Blvd, between Chatsworth St &, California 118, Chatsworth"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.1829524,
-          "lng": -118.4809759
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.18460834999999,
-            "lng": -118.4801042197085
-          },
-          "southwest": {
-            "lat": 34.17798454999999,
-            "lng": -118.4828021802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "SuihoEn - The Japanese Garden",
+      "name": "Dallas Zoo",
       "opening_hours": {
         "open_now": false
       },
       "photos": [
         {
-          "height": 3024,
+          "height": 3072,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/112033636425482359630\">alan royse</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/116388591433440459020\">Rafa Chapa</a>"
           ],
-          "photo_reference": "ATKogpdAVDnTC4gtV1d4eb6jw8wr9WjafdHAMC77WwYXRDI2rHrznSFwiBQwzbdFdPKbyAewMkRkaKvaSnPQYBih914qepLFp5z84sa2X-oQLoaez5kfUrOvDuEa_CSJg2P0Pdc4UESwjZ0qYmy6ZXjyMGO_q-ZMrRPWXOT2jusdpIhkrZvEqE-L-muUeg0Dtadm4S-5uG8onzf4LQpkQFiUua23z91vQW0CNdiSzglfISqx6C5L6kya9IjbowTIEdaI22VP9b5rip_O3VIeHLAgWaxG2Kn-f89S7Qg4aQYSzmIDHf4AK17wE96r93lwDcnTguKua_kEzss3Tjw38ZLKtS2BR5BZ09cywrTVsZH6GzTNqBAq5QCe6w_GY9jjlz-l_u0oT_pD4JbV64VwX3y_ZShfQDemi5IcxOpLDkgF3vI97hLNCdwPvajrJRb5hxYOdw03DIf8la6Y9UhuqFmlGXe5CqdQCCm_Nuxh-2-AGU61Znncc8rlDyw6J_H5PCJFondl6XK5ojBCyBitltPG9Gr2B7AIODnCn7lgH8-Tsl_IY8R5HvpJ-gb108jQ8L7ggoxx2-oEk2ozgIZ4ZVLYymVRXSeEWVwWhSyxdW8ArIiCkSxNSk0HKGjQp2DvaMs09L7zLZ80",
-          "width": 4032
+          "photo_reference": "ATKogpeabal2DPBJlK-hH2Znd1nD-OAanClTfX0ERBXULn9GDaW49EjAye79DODJubIAQAJZ_oKhcWYKFg79pEFlgBquKMcE5xtpTsuatiND1o6rmptVNbKKA8gveN0YldkTUXccYV_aqHNtXcHySDltDAUMxH-szBucN43yhEkS0HQjFMxGVZDVNbQ1cDYrpb89y5xWw9nwQE6Ib1mP0O1z8fddJL9BmAAZwls-9x4kowSzBKuHn2B6plvJoRKJASv0I_015J-Ne1sjgsjZ6rzRoGcfnlvExNfwgiJ9CjHQZiA7vGZDhCQI0N-d4-ZbEnAOPMXumlo0SDUEAuZTcRglt2yS5nL7xvSBBf0PR_WPlwVq0X3vjHOtquSy6JLDRpwkqpBQrBb3qNZJxoYF4yOvHKeWxjjsPIl8fnWd_BSqNQCpwjBgZdjKTfJEkbt1o43mf4DPLRrcL3yNOvzN-0uEZGzMzOT-5ngSYRbycOmRF-IzCW3yh9FZOA9_qw6HyjezXXwzJHbiADRDGUQDj69vhMFceVPDg3Bet6maV4132xlkOeBQpk9t-DtPvXoawQ8gElV0ps8SRND1RY96IzrwsoQDE-fV-njAh3HHbSzaDPaXmpU-Q1lfnFvzEFh5MSDmrzR71g",
+          "width": 4080
         }
       ],
-      "place_id": "ChIJN604VGOXwoARrjrG0Xv1LDE",
+      "place_id": "ChIJgaB_eJaZToYR0shi9YM_K-E",
       "plus_code": {
-        "compound_code": "5GM9+5J Lake Balboa, Los Angeles, CA, USA",
-        "global_code": "85635GM9+5J"
+        "compound_code": "P5RM+9V Dallas, TX, USA",
+        "global_code": "8645P5RM+9V"
       },
       "rating": 4.5,
-      "reference": "ChIJN604VGOXwoARrjrG0Xv1LDE",
+      "reference": "ChIJgaB_eJaZToYR0shi9YM_K-E",
       "scope": "GOOGLE",
       "types": [
+        "zoo",
         "tourist_attraction",
         "park",
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 1469,
-      "vicinity": "6100 Woodley Avenue, Lake Balboa"
+      "user_ratings_total": 22791,
+      "vicinity": "650 South R.L. Thornton Freeway, Dallas"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 34.36273619999999,
-          "lng": -118.5077219
+          "lat": 32.7787249,
+          "lng": -96.8064507
         },
         "viewport": {
           "northeast": {
-            "lat": 34.36399958029149,
-            "lng": -118.5062698197085
+            "lat": 32.7802638302915,
+            "lng": -96.80515671970849
           },
           "southwest": {
-            "lat": 34.3613016197085,
-            "lng": -118.5089677802915
+            "lat": 32.7775658697085,
+            "lng": -96.80785468029151
           }
         }
       },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
       "icon_background_color": "#7B9EB0",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "Eternal Valley Memorial Park & Mortuary",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/107665459362052569126\">Daniel Castro</a>"
-          ],
-          "photo_reference": "ATKogpcWzvqEDlmhmKFjTY_Ex_q5mJm0daCGczB6hY3U59J3Tg91GPgNCBbcphEgHaNRlESC6A-9yplrW7Y4BcOKu6IbHGeiIEVG9qFwShfA3Ks4398AWTLFuw0Z7QcSMnlYSd2m01NLZN-IY25J3YRidlCYUzHgSUnEJmDVX9udjBY0EG9Ds2HRSkE-5iHMjBRb2gYcm-TlAPkkg4wNLP4oS7TXPoL825lPJRYoKAdwNa6F7dp0WPpXQId5tCvPe19Qsa2qB4dF9YSnQtZgX8ghqi2noLTIXA5N44z4JToPiWgBA9c4UmposhHc24cXoanZHMSLSZnN1Ago4YqXLRZw4tPqvZxnTQ0YPSOcjQZ9IcU4AkV808WyybJUXa7lhnB0KPYj8fP1EYb285XURSpW1-KLeLdUvFcvYLWFbk5RaeVKe3DkTcasvhnrEOGk1Rr9_91vo0MaLtCqnIHN4Jmq54Qhk7hgrhgRSjBCUiFfAShC_nnJuhR_Mj77vgbFdvPfAcvqjNR0ha0CY_nguILzdvfW_S8PHoKKtw-1H-lfYAcHKo4SZAYvwWHceChYStA3NuDx_xqss1prUTHNLo0gZ9fLGOenN1NgRVKWXOLY27BYB6JQnk82JrQYKj-pX0QQe_ZjodH8",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJ3aInm92FwoARtorInlzhMtw",
-      "plus_code": {
-        "compound_code": "9F7R+3W Newhall, Santa Clarita, CA, USA",
-        "global_code": "85639F7R+3W"
-      },
-      "rating": 4.5,
-      "reference": "ChIJ3aInm92FwoARtorInlzhMtw",
-      "scope": "GOOGLE",
-      "types": [
-        "funeral_home",
-        "park",
-        "cemetery",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 341,
-      "vicinity": "23287 Sierra Highway, Newhall"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.2350471,
-          "lng": -118.5508231
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2365574302915,
-            "lng": -118.5494493697085
-          },
-          "southwest": {
-            "lat": 34.2338594697085,
-            "lng": -118.5521473302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
-      "icon_background_color": "#909CE1",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
-      "name": "Walnut RV Park and Storage",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3399,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/112938319896785966761\">Walnut RV Park and Storage</a>"
-          ],
-          "photo_reference": "ATKogpd0ZA5WybFYo2Ds-CF5OyDJhnpnd8dWUe_AaTSTT03Pqfbi47T4VEwxzmJ1WMcwTAaVRNZUWoGeXvqLyDbO6I8uurJmdzj-SVcQIpC238JQasvIUUg8sH_6xr_PlleTna2fGE7SaQq8RmQlpW20Lplf74_IYL-Jhqh-6a59ORnzpAUY8lVUKFytRcmQ2sh4AUJzirGRH7DbXRBgVN7GrwNu7X2CNoGwSG79W---Qt5osPflC4yU3woC6gIQd5la4PIejJxgZk8oFouhqct6MtLK9_G3LOTJ8Ps1x_rNof6ohVwGUn3Bx0vNDMd2FjUv2YDaeS0Zjxo",
-          "width": 3399
-        }
-      ],
-      "place_id": "ChIJQXZXzKCbwoAR96c6ZqaOaDE",
-      "plus_code": {
-        "compound_code": "6CPX+2M Northridge, Los Angeles, CA, USA",
-        "global_code": "85636CPX+2M"
-      },
-      "rating": 4.1,
-      "reference": "ChIJQXZXzKCbwoAR96c6ZqaOaDE",
-      "scope": "GOOGLE",
-      "types": [
-        "rv_park",
-        "campground",
-        "park",
-        "lodging",
-        "storage",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 415,
-      "vicinity": "19130 Nordhoff Street, Northridge"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.1845346,
-          "lng": -118.7709417
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.1859302302915,
-            "lng": -118.7694027197085
-          },
-          "southwest": {
-            "lat": 34.1832322697085,
-            "lng": -118.7721006802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Oak Canyon Community Park",
-      "photos": [
-        {
-          "height": 2988,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/101538823899916562992\">Edward Hansen</a>"
-          ],
-          "photo_reference": "ATKogpc6hVUrobBgoPPeC62gmQoeXw_s3ouXk-vPiSj1DkW1wu9bNt5ZigeiVtNN0_tmlwZGGoRTTWm6DZnoa7jASbAL1qyviqe5Bozs1gxuu4ohLPHTfKV-N8Qfu8vCg-1DPNsfnNbYNErh3lBUz29722rBbyZsy03pLq2bHy4fDiNRnTKTKIeERKxA5P9Mj7iwU0n7X5Ed5VU4m4UbotYF0WoL2Z23ciwFsvtdDQ8XmnLLyyFj-37Qvbvhu_1n_pUMX80uoSzUFYQ8ZPlzdrEC9lP9AZraPo6tzbZCepE-WnNhsgxyKkyMh-idfe1eyPrh3KqtjvlnieLwzx0snYNeSTQPCt4KwPS8TARyj1up4CsL4RZAyutdumubk3r8vo-qXYsqrDPhPtTV3tLU9N7rLi9XFB6WdwEbSLSfYDCq3ysZwAuge_DBq9OxbZwNJVeNAihvi6ENhYm4G-jK1W-1qUL4HKzUudKUlXFnQZSStUwUXEd_jnW1YGvW3ezeJOi6qk6-r86V-fIiybKgyjonEo3UPr9XFwNC2SYAHYOhcZtBoEY0neFqe4Qt_cD7kKWjrKz0ToyATEZlr35l918YNUHdF-kXzBvUe-gxhOneUyPJu1DNGDtDsvClbcr8m7u42lcp7Q",
-          "width": 5312
-        }
-      ],
-      "place_id": "ChIJlc7yqNYl6IAR3CnAWn2expE",
-      "plus_code": {
-        "compound_code": "56MH+RJ Oak Park, CA, USA",
-        "global_code": "856356MH+RJ"
-      },
-      "rating": 4.8,
-      "reference": "ChIJlc7yqNYl6IAR3CnAWn2expE",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 337,
-      "vicinity": "5600 Hollytree Drive, Oak Park"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.31052630000001,
-          "lng": -118.7536889
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.31158148029152,
-            "lng": -118.7527216197085
-          },
-          "southwest": {
-            "lat": 34.30888351970852,
-            "lng": -118.7554195802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Big Sky Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 2448,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/108645468886637717041\">Valter Nasufi</a>"
-          ],
-          "photo_reference": "ATKogped56Eiy91zxpjhyCm6Z33p3q_l9sQSLbYe6nRa7kv8r9VDWxCaebxoh4PN-qFZWUDGyyYgtPpXGEYmyKnoGrEuSYLLIO1B2b0tBz0gZrKn5pXDza070hR-ALJy0MXYcHCG5v-PLeCxTAPaduHhoiEOP6ag4x6Ct5zUR5Cg2h7_eBDB-TuMkeX-u-hAKDqLqW7YNSKxJqrn4K25mKOgVpeuJAfB1iW00n0beUT_N4CxYOkvE2kQxwpxd2Oy5sy9x4xtm0946T7zO2edRSaLap-RYb3zkZSyfRzd-KjjnelQihej_6YzCJxnV3R-xanfRgxEICUEyRAjPFi7IAGONXEBgPO8WWWkxbsuKv_ZlOH3RTGq4fKRliCWOTxFQnRMdzLhdtmHchebn440l_QoV4xSp8HGGXbi4Sp_OoUayR1faxOfVmzkymBxh-_qBg48UyzlKXYLWG6o6-9HPDNZHSFKkikim9viUDS1cWthb60qzETx2WQunE5HiK5bsbgRqP0FcBDt3p7SI-YFU81KeutG39Mnur6uD6T_RS-K-5AOq6y8adDBoQN-MZ1Pba3s_0dv5iFOV7vrXLUP4LTYmKTecW0WbO1D_meNGcgy-xXaMStl0pOALPZzBPvFu7V1vXY84w",
-          "width": 3264
-        }
-      ],
-      "place_id": "ChIJT3CnIuMr6IARzB4R9DMujYk",
-      "plus_code": {
-        "compound_code": "866W+6G Simi Valley, CA, USA",
-        "global_code": "8563866W+6G"
-      },
-      "rating": 4.6,
-      "reference": "ChIJT3CnIuMr6IARzB4R9DMujYk",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 189,
-      "vicinity": "2251 Lost Canyons Drive, Simi Valley"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.0493651,
-          "lng": -118.7533884
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.0506505302915,
-            "lng": -118.7523807197085
-          },
-          "southwest": {
-            "lat": 34.0479525697085,
-            "lng": -118.7550786802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Solstice Canyon",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/116104957204210446242\">Brian Hastings</a>"
-          ],
-          "photo_reference": "ATKogpduO-NPY3MM3OWvoqPK3Txg8Nv2RfofKGLY2tAPouP72LdilkNi9r29h9hKrzZ8__8z8mXeRnbh8TvJENYCPOu2VHPsWa9QhE2dA5xFNLoNCt5VWXsXLGxwKmtlmTWd-VtAbJiKDpnvuwaAxCtNqnEolkqivU5ZEB2TruVJzFGfL_hUVHsuw-kK32fLyAzO9H2ErxJciEIuuJmVep_CpBP_QHJXmw8aE5V2GhpFV_wmJuNcHzlST3CahGo49yHDuRYgunqdLxOMF7wA5RJ7Hdy5vAm60KFiNq1iv9lHH8gIyXV0zuFShcU97t0aVoAxZzA-yJkheza7ur_5Ev8ZiDm4IXrlDBbv6SZha-Enb0L77gsgbP6Ol3eKS_v76R2Istrqe3zNcaAwmciWTRTTC0Z_KALznv3ElceGc1aJDKSxKcC7hMqfAGgfSeOJFbgny6plteSrAmMakcgvqNMYUal3VSnzNY2wcdGLd2XMHrsC0cooiIUCwQaBpOXhT90OSNHWftAuK_BYvFa32Axno7vgfH86zvvnazaWbrCWz3lvIVDlkiysdauPTmav7uqmWwbFe2zDLuCqRlalxJ5tUNMmy53jGGsF5ARn_J8L22XMDPlwnN2wBuHt_LWzIY4E",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJ_yGlV0Yf6IARWsIYviajiVg",
-      "plus_code": {
-        "compound_code": "26XW+PJ Malibu, CA, USA",
-        "global_code": "856326XW+PJ"
-      },
-      "rating": 4.7,
-      "reference": "ChIJ_yGlV0Yf6IARWsIYviajiVg",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1072,
-      "vicinity": "3455 Solstice Canyon Road, Malibu"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.21131020000001,
-          "lng": -118.5010064
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2127514302915,
-            "lng": -118.4996107697085
-          },
-          "southwest": {
-            "lat": 34.21005346970851,
-            "lng": -118.5023087302915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
-      "icon_background_color": "#909CE1",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/hotel_pinlet",
-      "name": "Hollywood RV Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 1536,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/117286280501226781946\">Hollywood RV Park</a>"
-          ],
-          "photo_reference": "ATKogpchHLwzAXnE_8JCNYp1Nbn8yTBQTStBYbi8FVuCcwDthNU_QlFF-gGsfQFF2EcCLwsyCEjOWi96JOni8Rm6bFG5HuXZjyv_q5K_DRANNdVILbnwON568NmcgKZ2jG4yL0r_A88INQ94sMJIq6OhCOWIUFcFwOCFtgzCTDL3rnJxAYbh3tXOF6nrLRmkTF44MLkMjQHIjH50dLSp897I3bntuEIr0jqoK-L0ICCAq21ezcvJbXqSJA2bLwPXHov2-wh_gel1RYQjZSR-UBfc9aI7agHdxpAqtyaFH83K7JRd17jo-qvLG4JijiVyC-IamimSkl7bid8",
-          "width": 2048
-        }
-      ],
-      "place_id": "ChIJ6Y4d3ByawoAR_2-jRUDUH5M",
-      "plus_code": {
-        "compound_code": "6F6X+GH Van Nuys, Los Angeles, CA, USA",
-        "global_code": "85636F6X+GH"
-      },
-      "rating": 4.7,
-      "reference": "ChIJ6Y4d3ByawoAR_2-jRUDUH5M",
-      "scope": "GOOGLE",
-      "types": [
-        "rv_park",
-        "campground",
-        "park",
-        "lodging",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 691,
-      "vicinity": "7740 Balboa Boulevard, Van Nuys"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.2740211,
-          "lng": -118.4667445
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2753667802915,
-            "lng": -118.4653928197085
-          },
-          "southwest": {
-            "lat": 34.2726688197085,
-            "lng": -118.4680907802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/cemetery_grave-71.png",
-      "icon_background_color": "#7B9EB0",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/cemetery_pinlet",
-      "name": "San Fernando Mission Cemetery & Mission Hills Catholic Mortuary",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 2336,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/109259427873079677772\">San Fernando Mission Cemetery &amp; Mission Hills Catholic Mortuary</a>"
-          ],
-          "photo_reference": "ATKogpda7RFNcizmEbKwRGktwwGjlHEqO3hZIeFs-AWKGdVOUaZg8VyDlPPEbSvEW5Ttt0lN94W2U1Eia4xrUmUzCt32asqYLo8SYYfU3juKqR4bOblIghOb9dbbg9ehw6YzFS9Gdjfq6tCjqa0epzA93Or-XAkj9cthar3A6iO2u9R20Pr-hXAN0C1WUMZzbSFKf6aIoAW_Fa7auRckutIER1gXBPuPbXsAvLaaUPLsoz0Y1ucsFWLf5lI51lXqxPpR0l48UAoMGJV_yPLrdsGYokGSlV2rLoFgRsxydQ27bYEnBjal991kH_o-ES_TUbbQ9YS_6LqZ2gs",
-          "width": 3504
-        }
-      ],
-      "place_id": "ChIJS85dxGqQwoAR2je37_mVsLg",
-      "plus_code": {
-        "compound_code": "7GFM+J8 Mission Hills, Los Angeles, CA, USA",
-        "global_code": "85637GFM+J8"
-      },
-      "rating": 3.5,
-      "reference": "ChIJS85dxGqQwoAR2je37_mVsLg",
-      "scope": "GOOGLE",
-      "types": [
-        "cemetery",
-        "funeral_home",
-        "park",
-        "place_of_worship",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 198,
-      "vicinity": "11160 Stranwood Avenue, Mission Hills"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.24821740000001,
-          "lng": -118.8088359
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2495265302915,
-            "lng": -118.8073390197085
-          },
-          "southwest": {
-            "lat": 34.24682856970851,
-            "lng": -118.8100369802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Rancho Simi Recreation & Park",
-      "photos": [
-        {
-          "height": 3456,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/104921356981490964925\">filiberto cibrian</a>"
-          ],
-          "photo_reference": "ATKogpfVm5wf24tWDeqLmkYQyc5mxcuOFXMfNIzrLSZWySeP9A8NOrxrnTSO44LPELVM8eIZv95iaM_NJj8YVXEOC1JE8iRdG_lNhoKRzfQajWPLeo7zzuDNlLfDqy_3kqdCtXrCUrP-hrkK2FxcMhmQ-yHznYyWZSpIZ5PbtlwII8knCEdLumB1rwt-iEc2XubqEcrDeE3X_2XcMPPUhXq0_87EWOG4HDFoRAElHiLseIsCSv878f4CjyZ0g_O64A3UszkIjQvVhCQndfn0MoVMJWaTBspWCYANAH3JCOo0mW21g3Mj0HeJkR63AhxvW0rP3HO9Hhi4NLzopGDKcJZo3lEOWyi-5AIMgtpQaSLe5C-GGx7sjtMKsbPu5slXU8SGs9IVMJNdHIctm0Py97pqiaDkQnWRgUL57974jAxmsa_GIAyGu4tOM_sioMMxVZfRkpSNgAV1iHxkMCicROvzwF_BP1fMemmCBuCEnyMZYtVPsqdUykfuhbDsmKHBAG_bYYC-0EZ2weUKdlzIIZ6LdpCz_vXTIiwtpZwZYIyJsnIELbwCnrQqvSIqasXSg536g8cx2_rSQ250SxoWcxReGPFDdfRRvB0uGj5rBFnm7DH2p44yDP9wKgF5ABALilv34gS_SA",
-          "width": 4608
-        }
-      ],
-      "place_id": "ChIJy2evPwEv6IARYQBx-eoG3_g",
-      "plus_code": {
-        "compound_code": "65XR+7F Simi Valley, CA, USA",
-        "global_code": "856365XR+7F"
-      },
-      "rating": 4.8,
-      "reference": "ChIJy2evPwEv6IARYQBx-eoG3_g",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 57,
-      "vicinity": "556 Lake Park Drive, Simi Valley"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.09450619999999,
-          "lng": -118.6486753
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.09617913029149,
-            "lng": -118.6472355197085
-          },
-          "southwest": {
-            "lat": 34.09348116970849,
-            "lng": -118.6499334802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Cold Creek Canyon Preserve",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105998406267075989390\">joshua ward</a>"
-          ],
-          "photo_reference": "ATKogpfBNgtvW6eRY9LXvlE1VQluZl6e6dAecR4TD6o-FZ7H96EL0Xb9UrqoFFuwHIe_7fryTWSdgQiH6t6K2LebuHA7ltxDA-0al9U248cX6N3Obr564lKBofwSpwejHyjYc9S9HYmuIWOTGa_V4CTQbbNHkpnGMVvE6xE6ZrtW5TrGss-Pfh5BWowPHOmwwZuQ6D6AR8Anq0Flr99iBFtwvMI7BpVem4a-sLsl9-JuZv07_UBzJtvDf8GoSU7M5Ko2k66cl1MQ6nAHj4-XiR1J5AQhKpNkkj1kS_PXUcl02RiT4lj2yHjiPYDFQmrtZGBdCQJsejy-Ucv0TJwBFxKmJlcP87UeXsHnqIZrLGD-Hra-JvRjKXTQebT5zwOsk40vpokbyTgNrnBzY6TyDpgS7K1t6ZENm0o3dV06z8pHK7ctHhPXTA_FXtoBJdH_FDzccQoWul4wIh7wOJx_U6iwOdTBYE2BOyGDWxnqjohoz8JgiyEW5vLr-WZCcHLDBPxcjvmMiryW1KYrVfn6Gh9S6gIQyzVwIdsMvgoZ5FSL0jcYD-2ALYNPUxu7_K1pHwqbwGnt7YqH0AXM-3WkQdUldN_NZtJTblsOQTGHI4cegCVfzucl5CnWsc9VVojFcHaJnIbi_epa",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJ3SuEo4yfwoARWjw39l03hJQ",
-      "plus_code": {
-        "compound_code": "39V2+RG Calabasas, CA, USA",
-        "global_code": "856339V2+RG"
-      },
-      "rating": 4.8,
-      "reference": "ChIJ3SuEo4yfwoARWjw39l03hJQ",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "tourist_attraction",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 20,
-      "vicinity": "Calabasas"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.178336,
-          "lng": -118.5046402
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.1813282,
-            "lng": -118.4997073
-          },
-          "southwest": {
-            "lat": 34.1693594,
-            "lng": -118.5062845
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-      "icon_background_color": "#7B9EB0",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-      "name": "Balboa Sports Center",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 4284,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/105107828501464119640\">Jim Kara</a>"
-          ],
-          "photo_reference": "ATKogpc1GoblsHUEgpdtk_LjtspcsQzGgrhBSUwVJ7293sswLpBD4O09r5ojK0qcui__Kj1NA2N7t9KzUWcasCgVR4qc2PAA8-SqmWrYLBGwrazGmfXNeBHR5QO2Ry6VzuwEY5b5MaDHWl1nEiHDHkC5ACfS63ptNKw2Xu1ky3V8q5G425I6cG11YyfaceSnlG7pFIWLZgL3xe2zMwuR8MFHBF9oHEC-AR-p_XhB9MkEBc8fYTsZGVbqSojfNtu_ckTKtp5m75_BCeZH8jAV9XtUbV8vWJ3hxoDT0btJUouzqeHAW5wbFTnFv4nVBK6h6wy7dzUzZR6ewF0A5olrGb9veUvatVTU9kxP63KAqYzB7Z2yWuJyA3SNWF1RhHRVVpKDyiMqLRhntI6AYd9QZ8Dvqk6DD48bmX6teFNV_2KGENq8iokvylKiEk808WOVAAMB5q8yeV9D9GIRHTPs1oGeYDjzsIu4U2-gf5-zVDHHVEmAm5y_dqZNpF7NxwctGuTu2gpEYIrJqf_WbrdKiTypYsu9OX8fTzs5r9kW2ZtgHxhOoPGegfe15OoshZUfxDL7B5x2T3Pz4F7sAIKMf7Ed8h00bP8Bkolvls48SPoM-VBsO1vs-442RG85sUQ_riHMUpBQTA",
-          "width": 5712
-        }
-      ],
-      "place_id": "ChIJF71FKM-ZwoARzss9PI5L1_c",
-      "plus_code": {
-        "compound_code": "5FHW+84 Encino, Los Angeles, CA, USA",
-        "global_code": "85635FHW+84"
-      },
-      "rating": 4.5,
-      "reference": "ChIJF71FKM-ZwoARzss9PI5L1_c",
-      "scope": "GOOGLE",
-      "types": [
-        "tourist_attraction",
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 1146,
-      "vicinity": "17015 Burbank Boulevard, Encino"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.474615,
-          "lng": -118.761792
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.4759243802915,
-            "lng": -118.7603443197085
-          },
-          "southwest": {
-            "lat": 34.4732264197085,
-            "lng": -118.7630422802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/camping-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/camping_pinlet",
-      "name": "Lake Piru Recreation Area",
-      "photos": [
-        {
-          "height": 3024,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/113488872336018998197\">Millie Tagger</a>"
-          ],
-          "photo_reference": "ATKogpe-Do0K1bNCwZgOcT4LGHPlDMAiP7CMCPq6HbAcL7vY4iBT1jfHGytKD46aQA_ruacguohUk7-EJllDnHwrPuPw33fVPbzsxLCyX-7eg-H1XJuU7O_U9mkMpnXmoQPBkvBjDuPqzMm_NSk88qGyYPnKy15cdd-OKYoE4SNRm-6Ke4BNxjG8oEe4T0CY8DJzXaJN-GL6ehyqz8UXwt_tNwLJYlV4q2jh0oTTw0Nd0TQLJiaCAsGd0cai08Trr_284tk1uzWg8YaIP6w_VD1fJuvNG81O-nuQgwMp3nRaNQXKKloY3DjBHgLlQfIUayB5d18BaouP-DR5DEuxxZHQHx2KVjeMq77wVgxs59hystQktwCt8ZfIQYYtdFC7a-_O_9Q5w1FRmypaUMPzpPN2Ndm4niOQKCfZJjfd7NRIRH_GEOPd8YAYzJhDcZfgagnnw7bxAZUK2RfbosMBgJa_veYc65YTH6C08bN7Rvnh7Sme_a-5N3IDGalS_OlX2xmsv7_dbYRijFjt4pFRv5FIYrKc5qEtwTqmV79c5-QOrIwRjYzmDOaR06CyS_yWj0l11ViWFb-3-NA5I7Pt6xUpGsrwYkz9qYihHIv7AaufDQPELIJfgODA1pwJ9l1sZnwaQFOB0w",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJmSXzugjU6YARRlwflzFxWXE",
-      "plus_code": {
-        "compound_code": "F6FQ+R7 Piru, CA, USA",
-        "global_code": "8563F6FQ+R7"
-      },
-      "rating": 4.3,
-      "reference": "ChIJmSXzugjU6YARRlwflzFxWXE",
-      "scope": "GOOGLE",
-      "types": [
-        "campground",
-        "park",
-        "lodging",
-        "store",
-        "food",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 729,
-      "vicinity": "4780 Piru Canyon Road, Piru"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.21501660000001,
-          "lng": -119.0217026
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.2164540802915,
-            "lng": -119.0203487197085
-          },
-          "southwest": {
-            "lat": 34.21375611970851,
-            "lng": -119.0230466802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Pleasant Valley Fields",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/monument_pinlet",
+      "name": "John F. Kennedy Memorial Plaza",
       "opening_hours": {
         "open_now": true
       },
@@ -862,70 +84,19 @@
         {
           "height": 4000,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/107174905434045292531\">Pleasant Valley Fields - Snack Bar</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/116739967538148943147\">Matt Kieffer</a>"
           ],
-          "photo_reference": "ATKogpdBBeXmfXgJlYhuy6S9LY8ul-Ewtxxm5kp4Mtm9iqyHbwfWhf8AhX9zOBBsynplf-S0vDx-9Eiq4rJCO2tquZrDgSf17d9VN2oM-QmmUg9GSf1-daE9xAt1D_DUaVMuihq0_W7wBzEKzXv0w3Cco_UL6RuXVofFk9UFJaW0k0UWKASXBeQpb5aHuQAsmmkZ9rpEHx9-udENKeseEsMd3Qflp_gzXSBe5aiIM_rIoq0GFddL6G90hnnZMkvjQy85LBihLGrlMNTW0jWBjBH_MIj7yhRXVxj-ffyLLuq52xyJagfrPOzPnD4vW0yulfTt1jX3eXNAyss",
+          "photo_reference": "ATKogpfzo2UybZSpTb_BKhm11ElONUqolNeGelafe_mpNX7Kg_cwe_iFU7oXCZ5oXCCMu2NT0kP4I_CgNEEvJ6et0CR3-4BG34zL_3DQ7Dwmy7BVcti9BMC34IaP_U9RQ2TNXaHmzPZCx2eus2SJL-bvI4wX-CaHnPYAoxlASOjR1SBT6sGCWHy3B4Fr1z2hlgi1ESjFTGimyA0mW-6FwvXLDd5cA4pQNWCRGEx1xDIRnQDx_JHw-W6GlNiQo3MLMl1dxX0UUt-RbrR5fNVYhUyfM74JM2cGchWIYobEXBtPlQS9wvB_GiuiwQQf-71xRB2DeO9lM6lWxGXJ5n3vFlZlWYUbM-bq-yXV6xCXUDjVc1jMfNlx8b02aP5wxBAijnJUlHTL63Sso7JX9NZ-S76Q6wFTHNZt8VldHqxu0pGTVDOspqN62fMMnZfa16KD9t00R3NNnZFmU68lCnLfUDaW_AeZUsHdCW5IDq5foeHCSkzYUu34Eod3Z2GI24QOd93-b8nJ4KWOKTcHjFVaeAQ5PXzW4y62yrkpfmLcSr6H3_SANPFvZpfESRIEHxun3pzo3YUrGrdjloSs5mDZTisvWIg3saRHJv0vN1V-ZJGIhHtY91rMzKtQYQgJBCNqIcj5lo-73A",
           "width": 6000
         }
       ],
-      "place_id": "ChIJrwTxnj426IARvyR_YUUGb4E",
+      "place_id": "ChIJE_JdWRaZToYR0o3-Vndx750",
       "plus_code": {
-        "compound_code": "6X8H+28 Camarillo, CA, USA",
-        "global_code": "85626X8H+28"
+        "compound_code": "Q5HV+FC Dallas, TX, USA",
+        "global_code": "8645Q5HV+FC"
       },
-      "rating": 4.6,
-      "reference": "ChIJrwTxnj426IARvyR_YUUGb4E",
-      "scope": "GOOGLE",
-      "types": [
-        "park",
-        "point_of_interest",
-        "establishment"
-      ],
-      "user_ratings_total": 341,
-      "vicinity": "152 Westpark Court, Camarillo"
-    },
-    {
-      "business_status": "OPERATIONAL",
-      "geometry": {
-        "location": {
-          "lat": 34.0930059,
-          "lng": -118.5872898
-        },
-        "viewport": {
-          "northeast": {
-            "lat": 34.0944434802915,
-            "lng": -118.5859529197085
-          },
-          "southwest": {
-            "lat": 34.0917455197085,
-            "lng": -118.5886508802915
-          }
-        }
-      },
-      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
-      "icon_background_color": "#4DB546",
-      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Topanga State Park",
-      "opening_hours": {
-        "open_now": true
-      },
-      "photos": [
-        {
-          "height": 2268,
-          "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/108146102968527853710\">Abram Bailey</a>"
-          ],
-          "photo_reference": "ATKogpeLA0Gc-9B1qSRust_VXSc84_McvSpiRUdVgYufNfv0D960WHhP2cWLQAcmlTceVaX5L46WNikkrXqQJPI_wzJmqUzXtE4TZAfRatFA_BQ-sH99sJPloDGP5GdGGidWmtYCWZp85dPBHz5nACuDkmz-NlF4q2Old0C3C-oVYmh4BzP6feKcxI4F_6j2rBi98YqUpPfXCHtJcygyew0qsOVMw0i3ME7KpQyhSlo_GGRN-eBzPI7YGqn_-rtfoKG3AGT1Utj8SIi547a9qb2n08RJaxTocKd-BSXG-K5VQtiNNNSneaXQUuEo00CpSjIbjERQEc9VHuDbjbfggynlhBKxetW5afNKSgShfEGginz897AudPYrrhwgsxTVZlejGRqBAqROOgJNJmlqgimjJivmAitMx144y4hBmWpK5zKUQ7PPT6Uz0eEncWQHk6j4EvZE932b7VPFRalII3BvLQB3ei1B9OmMXuUWSxJrROhIESO_tU7uBQ8Mute-rTQwJn2OwYNbvuqWySQKfPjiAbgBBpiPLAYbiuv3cZabFUGbbDeR9VCAbMHDeN6bM-P-OJCvxCRoFUItZ9kOgEcDPfqtixsEWQm48JDryZwQhH6GhZ8FiCg_mtjIF44Lven4iC8LPHny",
-          "width": 4032
-        }
-      ],
-      "place_id": "ChIJ80VgrkaiwoARpSSTW7vH0tM",
-      "plus_code": {
-        "compound_code": "3CV7+63 Topanga, CA, USA",
-        "global_code": "85633CV7+63"
-      },
-      "rating": 4.7,
-      "reference": "ChIJ80VgrkaiwoARpSSTW7vH0tM",
+      "rating": 4.5,
+      "reference": "ChIJE_JdWRaZToYR0o3-Vndx750",
       "scope": "GOOGLE",
       "types": [
         "tourist_attraction",
@@ -933,48 +104,103 @@
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 1829,
-      "vicinity": "20828 Entrada Road, Topanga"
+      "user_ratings_total": 4712,
+      "vicinity": "646 Main Street, Dallas"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 34.098193,
-          "lng": -118.733076
+          "lat": 32.8236184,
+          "lng": -96.71662359999999
         },
         "viewport": {
           "northeast": {
-            "lat": 34.0997250302915,
-            "lng": -118.7313835697085
+            "lat": 32.8276216,
+            "lng": -96.71015040000002
           },
           "southwest": {
-            "lat": 34.0970270697085,
-            "lng": -118.7340815302915
+            "lat": 32.81900960000001,
+            "lng": -96.7196572
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
       "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Century Lake Dam",
+      "name": "The Dallas Arboretum and Botanical Garden",
+      "opening_hours": {
+        "open_now": false
+      },
       "photos": [
         {
-          "height": 3000,
+          "height": 2252,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/114620739240301940286\">Trigun Bhattarai</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/105726482695595407907\">Mark Craig</a>"
           ],
-          "photo_reference": "ATKogpf7hymWq7g9n4Ue_D291yNY0d0WMQ_RM-yCwOKTFb9DHMcl0U5DsolJHmvOWPjykstbSQgc4fqayzJHfY3ahTRLDxFOmLSO39fS7sR6u4PkX8XGr6T1gjvPEbTFMuQr5KCe2jiGRU61Tv7VxwJ4LF6KQqW_Wy8AH-pPeYWfRcm5N--mQWW-dlgqWWDquWlwb2oUzr1t7Y_sq3GH7WzX2IX8-KmuHVz81gHM3_rlbPuRbTFLMGk6_-soHSgvezJ3sZJh57FuxmiVX-heX1mkaamUoormSB49kGB0BE9ajMWVrWbngJ_2VPIvU09pcsA1x7rJLauheI_i_AZJo47ARkxhk0HxRywcygyj6cIPyfVqA3kXzU6eyW5RpTfdqfqcAyWuKNqeG5z2MeiwJKKZMadSoJo0OfZbLrPgz1Gw0HgDcuquhibZN0UDGtb4koQ2pX8yrSGT2Dz73kg7eLqvTu6N1OKjChp9qdlMp0fAQhwxFL_o3KZOlMXW0zZmcua46f8SfIUBOgMmQuoptjey17Jce6kId9QK3MB0KjBXEaH4xWo_hWwBAGw19mCiOLnFg0Kw9a0SV6RsYU-f3xpnBiphh0eEUIiqAOlmlBb8wevbvIZJjzJs21voor9T2ygdrRl6xg",
+          "photo_reference": "ATKogpflUHSeH5gxr-4N-bQESGQr9vxpiJqwNdMVdqibL2dM1gaABsDOJRUfRcG_3yw9sDeiasJ0VO64cB6QZ27ar3YVNl2fzEQIAsDi8siB2Izvrqh6SLGenFYVZTSJA8FclHXBE-btwEGIdgsWcaSJAgI3WSBz4seLYqKczsL2t6q-DCf9eCrvcSrxAG6kaNPHMT5VDEnJ_cvDInX3FvpXSDwDdnfgnrBAqmYArPR5iepS21aCH3TDLg_648yDAom82S6PkJ0bxiUWACMGAFi0MCQfdMXrwmABF1KUB6ejxVcd8LZCWm-FFL8B6_U9TihoFYWn1Shx3estLiCVkPWUAoVhsENjqVDK9AoEWUWpFBakFe0gl337WnlGiC-JnFqNNT3GjqeGyiTjEoElLqHjeblb9A1BzghNJPN3M0snRYtZu7C4obp2PrUwjqc3vzgjb8KbkRFWi88g8Cme8qvReoKC53mdvkAoqHBObFQNkPTxJUOB3d67uGrWLrLF6nIH7X72d5utZPmHHDZY3SFsHq17tOiwuDE1frku2riij-vKDJhTFC8oi21xqeEHrU_kp1QXUyRCMv15TcpHCStXsJDSxfil9oacz-Q-xC0xOjwufJ5XjETHk-CVI4N9p4nuUjDisN2K",
           "width": 4000
         }
       ],
-      "place_id": "ChIJkzkZNaUh6IAR7tw93oeUkxo",
+      "place_id": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
       "plus_code": {
-        "compound_code": "37X8+7Q Agoura Hills, CA, USA",
-        "global_code": "856337X8+7Q"
+        "compound_code": "R7FM+C9 Dallas, TX, USA",
+        "global_code": "8645R7FM+C9"
       },
-      "rating": 4.5,
-      "reference": "ChIJkzkZNaUh6IAR7tw93oeUkxo",
+      "rating": 4.7,
+      "reference": "ChIJRxtoZJqhToYRQnaLBzeSE2g",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 25524,
+      "vicinity": "8525 Garland Road, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7788184,
+          "lng": -96.8082993
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7800247802915,
+            "lng": -96.8066590197085
+          },
+          "southwest": {
+            "lat": 32.7773268197085,
+            "lng": -96.80935698029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Dealey Plaza",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/116800855297671873552\">Lucas Elias</a>"
+          ],
+          "photo_reference": "ATKogpcCW-AZ6x_mKuxmiMRKnULvS8_1ZY2jKsd0PE7B5AaVMOnUdCLaUx6aki0DbvCzhrBg1MnSaGhWpHBmHeYpRyptOSAMlFspXIz9M_9hAhrl_Oi__WHjz1Ewg6RGFbROeqsEibkYTZy72UvxlPwSjUb0e3F_Vye5Eobiws-C_Kf-f2kJCizxI_ZvDULY0trgMx8_UaXtrTgKzInuKp419lAsw4qfx1eJyRMhabKDMgxDhxV5ucpjEuo8_B0GUvzmoco6ZM03aWWm79M4mOe5b5LhWnKUyHhqWKrbibLE6PL7hl8znly7wwkNyqvWHruyK-bcyuhPqR6xsjp1OhTQ12ZYWGR0sL6nDwQnw_AFXdSv2O7jmA3PWpFGx54DoJLj50ZsCHljEmfL-mcg1BLv6x4ZNEQqI3cU1W7iKsPHqIfqWdqm0SdGyoZxIHBFqF5oWsdm2KNrYX0sGB6IdPZRANGGZupyKglDCy_FSYXycTbvxNM6psBqxDYHWdf1IU5PCMlM7hZJfG0H2FYYSh9IkwD0YMnJ8lXGDwtresmKBADfm9h0l4vh-UfLLLebeun50T2M-F9zT0CaLKwvu-keTe6FHkNmRAqow2tjntUpdjWBVoLFLpT0auIqPahWHp8vGejAdXIv",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
+      "plus_code": {
+        "compound_code": "Q5HR+GM Dallas, TX, USA",
+        "global_code": "8645Q5HR+GM"
+      },
+      "rating": 4.6,
+      "reference": "ChIJOfYI1RWZToYR4J9wW_J7pM8",
       "scope": "GOOGLE",
       "types": [
         "park",
@@ -982,59 +208,831 @@
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 32,
-      "vicinity": "Trail to Little Chihops, Agoura Hills"
+      "user_ratings_total": 5937,
+      "vicinity": "400 Main Street, Dallas"
     },
     {
       "business_status": "OPERATIONAL",
       "geometry": {
         "location": {
-          "lat": 34.1807679,
-          "lng": -118.9506812
+          "lat": 32.8411176,
+          "lng": -96.77822619999999
         },
         "viewport": {
           "northeast": {
-            "lat": 34.1820063302915,
-            "lng": -118.9499138697085
+            "lat": 32.84299055,
+            "lng": -96.77711461970848
           },
           "southwest": {
-            "lat": 34.1793083697085,
-            "lng": -118.9526118302915
+            "lat": 32.84024115000001,
+            "lng": -96.77981258029149
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
+      "icon_background_color": "#13B5C7",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/museum_pinlet",
+      "name": "George W. Bush Presidential Center",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/117571279609147319283\">Andy Jewett</a>"
+          ],
+          "photo_reference": "ATKogpeMj3OFnpjaE-v6-VLEUqvylszGG2av5qwgCV_WcSaJJUIM9gNPKxe0ztn4uuv-akg4PUZA7nl6Z6a2YWKnSqlP5kWM643492YHFIhG6r6hXnO9cqbLBvM46vJSvuijrdOoa89xklS9iGJRk0PtsyStWEHuzpdD77JcdKOJIWQNBBlzWZbeG6xgte0RBWdTJ6MpxcfQI1TwfsP4bUReeH7aMl20pm6jdw1-DPcylHfS6Kb0WHySkd6Yy78NF6Oly1KkSxlOrnleFhdhCEwi1M-rVN5RR0E0K3TQjCZPpcEUerR11bj0eCsdqUyshrPS0aJTaoLH0hOK1mQfcdrPkrtMMvBqO1VMA8bYI8zDSdWQSp_NYPRkxEX3GgHJtVqTFdSCTSgnd6jB8DHwhI02cpptc0K-WALiE4SD-0PUuRgxFkwIxZBPiZXCD5TOc_uRADGtfrZfhvGZT45lw75f6npL5d6A4w6WEXpeKr9NxLJ_WkPpwVf75N9G3hvxliCmt220eHRJz7p_ocSIbduakSwnp8fGucCVEU8EpLp-ekOvUtDBWP-KCHrCAXKehqKvzzk1g8lTqw0ktCwZ02sM0DohSnxsdtk3O5mG93nEJDzFK50cDnD70bsCGsLVZBFN0-WR2g",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
+      "plus_code": {
+        "compound_code": "R6RC+CP Dallas, TX, USA",
+        "global_code": "8645R6RC+CP"
+      },
+      "rating": 4.5,
+      "reference": "ChIJTSIEVQ6fToYR6bFECcv6kD4",
+      "scope": "GOOGLE",
+      "types": [
+        "museum",
+        "tourist_attraction",
+        "park",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1007,
+      "vicinity": "2943 SMU Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7893644,
+          "lng": -96.8016184
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.79203555,
+            "lng": -96.79889354999997
+          },
+          "southwest": {
+            "lat": 32.78681455000001,
+            "lng": -96.80375815000004
           }
         }
       },
       "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
       "icon_background_color": "#4DB546",
       "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
-      "name": "Borchard Community Park",
+      "name": "Klyde Warren Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2756,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/101645393419411890565\">Agent 8</a>"
+          ],
+          "photo_reference": "ATKogpfzoV4G4fRl9mXgIc6xs3qlBFBqKcOIxcwq0KhrDbguofis69CihftzedvLQa06y7ZmkkowldE6Ieyu1df5OJnFLy6VvxrKxXDtuf5wRp1Rw2FTnpXVDWqF-rfjjiKsdCnd_deFaxImYEObHCLdk2WnC4hRWoirhl5FIrVgXYlsxRYG1rq0Tvt_IDaogz4O8Rf3VlBFMGSwKcsxXaCM3EZTR0D0J-F186CPx-uPXQ57pHAq8aIPm-FFShiuKYzxt8KMfNt66q0fkYBNwAbZFJ9JaHgrCoxtNZh8Ix54OqykjCjgz3MPyMD5F9fzpjWLK10EPssh1tNtPEWbuKxeUWU3jloiTDVy0t97QorNi6rQKyob0XRvuyjZvu1VOhUM9Kra9_c5rLwJIYPJw7roLQePBDM0T-mDrBFXHHikv_FSc2cTsmzP5WvuxHZWngGN3C7UAPeO0Xzo91nloc2P5TKmnLqEAHQ1p75rxggCWYLJ9uOUSiNYkhAyUmqjJ4RwldiG2Wfmxu7ZySYUI-SWdp0uRIx-QXY_tY_3RXZzOvl2xNYRGZyl3K2mM55qnDttoy9Tf5xjO61scBpwW_bTagQBngtiLgTQh7F33V8m97VGY0C1bAcSWVpdyMWD1aWOXftME92O",
+          "width": 2450
+        }
+      ],
+      "place_id": "ChIJZf6cwiSZToYRas-lbLGASVA",
+      "plus_code": {
+        "compound_code": "Q5QX+P9 Dallas, TX, USA",
+        "global_code": "8645Q5QX+P9"
+      },
+      "rating": 4.7,
+      "reference": "ChIJZf6cwiSZToYRas-lbLGASVA",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 17921,
+      "vicinity": "2012 Woodall Rodgers Freeway, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.77275279999999,
+          "lng": -96.78654399999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7742036302915,
+            "lng": -96.7851566697085
+          },
+          "southwest": {
+            "lat": 32.7715056697085,
+            "lng": -96.7878546302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "City Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 6144,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/106681202681354726441\">Emil Matias</a>"
+          ],
+          "photo_reference": "ATKogpesIEHp7WaJsjtOzgvgXgB452FoHRLWPQ3_Vl2AtLuouwpdpH1Aw4ZHPSWH517MLCCfjn0ummpPjaTrhM7Jib5GOEEeoyqNkPF8nlBdlOVLxROjKviR2EARmIL1L5Sfh5XLIN3b_0iFpSinKFOLl05wtiA41LKou2zWaeT4mmBXzpkamVJ1pm8lQVbeknu7omK02XcR0ICLWWl5GAdh2Xem-UcDLvflhrYBn8W1xbHn-aZjjj8Ga9UTX7UTuecb9wdoml5V6wSf3zglVFwpeW1m6J3rKbT5rU83D7SmOsp6LIggv-qO_Id1O9v0K3gE7CCV-CyAJitKLFCV7UdX5viKdsY25ZZISF8bl_PYSwpAxp_oYpKODwhZyzg2vncanUHasqYavthaco3exHRdsXiZ-LdHXCswUOgCvIhIeCdvC64pYqngBagQBodn4ikmmoDFvWaujB0Y7wc75NtB8osgRDHWz5XpnfYIcxo8WRNsEiftI9ur6M-Yoh9Lu_gHDu8kDn17PuxnS1-IyWxYxgYdMdKNBn10mzjOm-LFK7zQexUTMfntR7ib9r2QGYSERUf023SrcV7cdFBOnWC67le3hWa5hsXyPZChquzpYztIKvROmnHiva7zrGzP-OeCLhbsRyEu",
+          "width": 8160
+        }
+      ],
+      "place_id": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
+      "plus_code": {
+        "compound_code": "Q6F7+49 Dallas, TX, USA",
+        "global_code": "8645Q6F7+49"
+      },
+      "rating": 4.6,
+      "reference": "ChIJeU_zFuOYToYRf8w6yEOeq-w",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "museum",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1328,
+      "vicinity": "1515 South Harwood Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7766323,
+          "lng": -96.80119859999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7780468802915,
+            "lng": -96.80000291970849
+          },
+          "southwest": {
+            "lat": 32.77534891970851,
+            "lng": -96.80270088029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Pioneer Plaza",
       "opening_hours": {
         "open_now": true
+      },
+      "photos": [
+        {
+          "height": 3456,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114660717085752617659\">Kim-Trang Nguyen</a>"
+          ],
+          "photo_reference": "ATKogpfElea-yv7-hQ9qbN586clqyXHeRQP7gwhCWqOsNEJb4opzMdPCbhDcKYcbyaj1BEnvxuz4_Wk__tTRgObgFZ27SBohp_stEFalcKjuIjlRfs16kI8EeBCA9Dtk2PkMNkdvfh1nY5m5TrV6xphcqjfoeGp5PaBDyq3cbXCOBIaX5S25ghg_ulRiFU0mdT9qaE5J7RF8XOAcTFcqTSSVm15OI6b_g-2zgYI5qXEq3wJM_uMwhKZtV3JFFfW67mfl-ERnVBVjdCQ2kHkETL25Eo_fYEW-b6xtQQa8pby3EtLjP4sDQVgxl0vpD8v8f8Nyk7TKTf9oQxRO3fYs3KjBr5Br3lh5oCdgs-YdkaKyK386si6RfIPg1t-dqSLJThwnF5OjvaKUuXwBwKTLeYnLxstnag2D4PfdXmqRSv9rbMBqftPpNP7ylm5gmbX5LCYZ6pjedkKjX5qOWg6HiFgUqS-HPY885CNBiu4K9hUv8oCs3ZMk8dhnPSMoD135eSVL7X0-2B_W3JLhCMi9AF3XkMD-AEpScjhWrxUotJPF6fvyNMByBqRyNfcO1F_VrtMmDcUQzRg7oZPqW3sB4OOF3ZOBl4YqP7Fgk8U7TDH9QrZE01tzpLNXZZxvUexpuYomo8Tx6Q",
+          "width": 4608
+        }
+      ],
+      "place_id": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
+      "plus_code": {
+        "compound_code": "Q5GX+MG Dallas, TX, USA",
+        "global_code": "8645Q5GX+MG"
+      },
+      "rating": 4.6,
+      "reference": "ChIJ6QFl8BmZToYRThNf5Xn_pUo",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 4490,
+      "vicinity": "1428 Young Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7782181,
+          "lng": -96.75927089999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.78760945000001,
+            "lng": -96.74695864999998
+          },
+          "southwest": {
+            "lat": 32.77060645,
+            "lng": -96.77135924999999
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Fair Park",
+      "opening_hours": {
+        "open_now": false
       },
       "photos": [
         {
           "height": 4032,
           "html_attributions": [
-            "<a href=\"https://maps.google.com/maps/contrib/106148781826830698525\">Rick Finley</a>"
+            "<a href=\"https://maps.google.com/maps/contrib/102034392453661473124\">J Weems</a>"
           ],
-          "photo_reference": "ATKogpfZbfgx0fHLCniXKpAe6Tmbc7etyuGy5lXt8JEW3zAqI0bEp7QIfzodHIM5IVE5pfRh8xOkfSfCeh5Kd0GWmbfl3l9nMM-LHGMhDa0gy714f3BLGJYWlvStSVgpmdJnC7SFyFDurrUi1PhzAjgjd9Sr_Oru8bux7hYXb4ykN7mlIRBlVEjSXaTxaxSHxryKyTyw24BfxR1Hs4vy2P-8VEGQ81IW6UQDV_cFmwujNeY_WTcQyrKyrY069zK2E5QAdZmHgeaYRoWERa4LxnTAZsZ1xn4uuG3zfx5LKwr-pYmfQjZOEE6cO2anTD0EFSnam4H2GMK59eV9CcUYK070qpKVFEJwDt9rZ4kU86F8pf9Q5zOAOGI3QsdCGGIRlkT948Um9u7JQ6hAuVgetFTq1LbZ9V_I0EoLbzNOfLa3EW69Ljm6AF2C-Sfn_OlD6HgsMk-AaSyG85yPflYXAnwa3Un-A3U9OlMpIDfKFh84_yNedxKBRDua9lEFvGuRd0W5f0vk5Cv-MYOG74KThbZKTNwrpxWh1646w5NnvhToLnlEXFp_du-DFN6dHGgiaP7OoYmUsE0jzMJdcZHBjr3exYkJqSwYFD0w4_by19fJX3N9WCv2lhcreBUXeQEZIrk4",
+          "photo_reference": "ATKogpf8SM-C_NTmY0eS62sMr_l30QzYKcRTFRCtXdEdYgflbqCKjY1UrFXbfYTsxevM3a9e5LQPuZslQu1HbUSJSw_SAqiCqQVHBPsbxZK3FO2T6UvSkhfHxD2K52nNFC_dURIl9i2I0xL9CZmddDYdPkRCk7xLsXRPOKEwQLAn4l6oJcZYA4aBPH0cK9GoAlZ6P4G2GZg54WKnK6P4kwR1WI07pwm1LV4hFHFMBwDxqKrOmphQYba08t_muWYTTWgZsAmSD8vkFZOT3DYWtopktOxGTd0aQq9pQgtYmC6u_SmMDj5cBJ_fU5hYfvEbsLfaKMSwsPUFFI7mUNvTKGGIioNpt4KNpv9IYWnn1Vxh1kBVQkEpvv2VBZn8u1A69vVajgc9tNlKAhG8lBvRHw90RkJEGfNLimxM4wtB1n5k7aXWZGBAurNVmUMZ4j2-l6JTXtlwJypxvI8mVHi15vzWWf_bz9Qib7N8RVitMXtjHyR4oC8g9IzsiXapKsiMnJeh_ZY4TZMxf7PKDzTKlJN6FLFWnLvLPPXm0wp9itYnKAO6tXEV6yiviVvaxH9Fa8FzdqKkVG_0SGBaFb11uDkoQzZIuKEJaekgo0Bu8f18q8v4yrNI3xErCC9_2un1W-MxJhrBFg",
           "width": 3024
         }
       ],
-      "place_id": "ChIJB5Rxlqww6IARUt5oBTCP2eM",
+      "place_id": "ChIJ12JIoZeYToYRRJHugtx3QgY",
       "plus_code": {
-        "compound_code": "52JX+8P Newbury Park, Thousand Oaks, CA, USA",
-        "global_code": "856352JX+8P"
+        "compound_code": "Q6HR+77 Dallas, TX, USA",
+        "global_code": "8645Q6HR+77"
       },
-      "rating": 4.6,
-      "reference": "ChIJB5Rxlqww6IARUt5oBTCP2eM",
+      "price_level": 0,
+      "rating": 4.5,
+      "reference": "ChIJ12JIoZeYToYRRJHugtx3QgY",
       "scope": "GOOGLE",
       "types": [
         "park",
         "point_of_interest",
         "establishment"
       ],
-      "user_ratings_total": 385,
-      "vicinity": "190 North Reino Road, Newbury Park"
+      "user_ratings_total": 16481,
+      "vicinity": "3809 Grand Avenue, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7036486,
+          "lng": -96.70531
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.70521533029149,
+            "lng": -96.7041377697085
+          },
+          "southwest": {
+            "lat": 32.7025173697085,
+            "lng": -96.7068357302915
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Trinity River Audubon Center",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 431,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/107249040236262904865\">Trinity River Audubon Center</a>"
+          ],
+          "photo_reference": "ATKogpegtrDH_T5XNxkMfWlL85qb1y1NGEQODpobFKvbC3dmYQIwUy9TqexbRkz5i4E_4geyNWhE7Nd-bS1VAamTBCjuYCV-qnzrAPxCYW_QU02kFpEbcq7CzdSJX_jGTY4uUXghVLyLQHQy--vwouh1l88GJg-ja8Q3Xfr372p4luilfoUUXJ3G3U_8Qpy-kJIvzz7Co5Z4c1raC0Qeglgoq0K6YHQ_p8dRbcJ1UshiWoshfUJYzvlg2qa9Ti2-0WyK_1diN-iXKupbcuPg3iEtWtDzui68rLZ6rtL3_o1g0B_KWAy8tYuWMDy4hl1bvj3UprZojUzN-aA",
+          "width": 647
+        }
+      ],
+      "place_id": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
+      "plus_code": {
+        "compound_code": "P73V+FV Dallas, TX, USA",
+        "global_code": "8645P73V+FV"
+      },
+      "rating": 4.6,
+      "reference": "ChIJZUzHmSm9ToYR8jTTPlxuJKM",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 662,
+      "vicinity": "6500 South Great Trinity Forest Way, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7811695,
+          "lng": -96.7948469
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.78252758029149,
+            "lng": -96.79315485
+          },
+          "southwest": {
+            "lat": 32.77982961970849,
+            "lng": -96.79648505
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Main Street Garden Park",
+      "opening_hours": {
+        "open_now": true
+      },
+      "photos": [
+        {
+          "height": 846,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/100041358449158047663\">Jason Cuellar</a>"
+          ],
+          "photo_reference": "ATKogpd1vRmFXs_OijHoi0ZZWGLVGn3t6o76ogWuVDAlRQeKAWBKerHL0gl8uck6hQxIM4707Ynp_-8TnEV-95J14U8oEJGOX_z7atw_pxVvN9oMwX5oAva3qvLO-F1PdQDmHb5wfEPpIKVaQekaSuCvX1FCXjM6YBOLNrsCTXemy_Ut8IDy5_3P6l0pFK8Y-LSgFGDkwosHlMg13himjlrt5LQ_h9NKeiwfDhwWaXqItMPN3ove54zpP-a68ftL8CzDiB6AvFaE-lTVYI5M0yzOK13VcF3nxXxAs_-Y00vFWrTT7r9WQRiDR-zWVZEatqvIe698yTdZJqMNR853FtVvthJj82J8sAsceAh03wn_dw7xlUexr5BWMnvkEMB9Hhs1XU3Ue4tv09z70zjAKNia-rfrUIdIDdz05qk4-uIlFpE9kcb0Inb87QHUXbJuNJkJ4rCRXdfm9KWn6_4OYLXwgHaeotubh_Cj3kCyN1zou0Nt1Qmp-migHiwO0nvklLuv2oR5P2_yCWRCvmwFy1Er3wGs5-S0L7zIc97qn4q1e1A5xe-MZ__hX_X6p7ci8CcvluRGyF7_eaH8-ZwKRRv-yGvaIfY2FCp-2J5zzWDTcM6EGAJEjiMzuhDEhvwxnQKa",
+          "width": 564
+        }
+      ],
+      "place_id": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
+      "plus_code": {
+        "compound_code": "Q6J4+F3 Dallas, TX, USA",
+        "global_code": "8645Q6J4+F3"
+      },
+      "rating": 4.5,
+      "reference": "ChIJRfzcnR-ZToYRg8yt9Ky1Hww",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 2343,
+      "vicinity": "1902 Main Street, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.9173035,
+          "lng": -96.89209389999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.91889768029149,
+            "lng": -96.89064446970849
+          },
+          "southwest": {
+            "lat": 32.9161997197085,
+            "lng": -96.89334243029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Farmers Branch Historical Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2518,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/105357574211655252461\">Farmers Branch Historical Park</a>"
+          ],
+          "photo_reference": "ATKogpfNh_IeiRnHQ0Lxyi2AMzb9QtoJB6xFtk3a7Lms5vuRjONvQlTQZckDrl9l3mBzIYc3mFtoot5vvfasZGnOpR0jvs_LiL2A1-hzNYg5gM1GfXXWVcz6lFI6JX8N4jLGw9sFKrm4SAa7JpYxp2UmD6qgyLOjc9FOAYE84-xFDzPI_gGWk8zMhs4-ix_AHfshMSD7dlDi5eYk9ch8kgdjEXR80KN-XNOhkubmhabdR9EEhYfV8UJEXK9sxDQ-g6ytS8a16oALOI-KdusF-fTHUq9FDMAXtJvvYQnWcrcqBAYYY_w-e5YSHqhpCqM3fJJDS0CnHxA5tN0",
+          "width": 3116
+        }
+      ],
+      "place_id": "ChIJca__DrwnTIYRQJEQo0vZDN0",
+      "plus_code": {
+        "compound_code": "W485+W5 Farmers Branch, TX, USA",
+        "global_code": "8645W485+W5"
+      },
+      "rating": 4.7,
+      "reference": "ChIJca__DrwnTIYRQJEQo0vZDN0",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 633,
+      "vicinity": "2540 Farmers Branch Lane, Farmers Branch"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7829966,
+          "lng": -96.7982236
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7840783802915,
+            "lng": -96.79680251970849
+          },
+          "southwest": {
+            "lat": 32.7813804197085,
+            "lng": -96.79950048029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#13B5C7",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "Thanks-Giving Square",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 1248,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/114144713469905302706\">Thanks-Giving Square</a>"
+          ],
+          "photo_reference": "ATKogpdMXJQjv0ucDVHETuRNpe0oAEuloUjBMPhvVoxgd7KzTJ6GQJRKzY7iWs155ID7KxNHXOHnzjSZiIveaEChLrPV-iN_1IC2ex9KU3lMOqRu8-03EHMQKQHcmO7vliIo9sWWIHRTlv1-jPP7Uo-oOBNTbB2quhKHZ_-Q5wVSD-cXY9Xtzj1yCysHgPGVEaBi6e-b-VcDFmrlQwzbRVKQ9p-FZvD6Gr2igRTg3Yk8r2uzKk3ftwrhhRLrcEY98E43wGQEtYj7jnOkFGGSLfa_tDOB2WQg-zQQT0KMhll6Qu-cETY8Zy2IWgOeGA7gAY9czX-XwCyuM0Y",
+          "width": 2519
+        }
+      ],
+      "place_id": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
+      "plus_code": {
+        "compound_code": "Q6M2+5P Dallas, TX, USA",
+        "global_code": "8645Q6M2+5P"
+      },
+      "rating": 4.6,
+      "reference": "ChIJTdYbDiKZToYRWSvYXHV9IQY",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "church",
+        "place_of_worship",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1170,
+      "vicinity": "1627 Pacific Avenue, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.7751527,
+          "lng": -96.75973800000001
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.7769124802915,
+            "lng": -96.75881251970851
+          },
+          "southwest": {
+            "lat": 32.7742145197085,
+            "lng": -96.76151048029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Texas Discovery Gardens at Fair Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 1000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/105845434105767880722\">Texas Discovery Gardens at Fair Park</a>"
+          ],
+          "photo_reference": "ATKogpeGPp9vUsvflZ0IwRvZhrX1UCwlNnwuEcKgIXw295tCMtMKR6SWZVe-vSfhqXNOIyHPgSTk3x1vW1jjOED1GPUC1K9IzPjA2K7PtOvhMqy1wIm7sB86cg9W6RNhLLnJeORod5XMvMu5aO39FDbvsaM5dqriQ3kKw-7QaxYUcR18P8HTXua9-5MViT0218oQFGVYNDMR1xdwlBEuxV67suYjZNLRFJZ0mtNsZ58QLgi-MUySKIIL9fnTaaM_7Oo1aSCJ83H97I2YF2OmzZfZaW6o4UxC0uygZbN3Z4g1G43QOhUF8qVkbmnXfPXFjSxFnVpyKQDpul4",
+          "width": 1778
+        }
+      ],
+      "place_id": "ChIJH51ghJCYToYRNpUGVzRnZtI",
+      "plus_code": {
+        "compound_code": "Q6GR+34 Dallas, TX, USA",
+        "global_code": "8645Q6GR+34"
+      },
+      "rating": 4.6,
+      "reference": "ChIJH51ghJCYToYRNpUGVzRnZtI",
+      "scope": "GOOGLE",
+      "types": [
+        "amusement_park",
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 1864,
+      "vicinity": "3601 Martin Luther King Junior Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.6194734,
+          "lng": -96.9837294
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.62075918029149,
+            "lng": -96.97140465000003
+          },
+          "southwest": {
+            "lat": 32.61806121970849,
+            "lng": -96.98783764999999
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Cedar Hill State Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/104051482289129192769\">Farouq Mahfuz</a>"
+          ],
+          "photo_reference": "ATKogpeY6ntgzx1wyDPa6J0nV5WHjMwn9LqI0zqEH1jfxXwVTqg49rhO-pQFI-Qa5X6DmnXRCWb6p0pzNb_s132XFdjFdqTYDzmMgRIlWTNRffgpNMOiz3szLPiZLWa0JliJfZmEJRWgtjHOaWxVEqCrAWatngOxJpIyukHsfu8utFknm2OzRI-HJeuBMsC4iacXCs6QSZVeaJjybIZLe6XRxBqCiyJdoo6NQ9iNCQwMn9IFrBV7M0VoTsmbwLM9xmdWDvrgDRzd8QkJheotjza6SS80mXqLaBO50pWWoDrUdMkfLln90B3XKkqM6aTU-8ikYeNsmcyZbu9Z3jMaHkmymKk2lWq4NQid_uszkiR4brLyR-O4YOv28Q2w8Jnfhqtcq33MpystAn7tq3IuOdyz45ecn_homVb2XCvP4MMtocyB1OVl6oldOGbEcjkP3VabvIz-rZ3WSEEjlyKuy19xeGxNXqts6k6LrzHZiJoBShhSNFoqpFf1-Crrb1wxJVdmLoovl0n-5WQVs180ckSON-AIOLn1M9aJzBJMo92qkeAvvojcRGhYu4eAnosNWjFqeVWk6yp-HnaqKSlVKd2Z6S00KzaTHPDo5RCw06K5a8eCgVU-ZTylzsTGlTFjyy-E",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "plus_code": {
+        "compound_code": "J298+QG Cedar Hill, TX, USA",
+        "global_code": "8645J298+QG"
+      },
+      "rating": 4.5,
+      "reference": "ChIJ_0yUzByMToYR7yJW8dMbkus",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 3782,
+      "vicinity": "1570 Farm to Market Road 1382, Cedar Hill"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.90013,
+          "lng": -96.77556
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.9017962802915,
+            "lng": -96.77441526970851
+          },
+          "southwest": {
+            "lat": 32.8990983197085,
+            "lng": -96.77711323029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+      "icon_background_color": "#7B9EB0",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+      "name": "North Haven Gardens",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/107553184210121124904\">Brittany Pedigo</a>"
+          ],
+          "photo_reference": "ATKogpf7xcvSivp7m6IxG4ChiHzYpSliJlAtIn9lwtjphHAa7zJtU8mf0Ay7SUhtUz8rtWkT4MQHGrWDVri8D3XZAR1y_RyfEA1toNfYXGygGeWjpWvqn-jUAWnEUbiyh_7Wq6MmuCDntOojxbETYvuncq1gaHEiLKa5b1X8cWNNNm853M836hQDbP_X8FWF_vAzVpmIXjCPRXADX3kxG5Hl0GGRAJghM_YpNfpdPIW2zFCWlUu81wCcPBS16gDwyNlAbskStfLu-Jr2UjxrxX3uOfJqBKYlrCX2QFWZr95-xEfuGGPCFjwnbyx-Fxib_FJ4sNulNF7hUqoWs40DMsRULJBYByQc9ZCca-SE_c6mUwJ2rCTU32v0apRQ_DZUwxj02YK2pbfqrI9zCSJANPGhvoyqexIna2OzNWKyD68SRxD70Ck2Ua1f5Io1SeN_6GR3NQzfj22SATGcVfsei3p8VWZJdtHYrNY6mQDTv1TVdkVWN1DABdKz1NlK5_J1FhyzQXjeSiDsYts7jyWWZUWGgS5Kiy8BRRybYP1w2YmaIFcZ_TRlVsdZ0p25q_riECSKJ8f0Oycxqri2a2rev8XWi7LfWIB4QkdP8YDyr6bK3vN13YKucZKzN1gvY1YVtnnxD1ZcHs6b",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "plus_code": {
+        "compound_code": "W62F+3Q Dallas, TX, USA",
+        "global_code": "8645W62F+3Q"
+      },
+      "price_level": 3,
+      "rating": 4.7,
+      "reference": "ChIJk-Y0CnQgTIYRIk80cUbLr7g",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "user_ratings_total": 899,
+      "vicinity": "7700 Northaven Road, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.85784809999999,
+          "lng": -96.7144113
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.86486625000001,
+            "lng": -96.711758
+          },
+          "southwest": {
+            "lat": 32.85119965000001,
+            "lng": -96.72075759999998
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Norbuck Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 2952,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/102888938745057128661\">Nalasi Mendy</a>"
+          ],
+          "photo_reference": "ATKogpdS3qw5BQ2OnASLVlYO_JRBFd2F-GzS0UmPPwqVX0a5Khj0K4PJKueIR_MfbVywtRQBgFwJyrpzgZ0Sh6U8GkcUWlNnE3ghvu3lA4EqIcXCvGvKD6DlSc4AfBU88cjIddZVmlfNp9xObUK2Jx1bn1c7MPic3fO0VJe0R2AYbdZnDeZ4cU6e_r2ZDbgo3pRoeuLqUo5Xcr7F30YKDyUsH8neWbxsTfCI2z-w8GdPT45dt6PBF64Yo3KwjzTr-kRNYVt4yns0Ap4nuJpqJUrz3zjXFbiIVotaT1IUhey3aqoyZU7URWCpXXFykfRbCi62EDi6lC2g0lFnOE86_194O-1iiHTO3KzkjCQy2W4kjJP6BiMKzbqhZAlg_ay5sqKVIXDBdTakeKey9yo1eCfHalfVZpQ7elLtjO1sdBmuHgS2nRGyUaA9M7w0toWscHFwgA-Pn9XU5DrnpHUH2jpgKzSVt4ljlZZBsG5Xr25_WoVq8JmE_d2y6m15-DuqKe2Khgt0nGCvhyzbCq_OcByNyb1HRz4IuyA4LgbiSjncRvmFZfXVKflWqq-eoIjKWohRcudysOX2u7olLIfcA_EdoanPpNeOraN1qR4DvQjES0RyS-5fI24eGwtKa4i1neGzjxASHRTL",
+          "width": 5248
+        }
+      ],
+      "place_id": "ChIJyUp9NVKgToYR65eZ97F4neo",
+      "plus_code": {
+        "compound_code": "V75P+46 Dallas, TX, USA",
+        "global_code": "8645V75P+46"
+      },
+      "rating": 4.4,
+      "reference": "ChIJyUp9NVKgToYR65eZ97F4neo",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 523,
+      "vicinity": "200 North Buckner Boulevard, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.8268333,
+          "lng": -96.8011782
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.8282048302915,
+            "lng": -96.79972651970849
+          },
+          "southwest": {
+            "lat": 32.82550686970851,
+            "lng": -96.80242448029149
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Lakeside Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 4000,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/111532420734731905675\">Brad Hall</a>"
+          ],
+          "photo_reference": "ATKogpcWa5-FegF2pOcwsbS8fI0qEzselSn6Q-y7HiJjF4-LwLA195Iqepy3Xc6n7GtShA660uNnGN-xs-Ju3jSn3KEmrhMCL4jGuioQ5HSGUwEFrUukUbuyx_68CbZTsSnLqK_jHFEMZXkXwSJjHuaH4NeMIfXkDl9-9ztuYj3u__kWeaerLEzMCV8ZMtOzlqL20JuTEZ8KEEIeBMlYqGqK8lCYgIqxSXLYb4nMZdk14dTkUEgHLJMURsPf0CJyOOsRNgUEoajcKC_iEVaUqfb-ALYErUD3IdM87y0M8aL_FcU9nYzRMoW8STSCQJwmNxHy_Hog9W99YGTwpPeVv_36YHRTPJJvcORH02ma2zbcQ25_McOT29gRJIbxSJIPCg79LJopirCT0eTPZLNmSGbmf7ZjPi-IMsWQ0ztyeXfzOhOo3p8bi4zcJVdZ2FXAX61Sx3PLMPXB0PRRuu_x4pSC9Rd5xGIXL_683-0It7_UYdVv5gWsIM7ZgLEf0LXcDg4asb8RAa4M0LhNWf0vMzyqKBYLKW9-C4IwdZvyiMfFYDeqRR2NEpBgX0-nxQU0N72KXu8uUfqrdOwFqJF0No0UnrvvEXRYByr5e5IB2R-nE2CjDmn4Ha3bZPbKuNbjamn1KZ7J9w",
+          "width": 3000
+        }
+      ],
+      "place_id": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "plus_code": {
+        "compound_code": "R5GX+PG Dallas, TX, USA",
+        "global_code": "8645R5GX+PG"
+      },
+      "rating": 4.7,
+      "reference": "ChIJZTZek-eeToYRCKwu_h9KC7E",
+      "scope": "GOOGLE",
+      "types": [
+        "tourist_attraction",
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 964,
+      "vicinity": "4601 Lakeside Drive, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.6930718,
+          "lng": -96.79168229999999
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.6948382302915,
+            "lng": -96.7904347697085
+          },
+          "southwest": {
+            "lat": 32.6921402697085,
+            "lng": -96.79313273029152
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Nomamiukor Dora I",
+      "place_id": "ChIJoV7orp-XToYR7WTvrWrhfSw",
+      "plus_code": {
+        "compound_code": "M6V5+68 Dallas, TX, USA",
+        "global_code": "8645M6V5+68"
+      },
+      "reference": "ChIJoV7orp-XToYR7WTvrWrhfSw",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "point_of_interest",
+        "establishment"
+      ],
+      "vicinity": "4500 South Lancaster Road #140, Dallas"
+    },
+    {
+      "business_status": "OPERATIONAL",
+      "geometry": {
+        "location": {
+          "lat": 32.832566,
+          "lng": -96.7785114
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 32.83352728029149,
+            "lng": -96.7778063197085
+          },
+          "southwest": {
+            "lat": 32.83082931970849,
+            "lng": -96.78050428029151
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/park-71.png",
+      "icon_background_color": "#4DB546",
+      "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet",
+      "name": "Glencoe Park",
+      "opening_hours": {
+        "open_now": false
+      },
+      "photos": [
+        {
+          "height": 3024,
+          "html_attributions": [
+            "<a href=\"https://maps.google.com/maps/contrib/102383517303626037461\">Michael “Mike”</a>"
+          ],
+          "photo_reference": "ATKogpfQnrJnR-34jsjUBt--sn0hAm2xEpsPIkVc9b-Y6dzxmLrz8d9yQkXdxSUwYm2SKB6-K55kTzghkSvRUrBrK_oDPghwqhuhmiV044aD1rULvHldUl4e-zpww7Jnu3Gv4yReOvg2chisWi962XGPx6GiUaJ0SJcRLzk6eSBaxYtvu0ScjWSdj34NniCDePNLIZ6NwtqKfDQqUnMT8KOj447VL67hRJCPdYTZQcZX6J7dhO8jfSeQaNKIpfatffu484--YAigZPQhQE3swMGjIJbNM5au72vEJMe9HJ1U3MSwyfYjVqOpQIUIuTVvX4BCbJbQb7C2X_zwLmhk8ME6s_63PTMmvaCuYa-z9AUq4OAwy7mTrrG6z6OJFKXtjNuOEXALnSfQ4jyYcH3SR44A2fH7qUz5WfTdH2yOJlDDIEOaDEP28a1sQS7ek2UF3H-ZNX6g3yWMSjeABr5OkSdoiu2jjsS0R12Ob3HkrJ6JJYruCKz-76YZESxzjmTSlIN9KjadRf_wVJE_ukv6cM0IXdz2kdfDI_6mID5hXVyxB5PJHJLAX2T-mTFgS3TfE-WBkbo41M5Xrai9Efm44ON5mOb80d4rxhxoro0sPaw6w4NsvvQGG1kK7a5CtPFQqKVl",
+          "width": 4032
+        }
+      ],
+      "place_id": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "plus_code": {
+        "compound_code": "R6MC+2H Dallas, TX, USA",
+        "global_code": "8645R6MC+2H"
+      },
+      "rating": 4.5,
+      "reference": "ChIJ59R52RafToYRRbwQaQXu62w",
+      "scope": "GOOGLE",
+      "types": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "user_ratings_total": 569,
+      "vicinity": "3700 Glencoe Street, Dallas"
     }
   ],
   "status": "OK"

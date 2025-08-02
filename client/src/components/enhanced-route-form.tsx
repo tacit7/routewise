@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, Flag, Plus, X, Loader2 } from "lucide-react";
+import { MapPin, Flag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -16,11 +16,6 @@ interface PlaceSuggestion {
   secondary_text: string;
 }
 
-interface Checkpoint {
-  id: string;
-  place: PlaceSuggestion | null;
-  displayName: string;
-}
 
 const routeSchema = z.object({
   startCity: z.string().min(1, "Please select a starting city"),
@@ -31,7 +26,6 @@ type RouteFormData = z.infer<typeof routeSchema>;
 
 export default function EnhancedRouteForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [startPlace, setStartPlace] = useState<PlaceSuggestion | null>(null);
   const [endPlace, setEndPlace] = useState<PlaceSuggestion | null>(null);
   const { toast } = useToast();
@@ -45,26 +39,6 @@ export default function EnhancedRouteForm() {
     },
   });
 
-  const addCheckpoint = () => {
-    const newCheckpoint: Checkpoint = {
-      id: `checkpoint-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      place: null,
-      displayName: "",
-    };
-    setCheckpoints([...checkpoints, newCheckpoint]);
-  };
-
-  const removeCheckpoint = (id: string) => {
-    setCheckpoints(checkpoints.filter(checkpoint => checkpoint.id !== id));
-  };
-
-  const updateCheckpoint = (id: string, place: PlaceSuggestion) => {
-    setCheckpoints(checkpoints.map(checkpoint => 
-      checkpoint.id === id 
-        ? { ...checkpoint, place, displayName: place.main_text }
-        : checkpoint
-    ));
-  };
 
   const handleStartCitySelect = (place: PlaceSuggestion) => {
     setStartPlace(place);
@@ -90,16 +64,6 @@ export default function EnhancedRouteForm() {
       return;
     }
 
-    // Validate checkpoints have valid places selected
-    const invalidCheckpoints = checkpoints.filter(cp => !cp.place);
-    if (invalidCheckpoints.length > 0) {
-      toast({
-        title: "Invalid checkpoints",
-        description: "Please select valid cities for all checkpoints or remove them.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     setIsLoading(true);
     
@@ -110,11 +74,7 @@ export default function EnhancedRouteForm() {
         endCity: data.endCity,
         startPlace,
         endPlace,
-        checkpoints: checkpoints.map(cp => ({
-          id: cp.id,
-          place: cp.place,
-          displayName: cp.displayName,
-        })),
+        checkpoints: [],
       };
       
       // Simulate processing time for better UX
@@ -123,24 +83,15 @@ export default function EnhancedRouteForm() {
       // Store route data for the results page
       localStorage.setItem('currentRoute', JSON.stringify(routeData));
       
-      // Build URL with checkpoints
-      const checkpointParams = checkpoints
-        .map(cp => `checkpoint=${encodeURIComponent(cp.displayName)}`)
-        .join('&');
-      
-      const baseUrl = `/route?start=${encodeURIComponent(data.startCity)}&end=${encodeURIComponent(data.endCity)}`;
-      const finalUrl = checkpointParams ? `${baseUrl}&${checkpointParams}` : baseUrl;
+      // Build URL
+      const finalUrl = `/route?start=${encodeURIComponent(data.startCity)}&end=${encodeURIComponent(data.endCity)}`;
       
       // Navigate to route results page
       setLocation(finalUrl);
       
-      const checkpointText = checkpoints.length > 0 
-        ? ` with ${checkpoints.length} checkpoint${checkpoints.length === 1 ? '' : 's'}`
-        : '';
-      
       toast({
         title: "Route planned!",
-        description: `Preparing your route${checkpointText} with embedded map...`,
+        description: `Preparing your route with embedded map...`,
       });
     } catch (error) {
       toast({
@@ -189,64 +140,6 @@ export default function EnhancedRouteForm() {
         </div>
       </div>
 
-      {/* Checkpoints Section */}
-      {checkpoints.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-slate-700">
-              Stops along the way
-            </Label>
-          </div>
-          
-          <div className="space-y-3">
-            {checkpoints.map((checkpoint, index) => (
-              <div key={checkpoint.id} className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-blue-600">
-                    {index + 1}
-                  </span>
-                </div>
-                
-                <div className="flex-grow">
-                  <PlaceAutocomplete
-                    value={checkpoint.displayName}
-                    onSelect={(place) => updateCheckpoint(checkpoint.id, place)}
-                    placeholder={`Stop ${index + 1} - Select a city`}
-                    className="w-full"
-                  />
-                </div>
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeCheckpoint(checkpoint.id)}
-                  className="flex-shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Add Checkpoint Button */}
-      <div className="flex justify-center">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addCheckpoint}
-          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
-          disabled={checkpoints.length >= 8} // Reasonable limit
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Stop
-          {checkpoints.length >= 8 && (
-            <span className="ml-2 text-xs text-gray-500">(Max 8)</span>
-          )}
-        </Button>
-      </div>
       
       <Button 
         type="submit" 
@@ -262,11 +155,6 @@ export default function EnhancedRouteForm() {
           <>
             <i className="fas fa-route mr-2" />
             Plan My Route
-            {checkpoints.length > 0 && (
-              <span className="ml-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs">
-                +{checkpoints.length}
-              </span>
-            )}
           </>
         )}
       </Button>

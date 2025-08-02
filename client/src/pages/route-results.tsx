@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Flag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -17,10 +17,6 @@ interface RouteData {
 
 // Helper function to extract city from POI data
 const extractCityFromPoi = (poi: Poi): string | null => {
-  // For checkpoint POIs, use timeFromStart
-  if (poi.timeFromStart && poi.timeFromStart.startsWith('In ')) {
-    return poi.timeFromStart.replace('In ', '').toLowerCase().trim();
-  }
   
   // For route POIs, try to extract city from address
   if (poi.address) {
@@ -70,10 +66,7 @@ export default function RouteResults() {
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
-  const [checkpoints, setCheckpoints] = useState<string[]>([]);
-  const [showCheckpointForm, setShowCheckpointForm] = useState<boolean>(false);
   const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
-  const [newCheckpoint, setNewCheckpoint] = useState<string>('');
   const { toast } = useToast();
 
   // Fetch Google Maps API key
@@ -99,37 +92,9 @@ export default function RouteResults() {
     enabled: !!routeData, // Only run query when we have route data
   });
 
-  // Fetch POIs for checkpoint cities
-  const { data: checkpointPois, isLoading: checkpointPoisLoading } = useQuery<Poi[]>({
-    queryKey: ["/api/checkpoint-pois", checkpoints],
-    queryFn: async () => {
-      if (checkpoints.length === 0) return [];
-      
-      const allCheckpointPois: Poi[] = [];
-      
-      // Fetch places for each checkpoint
-      for (const checkpoint of checkpoints) {
-        try {
-          const response = await fetch(`/api/pois?checkpoint=${encodeURIComponent(checkpoint)}`);
-          if (response.ok) {
-            const checkpointPlaces: Poi[] = await response.json();
-            allCheckpointPois.push(...checkpointPlaces);
-          }
-        } catch (error) {
-          console.error(`Failed to fetch places for checkpoint ${checkpoint}:`, error);
-        }
-      }
-      
-      return allCheckpointPois;
-    },
-    enabled: checkpoints.length > 0,
-  });
 
-  // Combine route POIs and checkpoint POIs
-  const allPois = [...(pois || []), ...(checkpointPois || [])];
-  
   // Remove duplicates based on placeId
-  const uniquePois = allPois.filter((poi, index, self) => 
+  const uniquePois = (pois || []).filter((poi, index, self) => 
     index === self.findIndex(p => p.placeId === poi.placeId)
   );
 
@@ -143,10 +108,6 @@ export default function RouteResults() {
       citySet.add(routeData.endCity.toLowerCase());
     }
     
-    // Add checkpoint cities
-    checkpoints.forEach(checkpoint => {
-      citySet.add(checkpoint.toLowerCase());
-    });
     
     // Debug: log some POI data to understand the structure
     if (uniquePois.length > 0) {
@@ -172,7 +133,7 @@ export default function RouteResults() {
     
     console.log('Available cities:', cities);
     return cities;
-  }, [uniquePois, routeData, checkpoints]);
+  }, [uniquePois, routeData]);
 
   const filteredPois = uniquePois.filter(poi => {
     const categoryMatch = selectedCategory === 'all' || poi.category === selectedCategory;
@@ -247,16 +208,10 @@ export default function RouteResults() {
     return null;
   }
 
-  // Prepare waypoints for Google Maps embed
-  const waypoints = checkpoints.join('|');
+  // Prepare Google Maps URLs
+  const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
   
-  const googleMapsDirectUrl = checkpoints.length > 0 
-    ? `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${checkpoints.map(c => encodeURIComponent(c)).join('/')}/${encodeURIComponent(routeData.endCity)}`
-    : `https://www.google.com/maps/dir/${encodeURIComponent(routeData.startCity)}/${encodeURIComponent(routeData.endCity)}`;
-  
-  const googleMapsEmbedUrl = checkpoints.length > 0
-    ? `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&waypoints=${encodeURIComponent(waypoints)}&mode=driving`
-    : `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${mapsApiData?.apiKey || ''}&origin=${encodeURIComponent(routeData.startCity)}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
 
   const handleSaveRoute = async () => {
     if (!routeData || uniquePois.length === 0) return;
@@ -271,7 +226,7 @@ export default function RouteResults() {
           startCity: routeData.startCity,
           endCity: routeData.endCity,
           poisIds: uniquePois.map(poi => poi.id),
-          checkpoints: checkpoints,
+          checkpoints: [],
         }),
       });
 
@@ -279,10 +234,9 @@ export default function RouteResults() {
         throw new Error('Failed to save route');
       }
 
-      const checkpointText = checkpoints.length > 0 ? ` with ${checkpoints.length} checkpoint${checkpoints.length > 1 ? 's' : ''}` : '';
       toast({
         title: "Route Saved!",
-        description: `Your route from ${routeData.startCity} to ${routeData.endCity}${checkpointText} has been saved with ${uniquePois.length} places.`,
+        description: `Your route from ${routeData.startCity} to ${routeData.endCity} has been saved with ${uniquePois.length} places.`,
       });
     } catch (error) {
       toast({
@@ -293,25 +247,6 @@ export default function RouteResults() {
     }
   };
 
-  const addCheckpoint = () => {
-    if (newCheckpoint.trim() && !checkpoints.includes(newCheckpoint.trim())) {
-      setCheckpoints([...checkpoints, newCheckpoint.trim()]);
-      setNewCheckpoint('');
-      setShowCheckpointForm(false);
-      toast({
-        title: "Checkpoint Added",
-        description: `Added ${newCheckpoint.trim()} to your route`,
-      });
-    }
-  };
-
-  const removeCheckpoint = (checkpoint: string) => {
-    setCheckpoints(checkpoints.filter(c => c !== checkpoint));
-    toast({
-      title: "Checkpoint Removed",
-      description: `Removed ${checkpoint} from your route`,
-    });
-  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -338,7 +273,7 @@ export default function RouteResults() {
             <ItineraryComponent
               startCity={routeData.startCity}
               endCity={routeData.endCity}
-              checkpoints={checkpoints}
+              checkpoints={[]}
               pois={uniquePois}
               onUpdateSelectedPois={handleUpdateSelectedPois}
               onSaveRoute={handleSaveRoute}
@@ -362,63 +297,10 @@ export default function RouteResults() {
                 <div className="text-right">
                   <div className="text-sm text-blue-100">Total Places Found</div>
                   <div className="text-3xl font-bold">{uniquePois.length}</div>
-                  {checkpoints.length > 0 && (
-                    <div className="text-xs text-blue-200">Including checkpoint places</div>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* Checkpoints Section */}
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-800">Checkpoints</h3>
-                <Button
-                  onClick={() => setShowCheckpointForm(!showCheckpointForm)}
-                  variant="outline"
-                  size="sm"
-                >
-                  {showCheckpointForm ? 'Cancel' : 'Add Checkpoint'}
-                </Button>
-              </div>
-
-              {showCheckpointForm && (
-                <div className="mb-4 flex gap-2">
-                  <input
-                    type="text"
-                    value={newCheckpoint}
-                    onChange={(e) => setNewCheckpoint(e.target.value)}
-                    placeholder="Enter city or landmark"
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyPress={(e) => e.key === 'Enter' && addCheckpoint()}
-                  />
-                  <Button onClick={addCheckpoint} size="sm">
-                    Add
-                  </Button>
-                </div>
-              )}
-
-              {checkpoints.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {checkpoints.map((checkpoint, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-                    >
-                      <span>{checkpoint}</span>
-                      <button
-                        onClick={() => removeCheckpoint(checkpoint)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-sm">No checkpoints added. Add strategic stops to customize your route.</p>
-              )}
-            </div>
 
             {/* Interactive Google Maps Component */}
             <div className="p-6">
@@ -432,7 +314,7 @@ export default function RouteResults() {
               <InteractiveMap
                 startCity={routeData.startCity}
                 endCity={routeData.endCity}
-                checkpoints={checkpoints}
+                checkpoints={[]}
                 pois={uniquePois}
                 selectedPoiIds={selectedPoiIds}
                 onPoiClick={handlePoiClick}
@@ -449,19 +331,26 @@ export default function RouteResults() {
               Amazing Places Along Your Route
             </h2>
 
-            {(poisLoading || checkpointPoisLoading) && (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                ))}
+            {poisLoading && (
+              <div className="space-y-6">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                  <p className="text-lg font-medium text-slate-700">Discovering amazing places...</p>
+                  <p className="text-sm text-slate-500 mt-1">This may take a few moments</p>
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="space-y-3">
+                      <Skeleton className="h-48 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {!poisLoading && !checkpointPoisLoading && uniquePois.length === 0 && (
+            {!poisLoading && uniquePois.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🗺️</div>
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">No Places Found</h3>
@@ -473,15 +362,6 @@ export default function RouteResults() {
 
             {uniquePois.length > 0 && (
               <>
-                {/* Loading indicator for checkpoint places */}
-                {checkpoints.length > 0 && checkpointPoisLoading && (
-                  <div className="mb-4 text-center">
-                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
-                      Loading places from your checkpoints...
-                    </div>
-                  </div>
-                )}
 
                 {/* City Filters */}
                 {availableCities.length > 0 && (
