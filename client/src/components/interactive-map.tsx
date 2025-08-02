@@ -9,6 +9,7 @@ interface InteractiveMapProps {
   checkpoints?: string[];
   pois?: Poi[];
   selectedPoiIds?: number[];
+  hoveredPoi?: Poi | null;
   onPoiClick?: (poi: Poi) => void;
   onPoiSelect?: (poiId: number, selected: boolean) => void;
   className?: string;
@@ -30,18 +31,32 @@ const getCategoryColor = (category: string): string => {
 };
 
 // Create marker icon with category-specific colors
-const createMarkerIcon = (category: string, isSelected = false): google.maps.Icon => {
-  const color = getCategoryColor(category);
-  const strokeColor = isSelected ? '#000000' : '#FFFFFF';
-  const strokeWidth = isSelected ? 3 : 2;
+const createMarkerIcon = (category: string, isSelected = false, isHovered = false): google.maps.Icon => {
+  let color = getCategoryColor(category); // Use category color by default
+  let strokeColor = '#FFFFFF';
+  let strokeWidth = 2;
+  let scale = 12; // Bigger default size
+  
+  if (isSelected) {
+    color = '#22C55E'; // Green color only when selected
+    strokeColor = '#000000';
+    strokeWidth = 3;
+    scale = 14;
+  }
+  
+  if (isHovered) {
+    strokeColor = '#FFD700'; // Gold for hover
+    strokeWidth = 4;
+    scale = 16; // Even bigger on hover
+  }
   
   return {
     path: google.maps.SymbolPath.CIRCLE,
     fillColor: color,
-    fillOpacity: 0.8,
+    fillOpacity: isHovered ? 1.0 : 0.8,
     strokeColor: strokeColor,
     strokeWeight: strokeWidth,
-    scale: isSelected ? 12 : 8,
+    scale: scale,
   };
 };
 
@@ -51,6 +66,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   checkpoints = [],
   pois = [],
   selectedPoiIds = [],
+  hoveredPoi,
   onPoiClick,
   onPoiSelect,
   className = '',
@@ -59,6 +75,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const poiMarkersRef = useRef<Map<number, google.maps.Marker>>(new Map());
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null);
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
@@ -263,29 +280,36 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
   };
 
-  // Update POI markers
-  const updatePoiMarkers = useCallback(() => {
+  // Create or update POI markers
+  const createPoiMarkers = useCallback(() => {
     if (!mapInstanceRef.current) return;
 
-    // Clear existing POI markers (keep route markers)
-    const routeMarkerCount = 2 + checkpoints.length; // start + end + checkpoints
-    const poiMarkers = markersRef.current.slice(routeMarkerCount);
-    poiMarkers.forEach(marker => marker.setMap(null));
-    markersRef.current = markersRef.current.slice(0, routeMarkerCount);
+    // Remove markers for POIs that no longer exist
+    const currentPoiIds = new Set(pois.map(poi => poi.placeId || poi.id));
+    poiMarkersRef.current.forEach((marker, poiId) => {
+      if (!currentPoiIds.has(poiId)) {
+        marker.setMap(null);
+        poiMarkersRef.current.delete(poiId);
+      }
+    });
 
-    // Add POI markers
     pois.forEach(poi => {
       if (!poi.address) return;
+
+      // Skip if marker already exists
+      const poiIdentifier = poi.placeId || poi.id;
+      if (poiMarkersRef.current.has(poiIdentifier)) return;
 
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address: poi.address }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           const isSelected = selectedPoiIds.includes(poi.id);
+          const isHovered = hoveredPoi && (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id);
           const marker = new google.maps.Marker({
             position: results[0].geometry.location,
             map: mapInstanceRef.current,
             title: poi.name,
-            icon: createMarkerIcon(poi.category, isSelected),
+            icon: createMarkerIcon(poi.category, isSelected, isHovered),
           });
 
           // Add click listener
@@ -321,11 +345,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             }
           });
 
-          markersRef.current.push(marker);
+          // Store the marker for future updates
+          const poiIdentifier = poi.placeId || poi.id;
+          poiMarkersRef.current.set(poiIdentifier, marker);
         }
       });
     });
-  }, [pois, selectedPoiIds, onPoiClick, onPoiSelect, checkpoints.length]);
+  }, [pois, onPoiClick, onPoiSelect]);
+
+  // Update marker icons based on selection and hover state
+  const updateMarkerIcons = useCallback(() => {
+    pois.forEach(poi => {
+      const poiIdentifier = poi.placeId || poi.id;
+      const marker = poiMarkersRef.current.get(poiIdentifier);
+      if (marker) {
+        const isSelected = selectedPoiIds.includes(poi.id);
+        const isHovered = hoveredPoi && (hoveredPoi.placeId || hoveredPoi.id) === poiIdentifier;
+        marker.setIcon(createMarkerIcon(poi.category, isSelected, isHovered));
+      }
+    });
+  }, [pois, selectedPoiIds, hoveredPoi]);
 
   // Setup global toggle function for info window buttons
   useEffect(() => {
@@ -351,12 +390,20 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   }, [googleMapsKey, initializeMap]);
 
-  // Update POI markers when pois or selection changes
+  // Create POI markers when pois change
   useEffect(() => {
     if (!isLoading && mapInstanceRef.current) {
-      updatePoiMarkers();
+      createPoiMarkers();
     }
-  }, [pois, selectedPoiIds, updatePoiMarkers, isLoading]);
+  }, [pois, createPoiMarkers, isLoading]);
+
+  // Update marker icons when selection or hover changes
+  useEffect(() => {
+    if (!isLoading && mapInstanceRef.current) {
+      updateMarkerIcons();
+    }
+  }, [selectedPoiIds, hoveredPoi, updateMarkerIcons, isLoading]);
+
 
   // Update route when checkpoints change
   useEffect(() => {
@@ -364,6 +411,19 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       loadRoute();
     }
   }, [checkpoints, loadRoute, isLoading]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Clear all POI markers
+      poiMarkersRef.current.forEach(marker => marker.setMap(null));
+      poiMarkersRef.current.clear();
+      
+      // Clear route markers
+      markersRef.current.forEach(marker => marker.setMap(null));
+      markersRef.current = [];
+    };
+  }, []);
 
   if (error) {
     return (
