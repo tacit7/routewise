@@ -7,10 +7,11 @@ import {
   Plus,
   X,
   ExternalLink,
+  Map,
 } from "lucide-react";
 import type { Poi } from "@shared/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PoiCardProps {
@@ -21,8 +22,36 @@ export default function PoiCard({ poi }: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
   const [isAdded, setIsAdded] = useState(false);
+  const [isAddedToTrip, setIsAddedToTrip] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
+
+  // Check if POI is already saved on mount and listen for updates
+  useEffect(() => {
+    const checkSavedStatus = () => {
+      const savedPlaces = JSON.parse(localStorage.getItem("myPlaces") || "[]");
+      const tripPlaces = JSON.parse(localStorage.getItem("tripPlaces") || "[]");
+      
+      // Use placeId as primary identifier if available, fallback to id
+      const poiIdentifier = poi.placeId || poi.id;
+      const isInSaved = savedPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
+      const isInTrip = tripPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
+      
+      setIsAdded(isInSaved);
+      setIsAddedToTrip(isInTrip);
+    };
+
+    checkSavedStatus();
+
+    // Listen for trip updates
+    window.addEventListener("tripUpdated", checkSavedStatus);
+    window.addEventListener("storage", checkSavedStatus);
+
+    return () => {
+      window.removeEventListener("tripUpdated", checkSavedStatus);
+      window.removeEventListener("storage", checkSavedStatus);
+    };
+  }, [poi.id]);
 
   const handleAddPlace = () => {
     // Save to localStorage for persistence
@@ -45,6 +74,33 @@ export default function PoiCard({ poi }: PoiCardProps) {
       title: "Place added!",
       description: `${poi.name} has been added to your places.`,
     });
+  };
+
+  const handleAddToTrip = () => {
+    // Save to localStorage for trip
+    const tripPlaces = JSON.parse(localStorage.getItem("tripPlaces") || "[]");
+    const poiIdentifier = poi.placeId || poi.id;
+    const isAlreadyInTrip = tripPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
+
+    if (isAlreadyInTrip) {
+      toast({
+        title: "Already in trip",
+        description: `${poi.name} is already in your trip.`,
+      });
+      return;
+    }
+
+    tripPlaces.push(poi);
+    localStorage.setItem("tripPlaces", JSON.stringify(tripPlaces));
+    setIsAddedToTrip(true);
+
+    toast({
+      title: "Added to trip!",
+      description: `${poi.name} has been added to your trip.`,
+    });
+
+    // Dispatch custom event for same-tab updates  
+    window.dispatchEvent(new Event("tripUpdated"));
   };
 
   return (
@@ -107,28 +163,52 @@ export default function PoiCard({ poi }: PoiCardProps) {
           </button>
         </div>
 
-        {/* Add to Places Button */}
-        <button
-          onClick={handleAddPlace}
-          disabled={isAdded}
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
-            isAdded
-              ? "bg-green-100 text-green-700 border border-green-200"
-              : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
-          }`}
-        >
-          {isAdded ? (
-            <>
-              <Heart className="h-4 w-4 mr-2 fill-current" />
-              Added to My Places
-            </>
-          ) : (
-            <>
-              <Plus className="h-4 w-4 mr-2" />
-              Add to My Places
-            </>
-          )}
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleAddPlace}
+            disabled={isAdded}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+              isAdded
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
+            }`}
+          >
+            {isAdded ? (
+              <>
+                <Heart className="h-4 w-4 mr-2 fill-current" />
+                Saved
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                Save Place
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={handleAddToTrip}
+            disabled={isAddedToTrip}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+              isAddedToTrip
+                ? "bg-purple-100 text-purple-700 border border-purple-200"
+                : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
+            }`}
+          >
+            {isAddedToTrip ? (
+              <>
+                <Map className="h-4 w-4 mr-2 fill-current" />
+                In Trip
+              </>
+            ) : (
+              <>
+                <Map className="h-4 w-4 mr-2" />
+                Add to Trip
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Details Modal */}
@@ -221,12 +301,34 @@ export default function PoiCard({ poi }: PoiCardProps) {
                   {isAdded ? (
                     <>
                       <Heart className="h-5 w-5 mr-2 fill-current" />
-                      Added to My Places
+                      Saved to Places
                     </>
                   ) : (
                     <>
                       <Plus className="h-5 w-5 mr-2" />
-                      Add to My Places
+                      Save Place
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleAddToTrip}
+                  disabled={isAddedToTrip}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+                    isAddedToTrip
+                      ? "bg-purple-100 text-purple-700 border border-purple-200"
+                      : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
+                  }`}
+                >
+                  {isAddedToTrip ? (
+                    <>
+                      <Map className="h-5 w-5 mr-2 fill-current" />
+                      Added to Trip
+                    </>
+                  ) : (
+                    <>
+                      <Map className="h-5 w-5 mr-2" />
+                      Add to Trip
                     </>
                   )}
                 </button>
