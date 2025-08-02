@@ -609,3 +609,357 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 **Related:** [[Project Documentation]] [[Development Workflow]] [[AI Assistance]]
 
 ---
+
+## Claude Code Commands
+
+### Creating Custom Slash Commands for Claude Code
+**Question:** How to add custom /end-session command and persona commands to Claude Code?
+**Error/Issue:** Initially thought commands needed to be external Node.js files, discovered Claude Code supports custom commands via markdown files
+**Context:** Wanted to add /end-session command that reads FAQ update prompt and 16 persona specialist commands for RouteWise development
+**Solution:** Created custom slash commands in ~/.claude/commands/ directory using markdown files with frontmatter
+**Code:**
+
+```markdown
+# ~/.claude/commands/end-session.md
+---
+description: "End session cleanup with summary and FAQ update"
+allowed_tools: ["bash", "read", "write", "edit"]
+---
+
+Please help me end this Claude Code session properly by reading and executing the instructions in `~/projects/FAQS/prompts/end-session.md`.
+
+# ~/.claude/commands/persona-backend-api.md  
+---
+description: "Activate backend API specialist for Express.js & PostgreSQL development"
+allowed_tools: ["read", "write", "edit", "bash", "grep", "glob"]
+---
+
+Please read and fully adopt the persona from `~/projects/FAQS/personas/backend-api-specialist.md`.
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#claude-code #slash-commands #custom-commands #personas #automation #solved
+**Related:** [[Claude Code Documentation]] [[Development Workflow]] [[Command Automation]]
+
+---
+
+### Claude Code Slash Command Features and Autocomplete
+**Question:** Will custom commands show autocomplete and descriptions in Claude Code?
+**Error/Issue:** Understanding how Claude Code displays custom commands in the interface
+**Context:** Creating 16+ persona commands and wanting good user experience with autocomplete
+**Solution:** Claude Code provides full autocomplete support for custom commands with descriptions from frontmatter displayed in dropdown
+**Code:**
+
+```markdown
+# Command naming for autocomplete grouping
+/persona-backend-api        - Backend API specialist
+/persona-frontend-components - React components engineer  
+/persona-devops            - CI/CD & infrastructure
+/persona-security          - System hardening specialist
+
+# Features confirmed:
+✅ Tab completion works
+✅ Descriptions show in autocomplete dropdown  
+✅ Commands grouped by prefix (/persona-)
+✅ Built-in commands + custom commands mixed
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#claude-code #autocomplete #user-experience #command-interface #solved
+**Related:** [[Custom Commands]] [[Development Workflow]] [[UI/UX]]
+
+---
+
+## Dashboard UX Improvements
+
+### Personalization Section Showing for Existing Users
+**Question:** Why is "Personalize Your Trip Suggestions" showing even though I already customized my preferences?
+**Error/Issue:** Dashboard was displaying personalization section for all users regardless of their interests configuration status
+**Context:** Dashboard needed conditional rendering based on user's first-time experience and interests configuration
+**Solution:** Added conditional rendering using `useFirstTimeUser` hook with `shouldShowFirstTimeExperience` and `hasInterestsConfigured` flags
+**Code:**
+
+```typescript
+// client/src/pages/dashboard.tsx
+import { useFirstTimeUser } from "@/hooks/use-first-time-user";
+
+const Dashboard = () => {
+  const { shouldShowFirstTimeExperience, hasInterestsConfigured } = useFirstTimeUser();
+  
+  return (
+    // Only show personalization section for first-time users or users without interests
+    {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
+      <section className="mb-12">
+        <div className="flex items-center justify-center mb-4">
+          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
+            <CheckCircle className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
+        </div>
+        {/* Personalization content */}
+      </section>
+    )}
+  );
+};
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #conditional-rendering #user-experience #dashboard #personalization #solved
+**Related:** [[First Time User Experience]] [[User Interests System]] [[Dashboard Layout]]
+
+---
+
+### Trip Card Button Alignment Issues
+**Question:** "Start This Trip" buttons should float to the bottom of the card
+**Error/Issue:** Trip cards had inconsistent button positioning due to varying content heights
+**Context:** Suggested trips cards needed consistent button alignment regardless of description length
+**Solution:** Implemented flexbox layout with `flex flex-col`, `flex-grow`, and `mt-auto` classes for proper button positioning
+**Code:**
+
+```typescript
+// Trip cards with bottom-aligned buttons
+<Card className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+  <div className="relative h-48">
+    <img src={trip.imageUrl} alt={trip.title} className="w-full h-full object-cover" />
+  </div>
+  <CardContent className="p-4 flex flex-col flex-grow">
+    <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
+    <p className="text-sm text-gray-600 mb-2">
+      {trip.startLocation} to {trip.endLocation}
+    </p>
+    <p className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow" style={{
+      display: '-webkit-box',
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: 'vertical'
+    }}>
+      {trip.description}
+    </p>
+    <Button 
+      onClick={() => handleStartTrip(trip)}
+      className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
+    >
+      Start This Trip
+    </Button>
+  </CardContent>
+</Card>
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #flexbox #css #card-layout #button-alignment #user-interface #solved
+**Related:** [[Component Layout]] [[CSS Flexbox]] [[Trip Cards]]
+
+---
+
+### Dashboard Section Layout and Positioning
+**Question:** Suggested trips should float to the bottom of the page
+**Error/Issue:** Dashboard layout needed better visual hierarchy with suggested trips anchored at bottom
+**Context:** Improving dashboard layout to create proper spacing and visual separation between sections
+**Solution:** Used flexbox main container with `flex-grow` spacer to push suggested trips section to bottom of viewport
+**Code:**
+
+```typescript
+// Dashboard with bottom-aligned suggested trips
+<main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
+  <div className="text-center flex-shrink-0">
+    {/* Top Action Buttons */}
+    {/* Personalize Section */}
+  </div>
+
+  {/* Spacer to push Suggested Trips to bottom */}
+  <div className="flex-grow"></div>
+
+  {/* Suggested Trips Section */}
+  <section className="text-center flex-shrink-0">
+    <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
+    {/* Trip cards grid */}
+  </section>
+</main>
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #layout #flexbox #css #dashboard #page-structure #visual-hierarchy #solved
+**Related:** [[Dashboard Layout]] [[CSS Layout]] [[Visual Design]]
+
+---
+
+### Empty State Dashboard Implementation
+**Question:** When user has no trips, it should look like the provided design
+**Error/Issue:** Needed centered empty state layout with custom illustration and call-to-action for users with zero trips
+**Context:** Implementing welcoming empty state that encourages first-time users to start trip planning
+**Solution:** Created conditional layout with custom illustration, centered content, and suggested trips section
+**Code:**
+
+```typescript
+// Empty state for users with no trips
+if (!hasUserTrips) {
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <Header />
+      
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
+        {/* Empty State Hero Section */}
+        <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
+          {/* Heading */}
+          <h1 className="text-4xl font-bold text-gray-900 mb-8">
+            Let's get your next adventure started!
+          </h1>
+          
+          {/* Custom illustration */}
+          <div className="mb-8 flex justify-center">
+            <img 
+              src="/planning.png" 
+              alt="Route planning illustration with road sign and map"
+              className="w-32 h-auto drop-shadow-lg"
+            />
+          </div>
+          
+          {/* Subtext and action button */}
+          <p className="text-xl text-gray-600 mb-12">
+            You haven't planned any trips yet. Start your first adventure below.
+          </p>
+
+          <div className="flex justify-center">
+            <Button 
+              onClick={handlePlanRoadTrip}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+            >
+              <Route className="w-6 h-6 mr-3" />
+              Start Planning
+            </Button>
+          </div>
+        </div>
+
+        {/* Spacer and Suggested Trips Section */}
+        <div className="flex-grow"></div>
+        <section className="text-center flex-shrink-0">
+          {/* Suggested trips for discovery */}
+        </section>
+      </main>
+    </div>
+  );
+}
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #empty-state #user-experience #dashboard #conditional-rendering #custom-illustration #solved
+**Related:** [[Empty State Design]] [[User Onboarding]] [[Custom Assets]]
+
+---
+
+### Custom Image Asset Integration
+**Question:** Can you use this image (~/Downloads/planning.png)?
+**Error/Issue:** Replacing CSS-generated icon with actual custom image asset
+**Context:** Using provided custom illustration for better visual consistency with design
+**Solution:** Copied image to public directory and updated component to reference static asset
+**Code:**
+
+```bash
+# Copy image to public directory
+cp ~/Downloads/planning.png /Users/urielmaldonado/projects/route-wise/frontend/client/public/
+
+# Component usage
+<img 
+  src="/planning.png" 
+  alt="Route planning illustration with road sign and map"
+  className="w-32 h-auto drop-shadow-lg"
+/>
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #static-assets #image-integration #public-directory #custom-illustration #solved
+**Related:** [[Static Assets]] [[Public Directory]] [[Image Optimization]]
+
+---
+
+### Button Simplification and UX Improvement
+**Question:** Instead of two buttons, just have one that says "Start Planning"
+**Error/Issue:** Two action buttons created decision paralysis for users
+**Context:** Simplifying user interface for better conversion and clearer user flow
+**Solution:** Replaced dual buttons with single "Start Planning" button and updated supporting copy
+**Code:**
+
+```typescript
+// Before: Two buttons causing decision paralysis
+<div className="flex flex-col sm:flex-row gap-6 justify-center max-w-lg mx-auto">
+  <Button onClick={handlePlanRoadTrip}>Plan a Road Trip</Button>
+  <Button onClick={handleHelpMePlan}>Help Me Plan a Trip</Button>
+</div>
+
+// After: Single clear call-to-action
+<div className="flex justify-center">
+  <Button 
+    onClick={handlePlanRoadTrip}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+  >
+    <Route className="w-6 h-6 mr-3" />
+    Start Planning
+  </Button>
+</div>
+
+// Updated subtext to match
+<p className="text-xl text-gray-600 mb-12">
+  You haven't planned any trips yet. Start your first adventure below.
+</p>
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #user-experience #button-design #conversion-optimization #decision-paralysis #solved
+**Related:** [[User Interface Design]] [[Conversion Optimization]] [[Call-to-Action]]
+
+---
+
+### Development Server Port Conflict Resolution
+**Question:** Error: listen EADDRINUSE: address already in use 0.0.0.0:3001
+**Error/Issue:** `EADDRINUSE` error when starting development server due to existing process on port 3001
+**Context:** Development server was already running in background, preventing new instance from starting
+**Solution:** Identified and killed existing processes using `lsof` and `kill` commands
+**Code:**
+
+```bash
+# Find processes using port 3001
+lsof -ti:3001
+# Returns PIDs: 30245, 33128
+
+# Check what processes are running
+ps -p 30245,33128 -o pid,command
+
+# Kill the Node.js server process
+kill 33128
+
+# Verify port is free
+lsof -ti:3001
+# Should return empty if successful
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#development #port-conflict #process-management #debugging #server-setup #solved
+**Related:** [[Development Environment]] [[Process Management]] [[Debugging]]
+
+---
