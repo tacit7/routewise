@@ -432,3 +432,180 @@ app.get("/api/pois", async (req, res) => {
 **Related:** [[Google Places Integration]] [[API Architecture]] [[Data Management]]
 
 ---
+
+## Authentication & OAuth
+
+### Google OAuth 503 Service Unavailable Error
+
+**Question:** Getting `GET http://localhost:3001/api/auth/google 503 (Service Unavailable)` error
+**Error/Issue:** 503 Service Unavailable response from Google auth endpoint
+**Context:** Setting up Google OAuth authentication for RouteWise app with existing environment variables configured
+**Solution:** GoogleOAuthService singleton was initialized before environment variables were loaded. Fixed by:
+1. Adding dynamic environment variable reading in service methods (`getCurrentClientId()`, `getCurrentClientSecret()`)
+2. Making `isConfigured()` method re-read env vars at runtime instead of constructor values
+3. Restarting dev server to ensure proper initialization timing
+**Code:**
+
+```typescript
+// server/google-oauth-service.ts - Fixed approach
+export class GoogleOAuthService {
+  private getCurrentClientId(): string {
+    return process.env.GOOGLE_CLIENT_ID || this.CLIENT_ID;
+  }
+
+  private getCurrentClientSecret(): string {
+    return process.env.GOOGLE_CLIENT_SECRET || this.CLIENT_SECRET;
+  }
+
+  isConfigured(): boolean {
+    const currentClientId = this.getCurrentClientId();
+    const currentClientSecret = this.getCurrentClientSecret();
+    return !!(currentClientId && currentClientSecret);
+  }
+
+  getAuthorizationUrl(): string {
+    const params = new URLSearchParams({
+      client_id: this.getCurrentClientId(),
+      redirect_uri: this.getCurrentRedirectUri(),
+      response_type: 'code',
+      scope: 'openid email profile',
+      // ... other params
+    });
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  }
+}
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#oauth #google-auth #503-error #authentication #environment-variables #initialization #solved
+**Related:** [[Authentication System]] [[Environment Configuration]] [[Google OAuth Setup]]
+
+---
+
+### User Authentication State Management Implementation
+
+**Question:** How can I implement user signed in state?
+**Error/Issue:** Need to show authenticated user info and handle Google OAuth flow completion
+**Context:** Implementing complete authentication flow with Google OAuth redirect handling and user state management
+**Solution:** Enhanced existing AuthContext with OAuth redirect parameter handling and toast notifications
+**Code:**
+
+```typescript
+// client/src/components/auth-context.tsx - OAuth handling
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    handleOAuthRedirect();
+    checkAuth();
+  }, []);
+
+  const handleOAuthRedirect = (): void => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    const message = urlParams.get('message');
+
+    if (success === 'google_auth') {
+      toast({
+        title: "Welcome!",
+        description: message || "Successfully signed in with Google",
+      });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (error) {
+      let errorMessage = "Authentication failed";
+      switch (error) {
+        case 'oauth_error':
+          errorMessage = "Google authentication was cancelled or failed";
+          break;
+        case 'auth_failed':
+          errorMessage = message || "Authentication failed";
+          break;
+        // ... other error cases
+      }
+      toast({
+        title: "Authentication Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  };
+};
+
+// Google Sign In Button component
+export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ 
+  disabled = false,
+  text = 'Continue with Google'
+}) => {
+  const handleGoogleSignIn = () => {
+    window.location.href = '/api/auth/google';
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={handleGoogleSignIn}
+      disabled={disabled}
+      className="w-full flex items-center justify-center gap-3"
+    >
+      {/* Google icon SVG */}
+      <span>{text}</span>
+    </Button>
+  );
+};
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#authentication #react-context #oauth #google-signin #user-state #toast-notifications #solved
+**Related:** [[Google OAuth Integration]] [[React Authentication]] [[User Experience]]
+
+---
+
+### CLAUDE.md Documentation Creation
+
+**Question:** How to create comprehensive documentation for future Claude Code instances?
+**Error/Issue:** Need proper project documentation for AI assistance and onboarding
+**Context:** Setting up documentation to help future Claude Code instances understand the project architecture and development workflow
+**Solution:** Created detailed CLAUDE.md with architecture overview, development commands, and key patterns specific to RouteWise
+**Code:**
+
+```markdown
+# CLAUDE.md structure created:
+
+## Development Commands
+- npm run dev (port 3001 with hot reload)
+- npm run dev:no-msw (MSW disabled)
+- npm run build, start, check, test
+- Database: npm run db:push
+
+## Architecture Overview
+- Full-stack TypeScript (React + Express)
+- PostgreSQL with Drizzle ORM + in-memory fallback
+- JWT authentication with Google OAuth
+- Google Places/Directions API integration
+- MSW for development mocking
+
+## Key Patterns
+- Environment loading complexity for OAuth
+- AuthContext with OAuth redirect handling
+- Storage abstraction (PostgreSQL/in-memory)
+- API service layer with caching and fallbacks
+```
+
+**Date:** August 2, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#documentation #claude-code #project-setup #architecture #onboarding #solved
+**Related:** [[Project Documentation]] [[Development Workflow]] [[AI Assistance]]
+
+---
