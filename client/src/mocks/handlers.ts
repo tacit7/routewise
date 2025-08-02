@@ -215,6 +215,75 @@ export const handlers = [
     }
   ),
 
+  // Google Maps DirectionsService.Route API
+  http.get(
+    "https://maps.googleapis.com/maps/api/js/DirectionsService.Route",
+    ({ request }) => {
+      const url = new URL(request.url);
+      const callback = url.searchParams.get("callback");
+      
+      // Extract origin and destination from URL parameters
+      const origin = url.searchParams.get("1m1") || url.searchParams.get("2s") || "Unknown Origin";
+      const destination = url.searchParams.get("2s") || "Unknown Destination";
+      
+      console.log(
+        `🎭 MSW: Intercepted Google Maps DirectionsService.Route - RETURNING MOCK ROUTE from "${origin}" to "${destination}"`
+      );
+
+      // Generate mock route data
+      const mockResponse = {
+        routes: [
+          {
+            legs: [
+              {
+                distance: {
+                  text: "274 mi",
+                  value: 440901
+                },
+                duration: {
+                  text: "4 hours 15 mins",
+                  value: 15300
+                },
+                end_address: `${destination}, TX, USA`,
+                start_address: `${origin}, TX, USA`,
+                steps: [
+                  {
+                    distance: { text: "0.2 mi", value: 322 },
+                    duration: { text: "1 min", value: 60 },
+                    html_instructions: "Head <b>north</b> on Main St",
+                    polyline: { points: "mockPolylinePoints" },
+                    start_location: { lat: 29.4241, lng: -98.4936 },
+                    end_location: { lat: 29.4261, lng: -98.4936 }
+                  }
+                ],
+                start_location: { lat: 29.4241, lng: -98.4936 },
+                end_location: { lat: 32.7767, lng: -96.797 }
+              }
+            ],
+            overview_polyline: {
+              points: "mockOverviewPolylinePoints"
+            },
+            summary: `I-35 N`,
+            warnings: [],
+            waypoint_order: []
+          }
+        ],
+        status: "OK"
+      };
+
+      // Return JSONP response if callback is provided, otherwise JSON
+      const jsonpResponse = callback
+        ? `${callback}(${JSON.stringify(mockResponse)});`
+        : JSON.stringify(mockResponse);
+      
+      console.log(`🎭 MSW: Returning mock route data for ${origin} to ${destination}`);
+
+      return new Response(jsonpResponse, {
+        headers: { "Content-Type": "application/javascript" },
+      });
+    }
+  ),
+
   // Google Maps Tiles API (Vector Tiles)
   http.get("https://maps.googleapis.com/maps/vt", ({ request }) => {
     const url = new URL(request.url);
@@ -242,6 +311,35 @@ export const handlers = [
         "Cache-Control": "public, max-age=86400", // Cache for 1 day like real tiles
         "Access-Control-Allow-Origin": "*",
       },
+    });
+  }),
+
+  // Google Maps Static Assets (cursors, icons, etc.)
+  http.get(/.*maps\.gstatic\.com\/mapfiles\/.*/, ({ request }) => {
+    const url = new URL(request.url);
+    const filename = url.pathname.split('/').pop();
+    
+    console.log(`🎭 MSW: Intercepted Google Maps static asset - ${filename}`);
+    
+    // Return empty response for cursor files (.cur)
+    if (filename && filename.endsWith('.cur')) {
+      // Create minimal cursor file data (empty .cur file)
+      const cursorData = new Uint8Array(0);
+      return new Response(cursorData, {
+        headers: {
+          'Content-Type': 'image/x-icon',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=86400'
+        }
+      });
+    }
+    
+    // For other static assets, return empty response
+    return new Response('', {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=86400'
+      }
     });
   }),
 
@@ -341,42 +439,35 @@ export const handlers = [
         console.log(`🎭 MSW: Generated filename: ${filename}`);
 
         // Try to load the actual mock file from responses directory
-        try {
-          const mockData = await import(`./responses/${filename}`);
-          console.log(`🎭 MSW: Found mock file ${filename} for photo reference`);
-          
-          // Create a simple placeholder image (1x1 gray pixel, scaled to requested size)
-          const grayPixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jgl+4QAAAABJRU5ErkJggg==';
-          const bytes = Uint8Array.from(atob(grayPixel), c => c.charCodeAt(0));
-          
-          return new Response(bytes, {
-            headers: {
-              'Content-Type': 'image/png',
-              'Access-Control-Allow-Origin': '*',
-              'Cache-Control': 'public, max-age=3600',
-              'Content-Length': bytes.length.toString()
-            }
-          });
-        } catch (importError) {
-          console.warn(
-            `🎭 MSW: Could not load mock file ${filename}:`,
-            importError
-          );
-
-          // Fallback: use photo reference as seed for consistent mock images
-          const seed = photoReference.slice(0, 8);
-          const mockImageUrl = `https://picsum.photos/${maxwidth}/400?random=${seed}`;
-
-          console.log(`🎭 MSW: Fallback redirecting to: ${mockImageUrl}`);
-          return Response.redirect(mockImageUrl, 302);
-        }
+        // Always return a static placeholder image instead of trying to load mock files
+        console.log(`🎭 MSW: Returning static placeholder image for photo reference`);
+        
+        // Create a simple placeholder image (1x1 gray pixel, scaled to requested size)
+        const grayPixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jgl+4QAAAABJRU5ErkJggg==';
+        const bytes = Uint8Array.from(atob(grayPixel), c => c.charCodeAt(0));
+        
+        return new Response(bytes, {
+          headers: {
+            'Content-Type': 'image/png',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=3600',
+            'Content-Length': bytes.length.toString()
+          }
+        });
       } catch (error) {
         console.error("🎭 MSW: Error processing photo request:", error);
-        // Fallback to a default placeholder
-        return Response.redirect(
-          `https://picsum.photos/${maxwidth}/400?random=default`,
-          302
-        );
+        // Fallback to a static placeholder image
+        const grayPixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jgl+4QAAAABJRU5ErkJggg==';
+        const bytes = Uint8Array.from(atob(grayPixel), c => c.charCodeAt(0));
+        
+        return new Response(bytes, {
+          headers: {
+            'Content-Type': 'image/png',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=3600',
+            'Content-Length': bytes.length.toString()
+          }
+        });
       }
     }
   ),

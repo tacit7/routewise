@@ -1,29 +1,26 @@
-/**
- * Sanitizes a string to be safe for use as a filename
- * @param input The string to sanitize
- * @param maxLength Maximum length of the sanitized string (default: 20)
- * @returns A sanitized string safe for filenames
- */
-export function sanitizeForFilename(input: string, maxLength: number = 20): string {
-  return input
-    .substring(0, maxLength)
-    .replace(/[^a-zA-Z0-9]/g, "_");
-}
+import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+// Import shared filename utilities
+export { sanitizeForFilename, createSafeFilename } from "../shared/filename-utils.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
- * Creates a safe filename with prefix and extension
- * @param prefix The filename prefix
- * @param identifier The identifier to sanitize
- * @param extension The file extension (default: 'mock.json')
- * @param maxIdentifierLength Maximum length for the identifier part (default: 20)
- * @returns A complete safe filename
+ * Saves an object as a pretty-printed JSON mock file in the mocks/responses directory.
+ * @param filename The mock file name (e.g. 'google-directions-route.mock.json')
+ * @param data The object to serialize and save
  */
-export function createSafeFilename(
-  prefix: string, 
-  identifier: string, 
-  extension: string = 'mock.json',
-  maxIdentifierLength: number = 20
-): string {
-  const sanitizedId = sanitizeForFilename(identifier, maxIdentifierLength);
-  return `${prefix}-${sanitizedId}.${extension}`;
+export function saveMockResponse(filename: string, data: any): void {
+  const mocksDir = path.resolve(__dirname, "../client/src/mocks/responses");
+  if (!fs.existsSync(mocksDir)) {
+    fs.mkdirSync(mocksDir, { recursive: true });
+  }
+  fs.writeFileSync(
+    path.join(mocksDir, filename),
+    JSON.stringify(data, null, 2)
+  );
 }

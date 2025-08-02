@@ -11,7 +11,14 @@ const isMswDisabled = import.meta.env.VITE_MSW_DISABLED === 'true' ||
 // Start the worker in development mode (unless explicitly disabled)
 if (import.meta.env.DEV && !isMswDisabled) {
   worker.start({
-    onUnhandledRequest: 'warn',
+    onUnhandledRequest: (req) => {
+      // Ignore warnings for Google Maps authentication requests
+      if (req.url.includes('AuthenticationService.Authenticate')) {
+        return;
+      }
+      // Show warnings for all other unhandled requests
+      console.warn(`[MSW] Warning: intercepted a request without a matching request handler:\n\n  • ${req.method} ${req.url}\n`);
+    },
     serviceWorker: {
       url: '/mockServiceWorker.js'
     },
