@@ -19,7 +19,7 @@ import { usePersonalizedTrips } from "@/hooks/use-personalized-trips";
 
 interface PoiCardProps {
   poi: Poi;
-  variant?: 'default' | 'grid';
+  variant?: 'default' | 'grid' | 'compact';
   showRelevanceScore?: boolean;
 }
 
@@ -96,6 +96,92 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
   };
 
   const isGridVariant = variant === 'grid';
+  const isCompactVariant = variant === 'compact';
+  
+  // Compact variant for sidebar display
+  if (isCompactVariant) {
+    return (
+      <div className="bg-white rounded border hover:shadow-sm transition-all p-2">
+        <div className="flex gap-2">
+          <img
+            src={poi.imageUrl}
+            alt={poi.name}
+            className="w-12 h-12 rounded object-cover flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h4 className="font-medium text-slate-800 text-sm truncate">
+              {poi.name}
+            </h4>
+            <p className="text-xs text-slate-600 line-clamp-1 mb-1">
+              {poi.description}
+            </p>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center text-xs text-slate-500">
+                <Star className="h-3 w-3 text-yellow-400 mr-1" />
+                {poi.rating}
+              </div>
+              <span className="text-xs text-slate-500">
+                {poi.timeFromStart}
+              </span>
+            </div>
+            {/* Compact Action Buttons */}
+            <div className="flex gap-1">
+              <button
+                onClick={handleAddPlace}
+                disabled={isAdded}
+                className={`flex-1 py-1 px-2 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
+                  isAdded
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                {isAdded ? (
+                  <>
+                    <Heart className="h-3 w-3 mr-1 fill-current" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-3 w-3 mr-1" />
+                    Save
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={handleAddToTrip}
+                disabled={isAddedToTrip || isAddingToTrip}
+                className={`flex-1 py-1 px-2 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
+                  isAddedToTrip
+                    ? "bg-purple-100 text-purple-700 border border-purple-200"
+                    : isAddingToTrip
+                    ? "bg-purple-400 text-white cursor-not-allowed"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
+              >
+                {isAddingToTrip ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    Adding...
+                  </>
+                ) : isAddedToTrip ? (
+                  <>
+                    <Map className="h-3 w-3 mr-1 fill-current" />
+                    In Trip
+                  </>
+                ) : (
+                  <>
+                    <Map className="h-3 w-3 mr-1" />
+                    Add to Trip
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">

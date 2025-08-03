@@ -346,38 +346,15 @@ export default function RouteResults() {
             )}
 
             {uniquePois.length > 0 && (
-              <div className="p-2 space-y-1">
+              <div className="p-2 space-y-2">
                 {filteredPois.map((poi, index) => (
                   <div
                     key={poi.placeId || poi.id || `poi-${index}`}
                     onMouseEnter={() => handlePoiHover(poi)}
                     onMouseLeave={() => handlePoiHover(null)}
-                    className="bg-white rounded border hover:shadow-sm transition-all cursor-pointer p-2"
+                    className="transition-all"
                   >
-                    <div className="flex gap-2">
-                      <img
-                        src={poi.imageUrl}
-                        alt={poi.name}
-                        className="w-12 h-12 rounded object-cover flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-slate-800 text-sm truncate">
-                          {poi.name}
-                        </h4>
-                        <p className="text-xs text-slate-600 line-clamp-1 mb-1">
-                          {poi.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-xs text-slate-500">
-                            <Star className="h-3 w-3 text-yellow-400 mr-1" />
-                            {poi.rating}
-                          </div>
-                          <span className="text-xs text-slate-500">
-                            {poi.timeFromStart}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <PoiCard poi={poi} variant="compact" />
                   </div>
                 ))}
               </div>
@@ -407,34 +384,15 @@ export default function RouteResults() {
         {!isMapVisible && (
           <div className="flex-1 p-4 overflow-y-auto bg-slate-50">
             <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredPois.map((poi, index) => (
                   <div
                     key={poi.placeId || poi.id || `poi-${index}`}
                     onMouseEnter={() => handlePoiHover(poi)}
                     onMouseLeave={() => handlePoiHover(null)}
-                    className="bg-white rounded-lg border hover:shadow-md transition-all cursor-pointer p-3"
+                    className="transition-all"
                   >
-                    <div className="flex flex-col">
-                      <img
-                        src={poi.imageUrl}
-                        alt={poi.name}
-                        className="w-full h-32 rounded object-cover mb-2"
-                      />
-                      <h4 className="font-medium text-slate-800 text-sm truncate mb-1">
-                        {poi.name}
-                      </h4>
-                      <p className="text-xs text-slate-600 line-clamp-2 mb-2">
-                        {poi.description}
-                      </p>
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <div className="flex items-center">
-                          <Star className="h-3 w-3 text-yellow-400 mr-1" />
-                          {poi.rating}
-                        </div>
-                        <span>{poi.timeFromStart}</span>
-                      </div>
-                    </div>
+                    <PoiCard poi={poi} variant="grid" />
                   </div>
                 ))}
               </div>
