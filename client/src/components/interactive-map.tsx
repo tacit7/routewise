@@ -437,6 +437,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   ` : ''}
                   <h3 class="font-semibold text-base mb-1">${poi.name}</h3>
                   <p class="text-xs text-gray-600 capitalize mb-2">${poi.category}</p>
+                  ${poi.description ? `<p class="text-sm text-gray-700 mb-2">${poi.description}</p>` : ''}
                   <div class="flex items-center text-xs mb-1">
                     <span class="text-yellow-500">⭐</span>
                     <span class="ml-1">${poi.rating} (${poi.reviewCount} reviews)</span>
@@ -446,18 +447,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   <div class="flex justify-center">
                     <button
                       onclick="window.addPoiToTrip('${poi.placeId || poi.id}')"
-                      ${isAddedToTrip || isCurrentlyAdding ? 'disabled' : ''}
+                      ${isAddedToTrip ? 'disabled' : ''}
                       class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center ${
                         isAddedToTrip
                           ? 'bg-purple-100 text-purple-700 border border-purple-200 cursor-not-allowed'
-                          : isCurrentlyAdding
-                          ? 'bg-purple-400 text-white cursor-not-allowed'
                           : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md cursor-pointer'
                       }"
+                      id="add-to-trip-btn-${poi.placeId || poi.id}"
                     >
-                      ${isCurrentlyAdding ? 
-                        '⏳ Adding...' : 
-                        isAddedToTrip ? 
+                      ${isAddedToTrip ? 
                           '✓ In Trip' : 
                           '+ Add to Trip'
                       }
@@ -509,11 +507,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       // Find the POI by placeId or id
       const poi = pois.find(p => (p.placeId || p.id) === poiIdentifier);
       if (poi && !isInTrip(poi) && !isAddingToTrip) {
-        addToTrip(poi);
-        // Close the info window after adding
-        if (infoWindowRef.current) {
-          infoWindowRef.current.close();
+        // Update button to show loading state
+        const button = document.getElementById(`add-to-trip-btn-${poiIdentifier}`);
+        if (button) {
+          button.innerHTML = '⏳ Adding...';
+          button.disabled = true;
+          button.className = button.className.replace(
+            'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md cursor-pointer',
+            'bg-purple-400 text-white cursor-not-allowed'
+          );
         }
+        
+        // Add to trip
+        addToTrip(poi);
+        
+        // The InfoWindow will be closed and updated by the trip state change
+        setTimeout(() => {
+          if (infoWindowRef.current) {
+            infoWindowRef.current.close();
+          }
+        }, 1000); // Give time for success toast
       }
     };
 
