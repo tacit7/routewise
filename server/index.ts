@@ -37,6 +37,7 @@ import { getRateLimiter } from "./simple-rate-limit";
 import { initializeStorageWithEnv } from "./storage";
 import { initializeAuthService } from "./auth-service";
 import { initializeGoogleOAuthService } from "./google-oauth-service";
+import { initializeRedisService } from "./redis-service";
 
 const app = express();
 
@@ -111,6 +112,7 @@ app.use((req, res, next) => {
   initializeStorageWithEnv(env.DATABASE_URL);
   initializeAuthService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
   initializeGoogleOAuthService(env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET, env.GOOGLE_REDIRECT_URI);
+  initializeRedisService(env.REDIS_URL);
   
   // Register authentication routes
   registerAuthRoutes(app);
