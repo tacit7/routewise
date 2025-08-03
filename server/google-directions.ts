@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { enhancedGoogleCache } from "./enhanced-google-cache";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -98,6 +99,13 @@ export class GoogleDirectionsService {
     destination: string,
     travelMode: "DRIVING" | "WALKING" | "BICYCLING" | "TRANSIT" = "DRIVING"
   ): Promise<RouteResult | null> {
+    // Check cache first
+    const cached = await enhancedGoogleCache.getCachedRoute(origin, destination, travelMode);
+    if (cached) {
+      console.log(`🗄️ Using cached route: ${origin} → ${destination}`);
+      return cached;
+    }
+
     try {
       const params = new URLSearchParams({
         origin: origin,
@@ -106,6 +114,7 @@ export class GoogleDirectionsService {
         key: this.apiKey,
       });
 
+      console.log(`🌐 API call: Google Directions ${origin} → ${destination}`);
       const response = await fetch(`${this.baseUrl}?${params}`);
       const data: DirectionsResponse = await response.json();
 
@@ -149,6 +158,10 @@ export class GoogleDirectionsService {
         })),
         route_points: routePoints,
       };
+
+      // Cache the result
+      await enhancedGoogleCache.cacheRoute(origin, destination, travelMode, result);
+      console.log(`💾 Cached route: ${origin} → ${destination}`);
 
       return result;
     } catch (error) {
