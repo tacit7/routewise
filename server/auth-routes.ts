@@ -1,7 +1,8 @@
 import type { Express, Request, Response } from "express";
-import { authService } from "./auth-service";
-import { googleOAuthService } from "./google-oauth-service";
+import { getAuthService } from "./auth-service";
+import { getGoogleOAuthService } from "./google-oauth-service";
 import { AuthMiddleware, type AuthenticatedRequest } from "./auth-middleware";
+import { log } from "./logger";
 
 export function registerAuthRoutes(app: Express): void {
   // Apply security headers to all auth routes
@@ -23,6 +24,7 @@ export function registerAuthRoutes(app: Express): void {
       try {
         const { username, password } = req.body;
 
+        const authService = getAuthService();
         const result = await authService.register({ username, password });
 
         if (!result.success) {
@@ -46,7 +48,7 @@ export function registerAuthRoutes(app: Express): void {
           token: result.token,
         });
       } catch (error) {
-        console.error("Registration endpoint error:", error);
+        log.error('Registration endpoint error', error);
         res.status(500).json({
           success: false,
           message: "Registration failed",
@@ -66,6 +68,7 @@ export function registerAuthRoutes(app: Express): void {
       try {
         const { username, password } = req.body;
 
+        const authService = getAuthService();
         const result = await authService.login({ username, password });
 
         if (!result.success) {
@@ -89,7 +92,7 @@ export function registerAuthRoutes(app: Express): void {
           token: result.token,
         });
       } catch (error) {
-        console.error("Login endpoint error:", error);
+        log.error('Login endpoint error', error);
         res.status(500).json({
           success: false,
           message: "Login failed",
@@ -116,7 +119,7 @@ export function registerAuthRoutes(app: Express): void {
         message: "Logged out successfully",
       });
     } catch (error) {
-      console.error("Logout endpoint error:", error);
+      log.error('Logout endpoint error', error);
       res.status(500).json({
         success: false,
         message: "Logout failed",
@@ -138,7 +141,7 @@ export function registerAuthRoutes(app: Express): void {
           user: req.user,
         });
       } catch (error) {
-        console.error("Get user endpoint error:", error);
+        log.error('Get user endpoint error', error);
         res.status(500).json({
           success: false,
           message: "Failed to get user information",
@@ -165,6 +168,7 @@ export function registerAuthRoutes(app: Express): void {
           });
         }
 
+        const authService = getAuthService();
         const result = await authService.changePassword(
           req.user.id,
           currentPassword,
@@ -177,7 +181,7 @@ export function registerAuthRoutes(app: Express): void {
 
         res.json(result);
       } catch (error) {
-        console.error("Change password endpoint error:", error);
+        log.error('Change password endpoint error', error);
         res.status(500).json({
           success: false,
           message: "Password change failed",
@@ -191,8 +195,9 @@ export function registerAuthRoutes(app: Express): void {
    * Redirect to Google OAuth
    */
   app.get("/api/auth/google", (req: Request, res: Response) => {
-    console.log("🔍 Google OAuth endpoint hit - checking configuration...");
+    log.info('Google OAuth endpoint hit - checking configuration');
     try {
+      const googleOAuthService = getGoogleOAuthService();
       if (!googleOAuthService.isConfigured()) {
         return res.status(503).json({
           success: false,
@@ -201,10 +206,10 @@ export function registerAuthRoutes(app: Express): void {
       }
 
       const authUrl = googleOAuthService.getAuthorizationUrl();
-      console.log("Redirecting to Google OAuth:", authUrl);
+      log.info('Redirecting to Google OAuth', { authUrl });
       res.redirect(authUrl);
     } catch (error) {
-      console.error("Google OAuth redirect error:", error);
+      log.error('Google OAuth redirect error', error);
       res.status(500).json({
         success: false,
         message: "Failed to initiate Google authentication",
@@ -221,7 +226,7 @@ export function registerAuthRoutes(app: Express): void {
       const { code, state, error } = req.query;
 
       if (error) {
-        console.error("Google OAuth error:", error);
+        log.error('Google OAuth error', error);
         return res.redirect("/?error=oauth_error");
       }
 
@@ -233,10 +238,11 @@ export function registerAuthRoutes(app: Express): void {
         return res.redirect("/?error=missing_state");
       }
 
+      const googleOAuthService = getGoogleOAuthService();
       const result = await googleOAuthService.handleCallback(code, state);
 
       if (!result.success) {
-        console.error("Google OAuth callback failed:", result.message);
+        log.error('Google OAuth callback failed', { message: result.message });
         return res.redirect(
           `/?error=auth_failed&message=${encodeURIComponent(
             result.message || "Authentication failed"
@@ -263,7 +269,7 @@ export function registerAuthRoutes(app: Express): void {
         `/?success=google_auth&message=${encodeURIComponent(welcomeMessage)}`
       );
     } catch (error) {
-      console.error("Google OAuth callback error:", error);
+      log.error('Google OAuth callback error', error);
       res.redirect("/?error=server_error");
     }
   });
@@ -293,17 +299,18 @@ export function registerAuthRoutes(app: Express): void {
       process.env.GOOGLE_REDIRECT_URI =
         redirectUri || "http://localhost:3001/api/auth/google/callback";
 
-      console.log("🔧 OAuth manually configured:");
-      console.log("- Client ID length:", clientId.length);
-      console.log("- Client Secret length:", clientSecret.length);
+      log.info('OAuth manually configured', {
+        clientIdLength: clientId.length,
+        clientSecretLength: clientSecret.length
+      });
 
       res.json({
         success: true,
         message: "OAuth configured successfully",
-        configured: googleOAuthService.isConfigured(),
+        configured: getGoogleOAuthService().isConfigured(),
       });
     } catch (error) {
-      console.error("OAuth configuration error:", error);
+      log.error('OAuth configuration error', error);
       res.status(500).json({
         success: false,
         message: "Failed to configure OAuth",
@@ -332,7 +339,7 @@ export function registerAuthRoutes(app: Express): void {
       googleClientIdSet: !!process.env.GOOGLE_CLIENT_ID,
       googleClientSecretSet: !!process.env.GOOGLE_CLIENT_SECRET,
       googleRedirectUri: process.env.GOOGLE_REDIRECT_URI,
-      oauthConfigured: googleOAuthService.isConfigured(),
+      oauthConfigured: getGoogleOAuthService().isConfigured(),
       freshCheck: {
         clientIdLength: freshCheck.clientId.length,
         clientSecretLength: freshCheck.clientSecret.length,
@@ -364,6 +371,7 @@ export function registerAuthRoutes(app: Express): void {
         });
       }
 
+      const authService = getAuthService();
       const user = await authService.getUserFromToken(token);
 
       if (!user) {
@@ -379,7 +387,7 @@ export function registerAuthRoutes(app: Express): void {
         user,
       });
     } catch (error) {
-      console.error("Token verification endpoint error:", error);
+      log.error('Token verification endpoint error', error);
       res.status(500).json({
         success: false,
         message: "Token verification failed",

@@ -19,6 +19,20 @@ import {
   userIdParamSchema,
   tripIdParamSchema 
 } from "./interests-validation";
+import { 
+  validateSchema as validateInput,
+  commonSchemas,
+  poiSchemas,
+  tripSchemas,
+  placesSchemas
+} from "./validation-middleware";
+import { 
+  getRateLimiter,
+  placesRateLimit,
+  tripsRateLimit,
+  poisRateLimit
+} from "./rate-limit-middleware";
+import { log } from "./logger";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -27,9 +41,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let placesService: GooglePlacesService | null = null;
   const nominatimService = new NominatimService(); // Always available, no API key needed
 
-  console.log('🔧 Environment check:');
-  console.log('  - Google Places API Key:', googlePlacesApiKey ? 'configured' : 'missing');
-  console.log('  - Google Maps API Key:', googleMapsApiKey ? 'configured' : 'missing');
+  log.info('Environment check', {
+    googlePlacesApiConfigured: !!googlePlacesApiKey,
+    googleMapsApiConfigured: !!googleMapsApiKey
+  });
 
   if (googlePlacesApiKey) {
     placesService = new GooglePlacesService(googlePlacesApiKey);
@@ -98,7 +113,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Free Places Autocomplete endpoint (using OpenStreetMap Nominatim)
-  app.get("/api/places/autocomplete", async (req, res) => {
+  app.get("/api/places/autocomplete", 
+    placesRateLimit,
+    validateInput(placesSchemas.autocomplete, 'query'),
+    async (req, res) => {
     const { input, types } = req.query;
     
     if (!input || typeof input !== 'string') {
@@ -125,7 +143,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Premium Google Places Autocomplete endpoint (fallback if needed)
-  app.get("/api/places/autocomplete/google", async (req, res) => {
+  app.get("/api/places/autocomplete/google", 
+    placesRateLimit,
+    validateInput(placesSchemas.autocomplete, 'query'),
+    async (req, res) => {
     const { input, types } = req.query;
     
     if (!input || typeof input !== 'string') {
@@ -173,7 +194,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get POIs for a specific route or checkpoint
-  app.get("/api/pois", async (req, res) => {
+  app.get("/api/pois", 
+    poisRateLimit,
+    validateInput(poiSchemas.poisQuery, 'query'),
+    async (req, res) => {
     const { start, end, checkpoint } = req.query;
     
     // If checkpoint parameter is provided, fetch places for that specific city
@@ -729,7 +753,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Get POI by ID
-  app.get("/api/pois/:id", async (req, res) => {
+  app.get("/api/pois/:id", 
+    validateInput(commonSchemas.idParam, 'params'),
+    async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -849,7 +875,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===== ROUTE CALCULATION ENDPOINT =====
 
   // Calculate route from wizard data
-  app.post("/api/route", async (req, res) => {
+  app.post("/api/route", 
+    tripsRateLimit,
+    validateInput(tripSchemas.routeCalculation, 'body'),
+    async (req, res) => {
     try {
       const { startLocation, endLocation, stops } = req.body;
       

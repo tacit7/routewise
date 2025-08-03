@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { storage } from './storage';
+import { getStorage } from './storage';
 import type { InsertUser, User } from '@shared/schema';
+import { log } from './logger';
 
 interface AuthTokenPayload {
   userId: number;
@@ -20,17 +21,21 @@ export class AuthService {
   private readonly JWT_EXPIRES_IN: string;
   private readonly SALT_ROUNDS = 12;
 
-  constructor() {
-    this.JWT_SECRET = process.env.JWT_SECRET || 'route-wise-dev-secret-key';
-    this.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+  constructor(jwtSecret: string, jwtExpiresIn: string = '7d') {
+    // JWT_SECRET is already validated by environment validation
+    this.JWT_SECRET = jwtSecret;
+    this.JWT_EXPIRES_IN = jwtExpiresIn;
     
-    if (!process.env.JWT_SECRET) {
-      console.warn('⚠️ JWT_SECRET not set, using development default');
-    }
+    log.info('AuthService initialized with secure JWT configuration', {
+      jwtSecretLength: jwtSecret.length,
+      jwtExpiresIn: jwtExpiresIn
+    });
   }
 
   async register(userData: InsertUser): Promise<AuthResult> {
     try {
+      const storage = getStorage();
+      
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
@@ -80,7 +85,7 @@ export class AuthService {
         token
       };
     } catch (error) {
-      console.error('Registration error:', error);
+      log.error('Registration error', error);
       return {
         success: false,
         message: 'Registration failed'
@@ -90,6 +95,8 @@ export class AuthService {
 
   async login(credentials: InsertUser): Promise<AuthResult> {
     try {
+      const storage = getStorage();
+      
       // Find user
       const user = await storage.getUserByUsername(credentials.username.trim().toLowerCase());
       if (!user) {
@@ -124,7 +131,7 @@ export class AuthService {
         token
       };
     } catch (error) {
-      console.error('Login error:', error);
+      log.error('Login error', error);
       return {
         success: false,
         message: 'Login failed'
@@ -149,7 +156,7 @@ export class AuthService {
       
       return decoded;
     } catch (error) {
-      console.error('Token verification failed:', error);
+      log.error('Token verification failed', error);
       return null;
     }
   }
@@ -160,6 +167,7 @@ export class AuthService {
       return null;
     }
 
+    const storage = getStorage();
     const user = await storage.getUser(payload.userId);
     if (!user) {
       return null;
@@ -174,6 +182,7 @@ export class AuthService {
 
   async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<AuthResult> {
     try {
+      const storage = getStorage();
       const user = await storage.getUser(userId);
       if (!user) {
         return {
@@ -211,7 +220,7 @@ export class AuthService {
         message: 'Password changed successfully'
       };
     } catch (error) {
-      console.error('Password change error:', error);
+      log.error('Password change error', error);
       return {
         success: false,
         message: 'Password change failed'
@@ -220,4 +229,19 @@ export class AuthService {
   }
 }
 
-export const authService = new AuthService();
+// AuthService instance will be initialized with validated environment
+let authServiceInstance: AuthService | null = null;
+
+export function initializeAuthService(jwtSecret: string, jwtExpiresIn: string): AuthService {
+  if (!authServiceInstance) {
+    authServiceInstance = new AuthService(jwtSecret, jwtExpiresIn);
+  }
+  return authServiceInstance;
+}
+
+export function getAuthService(): AuthService {
+  if (!authServiceInstance) {
+    throw new Error('AuthService not initialized. Call initializeAuthService() first.');
+  }
+  return authServiceInstance;
+}

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { authService } from './auth-service';
+import { getAuthService } from './auth-service';
 import type { User } from '@shared/schema';
+import { log } from './logger';
 
 // Extend Express Request type to include user
 declare global {
@@ -44,6 +45,7 @@ export class AuthMiddleware {
       }
 
       // Verify token and get user
+      const authService = getAuthService();
       const user = await authService.getUserFromToken(token);
       if (!user) {
         res.status(401).json({ 
@@ -57,7 +59,7 @@ export class AuthMiddleware {
       req.user = user;
       next();
     } catch (error) {
-      console.error('Authentication middleware error:', error);
+      log.error('Authentication middleware error', error);
       res.status(500).json({ 
         success: false, 
         message: 'Authentication error' 
@@ -87,6 +89,7 @@ export class AuthMiddleware {
 
       if (token) {
         // Try to get user, but don't fail if token is invalid
+        const authService = getAuthService();
         const user = await authService.getUserFromToken(token);
         if (user) {
           req.user = user;
@@ -95,7 +98,7 @@ export class AuthMiddleware {
 
       next();
     } catch (error) {
-      console.error('Optional auth middleware error:', error);
+      log.error('Optional auth middleware error', error);
       // Continue without authentication
       next();
     }

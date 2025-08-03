@@ -13,14 +13,8 @@ import {
   type InsertUserInterest,
   type UpdateUserInterest
 } from "@shared/schema";
-import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, and, inArray } from "drizzle-orm";
-import postgres from "postgres";
-
-// Database connection
-const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/routewise";
-const client = postgres(connectionString);
-export const db = drizzle(client);
+import { PostgreSQLStorage } from "./storage-postgresql";
+import { log } from "./logger";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -334,6 +328,69 @@ export class MemStorage implements IStorage {
     const key = `${userId}-${categoryId}`;
     return this.userInterests.delete(key);
   }
+
+  /**
+   * Get database instance for legacy compatibility - not applicable for MemStorage
+   */
+  getDb() {
+    return null;
+  }
 }
 
-export const storage = new MemStorage();
+/**
+ * Initialize storage with PostgreSQL as primary and MemStorage as fallback
+ * @param databaseUrl - Validated database URL from environment
+ */
+function initializeStorage(databaseUrl?: string): IStorage {
+  // Try PostgreSQL first if DATABASE_URL is configured
+  if (databaseUrl) {
+    try {
+      log.info('Initializing PostgreSQL storage with validated environment');
+      return new PostgreSQLStorage(databaseUrl);
+    } catch (error) {
+      log.error('Failed to initialize PostgreSQL storage, falling back to memory storage', error);
+    }
+  } else {
+    log.warn('DATABASE_URL not configured, using in-memory storage (not recommended for production)');
+  }
+  
+  // Fallback to memory storage
+  log.info('Using in-memory storage');
+  return new MemStorage();
+}
+
+/**
+ * Storage instance - will be initialized with validated environment
+ * Use initializeStorageWithEnv() to properly set up storage
+ */
+let storageInstance: IStorage | null = null;
+
+export function initializeStorageWithEnv(databaseUrl?: string): IStorage {
+  if (!storageInstance) {
+    storageInstance = initializeStorage(databaseUrl);
+    
+    // Set db instance for legacy compatibility
+    if ('getDb' in storageInstance) {
+      db = (storageInstance as any).getDb();
+    }
+  }
+  return storageInstance;
+}
+
+export function getStorage(): IStorage {
+  if (!storageInstance) {
+    throw new Error('Storage not initialized. Call initializeStorageWithEnv() first.');
+  }
+  return storageInstance;
+}
+
+// Legacy export for backward compatibility - will be removed
+export const storage = initializeStorage();
+
+// Export db for legacy trip-service.ts - should be refactored
+export let db: any = null;
+
+// Function to set db instance after PostgreSQL storage is initialized
+export function setDbInstance(dbInstance: any) {
+  db = dbInstance;
+}

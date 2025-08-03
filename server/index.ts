@@ -1,82 +1,71 @@
 // Load environment variables FIRST, before any other imports
 import { config } from "dotenv";
 import { resolve } from "path";
-import { existsSync, readFileSync } from "fs";
+import { existsSync } from "fs";
 
-// Manual environment loading to ensure it works
+// Load environment files in order of precedence
 const envFiles = [
+  resolve(process.cwd(), '.env.local'),
   resolve(process.cwd(), '.env'),
   resolve(process.cwd(), '..', '.env')
 ];
 
-console.log('🔍 Loading environment variables manually...');
+// Load environment files (dotenv handles the parsing)
 envFiles.forEach(envFile => {
   if (existsSync(envFile)) {
-    console.log(`📁 Found .env file: ${envFile}`);
-    
-    try {
-      // Load with dotenv
-      const result = config({ path: envFile, override: false });
-      if (result.error) {
-        console.log(`⚠️ Dotenv error:`, result.error.message);
-      } else {
-        console.log(`✅ Dotenv loaded successfully from: ${envFile}`);
-      }
-      
-      // Also manually parse to ensure we get the values
-      const envContent = readFileSync(envFile, 'utf8');
-      const lines = envContent.split('\n');
-      
-      lines.forEach(line => {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
-          const [key, ...valueParts] = trimmed.split('=');
-          const value = valueParts.join('=');
-          
-          // Only set if not already set (don't override)
-          if (!process.env[key]) {
-            process.env[key] = value;
-          }
-          
-          // Log Google-related vars (without showing values)
-          if (key.includes('GOOGLE_')) {
-            console.log(`  ✅ ${key}: ${value ? 'SET' : 'EMPTY'}`);
-          }
-        }
-      });
-      
-    } catch (error) {
-      console.log(`❌ Error loading ${envFile}:`, error.message);
-    }
-  } else {
-    console.log(`⚠️ .env file not found: ${envFile}`);
+    config({ path: envFile, override: false });
   }
 });
 
-// Verify final environment state
-console.log('🔍 Final Environment Variables:');
-console.log('- NODE_ENV:', process.env.NODE_ENV);
-console.log('- GOOGLE_CLIENT_ID exists:', !!process.env.GOOGLE_CLIENT_ID);
-console.log('- GOOGLE_CLIENT_SECRET exists:', !!process.env.GOOGLE_CLIENT_SECRET);
-console.log('- GOOGLE_REDIRECT_URI:', process.env.GOOGLE_REDIRECT_URI);
-if (process.env.GOOGLE_CLIENT_ID) {
-  console.log('- GOOGLE_CLIENT_ID length:', process.env.GOOGLE_CLIENT_ID.length);
-}
-if (process.env.GOOGLE_CLIENT_SECRET) {
-  console.log('- GOOGLE_CLIENT_SECRET length:', process.env.GOOGLE_CLIENT_SECRET.length);
-}
+// Import environment validation after dotenv is loaded
+import { initializeEnvironment, type ValidatedEnv } from './env-validation';
+
+// Initialize and validate environment early
+const env = initializeEnvironment();
 
 // Now import other modules
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { registerAuthRoutes } from "./auth-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { devApiCacheMiddleware } from "./dev-api-cache";
+import { log as logger, requestLogger, errorLogger } from "./logger";
+import { securityHeaders } from "./validation-middleware";
+import { generalRateLimit, logRateLimit } from "./rate-limit-middleware";
+import { initializeStorageWithEnv } from "./storage";
+import { initializeAuthService } from "./auth-service";
+import { initializeGoogleOAuthService } from "./google-oauth-service";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Security middleware (must be first)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      scriptSrc: ["'self'"],
+      connectSrc: ["'self'", "https://maps.googleapis.com"]
+    },
+  },
+  crossOriginEmbedderPolicy: false // Allow external resources like Google Maps
+}));
+app.use(securityHeaders());
+
+// Rate limiting (apply early, before other middleware)
+app.use(logRateLimit);
+app.use(generalRateLimit);
+
+// Request logging
+app.use(requestLogger());
+
+// Standard Express middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
 
 // Add development API caching middleware (especially useful when MSW is disabled)
@@ -114,17 +103,39 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize services with validated environment
+  initializeStorageWithEnv(env.DATABASE_URL);
+  initializeAuthService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
+  initializeGoogleOAuthService(env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET, env.GOOGLE_REDIRECT_URI);
+  
   // Register authentication routes
   registerAuthRoutes(app);
   
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  // Error handling middleware (must be last)
+  app.use(errorLogger());
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const message = process.env.NODE_ENV === 'production' 
+      ? (status === 500 ? "Internal Server Error" : err.message)
+      : err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Log the error
+    logger.error('Request error', err, {
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: status,
+      userId: (req as any).user?.id,
+      ip: req.ip
+    });
+
+    res.status(status).json({ 
+      success: false,
+      message,
+      code: err.code || 'INTERNAL_ERROR',
+      ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+    });
   });
 
   // importantly only setup vite in development and after
@@ -136,9 +147,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve the app on port 3001 for development, or from environment variable in production
-  // this serves both the API and the client.
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+  // Serve the app on the validated port
+  const port = env.PORT;
   server.listen({
     port,
     host: "0.0.0.0",

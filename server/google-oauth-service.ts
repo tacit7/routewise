@@ -1,6 +1,7 @@
-import { authService } from './auth-service';
-import { storage } from './storage';
+import { getAuthService } from './auth-service';
+import { getStorage } from './storage';
 import type { InsertUser, User } from '@shared/schema';
+import { log } from './logger';
 
 interface GoogleUserInfo {
   id: string;
@@ -24,28 +25,17 @@ export class GoogleOAuthService {
   private readonly CLIENT_SECRET: string;
   private readonly REDIRECT_URI: string;
 
-  constructor() {
-    // Load environment variables properly
-    this.CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
-    this.CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-    this.REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/google/callback';
+  constructor(clientId?: string, clientSecret?: string, redirectUri?: string) {
+    this.CLIENT_ID = clientId || '';
+    this.CLIENT_SECRET = clientSecret || '';
+    this.REDIRECT_URI = redirectUri || 'http://localhost:3001/api/auth/google/callback';
     
-    // Debug logging to see what's actually being loaded
-    console.log('🔍 GoogleOAuthService initialization (reloaded):');
-    console.log('- NODE_ENV:', process.env.NODE_ENV);
-    console.log('- GOOGLE_CLIENT_ID length:', this.CLIENT_ID.length);
-    console.log('- GOOGLE_CLIENT_SECRET length:', this.CLIENT_SECRET.length);
-    console.log('- GOOGLE_REDIRECT_URI:', this.REDIRECT_URI);
-    console.log('- isConfigured():', this.isConfigured());
-    
-    if (!this.CLIENT_ID || !this.CLIENT_SECRET) {
-      console.warn('⚠️ Google OAuth credentials not configured');
-      console.log('- CLIENT_ID exists:', !!this.CLIENT_ID);
-      console.log('- CLIENT_SECRET exists:', !!this.CLIENT_SECRET);
-      console.log('- Available env vars:', Object.keys(process.env).filter(key => key.includes('GOOGLE')));
-    } else {
-      console.log('✅ Google OAuth credentials loaded successfully');
-    }
+    log.info('GoogleOAuthService initialized', {
+      hasClientId: !!this.CLIENT_ID,
+      hasClientSecret: !!this.CLIENT_SECRET,
+      redirectUri: this.REDIRECT_URI,
+      isConfigured: this.isConfigured()
+    });
   }
 
   /**
@@ -117,7 +107,7 @@ export class GoogleOAuthService {
       const tokenData = await tokenResponse.json();
 
       if (!tokenResponse.ok || tokenData.error) {
-        console.error('Google token exchange failed:', tokenData);
+        log.error('Google token exchange failed', { tokenData });
         return {
           success: false,
           message: 'Failed to authenticate with Google'
@@ -134,7 +124,7 @@ export class GoogleOAuthService {
       const userInfo: GoogleUserInfo = await userInfoResponse.json();
 
       if (!userInfoResponse.ok) {
-        console.error('Failed to get user info from Google:', userInfo);
+        log.error('Failed to get user info from Google', { userInfo });
         return {
           success: false,
           message: 'Failed to get user information'
@@ -145,7 +135,7 @@ export class GoogleOAuthService {
       return await this.createOrLoginUser(userInfo);
 
     } catch (error) {
-      console.error('Google OAuth callback error:', error);
+      log.error('Google OAuth callback error', error);
       return {
         success: false,
         message: 'Authentication failed'
@@ -163,6 +153,7 @@ export class GoogleOAuthService {
 
       if (existingUser) {
         // User exists, generate token and login
+        const authService = getAuthService();
         const token = authService.generateToken({
           userId: existingUser.id,
           username: existingUser.username
@@ -192,8 +183,10 @@ export class GoogleOAuthService {
           provider: 'google'
         };
 
+        const storage = getStorage();
         const user = await storage.createUser(newUserData);
 
+        const authService = getAuthService();
         const token = authService.generateToken({
           userId: user.id,
           username: user.username
@@ -211,7 +204,7 @@ export class GoogleOAuthService {
         };
       }
     } catch (error) {
-      console.error('Error creating/logging in Google user:', error);
+      log.error('Error creating/logging in Google user', error);
       return {
         success: false,
         message: 'Failed to create or login user'
@@ -224,6 +217,7 @@ export class GoogleOAuthService {
    */
   private async findUserByGoogleInfo(googleUser: GoogleUserInfo): Promise<User | null> {
     // First try to find by Google ID
+    const storage = getStorage();
     const userByGoogleId = await storage.getUserByGoogleId(googleUser.id);
     if (userByGoogleId) {
       return userByGoogleId;
@@ -244,6 +238,8 @@ export class GoogleOAuthService {
    * Generate unique username from Google user info
    */
   private async generateUniqueUsername(googleUser: GoogleUserInfo): Promise<string> {
+    const storage = getStorage();
+    
     // Start with the name from Google, cleaned up
     let baseUsername = googleUser.given_name || googleUser.name || googleUser.email.split('@')[0];
     baseUsername = baseUsername
@@ -301,17 +297,35 @@ export class GoogleOAuthService {
     
     const configured = !!(currentClientId && currentClientSecret);
     
-    console.log('🔍 OAuth configuration check:');
-    console.log('- Constructor CLIENT_ID:', this.CLIENT_ID ? `SET (${this.CLIENT_ID.length} chars)` : 'EMPTY');
-    console.log('- Constructor CLIENT_SECRET:', this.CLIENT_SECRET ? `SET (${this.CLIENT_SECRET.length} chars)` : 'EMPTY');
-    console.log('- Env CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? `SET (${process.env.GOOGLE_CLIENT_ID.length} chars)` : 'EMPTY');
-    console.log('- Env CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? `SET (${process.env.GOOGLE_CLIENT_SECRET.length} chars)` : 'EMPTY');
-    console.log('- Current CLIENT_ID:', currentClientId ? `SET (${currentClientId.length} chars)` : 'EMPTY');
-    console.log('- Current CLIENT_SECRET:', currentClientSecret ? `SET (${currentClientSecret.length} chars)` : 'EMPTY');
-    console.log('- Final configured result:', configured);
+    log.info('OAuth configuration check', {
+      constructorClientId: this.CLIENT_ID ? `SET (${this.CLIENT_ID.length} chars)` : 'EMPTY',
+      constructorClientSecret: this.CLIENT_SECRET ? `SET (${this.CLIENT_SECRET.length} chars)` : 'EMPTY',
+      currentClientId: currentClientId ? `SET (${currentClientId.length} chars)` : 'EMPTY',
+      currentClientSecret: currentClientSecret ? `SET (${currentClientSecret.length} chars)` : 'EMPTY',
+      configured
+    });
     
     return configured;
   }
 }
 
+// GoogleOAuthService instance will be initialized with validated environment
+let googleOAuthServiceInstance: GoogleOAuthService | null = null;
+
+export function initializeGoogleOAuthService(clientId?: string, clientSecret?: string, redirectUri?: string): GoogleOAuthService {
+  if (!googleOAuthServiceInstance) {
+    googleOAuthServiceInstance = new GoogleOAuthService(clientId, clientSecret, redirectUri);
+  }
+  return googleOAuthServiceInstance;
+}
+
+export function getGoogleOAuthService(): GoogleOAuthService {
+  if (!googleOAuthServiceInstance) {
+    // Initialize with empty values if not configured
+    googleOAuthServiceInstance = new GoogleOAuthService();
+  }
+  return googleOAuthServiceInstance;
+}
+
+// Backward compatibility - will be removed
 export const googleOAuthService = new GoogleOAuthService();
