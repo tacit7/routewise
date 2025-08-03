@@ -1,4 +1,5 @@
 import RouteForm from "./route-form";
+import WizardEntryPoint from "./wizard-entry-point";
 
 export default function HeroSection() {
   return (
@@ -19,8 +20,18 @@ export default function HeroSection() {
           Discover amazing stops along your route - from hidden gems to must-see attractions. Let's make every mile memorable.
         </p>
         
-        <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
-          <RouteForm />
+        <div className="space-y-8">
+          {/* Quick Route Form */}
+          <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
+            <div className="mb-4 text-center">
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Quick Route</h3>
+              <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
+            </div>
+            <RouteForm />
+          </div>
+          
+          {/* Advanced Trip Planner Option */}
+          <WizardEntryPoint variant="hero" />
         </div>
       </div>
     </section>

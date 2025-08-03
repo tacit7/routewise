@@ -209,7 +209,15 @@ export class UserPreferencesManager {
     }
 
     try {
-      const current = this.getPreferences() as ExtendedUserPreferences;
+      // Get current preferences directly from localStorage to avoid circular reference
+      let current: ExtendedUserPreferences;
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        current = stored ? JSON.parse(stored) : { ...DEFAULT_PREFERENCES };
+      } catch {
+        current = { ...DEFAULT_PREFERENCES };
+      }
+      
       const updated: ExtendedUserPreferences = {
         ...current,
         ...preferences,

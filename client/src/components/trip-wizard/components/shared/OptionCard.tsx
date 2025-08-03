@@ -1,0 +1,72 @@
+import { cn } from "@/lib/utils";
+import { OptionCardProps } from "@/types/trip-wizard";
+import { Check } from "lucide-react";
+
+export function OptionCard({
+  title,
+  description,
+  icon,
+  selected,
+  onClick,
+  disabled = false,
+  className,
+}: OptionCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "relative w-full p-4 rounded-lg border-2 transition-all duration-200",
+        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+        "hover:shadow-md transform hover:-translate-y-1",
+        selected
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "border-slate-200 bg-white hover:border-slate-300",
+        disabled && "opacity-50 cursor-not-allowed hover:transform-none hover:shadow-none",
+        className
+      )}
+      aria-pressed={selected}
+      aria-describedby={description ? `${title}-description` : undefined}
+    >
+      {/* Selection indicator */}
+      {selected && (
+        <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      )}
+      
+      {/* Content */}
+      <div className="flex flex-col items-center text-center space-y-2">
+        {/* Icon */}
+        {icon && (
+          <div className="text-2xl mb-1">
+            {typeof icon === 'string' ? (
+              <span role="img" aria-hidden="true">{icon}</span>
+            ) : (
+              icon
+            )}
+          </div>
+        )}
+        
+        {/* Title */}
+        <h3 className={cn(
+          "font-semibold text-sm",
+          selected ? "text-primary" : "text-slate-800"
+        )}>
+          {title}
+        </h3>
+        
+        {/* Description */}
+        {description && (
+          <p 
+            id={`${title}-description`}
+            className="text-xs text-slate-600 leading-relaxed"
+          >
+            {description}
+          </p>
+        )}
+      </div>
+    </button>
+  );
+}

@@ -34,7 +34,7 @@ const Dashboard = () => {
   const hasUserTrips = userTrips.length > 0;
 
   const handlePlanRoadTrip = () => {
-    setLocation("/");
+    setLocation("/trip-planner");
   };
 
   const handleHelpMePlan = () => {
@@ -100,7 +100,7 @@ const Dashboard = () => {
             </div>
 
             {/* Trip Planning Icon */}
-            <div className="mb-8 flex justify-center">
+            <div className="w-64 flex justify-center">
               <img
                 src="/planning.png"
                 alt="Route planning illustration with road sign and map"

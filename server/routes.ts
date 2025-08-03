@@ -846,6 +846,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
+  // ===== ROUTE CALCULATION ENDPOINT =====
+
+  // Calculate route from wizard data
+  app.post("/api/route", async (req, res) => {
+    try {
+      const { startLocation, endLocation, stops } = req.body;
+      
+      // Validate required fields
+      if (!startLocation || !endLocation) {
+        return res.status(400).json({ message: "Start and end locations are required" });
+      }
+
+      // For now, return a simple route response that matches what the wizard expects
+      // In a real implementation, this would call Google Directions API
+      const routeData = {
+        startCity: startLocation,
+        endCity: endLocation,
+        distance: "unknown",
+        duration: "unknown",
+        stops: stops || [],
+        coordinates: SAMPLE_ROUTE_COORDINATES, // Use sample coordinates for now
+      };
+
+      res.json(routeData);
+    } catch (error) {
+      console.error("Error calculating route:", error);
+      res.status(500).json({ message: "Route calculation failed" });
+    }
+  });
+
   // ===== TRIP MANAGEMENT ENDPOINTS =====
 
   // Create a trip (requires authentication or allows anonymous public trips)

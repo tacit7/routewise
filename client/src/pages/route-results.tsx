@@ -357,6 +357,48 @@ export default function RouteResults() {
                 </div>
               </div>
 
+              {/* Wizard Preferences Display */}
+              {routeData.fromWizard && routeData.wizardPreferences && (
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                    Your Trip Preferences
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-slate-700">Trip Type:</span>
+                      <span className="ml-2 text-slate-600 capitalize">
+                        {routeData.wizardPreferences.tripType?.replace('-', ' ')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Transportation:</span>
+                      <span className="ml-2 text-slate-600">
+                        {routeData.wizardPreferences.transportation?.join(', ')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-slate-700">Budget:</span>
+                      <span className="ml-2 text-slate-600">
+                        ${routeData.wizardPreferences.budgetRange?.min} - ${routeData.wizardPreferences.budgetRange?.max}
+                      </span>
+                    </div>
+                    {routeData.wizardPreferences.intentions?.length > 0 && (
+                      <div className="md:col-span-2 lg:col-span-3">
+                        <span className="font-medium text-slate-700">Interests:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {routeData.wizardPreferences.intentions.map((intention: string) => (
+                            <span key={intention} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+                              {intention}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* POIs Display */}
               <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
                 <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
