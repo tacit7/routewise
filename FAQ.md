@@ -1,6 +1,180 @@
 # Routewise Project FAQ
 
-## Latest Session Q&A (August 3, 2025 - Session 11)
+## Latest Session Q&A (August 3, 2025 - Session 14)
+
+### Add to Trip Button Functionality Implementation
+
+**Question:** How to implement "Add to Trip" button functionality for POI cards?
+**Error/Issue:** Missing trip management functionality in POI cards preventing users from adding places to their trip
+**Context:** User requested implementation of trip management system to allow users to collect POIs into a trip from the route results page
+**Solution:** Implemented comprehensive Add to Trip functionality with compact POI card variants, TanStack Query integration, localStorage persistence, and visual feedback
+**Code:**
+
+```tsx
+// Enhanced PoiCard with Add to Trip functionality
+const {
+  isInTrip,
+  addToTrip,
+  isAddingToTrip
+} = useTripPlaces();
+
+// Check if this specific POI is in the trip
+const isAddedToTrip = isInTrip(poi);
+
+// Compact variant for sidebar display
+if (isCompactVariant) {
+  return (
+    <div className="bg-white rounded border hover:shadow-sm transition-all p-2">
+      <div className="flex gap-2">
+        <img src={poi.imageUrl} alt={poi.name} className="w-12 h-12 rounded object-cover flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          {/* POI info display */}
+          <div className="flex gap-1">
+            <button onClick={handleAddPlace} className="flex-1 py-1 px-2 rounded text-xs">
+              {isAdded ? "Saved" : "Save"}
+            </button>
+            <button
+              onClick={handleAddToTrip}
+              disabled={isAddedToTrip || isAddingToTrip}
+              className={`flex-1 py-1 px-2 rounded text-xs ${
+                isAddedToTrip ? "bg-purple-100 text-purple-700" : "bg-purple-600 text-white"
+              }`}
+            >
+              {isAddingToTrip ? "Adding..." : isAddedToTrip ? "In Trip" : "Add to Trip"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #trip-management #tanstack-query #localstorage #poi-cards #user-interaction #solved
+**Related:** [[POI Management]] [[Trip Planning]] [[User Interface Design]]
+
+---
+
+### POI Trip Status Bug Fix
+
+**Question:** Why are all POI cards showing "In Trip" status regardless of actual trip status?
+**Error/Issue:** All POI cards displaying "In Trip" for every POI instead of checking individual POI status
+**Context:** Recurring bug where POI trip status checking was incorrect, causing all POIs to appear as if they were already added to the trip
+**Solution:** Fixed isInTrip function usage by changing from treating it as a direct boolean to properly calling the function with POI parameter
+**Code:**
+
+```tsx
+// WRONG - using isInTrip as a direct boolean
+const {
+  isInTrip: isAddedToTrip,  // This was the bug!
+  addToTrip,
+  isAddingToTrip
+} = useTripPlaces();
+
+// CORRECT - calling isInTrip function with specific POI
+const {
+  isInTrip,
+  addToTrip,
+  isAddingToTrip
+} = useTripPlaces();
+
+// Check if this specific POI is in the trip
+const isAddedToTrip = isInTrip(poi);  // Fixed!
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #hooks #bug-fix #poi-cards #trip-status #function-calls #solved
+**Related:** [[Add to Trip Functionality]] [[React Hooks]] [[POI Management]]
+
+---
+
+## Previous Session Q&A (August 3, 2025 - Session 12)
+
+### Full-Screen Layout Implementation with Compact POI Cards
+
+**Question:** How to make the map and cards fill the entire horizontal space with no vertical gaps and make cards take up less space?
+**Error/Issue:** Route results page needed redesign to maximize screen real estate and reduce POI card size
+**Context:** User requested layout improvements for better space utilization and more compact POI display
+**Solution:** Implemented full-screen layout using `h-screen flex flex-col`, created compact sidebar (320px) with 48x48px POI cards, and full-width map using `flex-1`
+**Code:**
+
+```tsx
+// route-results.tsx - Full-screen layout with no gaps
+<div className="h-screen flex flex-col bg-slate-50">
+  {/* Header */}
+  <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
+    {/* Compact header content */}
+  </header>
+
+  {/* Full-width layout with no gaps */}
+  <div className="flex-1 flex overflow-hidden">
+    {/* Left Sidebar - Compact POI Cards */}
+    <div className="w-80 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+      {/* Scrollable POI List */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-2 space-y-1">
+          {filteredPois.map((poi, index) => (
+            <div className="bg-white rounded border hover:shadow-sm transition-all cursor-pointer p-2">
+              <div className="flex gap-2">
+                <img
+                  src={poi.imageUrl}
+                  alt={poi.name}
+                  className="w-12 h-12 rounded object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-slate-800 text-sm truncate">
+                    {poi.name}
+                  </h4>
+                  <p className="text-xs text-slate-600 line-clamp-1 mb-1">
+                    {poi.description}
+                  </p>
+                  {/* Compact info display */}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Main Map Area - Full Width */}
+    {isMapVisible && (
+      <div className="flex-1">
+        <InteractiveMap height="100%" className="w-full h-full" />
+      </div>
+    )}
+
+    {/* When map is hidden, show full-width POI grid */}
+    {!isMapVisible && (
+      <div className="flex-1 p-4 overflow-y-auto bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {/* Full-size POI cards in grid */}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+```
+
+**Date:** August 3, 2025
+**Project:** [[Routewise]]
+**Status:** Solved
+
+#layout #ui-ux #full-screen #compact-design #flexbox #space-optimization #poi-cards #solved
+**Related:** [[Component Layout]] [[Space Utilization]] [[User Interface Design]]
+
+---
+
+## Previous Session Q&A (August 3, 2025 - Session 11)
 
 ### Roadtrippers-Style Layout Implementation
 
