@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Loader2, ExternalLink, MapPin, Flag, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Poi } from "@shared/schema";
+import { useTripPlaces } from "@/hooks/use-trip-places";
 
 interface InteractiveMapProps {
   startCity: string;
@@ -94,6 +95,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   className = "",
   height = "400px",
 }) => {
+  // Trip management hook
+  const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
@@ -418,35 +421,48 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               onPoiClick(poi);
             }
 
-            // Show info window
+            // Show info window with image and Add to Trip functionality
             if (infoWindowRef.current) {
+              const isAddedToTrip = isInTrip(poi);
+              const isCurrentlyAdding = isAddingToTrip; // Get current loading state
+              
               const content = `
-                <div class="p-2 max-w-xs">
-                  <h3 class="font-semibold text-sm">${poi.name}</h3>
-                  <p class="text-xs text-gray-600 mb-2">${poi.category}</p>
+                <div class="p-3 max-w-sm">
+                  ${poi.imageUrl ? `
+                    <img 
+                      src="${poi.imageUrl}" 
+                      alt="${poi.name}" 
+                      class="w-full h-32 object-cover rounded mb-2"
+                    />
+                  ` : ''}
+                  <h3 class="font-semibold text-base mb-1">${poi.name}</h3>
+                  <p class="text-xs text-gray-600 capitalize mb-2">${poi.category}</p>
                   <div class="flex items-center text-xs mb-1">
                     <span class="text-yellow-500">⭐</span>
-                    <span class="ml-1">${poi.rating} (${
-                poi.reviewCount
-              } reviews)</span>
+                    <span class="ml-1">${poi.rating} (${poi.reviewCount} reviews)</span>
                   </div>
-                  <p class="text-xs text-gray-500">${poi.address}</p>
-                  ${
-                    onPoiSelect
-                      ? `
+                  ${poi.address ? `<p class="text-xs text-gray-500 mb-3">${poi.address}</p>` : ''}
+                  
+                  <div class="flex justify-center">
                     <button
-                      onclick="window.togglePoi(${poi.id})"
-                      class="mt-2 px-2 py-1 text-xs ${
-                        isSelected
-                          ? "bg-red-500 text-white"
-                          : "bg-blue-500 text-white"
-                      } rounded"
+                      onclick="window.addPoiToTrip('${poi.placeId || poi.id}')"
+                      ${isAddedToTrip || isCurrentlyAdding ? 'disabled' : ''}
+                      class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center ${
+                        isAddedToTrip
+                          ? 'bg-purple-100 text-purple-700 border border-purple-200 cursor-not-allowed'
+                          : isCurrentlyAdding
+                          ? 'bg-purple-400 text-white cursor-not-allowed'
+                          : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md cursor-pointer'
+                      }"
                     >
-                      ${isSelected ? "Remove from Route" : "Add to Route"}
+                      ${isCurrentlyAdding ? 
+                        '⏳ Adding...' : 
+                        isAddedToTrip ? 
+                          '✓ In Trip' : 
+                          '+ Add to Trip'
+                      }
                     </button>
-                  `
-                      : ""
-                  }
+                  </div>
                 </div>
               `;
 
@@ -487,22 +503,24 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
   }, [pois, selectedPoiIds, hoveredPoi]);
 
-  // Setup global toggle function for info window buttons
+  // Setup global function for Add to Trip functionality
   useEffect(() => {
-    if (onPoiSelect) {
-      (window as any).togglePoi = (poiId: number) => {
-        const isSelected = selectedPoiIds.includes(poiId);
-        onPoiSelect(poiId, !isSelected);
+    (window as any).addPoiToTrip = (poiIdentifier: string | number) => {
+      // Find the POI by placeId or id
+      const poi = pois.find(p => (p.placeId || p.id) === poiIdentifier);
+      if (poi && !isInTrip(poi) && !isAddingToTrip) {
+        addToTrip(poi);
+        // Close the info window after adding
         if (infoWindowRef.current) {
           infoWindowRef.current.close();
         }
-      };
-    }
+      }
+    };
 
     return () => {
-      delete (window as any).togglePoi;
+      delete (window as any).addPoiToTrip;
     };
-  }, [onPoiSelect, selectedPoiIds]);
+  }, [pois, addToTrip, isInTrip, isAddingToTrip]);
 
   // Initialize map when API key is available
   useEffect(() => {
