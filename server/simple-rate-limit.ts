@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { getRedisService } from './redis-service';
 
 interface RateLimitOptions {
   windowMs: number;
@@ -6,6 +7,7 @@ interface RateLimitOptions {
   message?: any;
   keyGenerator?: (req: Request) => string;
   skipSuccessfulRequests?: boolean;
+  useRedis?: boolean;
 }
 
 interface RequestRecord {
@@ -14,17 +16,72 @@ interface RequestRecord {
 }
 
 /**
- * Simple in-memory rate limiter without IPv6 validation issues
+ * Rate limiter with Redis support and in-memory fallback
  */
 export function createRateLimiter(options: RateLimitOptions) {
   const requests = new Map<string, RequestRecord>();
+  const useRedis = options.useRedis !== false; // Default to true
   
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Generate key for this request
-    const key = options.keyGenerator ? options.keyGenerator(req) : req.ip || 'unknown';
+    const baseKey = options.keyGenerator ? options.keyGenerator(req) : req.ip || 'unknown';
+    const key = `rate_limit:${baseKey}`;
     
     const now = Date.now();
+    const windowStart = Math.floor(now / options.windowMs) * options.windowMs;
+    const windowKey = `${key}:${windowStart}`;
     
+    try {
+      if (useRedis) {
+        // Try Redis-based rate limiting
+        const redisService = getRedisService();
+        const stats = redisService.getStats();
+        
+        if (stats.isRedisConnected) {
+          const count = await redisService.incr(windowKey);
+          
+          // Set expiration only for the first request in this window
+          if (count === 1) {
+            await redisService.expire(windowKey, Math.ceil(options.windowMs / 1000));
+          }
+          
+          if (count > options.max) {
+            const resetInSeconds = Math.ceil(options.windowMs / 1000);
+            const message = options.message || {
+              message: `Too many requests, please try again in ${resetInSeconds} seconds.`
+            };
+            
+            res.status(429).json(message);
+            return;
+          }
+          
+          // Handle skipSuccessfulRequests with Redis
+          if (options.skipSuccessfulRequests) {
+            const originalSend = res.send;
+            res.send = function(data) {
+              if (res.statusCode < 400) {
+                // Decrement counter asynchronously
+                redisService.incr(windowKey).then(newCount => {
+                  if (newCount > 0) {
+                    redisService.set(windowKey, newCount - 1, Math.ceil(options.windowMs / 1000));
+                  }
+                }).catch(() => {
+                  // Ignore decrement errors
+                });
+              }
+              return originalSend.call(this, data);
+            };
+          }
+          
+          next();
+          return;
+        }
+      }
+    } catch (error) {
+      // Fall through to memory-based rate limiting
+    }
+    
+    // Memory-based rate limiting (fallback)
     // Clean up expired entries
     for (const [k, v] of requests.entries()) {
       if (now > v.resetTime) {

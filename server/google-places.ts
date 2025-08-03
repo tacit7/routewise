@@ -52,7 +52,7 @@ export class GooglePlacesService {
   }
 
   private generateCacheKey(method: string, ...params: any[]): string {
-    return CacheService.generateCacheKey(`google-places:${method}`, ...params);
+    return `${method}:${params.map(p => String(p)).join(':')}`;
   }
 
   async geocodeCity(
@@ -60,44 +60,47 @@ export class GooglePlacesService {
   ): Promise<{ lat: number; lng: number } | null> {
     const cacheKey = this.generateCacheKey("geocodeCity", cityName);
 
-    return cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        try {
-          // Add more specific location formatting for better geocoding results
-          const formattedCity = cityName.includes(",")
-            ? cityName
-            : `${cityName}, USA`;
-          const response = await fetch(
-            `${this.geocodingUrl}?address=${encodeURIComponent(
-              formattedCity
-            )}&key=${this.apiKey}`
-          );
-          const data = await response.json();
-          console.log(`Geocoding ${formattedCity}: status = ${data.status}`);
+    // Check cache first
+    const cached = await cacheService.get<{ lat: number; lng: number }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
-          if (data.status === "OK" && data.results.length > 0) {
-            const location = data.results[0].geometry.location;
-            const coordinates = { lat: location.lat, lng: location.lng };
-            console.log(
-              `Found coordinates: ${coordinates.lat}, ${coordinates.lng}`
-            );
-            return coordinates;
-          } else {
-            console.error(
-              `Geocoding failed for ${formattedCity}:`,
-              data.status,
-              data.error_message
-            );
-            return null;
-          }
-        } catch (error) {
-          console.error("Geocoding error:", error);
-          return null;
-        }
-      },
-      { ttl: this.GEOCODING_CACHE_DURATION }
-    );
+    try {
+      // Add more specific location formatting for better geocoding results
+      const formattedCity = cityName.includes(",")
+        ? cityName
+        : `${cityName}, USA`;
+      const response = await fetch(
+        `${this.geocodingUrl}?address=${encodeURIComponent(
+          formattedCity
+        )}&key=${this.apiKey}`
+      );
+      const data = await response.json();
+      console.log(`Geocoding ${formattedCity}: status = ${data.status}`);
+
+      if (data.status === "OK" && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        const coordinates = { lat: location.lat, lng: location.lng };
+        console.log(
+          `Found coordinates: ${coordinates.lat}, ${coordinates.lng}`
+        );
+        
+        // Cache the result
+        await cacheService.set(cacheKey, coordinates, this.GEOCODING_CACHE_DURATION);
+        return coordinates;
+      } else {
+        console.error(
+          `Geocoding failed for ${formattedCity}:`,
+          data.status,
+          data.error_message
+        );
+        return null;
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      return null;
+    }
   }
 
   generateRoutePoints(
@@ -131,37 +134,39 @@ export class GooglePlacesService {
       type
     );
 
-    return cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const url = `${this.baseUrl}/nearbysearch/json`;
-        const params = new URLSearchParams({
-          location: `${latitude},${longitude}`,
-          radius: radius.toString(),
-          key: this.apiKey,
-        });
+    // Check cache first
+    const cached = await cacheService.get<GooglePlace[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
-        if (type) {
-          params.append("type", type);
-        }
+    const url = `${this.baseUrl}/nearbysearch/json`;
+    const params = new URLSearchParams({
+      location: `${latitude},${longitude}`,
+      radius: radius.toString(),
+      key: this.apiKey,
+    });
 
-        try {
-          const response = await fetch(`${url}?${params}`);
-          const data: GooglePlacesResponse = await response.json();
+    if (type) {
+      params.append("type", type);
+    }
 
-          if (data.status !== "OK") {
-            console.error("Google Places API error:", data.status);
-            return [];
-          }
+    try {
+      const response = await fetch(`${url}?${params}`);
+      const data: GooglePlacesResponse = await response.json();
 
-          return data.results;
-        } catch (error) {
-          console.error("Error fetching places:", error);
-          return [];
-        }
-      },
-      { ttl: this.PLACES_CACHE_DURATION }
-    );
+      if (data.status !== "OK") {
+        console.error("Google Places API error:", data.status);
+        return [];
+      }
+
+      // Cache the result
+      await cacheService.set(cacheKey, data.results, this.PLACES_CACHE_DURATION);
+      return data.results;
+    } catch (error) {
+      console.error("Error fetching places:", error);
+      return [];
+    }
   }
 
   async getPhotoUrl(

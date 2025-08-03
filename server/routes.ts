@@ -31,6 +31,7 @@ import {
   placesRateLimit
 } from "./simple-rate-limit";
 import { log } from "./logger";
+import { getRedisService } from "./redis-service";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -68,7 +69,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const apiCacheStats = getCacheStats();
       const placesServiceStats = placesService ? await placesService.getCacheStats() : null;
       
+      // Redis stats
+      let redisStats = null;
+      try {
+        const redisService = getRedisService();
+        redisStats = redisService.getStats();
+      } catch (error) {
+        redisStats = { error: 'Redis service not initialized' };
+      }
+      
       res.json({
+        redis: redisStats,
         apiCache: apiCacheStats,
         placesServiceCache: placesServiceStats,
         mswDisabled: process.env.MSW_DISABLED === 'true',
