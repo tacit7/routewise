@@ -1,13 +1,6 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  ArrowLeft,
-  MapPin,
-  Flag,
-  Loader2,
-  Map as MapIcon,
-  Star,
-} from "lucide-react";
+import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -151,19 +144,6 @@ export default function RouteResults() {
       citySet.add(routeData.endCity.toLowerCase());
     }
 
-    // Debug: log some POI data to understand the structure
-    if (uniquePois.length > 0) {
-      console.log(
-        "Sample POI data:",
-        uniquePois.slice(0, 3).map((poi) => ({
-          name: poi.name,
-          address: poi.address,
-          timeFromStart: poi.timeFromStart,
-          extractedCity: extractCityFromPoi(poi),
-        }))
-      );
-    }
-
     // Add cities extracted from POI data
     uniquePois.forEach((poi) => {
       const city = extractCityFromPoi(poi);
@@ -176,7 +156,6 @@ export default function RouteResults() {
       .map((city) => city.charAt(0).toUpperCase() + city.slice(1))
       .sort();
 
-    console.log("Available cities:", cities);
     return cities;
   }, [uniquePois, routeData]);
 
@@ -258,17 +237,6 @@ export default function RouteResults() {
     return null;
   }
 
-  // Prepare Google Maps URLs
-  const googleMapsDirectUrl = `https://www.google.com/maps/dir/${encodeURIComponent(
-    routeData.startCity
-  )}/${encodeURIComponent(routeData.endCity)}`;
-
-  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/directions?key=${
-    mapsApiData?.apiKey || ""
-  }&origin=${encodeURIComponent(
-    routeData.startCity
-  )}&destination=${encodeURIComponent(routeData.endCity)}&mode=driving`;
-
   const handleSaveRoute = async () => {
     if (!routeData || uniquePois.length === 0) return;
 
@@ -304,11 +272,11 @@ export default function RouteResults() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="h-screen flex flex-col bg-slate-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
+      <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-3">
             <Button
               variant="ghost"
               onClick={() => setLocation("/")}
@@ -317,441 +285,162 @@ export default function RouteResults() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-slate-600">
+                {routeData.startCity} → {routeData.endCity} • {uniquePois.length} places
+              </div>
+              <button
+                onClick={() => setIsMapVisible(!isMapVisible)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+              >
+                <MapIcon className="h-4 w-4" />
+                {isMapVisible ? "Hide Map" : "Show Map"}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          <div className="flex h-screen -mt-8 relative">
-            {/* Left Sidebar - Filters and POI List */}
-            <div className="w-96 bg-white shadow-xl z-10 flex flex-col">
-              {/* Sidebar Header */}
-              <div className="p-4 border-b border-slate-200">
-                <h2 className="text-xl font-bold text-slate-800 mb-4">
-                  Trip Details
-                </h2>
-                <div className="flex items-center text-sm text-slate-600 mb-4">
-                  <MapPin className="h-4 w-4 mr-2 text-green-600" />
-                  <span className="font-medium">{routeData.startCity}</span>
-                  <ArrowLeft className="h-4 w-4 mx-2 rotate-180 text-slate-400" />
-                  <Flag className="h-4 w-4 mr-2 text-red-600" />
-                  <span className="font-medium">{routeData.endCity}</span>
-                </div>
-                <div className="text-sm text-slate-500">
-                  {uniquePois.length} places found
-                </div>
-              </div>
-
-              {/* City Filters */}
-              {availableCities.length > 0 && (
-                <div className="p-4 border-b border-slate-200">
-                  <h3 className="text-sm font-medium text-slate-700 mb-3">
-                    Filter by City
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setSelectedCity("all")}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        selectedCity === "all"
-                          ? "bg-blue-600 text-white"
-                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                      }`}
-                    >
-                      All ({uniquePois.length})
-                    </button>
-                    {availableCities.slice(0, 4).map((city) => {
-                      const cityCount = uniquePois.filter((poi) => {
-                        const poiCity = extractCityFromPoi(poi);
-                        return (
-                          poiCity === city.toLowerCase() ||
-                          (routeData?.startCity.toLowerCase() ===
-                            city.toLowerCase() &&
-                            !poiCity) ||
-                          (routeData?.endCity.toLowerCase() ===
-                            city.toLowerCase() &&
-                            !poiCity)
-                        );
-                      }).length;
-
-                      return (
-                        <button
-                          key={city}
-                          onClick={() => setSelectedCity(city)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                            selectedCity === city
-                              ? "bg-blue-600 text-white"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                          }`}
-                        >
-                          {city} ({cityCount})
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* POI List - Scrollable */}
-              <div className="flex-1 overflow-y-auto">
-                {poisLoading && (
-                  <div className="p-6 text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
-                    <p className="text-sm text-slate-600">Loading places...</p>
-                  </div>
-                )}
-
-                {!poisLoading && uniquePois.length === 0 && (
-                  <div className="p-6 text-center">
-                    <div className="text-4xl mb-3">🗺️</div>
-                    <h3 className="text-lg font-semibold text-slate-700 mb-2">
-                      No places found
-                    </h3>
-                    <p className="text-sm text-slate-600">
-                      Try a different route or check back later.
-                    </p>
-                  </div>
-                )}
-
-                {uniquePois.length > 0 && (
-                  <div className="p-3 space-y-3">
-                    {filteredPois.map((poi, index) => (
-                      <div
-                        key={poi.placeId || poi.id || `poi-${index}`}
-                        onMouseEnter={() => handlePoiHover(poi)}
-                        onMouseLeave={() => handlePoiHover(null)}
-                        className="transition-transform hover:scale-[1.02] cursor-pointer"
-                      >
-                        <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow p-3">
-                          <div className="flex gap-3">
-                            <img
-                              src={poi.imageUrl}
-                              alt={poi.name}
-                              className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-slate-800 truncate text-sm">
-                                {poi.name}
-                              </h4>
-                              <p className="text-xs text-slate-600 line-clamp-2 mt-1">
-                                {poi.description}
-                              </p>
-                              <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center text-xs text-slate-500">
-                                  <Star className="h-3 w-3 text-yellow-400 mr-1" />
-                                  {poi.rating}
-                                </div>
-                                <span className="text-xs text-slate-500">
-                                  {poi.timeFromStart}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Main Map Area */}
-            <div className="flex-1 relative">
-              <InteractiveMap
-                startCity={routeData.startCity}
-                endCity={routeData.endCity}
-                checkpoints={[]}
-                pois={uniquePois}
-                selectedPoiIds={selectedPoiIds}
-                hoveredPoi={hoveredPoi}
-                onPoiClick={handlePoiClick}
-                onPoiSelect={handlePoiSelect}
-                height="100vh"
-                className="w-full h-full"
-              />
+      {/* Full-width layout with no gaps */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar - Compact POI Cards */}
+        <div className="w-80 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+          {/* Sidebar Header */}
+          <div className="p-3 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-800">
+              Places Along Route
+            </h2>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => setSelectedCity("all")}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  selectedCity === "all"
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                }`}
+              >
+                All ({uniquePois.length})
+              </button>
             </div>
           </div>
 
-          {/* Hidden section for non-map view */}
-          {!isMapVisible && (
-            <div className="space-y-6">
-              {/* Route Info Header */}
-              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1 className="text-2xl font-bold mb-2">Main Route</h1>
-                      <div className="flex items-center text-blue-100">
-                        <MapPin className="h-5 w-5 mr-2" />
-                        <span className="text-lg">{routeData.startCity}</span>
-                        <ArrowLeft className="h-5 w-5 mx-3 rotate-180" />
-                        <Flag className="h-5 w-5 mr-2" />
-                        <span className="text-lg">{routeData.endCity}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => setIsMapVisible(!isMapVisible)}
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-md hover:shadow-lg font-medium"
-                      >
-                        <MapIcon className="h-4 w-4" />
-                        {isMapVisible ? "Hide Map" : "Show Map"}
-                      </button>
-                      <div className="text-right">
-                        <div className="text-sm text-blue-100">
-                          Total Places Found
-                        </div>
-                        <div className="text-3xl font-bold">
-                          {uniquePois.length}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          {/* Scrollable POI List */}
+          <div className="flex-1 overflow-y-auto">
+            {poisLoading && (
+              <div className="p-4 text-center">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
+                <p className="text-xs text-slate-600">Loading places...</p>
               </div>
+            )}
 
-              {/* Wizard Preferences Display */}
-              {routeData.fromWizard && routeData.wizardPreferences && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-                    <span className="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
-                    Your Trip Preferences
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-slate-700">
-                        Trip Type:
-                      </span>
-                      <span className="ml-2 text-slate-600 capitalize">
-                        {routeData.wizardPreferences.tripType?.replace(
-                          "-",
-                          " "
-                        )}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-slate-700">
-                        Transportation:
-                      </span>
-                      <span className="ml-2 text-slate-600">
-                        {routeData.wizardPreferences.transportation?.join(", ")}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-slate-700">
-                        Budget:
-                      </span>
-                      <span className="ml-2 text-slate-600">
-                        ${routeData.wizardPreferences.budgetRange?.min} - $
-                        {routeData.wizardPreferences.budgetRange?.max}
-                      </span>
-                    </div>
-                    {routeData.wizardPreferences.intentions?.length > 0 && (
-                      <div className="md:col-span-2 lg:col-span-3">
-                        <span className="font-medium text-slate-700">
-                          Interests:
-                        </span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {routeData.wizardPreferences.intentions.map(
-                            (intention: string) => (
-                              <span
-                                key={intention}
-                                className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs"
-                              >
-                                {intention}
-                              </span>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+            {!poisLoading && uniquePois.length === 0 && (
+              <div className="p-4 text-center">
+                <div className="text-2xl mb-2">🗺️</div>
+                <h3 className="text-sm font-semibold text-slate-700 mb-1">
+                  No places found
+                </h3>
+                <p className="text-xs text-slate-600">
+                  Try a different route.
+                </p>
+              </div>
+            )}
 
-              {/* POIs Display */}
-              <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-                <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
-                  Amazing Places Along Your Route
-                </h2>
-
-                {poisLoading && (
-                  <div className="space-y-6">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                      <p className="text-lg font-medium text-slate-700">
-                        Discovering amazing places...
-                      </p>
-                      <p className="text-sm text-slate-500 mt-1">
-                        This may take a few moments
-                      </p>
-                    </div>
-                    <div className="grid gap-6">
-                      {[...Array(6)].map((_, i) => (
-                        <div key={i} className="space-y-3">
-                          <Skeleton className="h-48 w-full" />
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-4 w-1/2" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {!poisLoading && uniquePois.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="text-6xl mb-4">🗺️</div>
-                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                      No Places Found
-                    </h3>
-                    <p className="text-slate-600 max-w-md mx-auto">
-                      We couldn't find any places along this route. Try a
-                      different route or check back later as we add more
-                      locations.
-                    </p>
-                  </div>
-                )}
-
-                {uniquePois.length > 0 && (
-                  <>
-                    {/* City Filters */}
-                    {availableCities.length > 0 && (
-                      <div className="mb-6">
-                        <h3 className="text-sm font-medium text-slate-700 mb-3 text-center">
-                          Filter by City:
-                        </h3>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          <button
-                            onClick={() => setSelectedCity("all")}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                              selectedCity === "all"
-                                ? "bg-green-600 text-white"
-                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                            }`}
-                          >
-                            All Cities ({uniquePois.length})
-                          </button>
-                          {availableCities.map((city) => {
-                            const cityCount = uniquePois.filter((poi) => {
-                              const poiCity = extractCityFromPoi(poi);
-                              return (
-                                poiCity === city.toLowerCase() ||
-                                (routeData?.startCity.toLowerCase() ===
-                                  city.toLowerCase() &&
-                                  !poiCity) ||
-                                (routeData?.endCity.toLowerCase() ===
-                                  city.toLowerCase() &&
-                                  !poiCity)
-                              );
-                            }).length;
-
-                            return (
-                              <button
-                                key={city}
-                                onClick={() => setSelectedCity(city)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                  selectedCity === city
-                                    ? "bg-green-600 text-white"
-                                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                }`}
-                              >
-                                {city} ({cityCount})
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Places Cards */}
-                    <div
-                      className={`${
-                        isMapVisible
-                          ? "space-y-6"
-                          : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                      }`}
-                    >
-                      {filteredPois.map((poi, index) => (
-                        <div
-                          key={poi.placeId || poi.id || `poi-${index}`}
-                          onMouseEnter={() => handlePoiHover(poi)}
-                          onMouseLeave={() => handlePoiHover(null)}
-                          className="transition-transform hover:scale-[1.02]"
-                        >
-                          <PoiCard
-                            poi={poi}
-                            variant={isMapVisible ? "default" : "grid"}
-                            showRelevanceScore={true}
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    {filteredPois.length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-slate-600">
-                          No places found with the selected filters. Try
-                          adjusting your city or category selection.
+            {uniquePois.length > 0 && (
+              <div className="p-2 space-y-1">
+                {filteredPois.map((poi, index) => (
+                  <div
+                    key={poi.placeId || poi.id || `poi-${index}`}
+                    onMouseEnter={() => handlePoiHover(poi)}
+                    onMouseLeave={() => handlePoiHover(null)}
+                    className="bg-white rounded border hover:shadow-sm transition-all cursor-pointer p-2"
+                  >
+                    <div className="flex gap-2">
+                      <img
+                        src={poi.imageUrl}
+                        alt={poi.name}
+                        className="w-12 h-12 rounded object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-slate-800 text-sm truncate">
+                          {poi.name}
+                        </h4>
+                        <p className="text-xs text-slate-600 line-clamp-1 mb-1">
+                          {poi.description}
                         </p>
-                      </div>
-                    )}
-
-                    {/* Summary Stats */}
-                    <div className="mt-8 grid grid-cols-2 gap-4">
-                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-blue-700">
-                          {
-                            uniquePois.filter(
-                              (p) => p.category === "restaurant"
-                            ).length
-                          }
-                        </div>
-                        <div className="text-sm text-blue-700 font-medium">
-                          Restaurants
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-green-700">
-                          {
-                            uniquePois.filter(
-                              (p) => p.category === "attraction"
-                            ).length
-                          }
-                        </div>
-                        <div className="text-sm text-green-700 font-medium">
-                          Attractions
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-purple-700">
-                          {
-                            uniquePois.filter((p) => p.category === "park")
-                              .length
-                          }
-                        </div>
-                        <div className="text-sm text-purple-700 font-medium">
-                          Parks & Nature
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-amber-700">
-                          {
-                            uniquePois.filter(
-                              (p) => parseFloat(p.rating) >= 4.5
-                            ).length
-                          }
-                        </div>
-                        <div className="text-sm text-amber-700 font-medium">
-                          Highly Rated
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-xs text-slate-500">
+                            <Star className="h-3 w-3 text-yellow-400 mr-1" />
+                            {poi.rating}
+                          </div>
+                          <span className="text-xs text-slate-500">
+                            {poi.timeFromStart}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </>
-                )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Main Map Area - Full Width */}
+        {isMapVisible && (
+          <div className="flex-1">
+            <InteractiveMap
+              startCity={routeData.startCity}
+              endCity={routeData.endCity}
+              checkpoints={[]}
+              pois={uniquePois}
+              selectedPoiIds={selectedPoiIds}
+              hoveredPoi={hoveredPoi}
+              onPoiClick={handlePoiClick}
+              onPoiSelect={handlePoiSelect}
+              height="100%"
+              className="w-full h-full"
+            />
+          </div>
+        )}
+
+        {/* When map is hidden, show full-width POI grid */}
+        {!isMapVisible && (
+          <div className="flex-1 p-4 overflow-y-auto bg-slate-50">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {filteredPois.map((poi, index) => (
+                  <div
+                    key={poi.placeId || poi.id || `poi-${index}`}
+                    onMouseEnter={() => handlePoiHover(poi)}
+                    onMouseLeave={() => handlePoiHover(null)}
+                    className="bg-white rounded-lg border hover:shadow-md transition-all cursor-pointer p-3"
+                  >
+                    <div className="flex flex-col">
+                      <img
+                        src={poi.imageUrl}
+                        alt={poi.name}
+                        className="w-full h-32 rounded object-cover mb-2"
+                      />
+                      <h4 className="font-medium text-slate-800 text-sm truncate mb-1">
+                        {poi.name}
+                      </h4>
+                      <p className="text-xs text-slate-600 line-clamp-2 mb-2">
+                        {poi.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center">
+                          <Star className="h-3 w-3 text-yellow-400 mr-1" />
+                          {poi.rating}
+                        </div>
+                        <span>{poi.timeFromStart}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
