@@ -30,34 +30,51 @@ const getCategoryColor = (category: string): string => {
   return colors[category as keyof typeof colors] || colors.default;
 };
 
-// Create marker icon with category-specific colors
-const createMarkerIcon = (category: string, isSelected = false, isHovered = false): google.maps.Icon => {
-  let color = getCategoryColor(category); // Use category color by default
-  let strokeColor = '#FFFFFF';
-  let strokeWidth = 2;
-  let scale = 12; // Bigger default size
+// Create marker element with category-specific colors
+const createMarkerElement = (category: string, poi: any, isSelected = false, isHovered = false): HTMLElement => {
+  let color = getCategoryColor(category);
+  let borderColor = '#FFFFFF';
+  let borderWidth = '2px';
+  let size = '24px'; // Base size
   
   if (isSelected) {
     color = '#22C55E'; // Green color only when selected
-    strokeColor = '#000000';
-    strokeWidth = 3;
-    scale = 14;
+    borderColor = '#000000';
+    borderWidth = '3px';
+    size = '26px'; // Slight increase for selection
   }
   
   if (isHovered) {
-    strokeColor = '#FFD700'; // Gold for hover
-    strokeWidth = 4;
-    scale = 16; // Even bigger on hover
+    borderColor = '#FFD700'; // Gold for hover
+    borderWidth = '4px';
+    size = '26px'; // Same slight increase for hover
   }
   
-  return {
-    path: google.maps.SymbolPath.CIRCLE,
-    fillColor: color,
-    fillOpacity: isHovered ? 1.0 : 0.8,
-    strokeColor: strokeColor,
-    strokeWeight: strokeWidth,
-    scale: scale,
-  };
+  const markerElement = document.createElement('div');
+  markerElement.style.cssText = `
+    width: ${size};
+    height: ${size};
+    background-color: ${color};
+    border: ${borderWidth} solid ${borderColor};
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: ${isHovered ? '1.0' : '0.8'};
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  `;
+  
+  // Add category initial as text content
+  const categoryInitial = category.charAt(0).toUpperCase();
+  markerElement.textContent = categoryInitial;
+  
+  return markerElement;
 };
 
 export const InteractiveMap: React.FC<InteractiveMapProps> = ({
@@ -74,8 +91,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
-  const poiMarkersRef = useRef<Map<number, google.maps.Marker>>(new Map());
+  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const poiMarkersRef = useRef<Map<number, google.maps.marker.AdvancedMarkerElement>>(new Map());
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null);
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
@@ -104,7 +121,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     fetchMapsKey();
   }, []);
 
-  // Load Google Maps JavaScript API
+  // Load Google Maps JavaScript API with async loading pattern
   const loadGoogleMapsScript = useCallback((apiKey: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       // Check if already loaded
@@ -114,7 +131,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
 
       // Check if script is already being loaded
-      if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
         // Wait for it to load
         const checkGoogleMaps = () => {
           if (window.google && window.google.maps) {
@@ -128,11 +146,34 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      // Use the recommended async loading pattern with loading=async parameter
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&loading=async`;
       script.async = true;
       script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Google Maps'));
+      
+      // Set up load and error handlers before appending to DOM
+      script.addEventListener('load', () => {
+        // Ensure the API is fully loaded with all required properties
+        const checkApiReady = () => {
+          if (window.google && 
+              window.google.maps && 
+              window.google.maps.Map && 
+              window.google.maps.MapTypeId &&
+              window.google.maps.marker &&
+              window.google.maps.marker.AdvancedMarkerElement) {
+            resolve();
+          } else {
+            // Wait a bit more for the API to fully initialize
+            setTimeout(checkApiReady, 100);
+          }
+        };
+        checkApiReady();
+      });
+      
+      script.addEventListener('error', () => {
+        reject(new Error('Failed to load Google Maps'));
+      });
+      
       document.head.appendChild(script);
     });
   }, []);
@@ -148,7 +189,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const map = new google.maps.Map(mapRef.current, {
         zoom: 8,
         center: { lat: 39.8283, lng: -98.5795 }, // Center of US, will be updated
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeId: 'roadmap', // Use string constant instead of enum
+        mapId: 'routewise-map', // Required for AdvancedMarkerElement
         zoomControl: true,
         mapTypeControl: true,
         scaleControl: true,
@@ -192,7 +234,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       destination: endCity,
       waypoints: waypoints,
       optimizeWaypoints: false,
-      travelMode: google.maps.TravelMode.DRIVING,
+      travelMode: 'DRIVING' as google.maps.TravelMode,
     };
 
     try {
@@ -224,37 +266,59 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     if (!route) return;
 
     // Clear existing route markers
-    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current.forEach(marker => marker.map = null);
     markersRef.current = [];
 
+    // Create start marker element
+    const startElement = document.createElement('div');
+    startElement.style.cssText = `
+      width: 20px;
+      height: 20px;
+      background-color: #22C55E;
+      border: 2px solid #FFFFFF;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+      font-weight: bold;
+    `;
+    startElement.textContent = 'S';
+
     // Add start marker
-    const startMarker = new google.maps.Marker({
+    const startMarker = new google.maps.marker.AdvancedMarkerElement({
       position: route.legs[0].start_location,
       map: mapInstanceRef.current,
       title: `Start: ${startCity}`,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#22C55E',
-        fillOpacity: 1,
-        strokeColor: '#FFFFFF',
-        strokeWeight: 2,
-        scale: 10,
-      },
+      content: startElement,
     });
 
+    // Create end marker element
+    const endElement = document.createElement('div');
+    endElement.style.cssText = `
+      width: 20px;
+      height: 20px;
+      background-color: #EF4444;
+      border: 2px solid #FFFFFF;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+      font-weight: bold;
+    `;
+    endElement.textContent = 'E';
+
     // Add end marker
-    const endMarker = new google.maps.Marker({
+    const endMarker = new google.maps.marker.AdvancedMarkerElement({
       position: route.legs[route.legs.length - 1].end_location,
       map: mapInstanceRef.current,
       title: `End: ${endCity}`,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#EF4444',
-        fillOpacity: 1,
-        strokeColor: '#FFFFFF',
-        strokeWeight: 2,
-        scale: 10,
-      },
+      content: endElement,
     });
 
     markersRef.current.push(startMarker, endMarker);
@@ -262,18 +326,28 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // Add checkpoint markers
     checkpoints.forEach((checkpoint, index) => {
       if (route.legs[index] && route.legs[index].end_location) {
-        const checkpointMarker = new google.maps.Marker({
+        const checkpointElement = document.createElement('div');
+        checkpointElement.style.cssText = `
+          width: 16px;
+          height: 16px;
+          background-color: #F59E0B;
+          border: 2px solid #FFFFFF;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 8px;
+          color: white;
+          font-weight: bold;
+        `;
+        checkpointElement.textContent = (index + 1).toString();
+
+        const checkpointMarker = new google.maps.marker.AdvancedMarkerElement({
           position: route.legs[index].end_location,
           map: mapInstanceRef.current,
           title: `Checkpoint: ${checkpoint}`,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: '#F59E0B',
-            fillOpacity: 1,
-            strokeColor: '#FFFFFF',
-            strokeWeight: 2,
-            scale: 8,
-          },
+          content: checkpointElement,
         });
         markersRef.current.push(checkpointMarker);
       }
@@ -288,7 +362,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     const currentPoiIds = new Set(pois.map(poi => poi.placeId || poi.id));
     poiMarkersRef.current.forEach((marker, poiId) => {
       if (!currentPoiIds.has(poiId)) {
-        marker.setMap(null);
+        marker.map = null;
         poiMarkersRef.current.delete(poiId);
       }
     });
@@ -305,11 +379,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         if (status === 'OK' && results && results[0]) {
           const isSelected = selectedPoiIds.includes(poi.id);
           const isHovered = hoveredPoi && (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id);
-          const marker = new google.maps.Marker({
+          
+          // Create marker element
+          const markerElement = createMarkerElement(poi.category, poi, isSelected, isHovered);
+          
+          const marker = new google.maps.marker.AdvancedMarkerElement({
             position: results[0].geometry.location,
             map: mapInstanceRef.current,
             title: poi.name,
-            icon: createMarkerIcon(poi.category, isSelected, isHovered),
+            content: markerElement,
           });
 
           // Add click listener
@@ -355,13 +433,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // Update marker icons based on selection and hover state
   const updateMarkerIcons = useCallback(() => {
+    if (!mapInstanceRef.current) return;
+    
     pois.forEach(poi => {
       const poiIdentifier = poi.placeId || poi.id;
       const marker = poiMarkersRef.current.get(poiIdentifier);
       if (marker) {
         const isSelected = selectedPoiIds.includes(poi.id);
         const isHovered = hoveredPoi && (hoveredPoi.placeId || hoveredPoi.id) === poiIdentifier;
-        marker.setIcon(createMarkerIcon(poi.category, isSelected, isHovered));
+        
+        // Create new marker element with updated state
+        const newMarkerElement = createMarkerElement(poi.category, poi, isSelected, isHovered);
+        marker.content = newMarkerElement;
       }
     });
   }, [pois, selectedPoiIds, hoveredPoi]);
@@ -416,11 +499,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   useEffect(() => {
     return () => {
       // Clear all POI markers
-      poiMarkersRef.current.forEach(marker => marker.setMap(null));
+      poiMarkersRef.current.forEach(marker => marker.map = null);
       poiMarkersRef.current.clear();
       
       // Clear route markers
-      markersRef.current.forEach(marker => marker.setMap(null));
+      markersRef.current.forEach(marker => marker.map = null);
       markersRef.current = [];
     };
   }, []);
@@ -460,16 +543,35 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       
       <div ref={mapRef} className="w-full h-full" />
       
-      {/* Map controls overlay */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+      {/* Map controls overlay - Zoom buttons */}
+      <div className="absolute top-4 right-4 flex flex-col gap-1 z-20">
         <Button
           size="sm"
           variant="secondary"
-          onClick={() => window.open(googleMapsDirectUrl, '_blank')}
-          className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const currentZoom = mapInstanceRef.current.getZoom() || 8;
+              mapInstanceRef.current.setZoom(currentZoom + 1);
+            }
+          }}
+          className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg w-10 h-10 p-0 flex items-center justify-center"
+          aria-label="Zoom in"
         >
-          <ExternalLink className="h-4 w-4 mr-1" />
-          Open in Google Maps
+          <span className="text-lg font-bold">+</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const currentZoom = mapInstanceRef.current.getZoom() || 8;
+              mapInstanceRef.current.setZoom(Math.max(1, currentZoom - 1));
+            }
+          }}
+          className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg w-10 h-10 p-0 flex items-center justify-center"
+          aria-label="Zoom out"
+        >
+          <span className="text-lg font-bold">−</span>
         </Button>
       </div>
 

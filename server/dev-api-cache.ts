@@ -1,7 +1,9 @@
 // dev-api-cache.ts
-// Enhanced in-memory cache for API responses, enabled in development
+// Enhanced cache for API responses, enabled in development
+// Uses Redis when available, falls back to in-memory cache
 // Provides intelligent caching when MSW is disabled
 import type { Request, Response, NextFunction } from "express";
+import { cacheService } from "./cache-service";
 
 interface CacheEntry {
   data: any;
@@ -54,49 +56,81 @@ export function devApiCacheMiddleware(req: Request, res: Response, next: NextFun
   // Only cache API requests
   if (!req.path.startsWith("/api")) return next();
   
-  // Check if MSW is disabled (when caching is most useful)
-  const isMswDisabled = process.env.MSW_DISABLED === 'true';
-  
   const key = makeCacheKey(req);
-  const now = Date.now();
-  const entry = cache[key];
   const cacheDuration = getCacheDuration(req.path);
 
-  // Check for cache hit
-  if (entry && now - entry.timestamp < cacheDuration) {
-    logCacheOperation('HIT', key, req.path);
-    return res.json(entry.data);
-  } else if (entry) {
-    // Cache entry exists but is expired
-    delete cache[key];
-  }
-
-  logCacheOperation('MISS', key, req.path);
-
-  // Monkey-patch res.json to capture response
-  const originalJson = res.json.bind(res);
-  res.json = (body: any) => {
-    // Only cache successful responses
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      cache[key] = { 
-        data: body, 
-        timestamp: Date.now(),
-        url: req.originalUrl,
-        method: req.method
-      };
-      logCacheOperation('SET', key, req.path);
+  // Try async cache check
+  cacheService.get(key).then(cachedResult => {
+    if (cachedResult) {
+      logCacheOperation('HIT', key, req.path);
+      return res.json(cachedResult);
     }
-    return originalJson(body);
-  };
 
-  next();
+    // Cache miss - check fallback memory cache
+    const now = Date.now();
+    const entry = cache[key];
+
+    if (entry && now - entry.timestamp < cacheDuration) {
+      logCacheOperation('HIT', key, req.path);
+      return res.json(entry.data);
+    } else if (entry) {
+      // Cache entry exists but is expired
+      delete cache[key];
+    }
+
+    logCacheOperation('MISS', key, req.path);
+
+    // Monkey-patch res.json to capture response
+    const originalJson = res.json.bind(res);
+    res.json = (body: any) => {
+      // Only cache successful responses
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        // Cache in both Redis and memory
+        cacheService.set(key, body, { ttl: cacheDuration }).catch(err => {
+          console.error('Cache set error:', err.message);
+        });
+
+        cache[key] = { 
+          data: body, 
+          timestamp: Date.now(),
+          url: req.originalUrl,
+          method: req.method
+        };
+        logCacheOperation('SET', key, req.path);
+      }
+      return originalJson(body);
+    };
+
+    next();
+  }).catch(err => {
+    console.error('Cache get error:', err.message);
+    // Fall back to memory cache
+    const now = Date.now();
+    const entry = cache[key];
+
+    if (entry && now - entry.timestamp < cacheDuration) {
+      logCacheOperation('HIT', key, req.path);
+      return res.json(entry.data);
+    }
+
+    next();
+  });
 }
 
 // Utility function to clear cache (useful for testing)
-export function clearCache() {
+export async function clearCache() {
   const count = Object.keys(cache).length;
+  
+  // Clear Redis cache
+  try {
+    await cacheService.clear();
+  } catch (error) {
+    console.error('Error clearing Redis cache:', error.message);
+  }
+  
+  // Clear memory cache
   Object.keys(cache).forEach(key => delete cache[key]);
-  console.log(`🗑️  [cache] Cleared ${count} cache entries`);
+  console.log(`🗑️  [cache] Cleared ${count} dev cache entries`);
 }
 
 // Utility function to show cache stats

@@ -16,9 +16,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface PoiCardProps {
   poi: Poi;
+  variant?: 'default' | 'grid';
 }
 
-export default function PoiCard({ poi }: PoiCardProps) {
+export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
   const [isAdded, setIsAdded] = useState(false);
@@ -103,14 +104,16 @@ export default function PoiCard({ poi }: PoiCardProps) {
     window.dispatchEvent(new Event("tripUpdated"));
   };
 
+  const isGridVariant = variant === 'grid';
+  
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
       <img
         src={poi.imageUrl}
         alt={poi.name}
-        className="w-full h-48 object-cover"
+        className={`w-full object-cover ${isGridVariant ? 'h-56' : 'h-48'}`}
       />
-      <div className="p-6">
+      <div className={`${isGridVariant ? 'p-4 flex-1 flex flex-col' : 'p-6'}`}>
         <div className="flex items-center justify-between mb-2">
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor}`}
@@ -121,10 +124,10 @@ export default function PoiCard({ poi }: PoiCardProps) {
           <span className="text-slate-500 text-sm">{poi.timeFromStart}</span>
         </div>
 
-        <h4 className="text-xl font-semibold text-slate-800 mb-2">
+        <h4 className={`font-semibold text-slate-800 mb-2 ${isGridVariant ? 'text-lg' : 'text-xl'}`}>
           {poi.name}
         </h4>
-        <p className="text-slate-600 mb-3">{poi.description}</p>
+        <p className={`text-slate-600 ${isGridVariant ? 'mb-2 text-sm flex-1' : 'mb-3'}`}>{poi.description}</p>
 
         {poi.address && (
           <div className="flex items-center text-slate-500 text-sm mb-2">
@@ -164,7 +167,7 @@ export default function PoiCard({ poi }: PoiCardProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className={`flex gap-2 ${isGridVariant ? 'mt-auto' : ''}`}>
           <button
             onClick={handleAddPlace}
             disabled={isAdded}

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { cacheService, CacheService } from "./cache-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -33,93 +34,70 @@ interface GooglePlacesResponse {
   next_page_token?: string;
 }
 
-interface CacheEntry {
-  data: any;
-  timestamp: number;
-}
-
 export class GooglePlacesService {
   private apiKey: string;
   private baseUrl = "https://maps.googleapis.com/maps/api/place";
   private geocodingUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-  private cache: Map<string, CacheEntry> = new Map();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-  private readonly GEOCODING_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for geocoding
+  private readonly PLACES_CACHE_DURATION: number; // in milliseconds
+  private readonly GEOCODING_CACHE_DURATION: number; // in milliseconds
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    
+    // Configure cache durations from environment variables (in minutes, converted to ms)
+    this.PLACES_CACHE_DURATION = (parseInt(process.env.GOOGLE_PLACES_CACHE_DURATION || "5") * 60 * 1000);
+    this.GEOCODING_CACHE_DURATION = (parseInt(process.env.GOOGLE_GEOCODING_CACHE_DURATION || "10") * 60 * 1000);
+    
+    console.log(`🗄️ GooglePlacesService cache config: Places=${this.PLACES_CACHE_DURATION/60000}min, Geocoding=${this.GEOCODING_CACHE_DURATION/60000}min`);
   }
 
   private generateCacheKey(method: string, ...params: any[]): string {
-    return `${method}:${JSON.stringify(params)}`;
-  }
-
-  private getCachedResult<T>(cacheKey: string, maxAge: number = this.CACHE_DURATION): T | null {
-    const entry = this.cache.get(cacheKey);
-    if (entry && Date.now() - entry.timestamp < maxAge) {
-      console.log(`🎯 Cache HIT for ${cacheKey}`);
-      return entry.data as T;
-    }
-    if (entry) {
-      this.cache.delete(cacheKey);
-    }
-    console.log(`🔍 Cache MISS for ${cacheKey}`);
-    return null;
-  }
-
-  private setCachedResult(cacheKey: string, data: any): void {
-    this.cache.set(cacheKey, {
-      data,
-      timestamp: Date.now()
-    });
-    console.log(`💾 Cache SET for ${cacheKey}`);
+    return CacheService.generateCacheKey(`google-places:${method}`, ...params);
   }
 
   async geocodeCity(
     cityName: string
   ): Promise<{ lat: number; lng: number } | null> {
-    const cacheKey = this.generateCacheKey('geocodeCity', cityName);
-    const cachedResult = this.getCachedResult<{ lat: number; lng: number }>(
-      cacheKey, 
-      this.GEOCODING_CACHE_DURATION
+    const cacheKey = this.generateCacheKey("geocodeCity", cityName);
+
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        try {
+          // Add more specific location formatting for better geocoding results
+          const formattedCity = cityName.includes(",")
+            ? cityName
+            : `${cityName}, USA`;
+          const response = await fetch(
+            `${this.geocodingUrl}?address=${encodeURIComponent(
+              formattedCity
+            )}&key=${this.apiKey}`
+          );
+          const data = await response.json();
+          console.log(`Geocoding ${formattedCity}: status = ${data.status}`);
+
+          if (data.status === "OK" && data.results.length > 0) {
+            const location = data.results[0].geometry.location;
+            const coordinates = { lat: location.lat, lng: location.lng };
+            console.log(
+              `Found coordinates: ${coordinates.lat}, ${coordinates.lng}`
+            );
+            return coordinates;
+          } else {
+            console.error(
+              `Geocoding failed for ${formattedCity}:`,
+              data.status,
+              data.error_message
+            );
+            return null;
+          }
+        } catch (error) {
+          console.error("Geocoding error:", error);
+          return null;
+        }
+      },
+      { ttl: this.GEOCODING_CACHE_DURATION }
     );
-    
-    if (cachedResult) {
-      return cachedResult;
-    }
-
-    try {
-      // Add more specific location formatting for better geocoding results
-      const formattedCity = cityName.includes(",")
-        ? cityName
-        : `${cityName}, USA`;
-      const response = await fetch(
-        `${this.geocodingUrl}?address=${encodeURIComponent(
-          formattedCity
-        )}&key=${this.apiKey}`
-      );
-      const data = await response.json();
-      console.log(`Geocoding ${formattedCity}: status = ${data.status}`);
-
-      if (data.status === "OK" && data.results.length > 0) {
-        const location = data.results[0].geometry.location;
-        const coordinates = { lat: location.lat, lng: location.lng };
-        console.log(`Found coordinates: ${coordinates.lat}, ${coordinates.lng}`);
-        
-        this.setCachedResult(cacheKey, coordinates);
-        return coordinates;
-      } else {
-        console.error(
-          `Geocoding failed for ${formattedCity}:`,
-          data.status,
-          data.error_message
-        );
-      }
-      return null;
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      return null;
-    }
   }
 
   generateRoutePoints(
@@ -145,44 +123,45 @@ export class GooglePlacesService {
     radius: number = 50000,
     type?: string
   ): Promise<GooglePlace[]> {
-    const cacheKey = this.generateCacheKey('searchNearbyPlaces', latitude, longitude, radius, type);
-    const cachedResult = this.getCachedResult<GooglePlace[]>(cacheKey);
-    
-    if (cachedResult) {
-      return cachedResult;
-    }
+    const cacheKey = this.generateCacheKey(
+      "searchNearbyPlaces",
+      latitude,
+      longitude,
+      radius,
+      type
+    );
 
-    const url = `${this.baseUrl}/nearbysearch/json`;
-    const params = new URLSearchParams({
-      location: `${latitude},${longitude}`,
-      radius: radius.toString(),
-      key: this.apiKey,
-    });
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const url = `${this.baseUrl}/nearbysearch/json`;
+        const params = new URLSearchParams({
+          location: `${latitude},${longitude}`,
+          radius: radius.toString(),
+          key: this.apiKey,
+        });
 
-    if (type) {
-      params.append("type", type);
-    }
+        if (type) {
+          params.append("type", type);
+        }
 
-    try {
-      const response = await fetch(`${url}?${params}`);
-      const data: GooglePlacesResponse = await response.json();
+        try {
+          const response = await fetch(`${url}?${params}`);
+          const data: GooglePlacesResponse = await response.json();
 
-      fs.writeFileSync(
-        path.join(__dirname, "google-places-nearby.mock.json"),
-        JSON.stringify(data, null, 2)
-      );
-      
-      if (data.status !== "OK") {
-        console.error("Google Places API error:", data.status);
-        return [];
-      }
+          if (data.status !== "OK") {
+            console.error("Google Places API error:", data.status);
+            return [];
+          }
 
-      this.setCachedResult(cacheKey, data.results);
-      return data.results;
-    } catch (error) {
-      console.error("Error fetching places:", error);
-      return [];
-    }
+          return data.results;
+        } catch (error) {
+          console.error("Error fetching places:", error);
+          return [];
+        }
+      },
+      { ttl: this.PLACES_CACHE_DURATION }
+    );
   }
 
   async getPhotoUrl(
@@ -286,21 +265,14 @@ export class GooglePlacesService {
   }
 
   // Cache management methods
-  clearCache(): void {
-    const count = this.cache.size;
-    this.cache.clear();
-    console.log(`🗑️ Cleared ${count} cache entries from GooglePlacesService`);
+  async clearCache(): Promise<void> {
+    // Clear all google-places related cache entries
+    await cacheService.clear();
+    console.log(`🗑️ Cleared GooglePlacesService cache entries`);
   }
 
-  getCacheStats(): { totalEntries: number; methods: string[] } {
-    const entries = Array.from(this.cache.keys());
-    const methodSet = new Set(entries.map(key => key.split(':')[0]));
-    const methods = Array.from(methodSet);
-    
-    return {
-      totalEntries: this.cache.size,
-      methods
-    };
+  async getCacheStats(): Promise<{ type: string; connected: boolean; totalEntries?: number }> {
+    return await cacheService.getStats();
   }
 }
 

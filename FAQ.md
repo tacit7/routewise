@@ -1200,3 +1200,605 @@ const isDisabled = false; // Allow selecting all intentions
 **Related:** [[Trip Type Selection]] [[UI Simplification]] [[Component Configuration]]
 
 ---
+
+## UI/UX Improvements
+
+### POI Card Grid Layout Optimization for Desktop
+**Question:** Grid layout showing too many columns making cards look cramped
+**Error/Issue:** Original 4+ column grid made POI cards too narrow and buttons squished
+**Context:** Improving POI card display when map is hidden for better visual hierarchy
+**Solution:** Simplified responsive grid to maximum 3 columns (1→2→3) for optimal card width and button spacing
+**Code:**
+
+```typescript
+// Optimized grid layout
+<div className={`${isMapVisible ? 'space-y-6' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'}`}>
+  {filteredPois.map((poi, index) => (
+    <PoiCard poi={poi} variant={isMapVisible ? 'default' : 'grid'} />
+  ))}
+</div>
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #css #grid-layout #responsive-design #ui-optimization #solved
+**Related:** [[POI Card Enhancement]] [[Responsive Design]] [[Grid Systems]]
+
+---
+
+### POI Card Visual Enhancement for Grid Display
+**Question:** POI cards need to be bigger and more prominent in grid layout
+**Error/Issue:** Cards were too small with inadequate visual impact in grid view
+**Context:** Enhancing visual appeal and usability of POI cards when map is hidden
+**Solution:** Created grid variant with larger images, optimized padding, and improved layout structure
+**Code:**
+
+```typescript
+// Enhanced POI card with grid variant
+const isGridVariant = variant === 'grid';
+
+return (
+  <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
+    <img
+      src={poi.imageUrl}
+      alt={poi.name}
+      className={`w-full object-cover ${isGridVariant ? 'h-56' : 'h-48'}`}
+    />
+    <div className={`${isGridVariant ? 'p-4 flex-1 flex flex-col' : 'p-6'}`}>
+      {/* Content with optimized spacing and flex layout */}
+    </div>
+  </div>
+);
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #typescript #ui-components #visual-design #responsive-cards #solved
+**Related:** [[Grid Layout Optimization]] [[Component Variants]] [[Visual Hierarchy]]
+
+---
+
+### Route Visualization Layout Alignment
+**Question:** Start and end cities in route display need proper positioning and alignment
+**Error/Issue:** Route endpoints were not properly aligned, needed centering or edge positioning
+**Context:** Improving route visualization component for better user experience and visual clarity
+**Solution:** Implemented justify-between layout with proper connector line, z-index layering, and symmetrical positioning
+**Code:**
+
+```typescript
+// Improved route layout with proper positioning
+<div className="relative flex items-center justify-between min-w-full">
+  {/* Connector Line - Behind Icons */}
+  {cityStops.length === 2 && (
+    <div className="absolute inset-x-0 top-6 flex items-center justify-center pointer-events-none">
+      <div className="w-full max-w-[calc(100%-6rem)] h-0.5 bg-blue-300"></div>
+    </div>
+  )}
+  
+  {cityStops.map((stop, index) => (
+    <div key={`city-${index}`} className="flex flex-col items-center relative z-10">
+      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center border-2 border-white">
+        {/* Icons with proper layering */}
+      </div>
+    </div>
+  ))}
+</div>
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #css #layout #flexbox #route-visualization #alignment #solved
+**Related:** [[Component Layout]] [[Visual Design]] [[Route Display]]
+
+---
+
+## Redis Caching Implementation
+
+### Implementing Redis Caching for Production Scalability
+**Question:** How can we implement Redis caching to replace in-memory caching in the RouteWise backend?
+**Error/Issue:** In-memory cache was volatile, lost on restarts, and couldn't scale across multiple instances
+**Context:** Upgrading from development in-memory caching to production-ready Redis caching for better performance and scalability
+**Solution:** Implemented comprehensive Redis caching system with graceful fallback to in-memory cache when Redis unavailable
+**Code:**
+
+```typescript
+// server/cache-service.ts - Unified caching service
+export class CacheService {
+  private redisClient: RedisClientType | null = null;
+  private memoryCache: Map<string, CacheEntry> = new Map();
+  private isRedisConnected = false;
+
+  constructor(options: { defaultTTL?: number; keyPrefix?: string } = {}) {
+    this.defaultTTL = options.defaultTTL || 5 * 60 * 1000;
+    this.keyPrefix = options.keyPrefix || 'routewise:';
+    this.initializeRedis();
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    const fullKey = this.generateKey(key);
+    
+    try {
+      if (this.isRedisConnected && this.redisClient) {
+        const value = await this.redisClient.get(fullKey);
+        if (value) {
+          console.log(`🎯 Redis cache HIT: ${key}`);
+          return JSON.parse(value) as T;
+        }
+      }
+    } catch (error) {
+      console.error(`⚠️ Redis get error: ${error.message}`);
+    }
+
+    // Fallback to memory cache
+    const entry = this.memoryCache.get(fullKey);
+    if (entry && Date.now() - entry.timestamp < this.defaultTTL) {
+      console.log(`🎯 Memory cache HIT: ${key}`);
+      return entry.data as T;
+    }
+    return null;
+  }
+
+  async getOrSet<T>(
+    key: string, 
+    fetchFunction: () => Promise<T>, 
+    options?: CacheOptions
+  ): Promise<T> {
+    const cached = await this.get<T>(key);
+    if (cached !== null) return cached;
+
+    const result = await fetchFunction();
+    await this.set(key, result, options);
+    return result;
+  }
+}
+
+// Migrated Google Places Service
+async geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
+  const cacheKey = this.generateCacheKey("geocodeCity", cityName);
+  
+  return cacheService.getOrSet(
+    cacheKey,
+    async () => {
+      // Original geocoding logic here
+      return coordinates;
+    },
+    { ttl: this.GEOCODING_CACHE_DURATION }
+  );
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#redis #caching #backend #performance #scalability #production #nodejs #express #solved
+**Related:** [[Performance Optimization]] [[Production Deployment]] [[Caching Strategy]]
+
+---
+
+### Making Google Places Cache Duration Configurable
+**Question:** Can you make the cache duration configurable via environment variables?
+**Error/Issue:** Cache durations were hardcoded, couldn't adjust for different environments
+**Context:** Needed flexible cache configuration for development vs production environments
+**Solution:** Added environment variables for cache durations with fallback defaults
+**Code:**
+
+```bash
+# .env configuration
+GOOGLE_PLACES_CACHE_DURATION=5    # Places nearby search cache (minutes)
+GOOGLE_GEOCODING_CACHE_DURATION=10 # Geocoding results cache (minutes)
+
+# Redis configuration (optional)
+REDIS_URL=redis://localhost:6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
+CACHE_DEFAULT_TTL=300000           # Default cache TTL (milliseconds)
+CACHE_KEY_PREFIX=routewise:        # Cache key prefix
+```
+
+```typescript
+// GooglePlacesService constructor
+constructor(apiKey: string) {
+  this.apiKey = apiKey;
+  
+  // Configure cache durations from environment variables
+  this.PLACES_CACHE_DURATION = (parseInt(process.env.GOOGLE_PLACES_CACHE_DURATION || "5") * 60 * 1000);
+  this.GEOCODING_CACHE_DURATION = (parseInt(process.env.GOOGLE_GEOCODING_CACHE_DURATION || "10") * 60 * 1000);
+  
+  console.log(`🗄️ GooglePlacesService cache config: Places=${this.PLACES_CACHE_DURATION/60000}min, Geocoding=${this.GEOCODING_CACHE_DURATION/60000}min`);
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#environment-variables #configuration #caching #google-api #flexibility #solved
+**Related:** [[Environment Configuration]] [[Google Places Integration]] [[Cache Management]]
+
+---
+
+### Redis Service Setup and Environment Configuration
+**Question:** Can you start Redis using brew services and set the environment variables?
+**Error/Issue:** Needed to activate Redis locally and configure environment for testing
+**Context:** Setting up local Redis instance for testing production caching implementation
+**Solution:** Started Redis via brew services and configured environment variables for local development
+**Code:**
+
+```bash
+# Install and start Redis (if not already running)
+brew services start redis
+
+# Test Redis connection
+redis-cli ping
+# Should return: PONG
+
+# Configure environment variables in .env
+REDIS_URL=redis://localhost:6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
+# REDIS_PASSWORD= (leave empty for local setup)
+
+# Test Redis integration
+node test-redis.js
+
+# Check Redis keys
+redis-cli keys "routewise:*"
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#redis #homebrew #local-development #environment-setup #testing #solved
+**Related:** [[Redis Setup]] [[Local Development]] [[Service Management]]
+
+---
+
+### Database Query Caching Implementation
+**Question:** How to add caching to database queries for interests and user lookups?
+**Error/Issue:** Database queries were hitting storage layer repeatedly for the same data
+**Context:** Optimizing database performance by caching frequently accessed data like interest categories and user preferences
+**Solution:** Added Redis caching to InterestsService with intelligent cache invalidation
+**Code:**
+
+```typescript
+// server/interests-service.ts - Database query caching
+export class InterestsService {
+  private readonly CATEGORIES_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+  private readonly USER_INTERESTS_CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+
+  async getInterestCategories(): Promise<InterestCategory[]> {
+    const cacheKey = CacheService.generateCacheKey("interests:categories");
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => storage.getAllInterestCategories(),
+      { ttl: this.CATEGORIES_CACHE_DURATION }
+    );
+  }
+
+  async getUserInterests(userId: number): Promise<(UserInterest & { category: InterestCategory })[]> {
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => storage.getUserInterests(userId),
+      { ttl: this.USER_INTERESTS_CACHE_DURATION }
+    );
+  }
+
+  async updateUserInterests(userId: number, interests: any[]): Promise<any> {
+    await storage.setUserInterests(userId, insertInterests);
+    
+    // Invalidate user's interests cache
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    await cacheService.delete(cacheKey);
+    
+    return this.getUserInterests(userId);
+  }
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#database #caching #performance #cache-invalidation #user-data #interests #solved
+**Related:** [[Database Optimization]] [[Cache Invalidation]] [[User Preferences]]
+
+---
+
+### Map Toggle Button Integration and Enhancement
+**Question:** Map toggle button needs better placement and visibility in main route header
+**Error/Issue:** Button was standalone and then incorrectly placed in itinerary card instead of main route header
+**Context:** Improving map control accessibility and visual prominence for better UX
+**Solution:** Moved button to Main Route header with enhanced amber styling for better visibility and context
+**Code:**
+
+```typescript
+// Enhanced map toggle button in main route header
+<div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+  <div className="flex items-center justify-between">
+    <div>
+      <h1 className="text-2xl font-bold mb-2">Main Route</h1>
+      {/* Route info */}
+    </div>
+    <div className="flex items-center gap-4">
+      <button
+        onClick={() => setIsMapVisible(!isMapVisible)}
+        className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-md hover:shadow-lg font-medium"
+      >
+        <MapIcon className="h-4 w-4" />
+        {isMapVisible ? 'Hide Map' : 'Show Map'}
+      </button>
+      {/* Stats display */}
+    </div>
+  </div>
+</div>
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #ui-ux #button-design #color-design #user-controls #accessibility #solved
+**Related:** [[Button Placement]] [[Color Theory]] [[User Interface Design]]
+
+---
+
+### Redis Caching System Implementation
+**Question:** How can we implement Redis caching to replace volatile in-memory caching for production scalability?
+**Error/Issue:** In-memory cache was volatile, lost on server restarts, and couldn't scale across multiple instances
+**Context:** Upgrading from development in-memory caching to production-ready Redis caching for better performance and scalability
+**Solution:** Implemented comprehensive Redis caching system with graceful fallback to in-memory cache when Redis unavailable
+**Code:**
+
+```typescript
+// server/cache-service.ts - Unified caching service
+export class CacheService {
+  private redisClient: RedisClientType | null = null;
+  private memoryCache: Map<string, CacheEntry> = new Map();
+  private isRedisConnected = false;
+
+  constructor(options: { defaultTTL?: number; keyPrefix?: string } = {}) {
+    this.defaultTTL = options.defaultTTL || 5 * 60 * 1000;
+    this.keyPrefix = options.keyPrefix || 'routewise:';
+    this.initializeRedis();
+  }
+
+  async getOrSet<T>(
+    key: string, 
+    fetchFunction: () => Promise<T>, 
+    options?: CacheOptions
+  ): Promise<T> {
+    const cached = await this.get<T>(key);
+    if (cached !== null) return cached;
+
+    const result = await fetchFunction();
+    await this.set(key, result, options);
+    return result;
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    const fullKey = this.generateKey(key);
+    
+    try {
+      if (this.isRedisConnected && this.redisClient) {
+        const value = await this.redisClient.get(fullKey);
+        if (value) {
+          console.log(`🎯 Redis cache HIT: ${key}`);
+          return JSON.parse(value) as T;
+        }
+      }
+    } catch (error) {
+      console.error(`⚠️ Redis get error: ${error.message}`);
+    }
+
+    // Fallback to memory cache
+    const entry = this.memoryCache.get(fullKey);
+    if (entry && Date.now() - entry.timestamp < this.defaultTTL) {
+      console.log(`🎯 Memory cache HIT: ${key}`);
+      return entry.data as T;
+    }
+    return null;
+  }
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#redis #caching #backend #performance #scalability #production #nodejs #express #solved
+**Related:** [[Performance Optimization]] [[Production Deployment]] [[Caching Strategy]]
+
+---
+
+### Configurable Cache Durations via Environment Variables
+**Question:** Can you make the cache duration configurable via environment variables?
+**Error/Issue:** Cache durations were hardcoded, couldn't adjust for different environments or use cases
+**Context:** Needed flexible cache configuration for development vs production environments with different performance requirements
+**Solution:** Added environment variables for cache durations with sensible defaults and runtime configuration
+**Code:**
+
+```bash
+# .env configuration
+GOOGLE_PLACES_CACHE_DURATION=5    # Places nearby search cache (minutes)
+GOOGLE_GEOCODING_CACHE_DURATION=10 # Geocoding results cache (minutes)
+
+# Redis configuration (optional - graceful fallback to memory)
+REDIS_URL=redis://localhost:6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
+CACHE_DEFAULT_TTL=300000           # Default cache TTL (milliseconds)
+CACHE_KEY_PREFIX=routewise:        # Cache key prefix
+```
+
+```typescript
+// GooglePlacesService with configurable cache durations
+constructor(apiKey: string) {
+  this.apiKey = apiKey;
+  
+  // Configure cache durations from environment variables
+  this.PLACES_CACHE_DURATION = (parseInt(process.env.GOOGLE_PLACES_CACHE_DURATION || "5") * 60 * 1000);
+  this.GEOCODING_CACHE_DURATION = (parseInt(process.env.GOOGLE_GEOCODING_CACHE_DURATION || "10") * 60 * 1000);
+  
+  console.log(`🗄️ GooglePlacesService cache config: Places=${this.PLACES_CACHE_DURATION/60000}min, Geocoding=${this.GEOCODING_CACHE_DURATION/60000}min`);
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#environment-variables #configuration #caching #google-api #flexibility #solved
+**Related:** [[Environment Configuration]] [[Google Places Integration]] [[Cache Management]]
+
+---
+
+### Redis Service Setup and Local Development Configuration
+**Question:** Can you start Redis using brew services and set the environment variables for testing?
+**Error/Issue:** Needed to activate Redis locally and configure environment for testing production caching implementation
+**Context:** Setting up local Redis instance for testing production-ready caching before deployment
+**Solution:** Started Redis via brew services and configured environment variables for seamless local development
+**Code:**
+
+```bash
+# Install and start Redis (if not already running)
+brew services start redis
+
+# Test Redis connection
+redis-cli ping
+# Should return: PONG
+
+# Configure environment variables in .env
+REDIS_URL=redis://localhost:6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
+# REDIS_PASSWORD= (leave empty for local setup)
+
+# Test Redis integration
+node test-redis.js
+
+# Check Redis keys to verify caching
+redis-cli keys "routewise:*"
+
+# Monitor Redis in real-time
+redis-cli monitor
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#redis #homebrew #local-development #environment-setup #testing #brew-services #solved
+**Related:** [[Redis Setup]] [[Local Development]] [[Service Management]]
+
+---
+
+### Database Query Caching for Interests and User Data
+**Question:** How to add caching to database queries for interests and user lookups to improve performance?
+**Error/Issue:** Database queries were hitting storage layer repeatedly for the same data, causing unnecessary load
+**Context:** Optimizing database performance by caching frequently accessed data like interest categories and user preferences
+**Solution:** Added Redis caching to InterestsService with intelligent cache invalidation and appropriate TTL settings
+**Code:**
+
+```typescript
+// server/interests-service.ts - Database query caching
+export class InterestsService {
+  private readonly CATEGORIES_CACHE_DURATION = 60 * 60 * 1000; // 1 hour - categories rarely change
+  private readonly USER_INTERESTS_CACHE_DURATION = 15 * 60 * 1000; // 15 minutes - user data changes more frequently
+
+  async getInterestCategories(): Promise<InterestCategory[]> {
+    const cacheKey = CacheService.generateCacheKey("interests:categories");
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => storage.getAllInterestCategories(),
+      { ttl: this.CATEGORIES_CACHE_DURATION }
+    );
+  }
+
+  async updateUserInterests(userId: number, interests: any[]): Promise<any> {
+    await storage.setUserInterests(userId, insertInterests);
+    
+    // Invalidate user's interests cache to ensure fresh data
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    await cacheService.delete(cacheKey);
+    
+    return this.getUserInterests(userId);
+  }
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#database #caching #performance #cache-invalidation #user-data #interests #redis #solved
+**Related:** [[Database Optimization]] [[Cache Invalidation]] [[User Preferences]]
+
+---
+
+### Adding Redis Caching to Nominatim Geocoding Service
+**Question:** How to add caching to Nominatim service for city search results?
+**Error/Issue:** Nominatim API calls were being made repeatedly for the same city searches
+**Context:** Optimizing third-party API usage by caching stable geocoding data for cities
+**Solution:** Added 24-hour Redis caching to NominatimService for city search results with appropriate TTL
+**Code:**
+
+```typescript
+// server/nominatim-service.ts - Added caching support
+export class NominatimService {
+  private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - city data is stable
+
+  async searchCities(query: string, limit: number = 8): Promise<PlaceSuggestion[]> {
+    const cacheKey = `nominatim:cities:${query.toLowerCase()}:${limit}`;
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const url = `${this.baseUrl}/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=${limit}&featuretype=city`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.error(`Nominatim API error: ${response.status}`);
+          return [];
+        }
+
+        const data = await response.json();
+        console.log(`📍 Nominatim found ${data.length} cities for "${query}"`);
+
+        // Transform to PlaceSuggestion format
+        return data.map((place: any) => ({
+          place_id: place.place_id,
+          description: this.formatCityDescription(place),
+          geometry: {
+            location: {
+              lat: parseFloat(place.lat),
+              lng: parseFloat(place.lon)
+            }
+          }
+        }));
+      },
+      { ttl: this.CACHE_DURATION }
+    );
+  }
+}
+```
+
+**Date:** August 3, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#nominatim #geocoding #api-caching #city-search #third-party-api #redis #24-hour-cache #solved
+**Related:** [[Geocoding Services]] [[API Optimization]] [[Third-party Integration]]
+
+---

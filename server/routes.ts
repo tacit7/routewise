@@ -53,7 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.get("/api/cache-stats", async (req, res) => {
       const { getCacheStats } = await import('./dev-api-cache');
       const apiCacheStats = getCacheStats();
-      const placesServiceStats = placesService ? placesService.getCacheStats() : null;
+      const placesServiceStats = placesService ? await placesService.getCacheStats() : null;
       
       res.json({
         apiCache: apiCacheStats,
@@ -66,9 +66,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Clear cache endpoint
     app.post("/api/clear-cache", async (req, res) => {
       const { clearCache } = await import('./dev-api-cache');
-      clearCache();
+      await clearCache();
       if (placesService) {
-        placesService.clearCache();
+        await placesService.clearCache();
       }
       res.json({ message: 'Cache cleared', timestamp: new Date().toISOString() });
     });

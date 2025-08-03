@@ -1,4 +1,5 @@
 import { storage } from "./storage";
+import { cacheService, CacheService } from "./cache-service";
 import type { 
   InterestCategory, 
   UserInterest, 
@@ -7,18 +8,37 @@ import type {
 } from "@shared/schema";
 
 export class InterestsService {
+  private readonly CATEGORIES_CACHE_DURATION = 60 * 60 * 1000; // 1 hour - categories rarely change
+  private readonly USER_INTERESTS_CACHE_DURATION = 15 * 60 * 1000; // 15 minutes - user data changes more frequently
+
   /**
    * Get all available interest categories
    */
   async getInterestCategories(): Promise<InterestCategory[]> {
-    return storage.getAllInterestCategories();
+    const cacheKey = CacheService.generateCacheKey("interests:categories");
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        return storage.getAllInterestCategories();
+      },
+      { ttl: this.CATEGORIES_CACHE_DURATION }
+    );
   }
 
   /**
    * Get user's current interest preferences
    */
   async getUserInterests(userId: number): Promise<(UserInterest & { category: InterestCategory })[]> {
-    return storage.getUserInterests(userId);
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        return storage.getUserInterests(userId);
+      },
+      { ttl: this.USER_INTERESTS_CACHE_DURATION }
+    );
   }
 
   /**
@@ -40,6 +60,10 @@ export class InterestsService {
     // Replace all user interests with new set
     await storage.setUserInterests(userId, insertInterests);
     
+    // Invalidate user's interests cache
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    await cacheService.delete(cacheKey);
+    
     // Return updated interests with category details
     return this.getUserInterests(userId);
   }
@@ -48,7 +72,7 @@ export class InterestsService {
    * Enable all available interests for a user (default behavior)
    */
   async enableAllInterestsForUser(userId: number): Promise<(UserInterest & { category: InterestCategory })[]> {
-    const categories = await storage.getAllInterestCategories();
+    const categories = await this.getInterestCategories(); // Use cached version
     
     const allInterests: InsertUserInterest[] = categories.map(category => ({
       userId,
@@ -58,6 +82,11 @@ export class InterestsService {
     }));
 
     await storage.setUserInterests(userId, allInterests);
+    
+    // Invalidate user's interests cache
+    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    await cacheService.delete(cacheKey);
+    
     return this.getUserInterests(userId);
   }
 
@@ -65,7 +94,7 @@ export class InterestsService {
    * Get interest categories by their names (for mapping POI categories)
    */
   async getInterestCategoriesByNames(names: string[]): Promise<InterestCategory[]> {
-    const allCategories = await storage.getAllInterestCategories();
+    const allCategories = await this.getInterestCategories(); // Use cached version
     return allCategories.filter(cat => names.includes(cat.name));
   }
 

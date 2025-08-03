@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { saveMockResponse } from "./saveMockResponse";
+import { cacheService, CacheService } from "./cache-service";
 
 // ES modules equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -40,6 +41,7 @@ export class NominatimService {
   private baseUrl = "https://nominatim.openstreetmap.org";
   private lastRequestTime = 0;
   private minRequestInterval = 1000; // 1 second between requests (respectful rate limiting)
+  private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours (city data is very stable)
 
   private async respectRateLimit(): Promise<void> {
     const now = Date.now();
@@ -142,60 +144,69 @@ export class NominatimService {
       return [];
     }
 
-    await this.respectRateLimit();
+    const cacheKey = CacheService.generateCacheKey("nominatim:searchCities", query, limit);
 
-    try {
-      // More specific search for cities
-      const params = new URLSearchParams({
-        q: `${query} city`,
-        format: "json",
-        addressdetails: "1",
-        limit: (limit * 2).toString(), // Get more results to filter
-        countrycodes: "us,ca",
-        "accept-language": "en",
-        class: "place",
-        type: "city,town,village",
-      });
+    return cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        await this.respectRateLimit();
 
-      const response = await fetch(`${this.baseUrl}/search?${params}`, {
-        headers: {
-          "User-Agent": "RouteWise/1.0 (roadtrip-planner)",
-        },
-      });
+        try {
+          // More specific search for cities
+          const params = new URLSearchParams({
+            q: `${query} city`,
+            format: "json",
+            addressdetails: "1",
+            limit: (limit * 2).toString(), // Get more results to filter
+            countrycodes: "us,ca",
+            "accept-language": "en",
+            class: "place",
+            type: "city,town,village",
+          });
 
-      if (!response.ok) {
-        throw new Error(`Nominatim API error: ${response.status}`);
-      }
+          const response = await fetch(`${this.baseUrl}/search?${params}`, {
+            headers: {
+              "User-Agent": "RouteWise/1.0 (roadtrip-planner)",
+            },
+          });
 
-      const data: NominatimPlace[] = await response.json();
+          if (!response.ok) {
+            throw new Error(`Nominatim API error: ${response.status}`);
+          }
 
-      fs.writeFileSync(
-        path.join(__dirname, "nominatim-search-cities.mock.json"),
-        JSON.stringify(data, null, 2)
-      );
-      // Filter and rank results
-      const suggestions = this.transformToSuggestions(data);
+          const data: NominatimPlace[] = await response.json();
 
-      // Sort by importance and relevance
-      return suggestions
-        .sort((a, b) => {
-          // Prioritize exact matches at the beginning
-          const aStartsWithQuery = a.main_text
-            .toLowerCase()
-            .startsWith(query.toLowerCase());
-          const bStartsWithQuery = b.main_text
-            .toLowerCase()
-            .startsWith(query.toLowerCase());
+          fs.writeFileSync(
+            path.join(__dirname, "nominatim-search-cities.mock.json"),
+            JSON.stringify(data, null, 2)
+          );
+          
+          // Filter and rank results
+          const suggestions = this.transformToSuggestions(data);
 
-          if (aStartsWithQuery && !bStartsWithQuery) return -1;
-          if (!aStartsWithQuery && bStartsWithQuery) return 1;
+          // Sort by importance and relevance
+          return suggestions
+            .sort((a, b) => {
+              // Prioritize exact matches at the beginning
+              const aStartsWithQuery = a.main_text
+                .toLowerCase()
+                .startsWith(query.toLowerCase());
+              const bStartsWithQuery = b.main_text
+                .toLowerCase()
+                .startsWith(query.toLowerCase());
 
-          return 0;
-        })
-        .slice(0, limit);
-    } catch (error) {
-      console.error("Nominatim city search error:", error);
-      return [];
-    }
+              if (aStartsWithQuery && !bStartsWithQuery) return -1;
+              if (!aStartsWithQuery && bStartsWithQuery) return 1;
+
+              return 0;
+            })
+            .slice(0, limit);
+        } catch (error) {
+          console.error("Nominatim city search error:", error);
+          return [];
+        }
+      },
+      { ttl: this.CACHE_DURATION }
+    );
   }
 }
