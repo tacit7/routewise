@@ -32,10 +32,13 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
 
   // Use enhanced trip management hooks
   const {
-    isInTrip: isAddedToTrip,
+    isInTrip,
     addToTrip,
     isAddingToTrip
   } = useTripPlaces();
+
+  // Check if this specific POI is in the trip
+  const isAddedToTrip = isInTrip(poi);
 
   // Use personalization for relevance scoring
   const {
