@@ -3,8 +3,6 @@ import {
   ArrowRight,
   MapPin,
   Clock,
-  Heart,
-  Plus,
   X,
   ExternalLink,
   Map,
@@ -26,9 +24,7 @@ interface PoiCardProps {
 export default function PoiCard({ poi, variant = 'default', showRelevanceScore = false }: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
-  const [isAdded, setIsAdded] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const { toast } = useToast();
 
   // Use enhanced trip management hooks
   const {
@@ -48,51 +44,6 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
 
   // Calculate relevance score for display
   const relevanceScore = isPersonalized ? calculateRelevanceScore(poi) : 0;
-
-  // Check if POI is already saved in places on mount and listen for updates
-  useEffect(() => {
-    const checkSavedStatus = () => {
-      const savedPlaces = JSON.parse(localStorage.getItem("myPlaces") || "[]");
-      
-      // Use placeId as primary identifier if available, fallback to id
-      const poiIdentifier = poi.placeId || poi.id;
-      const isInSaved = savedPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
-      
-      setIsAdded(isInSaved);
-    };
-
-    checkSavedStatus();
-
-    // Listen for storage updates
-    window.addEventListener("storage", checkSavedStatus);
-
-    return () => {
-      window.removeEventListener("storage", checkSavedStatus);
-    };
-  }, [poi.id]);
-
-  const handleAddPlace = () => {
-    // Save to localStorage for persistence
-    const savedPlaces = JSON.parse(localStorage.getItem("myPlaces") || "[]");
-    const isAlreadySaved = savedPlaces.some((p: Poi) => p.id === poi.id);
-
-    if (isAlreadySaved) {
-      toast({
-        title: "Already saved",
-        description: `${poi.name} is already in your places.`,
-      });
-      return;
-    }
-
-    savedPlaces.push(poi);
-    localStorage.setItem("myPlaces", JSON.stringify(savedPlaces));
-    setIsAdded(true);
-
-    toast({
-      title: "Place added!",
-      description: `${poi.name} has been added to your places.`,
-    });
-  };
 
   const handleAddToTrip = () => {
     addToTrip(poi);
@@ -127,34 +78,12 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
                 {poi.timeFromStart}
               </span>
             </div>
-            {/* Compact Action Buttons */}
-            <div className="flex gap-1">
-              <button
-                onClick={handleAddPlace}
-                disabled={isAdded}
-                className={`flex-1 py-1 px-2 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
-                  isAdded
-                    ? "bg-green-100 text-green-700 border border-green-200"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
-              >
-                {isAdded ? (
-                  <>
-                    <Heart className="h-3 w-3 mr-1 fill-current" />
-                    Saved
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-3 w-3 mr-1" />
-                    Save
-                  </>
-                )}
-              </button>
-              
+            {/* Centered Add to Trip Button */}
+            <div className="flex justify-center">
               <button
                 onClick={handleAddToTrip}
                 disabled={isAddedToTrip || isAddingToTrip}
-                className={`flex-1 py-1 px-2 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
+                className={`py-1 px-3 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
                   isAddedToTrip
                     ? "bg-purple-100 text-purple-700 border border-purple-200"
                     : isAddingToTrip
@@ -253,34 +182,12 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
           </button>
         </div>
 
-        {/* Action Buttons */}
-        <div className={`flex gap-2 ${isGridVariant ? 'mt-auto' : ''}`}>
-          <button
-            onClick={handleAddPlace}
-            disabled={isAdded}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
-              isAdded
-                ? "bg-green-100 text-green-700 border border-green-200"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
-            }`}
-          >
-            {isAdded ? (
-              <>
-                <Heart className="h-4 w-4 mr-2 fill-current" />
-                Saved
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Save Place
-              </>
-            )}
-          </button>
-          
+        {/* Centered Add to Trip Button */}
+        <div className={`flex justify-center ${isGridVariant ? 'mt-auto' : ''}`}>
           <button
             onClick={handleAddToTrip}
             disabled={isAddedToTrip || isAddingToTrip}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+            className={`py-2 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
               isAddedToTrip
                 ? "bg-purple-100 text-purple-700 border border-purple-200"
                 : isAddingToTrip
@@ -385,33 +292,11 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
                 )}
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={handleAddPlace}
-                  disabled={isAdded}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
-                    isAdded
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
-                  }`}
-                >
-                  {isAdded ? (
-                    <>
-                      <Heart className="h-5 w-5 mr-2 fill-current" />
-                      Saved to Places
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-5 w-5 mr-2" />
-                      Save Place
-                    </>
-                  )}
-                </button>
-
+              <div className="flex justify-center">
                 <button
                   onClick={handleAddToTrip}
                   disabled={isAddedToTrip || isAddingToTrip}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
+                  className={`py-3 px-8 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
                     isAddedToTrip
                       ? "bg-purple-100 text-purple-700 border border-purple-200"
                       : isAddingToTrip
