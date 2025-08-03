@@ -1,6 +1,13 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Flag,
+  Loader2,
+  Map as MapIcon,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -316,20 +323,6 @@ export default function RouteResults() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Itinerary Component */}
-          {uniquePois.length > 0 && (
-            <ItineraryComponent
-              startCity={routeData.startCity}
-              endCity={routeData.endCity}
-              checkpoints={[]}
-              pois={uniquePois}
-              onUpdateSelectedPois={handleUpdateSelectedPois}
-              onSaveRoute={handleSaveRoute}
-              poisCount={uniquePois.length}
-            />
-          )}
-
-          {/* Roadtrippers-style Layout */}
           <div className="flex h-screen -mt-8 relative">
             {/* Left Sidebar - Filters and POI List */}
             <div className="w-96 bg-white shadow-xl z-10 flex flex-col">

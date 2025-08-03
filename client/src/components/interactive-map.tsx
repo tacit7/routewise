@@ -210,15 +210,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       directionsRendererRef.current.setMap(map);
       infoWindowRef.current = new google.maps.InfoWindow();
 
-      // Load route and POI markers
-      await loadRoute();
       setIsLoading(false);
     } catch (err) {
       console.error('Map initialization error:', err);
       setError('Failed to initialize map');
       setIsLoading(false);
     }
-  }, [googleMapsKey]);
+  }, [googleMapsKey, loadGoogleMapsScript]);
 
   // Load route with waypoints
   const loadRoute = useCallback(async () => {
