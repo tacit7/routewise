@@ -1,6 +1,14 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Flag,
+  Loader2,
+  Map as MapIcon,
+  Star,
+  Calendar,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -9,6 +17,7 @@ import ItineraryComponent from "@/components/itinerary-component-enhanced";
 import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useTripPlaces } from "@/hooks/use-trip-places";
 
 interface RouteData {
   startCity: string;
@@ -99,6 +108,7 @@ export default function RouteResults() {
   const [hoveredPoi, setHoveredPoi] = useState<Poi | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
   const { toast } = useToast();
+  const { tripPlaces } = useTripPlaces();
 
   // Fetch Google Maps API key
   const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{
@@ -287,7 +297,8 @@ export default function RouteResults() {
             </Button>
             <div className="flex items-center gap-4">
               <div className="text-sm text-slate-600">
-                {routeData.startCity} → {routeData.endCity} • {uniquePois.length} places
+                {routeData.startCity} → {routeData.endCity} •{" "}
+                {uniquePois.length} places
               </div>
               <button
                 onClick={() => setIsMapVisible(!isMapVisible)}
@@ -339,9 +350,7 @@ export default function RouteResults() {
                 <h3 className="text-sm font-semibold text-slate-700 mb-1">
                   No places found
                 </h3>
-                <p className="text-xs text-slate-600">
-                  Try a different route.
-                </p>
+                <p className="text-xs text-slate-600">Try a different route.</p>
               </div>
             )}
 
@@ -360,6 +369,20 @@ export default function RouteResults() {
               </div>
             )}
           </div>
+
+          {/* Start Itinerary Button */}
+          {tripPlaces.length > 0 && (
+            <div className="p-3 border-t border-slate-200 bg-slate-50">
+              <Button
+                onClick={() => setLocation('/itinerary')}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                size="sm"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Start Itinerary ({tripPlaces.length} places)
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Main Map Area - Full Width */}
