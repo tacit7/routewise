@@ -256,32 +256,37 @@ function ErrorFallback({
   };
 
   return (
-    <div className={`error-boundary ${level}`} role="alert">
-      <div className="error-content">
-        <div className="error-icon">
+    <div 
+      className={`flex items-center justify-center p-8 bg-red-50 border border-red-200 rounded-lg my-4 ${
+        isPageLevel ? 'min-h-[400px] m-0' : 'min-h-[200px]'
+      }`} 
+      role="alert"
+    >
+      <div className="text-center max-w-md">
+        <div className="text-5xl mb-4">
           {isPageLevel ? '🚫' : isSectionLevel ? '⚠️' : '❌'}
         </div>
         
-        <div className="error-message">
-          <h2>{getMessage()}</h2>
-          <p>{getSubMessage()}</p>
+        <div className="mb-6">
+          <h2 className="text-red-600 text-xl font-semibold mb-2">{getMessage()}</h2>
+          <p className="text-gray-600 mb-4">{getSubMessage()}</p>
           
           {error.message && (
-            <details className="error-details">
-              <summary>Technical Details</summary>
-              <pre>{error.message}</pre>
+            <details className="text-left my-4 p-4 bg-gray-50 rounded border">
+              <summary className="cursor-pointer text-sm font-medium">Technical Details</summary>
+              <pre className="text-sm text-gray-700 mt-2 overflow-x-auto">{error.message}</pre>
               {process.env.NODE_ENV === 'development' && (
-                <pre>{error.stack}</pre>
+                <pre className="text-sm text-gray-700 mt-2 overflow-x-auto">{error.stack}</pre>
               )}
             </details>
           )}
         </div>
 
-        <div className="error-actions">
+        <div className="flex gap-4 justify-center flex-wrap">
           {canRetry && (
             <button
               onClick={retry}
-              className="retry-button"
+              className="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!canRetry}
             >
               Try Again ({maxRetries - retryCount} attempts left)
@@ -291,7 +296,7 @@ function ErrorFallback({
           {isPageLevel && (
             <button
               onClick={() => window.location.reload()}
-              className="reload-button"
+              className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
             >
               Reload Page
             </button>
@@ -299,104 +304,13 @@ function ErrorFallback({
           
           <button
             onClick={() => window.history.back()}
-            className="back-button"
+            className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
           >
             Go Back
           </button>
         </div>
       </div>
 
-      <style jsx>{`
-        .error-boundary {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 200px;
-          padding: 2rem;
-          background: #fef2f2;
-          border: 1px solid #fecaca;
-          border-radius: 8px;
-          margin: 1rem 0;
-        }
-
-        .error-boundary.page {
-          min-height: 400px;
-          margin: 0;
-        }
-
-        .error-content {
-          text-align: center;
-          max-width: 500px;
-        }
-
-        .error-icon {
-          font-size: 3rem;
-          margin-bottom: 1rem;
-        }
-
-        .error-message h2 {
-          color: #dc2626;
-          margin-bottom: 0.5rem;
-        }
-
-        .error-message p {
-          color: #6b7280;
-          margin-bottom: 1rem;
-        }
-
-        .error-details {
-          text-align: left;
-          margin: 1rem 0;
-          padding: 1rem;
-          background: #f9fafb;
-          border-radius: 4px;
-        }
-
-        .error-details pre {
-          font-size: 0.875rem;
-          color: #374151;
-          overflow-x: auto;
-        }
-
-        .error-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .error-actions button {
-          padding: 0.5rem 1rem;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          background: white;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .retry-button {
-          background: #3b82f6 !important;
-          color: white !important;
-          border-color: #3b82f6 !important;
-        }
-
-        .retry-button:hover:not(:disabled) {
-          background: #2563eb !important;
-        }
-
-        .retry-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .reload-button:hover {
-          background: #f3f4f6;
-        }
-
-        .back-button:hover {
-          background: #f3f4f6;
-        }
-      `}</style>
     </div>
   );
 }
@@ -427,7 +341,7 @@ export function useErrorHandler() {
     }
   }, []);
 
-  const wrapAsync = React.useCallback(<T>(
+  const wrapAsync = React.useCallback(<T extends unknown>(
     asyncFn: () => Promise<T>,
     fallback?: T
   ): Promise<T> => {
@@ -446,7 +360,7 @@ export function useErrorHandler() {
 /**
  * Higher-order component for automatic error boundary wrapping
  */
-export function withErrorBoundary<P extends object>(
+export function withErrorBoundary<P extends Record<string, unknown>>(
   Component: React.ComponentType<P>,
   boundaryProps?: Omit<ErrorBoundaryProps, 'children'>
 ) {

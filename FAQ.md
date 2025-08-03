@@ -1,5 +1,97 @@
 # Routewise Project FAQ
 
+## Latest Session Q&A (August 3, 2025 - Session 11)
+
+### Roadtrippers-Style Layout Implementation
+
+**Question:** How do I implement a Roadtrippers-style layout with sidebar and full-screen map?
+**Error/Issue:** Need to redesign route-results page to match provided screenshot layout
+**Context:** User provided Roadtrippers screenshot showing left sidebar with filters/POI list and full-screen map
+**Solution:** Implement flexbox layout with fixed-width sidebar and flexible map area
+**Code:**
+
+```tsx
+// route-results.tsx
+<div className="flex h-screen -mt-8 relative">
+  {/* Left Sidebar - Filters and POI List */}
+  <div className="w-96 bg-white shadow-xl z-10 flex flex-col">
+    {/* Compact POI cards optimized for sidebar */}
+  </div>
+  {/* Main Map Area */}
+  <div className="flex-1 relative">
+    <InteractiveMap height="100vh" className="w-full h-full" />
+  </div>
+</div>
+```
+
+**Date:** August 3, 2025
+**Project:** [[Routewise]]
+**Status:** Solved
+
+#layout #ui-ux #roadtrippers #sidebar #map #flexbox #solved
+**Related:** [[Layout Design]] [[Component Architecture]]
+
+---
+
+### JSX Adjacent Elements Error Fix
+
+**Question:** How to fix "Adjacent JSX elements must be wrapped in an enclosing tag" error?
+**Error/Issue:** JSX compilation error after implementing new layout structure
+**Context:** Error occurred during layout redesign with conditional rendering
+**Solution:** Properly wrap conditional JSX content in fragments or proper containers
+**Code:**
+
+```tsx
+// Before (error)
+{!isMapVisible && 
+  <div>Content 1</div>
+  <div>Content 2</div>
+}
+
+// After (fixed)
+{!isMapVisible && (
+  <>
+    <div>Content 1</div>
+    <div>Content 2</div>
+  </>
+)}
+```
+
+**Date:** August 3, 2025
+**Project:** [[Routewise]]
+**Status:** Solved
+
+#jsx #react #compilation-error #conditional-rendering #solved
+**Related:** [[React Development]] [[Error Resolution]]
+
+---
+
+### useMemo Import Error Resolution
+
+**Question:** How to fix "useMemo" import error from @tanstack/react-query?
+**Error/Issue:** "The requested module does not provide an export named 'useMemo'"
+**Context:** useMemo incorrectly imported from @tanstack/react-query instead of react
+**Solution:** Import useMemo from 'react' and useQuery from '@tanstack/react-query' separately
+**Code:**
+
+```tsx
+// Before (error)
+import { useQuery, useMemo } from '@tanstack/react-query';
+
+// After (fixed)
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+```
+
+**Date:** August 3, 2025
+**Project:** [[Routewise]]
+**Status:** Solved
+
+#import-error #react-hooks #tanstack-query #usememo #solved
+**Related:** [[React Hooks]] [[Import Management]]
+
+---
+
 ## Development Environment
 
 ### Docker Compose Command Updates
@@ -1800,5 +1892,162 @@ export class NominatimService {
 
 #nominatim #geocoding #api-caching #city-search #third-party-api #redis #24-hour-cache #solved
 **Related:** [[Geocoding Services]] [[API Optimization]] [[Third-party Integration]]
+
+---
+
+### Backend Security "Site Can't Be Reached" After Port Configuration
+**Question:** Why does the browser show "site can't be reached" error after implementing backend security improvements?
+**Error/Issue:** Browser unable to connect to localhost after security hardening and port configuration changes
+**Context:** Implementing comprehensive backend security including JWT validation, rate limiting, and PostgreSQL integration
+**Solution:** Port configuration mismatch between server binding and environment variables. Server was binding to port 3001 in code but environment was set to 3000. Fixed by updating PORT=3000 in .env file and ensuring server binds to validated env.PORT value. Server now properly binds to 127.0.0.1 with the validated port.
+**Code:** 
+```typescript
+// server/index.ts - Fixed port configuration
+const port = env.PORT; // Uses validated environment port
+server.listen(port, '127.0.0.1', () => {
+  logger.info(`🚀 Server listening on http://127.0.0.1:${port}`);
+});
+
+// .env - Corrected port configuration
+PORT=3000
+```
+**Date:** 2025-08-03
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#nodejs #express #backend #configuration #port #localhost #solved
+
+---
+
+### JWT Secret Environment Validation Security Implementation
+**Question:** How to properly secure JWT secrets and validate environment variables for production security?
+**Error/Issue:** JWT secrets and sensitive environment variables not properly validated on server startup
+**Context:** Hardening backend security to prevent vulnerabilities from misconfigured or missing environment variables
+**Solution:** Implemented comprehensive environment validation using Zod schemas with proper error handling and startup validation. Added JWT secret length validation (minimum 32 characters) and proper environment loading order.
+**Code:**
+```typescript
+// env-validation.ts - Environment validation with Zod
+const envSchema = z.object({
+  JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  PORT: z.coerce.number().default(3000),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development')
+});
+
+export function initializeEnvironment(): ValidatedEnv {
+  const result = envSchema.safeParse(process.env);
+  if (!result.success) {
+    throw new Error(`Environment validation failed: ${result.error.message}`);
+  }
+  return result.data;
+}
+```
+**Date:** 2025-08-03
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#security #jwt #environment #validation #zod #solved
+
+---
+
+### PostgreSQL Integration with Unified Storage Layer
+**Question:** How to implement unified storage layer supporting both PostgreSQL and in-memory fallback?
+**Error/Issue:** Need to migrate from dual storage system to unified PostgreSQL with proper connection handling
+**Context:** Modernizing backend architecture to use PostgreSQL as primary database with proper connection pooling and error handling
+**Solution:** Created unified storage abstraction that initializes PostgreSQL connection when DATABASE_URL is available, with automatic fallback to in-memory storage for development. Implemented proper connection handling and error recovery.
+**Code:**
+```typescript
+// storage.ts - Unified storage initialization
+export function initializeStorageWithEnv(databaseUrl?: string) {
+  if (databaseUrl) {
+    try {
+      initializeDatabase(databaseUrl);
+      logger.info('✅ PostgreSQL storage initialized');
+    } catch (error) {
+      logger.warn('Failed to initialize PostgreSQL, falling back to in-memory storage', error);
+      initializeInMemoryStorage();
+    }
+  } else {
+    logger.info('No DATABASE_URL provided, using in-memory storage');
+    initializeInMemoryStorage();
+  }
+}
+```
+**Date:** 2025-08-03
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#postgresql #database #storage #backend #drizzle #solved
+
+---
+
+### Rate Limiting Implementation for API Security
+**Question:** How to implement comprehensive rate limiting to prevent API abuse and enhance security?
+**Error/Issue:** Need to protect API endpoints from abuse with appropriate rate limiting strategies
+**Context:** Implementing backend security hardening with rate limiting for different endpoint types
+**Solution:** Implemented tiered rate limiting with different limits for general requests and logging endpoints. Used express-rate-limit with proper configuration for production security.
+**Code:**
+```typescript
+// rate-limit-middleware.ts
+export const generalRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const logRateLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10, // Limit logging endpoints more strictly
+  skip: (req) => !req.path.includes('/log'),
+});
+```
+**Date:** 2025-08-03
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#security #ratelimiting #api #express #middleware #solved
+
+---
+
+### Structured Logging Implementation with Winston
+**Question:** How to replace console.log with proper structured logging for production applications?
+**Error/Issue:** Using console.log statements throughout application instead of proper logging framework
+**Context:** Implementing production-ready logging with proper log levels, formatting, and error tracking
+**Solution:** Implemented Winston logger with structured JSON formatting, multiple log levels, and proper error handling. Added request logging middleware and error tracking.
+**Code:**
+```typescript
+// logger.ts - Winston structured logging
+export const log = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  ]
+});
+
+// Usage in middleware
+export const requestLogger = () => (req: Request, res: Response, next: NextFunction) => {
+  log.info('Request received', {
+    method: req.method,
+    url: req.originalUrl,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
+  next();
+};
+```
+**Date:** 2025-08-03
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#logging #winston #structured-logging #middleware #production #solved
 
 ---

@@ -8,48 +8,62 @@ import {
   X,
   ExternalLink,
   Map,
+  Loader2,
 } from "lucide-react";
 import type { Poi } from "@shared/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useTripPlaces } from "@/hooks/use-trip-places";
+import { usePersonalizedTrips } from "@/hooks/use-personalized-trips";
 
 interface PoiCardProps {
   poi: Poi;
   variant?: 'default' | 'grid';
+  showRelevanceScore?: boolean;
 }
 
-export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
+export default function PoiCard({ poi, variant = 'default', showRelevanceScore = false }: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
   const [isAdded, setIsAdded] = useState(false);
-  const [isAddedToTrip, setIsAddedToTrip] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
 
-  // Check if POI is already saved on mount and listen for updates
+  // Use enhanced trip management hooks
+  const {
+    isInTrip: isAddedToTrip,
+    addToTrip,
+    isAddingToTrip
+  } = useTripPlaces();
+
+  // Use personalization for relevance scoring
+  const {
+    calculateRelevanceScore,
+    isPersonalized
+  } = usePersonalizedTrips();
+
+  // Calculate relevance score for display
+  const relevanceScore = isPersonalized ? calculateRelevanceScore(poi) : 0;
+
+  // Check if POI is already saved in places on mount and listen for updates
   useEffect(() => {
     const checkSavedStatus = () => {
       const savedPlaces = JSON.parse(localStorage.getItem("myPlaces") || "[]");
-      const tripPlaces = JSON.parse(localStorage.getItem("tripPlaces") || "[]");
       
       // Use placeId as primary identifier if available, fallback to id
       const poiIdentifier = poi.placeId || poi.id;
       const isInSaved = savedPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
-      const isInTrip = tripPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
       
       setIsAdded(isInSaved);
-      setIsAddedToTrip(isInTrip);
     };
 
     checkSavedStatus();
 
-    // Listen for trip updates
-    window.addEventListener("tripUpdated", checkSavedStatus);
+    // Listen for storage updates
     window.addEventListener("storage", checkSavedStatus);
 
     return () => {
-      window.removeEventListener("tripUpdated", checkSavedStatus);
       window.removeEventListener("storage", checkSavedStatus);
     };
   }, [poi.id]);
@@ -78,30 +92,7 @@ export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
   };
 
   const handleAddToTrip = () => {
-    // Save to localStorage for trip
-    const tripPlaces = JSON.parse(localStorage.getItem("tripPlaces") || "[]");
-    const poiIdentifier = poi.placeId || poi.id;
-    const isAlreadyInTrip = tripPlaces.some((p: Poi) => (p.placeId || p.id) === poiIdentifier);
-
-    if (isAlreadyInTrip) {
-      toast({
-        title: "Already in trip",
-        description: `${poi.name} is already in your trip.`,
-      });
-      return;
-    }
-
-    tripPlaces.push(poi);
-    localStorage.setItem("tripPlaces", JSON.stringify(tripPlaces));
-    setIsAddedToTrip(true);
-
-    toast({
-      title: "Added to trip!",
-      description: `${poi.name} has been added to your trip.`,
-    });
-
-    // Dispatch custom event for same-tab updates  
-    window.dispatchEvent(new Event("tripUpdated"));
+    addToTrip(poi);
   };
 
   const isGridVariant = variant === 'grid';
@@ -115,12 +106,19 @@ export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
       />
       <div className={`${isGridVariant ? 'p-4 flex-1 flex flex-col' : 'p-6'}`}>
         <div className="flex items-center justify-between mb-2">
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor}`}
-          >
-            <i className={`${categoryIcon} mr-1`} />
-            {poi.category.charAt(0).toUpperCase() + poi.category.slice(1)}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor}`}
+            >
+              <i className={`${categoryIcon} mr-1`} />
+              {poi.category.charAt(0).toUpperCase() + poi.category.slice(1)}
+            </span>
+            {showRelevanceScore && isPersonalized && relevanceScore > 0.6 && (
+              <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                {Math.round(relevanceScore * 100)}% match
+              </span>
+            )}
+          </div>
           <span className="text-slate-500 text-sm">{poi.timeFromStart}</span>
         </div>
 
@@ -192,14 +190,21 @@ export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
           
           <button
             onClick={handleAddToTrip}
-            disabled={isAddedToTrip}
+            disabled={isAddedToTrip || isAddingToTrip}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
               isAddedToTrip
                 ? "bg-purple-100 text-purple-700 border border-purple-200"
+                : isAddingToTrip
+                ? "bg-purple-400 text-white cursor-not-allowed"
                 : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
             }`}
           >
-            {isAddedToTrip ? (
+            {isAddingToTrip ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Adding...
+              </>
+            ) : isAddedToTrip ? (
               <>
                 <Map className="h-4 w-4 mr-2 fill-current" />
                 In Trip
@@ -316,14 +321,21 @@ export default function PoiCard({ poi, variant = 'default' }: PoiCardProps) {
 
                 <button
                   onClick={handleAddToTrip}
-                  disabled={isAddedToTrip}
+                  disabled={isAddedToTrip || isAddingToTrip}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
                     isAddedToTrip
                       ? "bg-purple-100 text-purple-700 border border-purple-200"
+                      : isAddingToTrip
+                      ? "bg-purple-400 text-white cursor-not-allowed"
                       : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
                   }`}
                 >
-                  {isAddedToTrip ? (
+                  {isAddingToTrip ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : isAddedToTrip ? (
                     <>
                       <Map className="h-5 w-5 mr-2 fill-current" />
                       Added to Trip

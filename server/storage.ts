@@ -345,10 +345,12 @@ function initializeStorage(databaseUrl?: string): IStorage {
   // Try PostgreSQL first if DATABASE_URL is configured
   if (databaseUrl) {
     try {
-      log.info('Initializing PostgreSQL storage with validated environment');
-      return new PostgreSQLStorage(databaseUrl);
+      log.info('Attempting PostgreSQL storage initialization');
+      const pgStorage = new PostgreSQLStorage(databaseUrl);
+      log.info('PostgreSQL storage instance created successfully');
+      return pgStorage;
     } catch (error) {
-      log.error('Failed to initialize PostgreSQL storage, falling back to memory storage', error);
+      log.error('Failed to create PostgreSQL storage instance, falling back to memory storage', error);
     }
   } else {
     log.warn('DATABASE_URL not configured, using in-memory storage (not recommended for production)');
@@ -384,8 +386,7 @@ export function getStorage(): IStorage {
   return storageInstance;
 }
 
-// Legacy export for backward compatibility - will be removed
-export const storage = initializeStorage();
+// Legacy export removed - use initializeStorageWithEnv() and getStorage() instead
 
 // Export db for legacy trip-service.ts - should be refactored
 export let db: any = null;

@@ -1,38 +1,17 @@
-import { useState, useEffect } from "react";
-import { Map } from "lucide-react";
+import { useState } from "react";
+import { Map, Sparkles } from "lucide-react";
 import TripPlanner from "./trip-planner";
+import { useTripPlaces } from "@/hooks/use-trip-places";
+import { usePersonalizedTrips } from "@/hooks/use-personalized-trips";
 
 export default function TripIndicator() {
-  const [tripCount, setTripCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    // Load initial count
-    const loadTripCount = () => {
-      const saved = localStorage.getItem("tripPlaces");
-      if (saved) {
-        const places = JSON.parse(saved);
-        setTripCount(places.length);
-      } else {
-        setTripCount(0);
-      }
-    };
+  // Use enhanced trip management hooks
+  const { tripStats } = useTripPlaces();
+  const { tripInsights, isPersonalized } = usePersonalizedTrips();
 
-    loadTripCount();
-
-    // Listen for updates
-    const handleUpdate = () => {
-      loadTripCount();
-    };
-
-    window.addEventListener("storage", handleUpdate);
-    window.addEventListener("tripUpdated", handleUpdate);
-
-    return () => {
-      window.removeEventListener("storage", handleUpdate);
-      window.removeEventListener("tripUpdated", handleUpdate);
-    };
-  }, []);
+  const tripCount = tripStats.count;
 
   return (
     <>
@@ -46,10 +25,22 @@ export default function TripIndicator() {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center group-hover:scale-110 transition-transform">
               {tripCount}
             </span>
+            {isPersonalized && tripInsights.overallScore > 0 && (
+              <span className="absolute -bottom-1 -left-1 bg-amber-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                <Sparkles className="h-2 w-2" />
+              </span>
+            )}
           </div>
-          <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            View Trip ({tripCount} {tripCount === 1 ? 'place' : 'places'})
-          </span>
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <div className="font-medium">
+              View Trip ({tripCount} {tripCount === 1 ? 'place' : 'places'})
+            </div>
+            {isPersonalized && tripInsights.overallScore > 0 && (
+              <div className="text-xs text-gray-300 mt-1">
+                {tripInsights.overallScore}% personalized • {tripInsights.timeDistribution.estimatedDuration.toFixed(1)}h
+              </div>
+            )}
+          </div>
         </button>
       )}
 

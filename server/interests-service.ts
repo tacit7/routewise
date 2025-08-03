@@ -1,4 +1,4 @@
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 import { cacheService, CacheService } from "./cache-service";
 import type { 
   InterestCategory, 
@@ -20,6 +20,7 @@ export class InterestsService {
     return cacheService.getOrSet(
       cacheKey,
       async () => {
+        const storage = getStorage();
         return storage.getAllInterestCategories();
       },
       { ttl: this.CATEGORIES_CACHE_DURATION }
@@ -35,6 +36,7 @@ export class InterestsService {
     return cacheService.getOrSet(
       cacheKey,
       async () => {
+        const storage = getStorage();
         return storage.getUserInterests(userId);
       },
       { ttl: this.USER_INTERESTS_CACHE_DURATION }
@@ -58,6 +60,7 @@ export class InterestsService {
     }));
 
     // Replace all user interests with new set
+    const storage = getStorage();
     await storage.setUserInterests(userId, insertInterests);
     
     // Invalidate user's interests cache
@@ -81,6 +84,7 @@ export class InterestsService {
       priority: 1
     }));
 
+    const storage = getStorage();
     await storage.setUserInterests(userId, allInterests);
     
     // Invalidate user's interests cache
@@ -129,6 +133,7 @@ export class InterestsService {
     isEnabled: boolean,
     priority?: number
   ): Promise<UserInterest | null> {
+    const storage = getStorage();
     const updated = await storage.updateUserInterest(userId, categoryId, {
       isEnabled,
       priority,

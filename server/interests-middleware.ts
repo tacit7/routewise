@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import { storage } from './storage';
+import { getStorage } from './storage';
 
 /**
  * Generic validation middleware factory
@@ -83,6 +83,7 @@ export function validateInterestCategories() {
       }
       
       // Get all valid category IDs
+      const storage = getStorage();
       const allCategories = await storage.getAllInterestCategories();
       const validCategoryIds = new Set(allCategories.map(cat => cat.id));
       

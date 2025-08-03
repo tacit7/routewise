@@ -95,9 +95,46 @@ const productionEnvSchema = z.object({
  * Development-specific validation (more lenient)
  */
 const developmentEnvSchema = z.object({
-  ...envSchema.shape,
-  DATABASE_URL: z.string().optional(),
+  // Node environment
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  
+  // Server configuration
+  PORT: z.string().default('3001').transform(Number),
+  
+  // Database (optional in development)
+  DATABASE_URL: z.string().url('DATABASE_URL must be a valid URL').optional(),
+  
+  // JWT Authentication (more lenient in development)
   JWT_SECRET: z.string().min(32).default('route-wise-dev-secret-key'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  
+  // Google Services (optional)
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().url().optional(),
+  GOOGLE_PLACES_API_KEY: z.string().optional(),
+  GOOGLE_MAPS_API_KEY: z.string().optional(),
+  
+  // Cache configuration
+  GOOGLE_PLACES_CACHE_DURATION: z.string().default('5').transform(Number),
+  GOOGLE_GEOCODING_CACHE_DURATION: z.string().default('10').transform(Number),
+  
+  // Redis configuration (optional)
+  REDIS_URL: z.string().url().optional(),
+  REDIS_HOST: z.string().optional(),
+  REDIS_PORT: z.string().transform(Number).optional(),
+  REDIS_PASSWORD: z.string().optional(),
+  CACHE_DEFAULT_TTL: z.string().default('300000').transform(Number),
+  CACHE_KEY_PREFIX: z.string().default('routewise:'),
+  
+  // Logging
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('info'),
+  
+  // TripAdvisor API (optional)
+  TRIPADVISOR_API_KEY: z.string().optional(),
+  
+  // Development flags
+  MSW_DISABLED: z.string().optional().transform(val => val === 'true'),
 });
 
 /**

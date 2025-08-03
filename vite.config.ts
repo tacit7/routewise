@@ -11,7 +11,7 @@ export default defineConfig({
     process.env.REPL_ID !== undefined
       ? [
           await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
+            m.cartographer()
           ),
         ]
       : []),
@@ -36,6 +36,8 @@ export default defineConfig({
   },
   define: {
     // Pass MSW_DISABLED environment variable to client
-    'import.meta.env.VITE_MSW_DISABLED': JSON.stringify(process.env.MSW_DISABLED || 'false'),
+    "import.meta.env.VITE_MSW_DISABLED": JSON.stringify(
+      process.env.MSW_DISABLED || "false"
+    ),
   },
 });

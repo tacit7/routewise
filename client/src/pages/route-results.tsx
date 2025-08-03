@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon } from "lucide-react";
+import { ArrowLeft, MapPin, Flag, Loader2, Map as MapIcon, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Poi } from "@shared/schema";
@@ -329,48 +329,158 @@ export default function RouteResults() {
             />
           )}
 
-          {/* Main Content - Side by Side Layout */}
-          <div
-            className={`grid gap-8 ${
-              isMapVisible ? "lg:grid-cols-2" : "lg:grid-cols-1"
-            }`}
-          >
-            {/* Left Column - Sticky Map */}
-            {isMapVisible && (
-              <div className="lg:sticky lg:top-8 lg:h-screen">
-                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-full">
-                  <div className="p-4 border-b border-slate-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-slate-800">
-                        Interactive Route Map
-                      </h3>
-                      <div className="text-sm text-slate-600">
-                        {hoveredPoi
-                          ? `Viewing: ${hoveredPoi.name}`
-                          : "Hover over cards to explore"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="h-full">
-                    <InteractiveMap
-                      startCity={routeData.startCity}
-                      endCity={routeData.endCity}
-                      checkpoints={[]}
-                      pois={uniquePois}
-                      selectedPoiIds={selectedPoiIds}
-                      hoveredPoi={hoveredPoi}
-                      onPoiClick={handlePoiClick}
-                      onPoiSelect={handlePoiSelect}
-                      height="calc(100vh - 200px)"
-                      className="w-full"
-                    />
-                  </div>
+          {/* Roadtrippers-style Layout */}
+          <div className="flex h-screen -mt-8 relative">
+            {/* Left Sidebar - Filters and POI List */}
+            <div className="w-96 bg-white shadow-xl z-10 flex flex-col">
+              {/* Sidebar Header */}
+              <div className="p-4 border-b border-slate-200">
+                <h2 className="text-xl font-bold text-slate-800 mb-4">
+                  Trip Details
+                </h2>
+                <div className="flex items-center text-sm text-slate-600 mb-4">
+                  <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                  <span className="font-medium">{routeData.startCity}</span>
+                  <ArrowLeft className="h-4 w-4 mx-2 rotate-180 text-slate-400" />
+                  <Flag className="h-4 w-4 mr-2 text-red-600" />
+                  <span className="font-medium">{routeData.endCity}</span>
+                </div>
+                <div className="text-sm text-slate-500">
+                  {uniquePois.length} places found
                 </div>
               </div>
-            )}
 
-            {/* Right Column - POI Cards */}
+              {/* City Filters */}
+              {availableCities.length > 0 && (
+                <div className="p-4 border-b border-slate-200">
+                  <h3 className="text-sm font-medium text-slate-700 mb-3">
+                    Filter by City
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setSelectedCity("all")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        selectedCity === "all"
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      All ({uniquePois.length})
+                    </button>
+                    {availableCities.slice(0, 4).map((city) => {
+                      const cityCount = uniquePois.filter((poi) => {
+                        const poiCity = extractCityFromPoi(poi);
+                        return (
+                          poiCity === city.toLowerCase() ||
+                          (routeData?.startCity.toLowerCase() ===
+                            city.toLowerCase() &&
+                            !poiCity) ||
+                          (routeData?.endCity.toLowerCase() ===
+                            city.toLowerCase() &&
+                            !poiCity)
+                        );
+                      }).length;
+
+                      return (
+                        <button
+                          key={city}
+                          onClick={() => setSelectedCity(city)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            selectedCity === city
+                              ? "bg-blue-600 text-white"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          {city} ({cityCount})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* POI List - Scrollable */}
+              <div className="flex-1 overflow-y-auto">
+                {poisLoading && (
+                  <div className="p-6 text-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
+                    <p className="text-sm text-slate-600">Loading places...</p>
+                  </div>
+                )}
+
+                {!poisLoading && uniquePois.length === 0 && (
+                  <div className="p-6 text-center">
+                    <div className="text-4xl mb-3">🗺️</div>
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                      No places found
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      Try a different route or check back later.
+                    </p>
+                  </div>
+                )}
+
+                {uniquePois.length > 0 && (
+                  <div className="p-3 space-y-3">
+                    {filteredPois.map((poi, index) => (
+                      <div
+                        key={poi.placeId || poi.id || `poi-${index}`}
+                        onMouseEnter={() => handlePoiHover(poi)}
+                        onMouseLeave={() => handlePoiHover(null)}
+                        className="transition-transform hover:scale-[1.02] cursor-pointer"
+                      >
+                        <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow p-3">
+                          <div className="flex gap-3">
+                            <img
+                              src={poi.imageUrl}
+                              alt={poi.name}
+                              className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-slate-800 truncate text-sm">
+                                {poi.name}
+                              </h4>
+                              <p className="text-xs text-slate-600 line-clamp-2 mt-1">
+                                {poi.description}
+                              </p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center text-xs text-slate-500">
+                                  <Star className="h-3 w-3 text-yellow-400 mr-1" />
+                                  {poi.rating}
+                                </div>
+                                <span className="text-xs text-slate-500">
+                                  {poi.timeFromStart}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Main Map Area */}
+            <div className="flex-1 relative">
+              <InteractiveMap
+                startCity={routeData.startCity}
+                endCity={routeData.endCity}
+                checkpoints={[]}
+                pois={uniquePois}
+                selectedPoiIds={selectedPoiIds}
+                hoveredPoi={hoveredPoi}
+                onPoiClick={handlePoiClick}
+                onPoiSelect={handlePoiSelect}
+                height="100vh"
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+
+          {/* Hidden section for non-map view */}
+          {!isMapVisible && (
             <div className="space-y-6">
               {/* Route Info Header */}
               <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
@@ -578,6 +688,7 @@ export default function RouteResults() {
                           <PoiCard
                             poi={poi}
                             variant={isMapVisible ? "default" : "grid"}
+                            showRelevanceScore={true}
                           />
                         </div>
                       ))}
@@ -646,7 +757,7 @@ export default function RouteResults() {
                 )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

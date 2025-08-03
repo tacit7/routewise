@@ -3,13 +3,13 @@ import { getAuthService } from "./auth-service";
 import { getGoogleOAuthService } from "./google-oauth-service";
 import { AuthMiddleware, type AuthenticatedRequest } from "./auth-middleware";
 import { log } from "./logger";
+import { authRateLimit } from "./simple-rate-limit";
 
 export function registerAuthRoutes(app: Express): void {
   // Apply security headers to all auth routes
   app.use("/api/auth/*", AuthMiddleware.securityHeaders);
 
   // Apply rate limiting to auth endpoints
-  const authRateLimit = AuthMiddleware.rateLimit();
   app.use("/api/auth/login", authRateLimit);
   app.use("/api/auth/register", authRateLimit);
 

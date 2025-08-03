@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 import { GooglePlacesService, SAMPLE_ROUTE_COORDINATES } from "./google-places";
 import { NominatimService } from "./nominatim-service";
 import { tripService } from "./trip-service";
@@ -28,10 +28,8 @@ import {
 } from "./validation-middleware";
 import { 
   getRateLimiter,
-  placesRateLimit,
-  tripsRateLimit,
-  poisRateLimit
-} from "./rate-limit-middleware";
+  placesRateLimit
+} from "./simple-rate-limit";
 import { log } from "./logger";
 import type { InsertPoi } from "@shared/schema";
 
@@ -195,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get POIs for a specific route or checkpoint
   app.get("/api/pois", 
-    poisRateLimit,
+    getRateLimiter('general'),
     validateInput(poiSchemas.poisQuery, 'query'),
     async (req, res) => {
     const { start, end, checkpoint } = req.query;
@@ -876,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Calculate route from wizard data
   app.post("/api/route", 
-    tripsRateLimit,
+    getRateLimiter('general'),
     validateInput(tripSchemas.routeCalculation, 'body'),
     async (req, res) => {
     try {

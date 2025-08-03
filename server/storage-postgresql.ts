@@ -55,7 +55,12 @@ export class PostgreSQLStorage implements IStorage {
     });
 
     this.db = drizzle(this.client);
-    this.initializeConnection();
+    
+    // Initialize connection in background - don't block constructor
+    this.initializeConnection().catch((error) => {
+      log.error('PostgreSQL initialization failed completely', error);
+      this.isConnected = false;
+    });
   }
 
   /**
@@ -86,7 +91,8 @@ export class PostgreSQLStorage implements IStorage {
         log.info(`Retrying PostgreSQL connection in ${this.retryDelay}ms...`);
         setTimeout(() => this.initializeConnection(), this.retryDelay);
       } else {
-        throw new Error(`Failed to connect to PostgreSQL after ${this.maxRetries} attempts`);
+        log.error(`Failed to connect to PostgreSQL after ${this.maxRetries} attempts - PostgreSQL storage will be unavailable`);
+        this.isConnected = false;
       }
     }
   }

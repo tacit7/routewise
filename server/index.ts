@@ -33,12 +33,15 @@ import { setupVite, serveStatic, log } from "./vite";
 import { devApiCacheMiddleware } from "./dev-api-cache";
 import { log as logger, requestLogger, errorLogger } from "./logger";
 import { securityHeaders } from "./validation-middleware";
-import { generalRateLimit, logRateLimit } from "./rate-limit-middleware";
+import { getRateLimiter } from "./simple-rate-limit";
 import { initializeStorageWithEnv } from "./storage";
 import { initializeAuthService } from "./auth-service";
 import { initializeGoogleOAuthService } from "./google-oauth-service";
 
 const app = express();
+
+// Trust proxy headers (fixes IPv6 rate limiting issues)
+app.set('trust proxy', true);
 
 // Security middleware (must be first)
 app.use(helmet({
@@ -59,8 +62,7 @@ app.use(helmet({
 app.use(securityHeaders());
 
 // Rate limiting (apply early, before other middleware)
-app.use(logRateLimit);
-app.use(generalRateLimit);
+app.use(getRateLimiter('general'));
 
 // Request logging
 app.use(requestLogger());
@@ -140,6 +142,28 @@ app.use((req, res, next) => {
     });
   });
 
+  // Serve the app on the validated port first
+  const port = env.PORT;
+  server.listen(port, '127.0.0.1', () => {
+    logger.info(`🚀 Server listening on http://127.0.0.1:${port}`, {
+      environment: env.NODE_ENV,
+      port: port,
+      hasDatabase: !!env.DATABASE_URL,
+      hasGoogleOAuth: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
+    });
+  });
+
+  // Handle server errors
+  server.on('error', (error: any) => {
+    if (error.code === 'EADDRINUSE') {
+      logger.error(`Port ${port} is already in use`);
+      process.exit(1);
+    } else {
+      logger.error('Server error:', error);
+      process.exit(1);
+    }
+  });
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
@@ -148,14 +172,4 @@ app.use((req, res, next) => {
   } else {
     serveStatic(app);
   }
-
-  // Serve the app on the validated port
-  const port = env.PORT;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();

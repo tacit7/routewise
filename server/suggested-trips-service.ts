@@ -1,4 +1,4 @@
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 import { interestsService } from "./interests-service";
 import { GooglePlacesService } from "./google-places";
 import type { Poi, InsertPoi } from "@shared/schema";
@@ -217,6 +217,7 @@ export class SuggestedTripsService {
   ): Promise<Poi[]> {
     try {
       // Get existing POIs from storage
+      const storage = getStorage();
       const allPois = await storage.getAllPois();
       
       // Filter POIs by user interests using the mapping

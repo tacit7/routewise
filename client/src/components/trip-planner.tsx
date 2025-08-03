@@ -11,10 +11,16 @@ import {
   Download,
   ChevronUp,
   ChevronDown,
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
 } from "lucide-react";
 import type { Poi } from "@shared/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useTripPlaces } from "@/hooks/use-trip-places";
+import { usePersonalizedTrips } from "@/hooks/use-personalized-trips";
 
 interface TripPlannerProps {
   isOpen: boolean;
@@ -22,60 +28,27 @@ interface TripPlannerProps {
 }
 
 export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
-  const [tripPlaces, setTripPlaces] = useState<Poi[]>([]);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Load trip places from localStorage
-    const loadTripPlaces = () => {
-      const saved = localStorage.getItem("tripPlaces");
-      if (saved) {
-        setTripPlaces(JSON.parse(saved));
-      }
-    };
+  // Use enhanced trip management hooks
+  const {
+    tripPlaces,
+    tripStats,
+    removeFromTrip,
+    clearTrip,
+    reorderTrip,
+    isRemovingFromTrip,
+    isClearingTrip
+  } = useTripPlaces();
 
-    loadTripPlaces();
+  // Use personalization for trip insights
+  const {
+    tripInsights,
+    isPersonalized
+  } = usePersonalizedTrips();
 
-    // Listen for storage changes (for real-time updates)
-    const handleStorageChange = () => {
-      loadTripPlaces();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    // Custom event for same-tab updates
-    window.addEventListener("tripUpdated", loadTripPlaces);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("tripUpdated", loadTripPlaces);
-    };
-  }, []);
-
-  const removeFromTrip = (poiId: number) => {
-    const updatedPlaces = tripPlaces.filter(place => place.id !== poiId);
-    setTripPlaces(updatedPlaces);
-    localStorage.setItem("tripPlaces", JSON.stringify(updatedPlaces));
-    
-    // Dispatch custom event for same-tab updates
-    window.dispatchEvent(new Event("tripUpdated"));
-    
-    toast({
-      title: "Removed from trip",
-      description: "Place has been removed from your trip.",
-    });
-  };
-
-  const clearTrip = () => {
-    setTripPlaces([]);
-    localStorage.removeItem("tripPlaces");
-    window.dispatchEvent(new Event("tripUpdated"));
-    
-    toast({
-      title: "Trip cleared",
-      description: "All places have been removed from your trip.",
-    });
-  };
+  // Remove functions handled by hooks
 
   const toggleCardExpansion = (poiId: number) => {
     const newExpanded = new Set(expandedCards);
@@ -144,11 +117,79 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
             </button>
             <button
               onClick={clearTrip}
-              className="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              disabled={isClearingTrip}
+              className="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear All
+              {isClearingTrip ? 'Clearing...' : 'Clear All'}
             </button>
+          </div>
+        )}
+
+        {/* Trip Insights */}
+        {tripPlaces.length > 0 && isPersonalized && (
+          <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                Trip Insights
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Personalization Score:</span>
+                <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                  tripInsights.overallScore >= 80 ? 'bg-green-100 text-green-700' :
+                  tripInsights.overallScore >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {tripInsights.overallScore}%
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-green-600" />
+                <div>
+                  <div className="font-medium text-gray-700">Budget</div>
+                  <div className="text-gray-600 capitalize">{tripInsights.budgetAnalysis.budgetRange}</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600" />
+                <div>
+                  <div className="font-medium text-gray-700">Duration</div>
+                  <div className="text-gray-600">{tripInsights.timeDistribution.estimatedDuration.toFixed(1)}h</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-600" />
+                <div>
+                  <div className="font-medium text-gray-700">Avg Rating</div>
+                  <div className="text-gray-600">{tripStats.averageRating.toFixed(1)}</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-purple-600" />
+                <div>
+                  <div className="font-medium text-gray-700">Categories</div>
+                  <div className="text-gray-600">{Object.keys(tripStats.categories).length}</div>
+                </div>
+              </div>
+            </div>
+
+            {tripInsights.missingInterests.length > 0 && (
+              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="text-sm">
+                  <span className="font-medium text-amber-800">Suggestion:</span>
+                  <span className="text-amber-700 ml-1">
+                    Consider adding places for: {tripInsights.missingInterests.join(', ')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
