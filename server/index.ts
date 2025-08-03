@@ -52,8 +52,8 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
       scriptSrc: process.env.NODE_ENV === 'development' 
-        ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] 
-        : ["'self'"],
+        ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://maps.googleapis.com"] 
+        : ["'self'", "https://maps.googleapis.com"],
       connectSrc: ["'self'", "https://maps.googleapis.com", "ws://localhost:*", "wss://localhost:*"]
     },
   },
