@@ -1,5 +1,5 @@
-import winston from 'winston';
-import { Request, Response } from 'express';
+import winston from "winston";
+import { Request, Response } from "express";
 
 /**
  * Structured logging system for RouteWise backend
@@ -16,89 +16,100 @@ const logLevels = {
 };
 
 const logColors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'magenta',
-  debug: 'white',
+  error: "red",
+  warn: "yellow",
+  info: "green",
+  http: "magenta",
+  debug: "white",
 };
 
 winston.addColors(logColors);
 
 // Custom format for structured logging
 const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
   winston.format.errors({ stack: true }),
   winston.format.colorize({ all: true }),
   winston.format.printf((info) => {
-    const { timestamp, level, message, service, userId, operation, duration, ...meta } = info;
-    
+    const {
+      timestamp,
+      level,
+      message,
+      service,
+      userId,
+      operation,
+      duration,
+      ...meta
+    } = info;
+
     let logMessage = `${timestamp} [${level}]`;
-    
+
     if (service) logMessage += ` [${service}]`;
     if (operation) logMessage += ` [${operation}]`;
     if (userId) logMessage += ` [user:${userId}]`;
-    
+
     logMessage += `: ${message}`;
-    
+
     if (duration) logMessage += ` (${duration}ms)`;
-    
+
     // Add metadata if present (excluding sensitive fields)
-    const metaKeys = Object.keys(meta).filter(key => 
-      !['password', 'token', 'secret', 'key', 'authorization'].includes(key.toLowerCase())
+    const metaKeys = Object.keys(meta).filter(
+      (key) =>
+        !["password", "token", "secret", "key", "authorization"].includes(
+          key.toLowerCase()
+        )
     );
-    
+
     if (metaKeys.length > 0) {
       const sanitizedMeta: any = {};
-      metaKeys.forEach(key => {
+      metaKeys.forEach((key) => {
         sanitizedMeta[key] = meta[key];
       });
       logMessage += ` ${JSON.stringify(sanitizedMeta)}`;
     }
-    
+
     return logMessage;
   })
 );
 
 // Create Winston logger instance
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  level:
+    process.env.LOG_LEVEL ||
+    (process.env.NODE_ENV === "production" ? "info" : "debug"),
   levels: logLevels,
   format: logFormat,
-  defaultMeta: { service: 'routewise-backend' },
+  defaultMeta: { service: "routewise-backend" },
   transports: [
     // Console transport for development
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        logFormat
-      )
+      format: winston.format.combine(winston.format.colorize(), logFormat),
     }),
-    
+
     // File transports for production
     new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
+      filename: "logs/error.log",
+      level: "error",
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
-      )
+      ),
     }),
-    
+
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: "logs/combined.log",
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
-      )
+      ),
     }),
   ],
 });
 
 // Create logs directory if it doesn't exist
-import { existsSync, mkdirSync } from 'fs';
-if (!existsSync('logs')) {
-  mkdirSync('logs');
+import { existsSync, mkdirSync } from "fs";
+if (!existsSync("logs")) {
+  mkdirSync("logs");
 }
 
 /**
@@ -167,10 +178,15 @@ export class Logger {
   /**
    * Log authentication events
    */
-  auth(operation: string, userId?: number, success: boolean = true, meta?: any) {
-    const level = success ? 'info' : 'warn';
+  auth(
+    operation: string,
+    userId?: number,
+    success: boolean = true,
+    meta?: any
+  ) {
+    const level = success ? "info" : "warn";
     this.winston[level](`Authentication ${operation}`, {
-      operation: 'auth',
+      operation: "auth",
       userId,
       success,
       ...meta,
@@ -182,7 +198,7 @@ export class Logger {
    */
   api(operation: string, userId?: number, duration?: number, meta?: any) {
     this.winston.info(`API operation: ${operation}`, {
-      operation: 'api',
+      operation: "api",
       userId,
       duration,
       ...meta,
@@ -194,7 +210,7 @@ export class Logger {
    */
   database(operation: string, table?: string, duration?: number, meta?: any) {
     this.winston.debug(`Database ${operation}`, {
-      operation: 'database',
+      operation: "database",
       table,
       duration,
       ...meta,
@@ -204,9 +220,15 @@ export class Logger {
   /**
    * Log cache operations
    */
-  cache(operation: string, key: string, hit: boolean = true, duration?: number, meta?: any) {
+  cache(
+    operation: string,
+    key: string,
+    hit: boolean = true,
+    duration?: number,
+    meta?: any
+  ) {
     this.winston.debug(`Cache ${operation}`, {
-      operation: 'cache',
+      operation: "cache",
       key,
       hit,
       duration,
@@ -217,10 +239,16 @@ export class Logger {
   /**
    * Log external API calls
    */
-  external(service: string, operation: string, duration?: number, success: boolean = true, meta?: any) {
-    const level = success ? 'info' : 'warn';
+  external(
+    service: string,
+    operation: string,
+    duration?: number,
+    success: boolean = true,
+    meta?: any
+  ) {
+    const level = success ? "info" : "warn";
     this.winston[level](`External API: ${service} ${operation}`, {
-      operation: 'external',
+      operation: "external",
       service,
       duration,
       success,
@@ -231,10 +259,15 @@ export class Logger {
   /**
    * Log security events
    */
-  security(event: string, severity: 'low' | 'medium' | 'high' | 'critical', meta?: any) {
-    const level = severity === 'critical' || severity === 'high' ? 'error' : 'warn';
+  security(
+    event: string,
+    severity: "low" | "medium" | "high" | "critical",
+    meta?: any
+  ) {
+    const level =
+      severity === "critical" || severity === "high" ? "error" : "warn";
     this.winston[level](`Security event: ${event}`, {
-      operation: 'security',
+      operation: "security",
       severity,
       ...meta,
     });
@@ -243,9 +276,9 @@ export class Logger {
   /**
    * Log performance metrics
    */
-  performance(metric: string, value: number, unit: string = 'ms', meta?: any) {
+  performance(metric: string, value: number, unit: string = "ms", meta?: any) {
     this.winston.info(`Performance: ${metric}`, {
-      operation: 'performance',
+      operation: "performance",
       metric,
       value,
       unit,
@@ -265,27 +298,27 @@ export function requestLogger() {
     const startTime = Date.now();
     const originalUrl = req.originalUrl || req.url;
     const method = req.method;
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    const userAgent = req.get('User-Agent') || 'unknown';
+    const ip = req.ip || req.connection.remoteAddress || "unknown";
+    const userAgent = req.get("User-Agent") || "unknown";
     const userId = (req as any).user?.id;
 
     // Override res.json to capture response data (without sensitive info)
     const originalJson = res.json;
     let responseBody: any;
-    
-    res.json = function(data: any) {
+
+    res.json = function (data: any) {
       responseBody = sanitizeResponseForLogging(data);
       return originalJson.call(this, data);
     };
 
     // Log when response finishes
-    res.on('finish', () => {
+    res.on("finish", () => {
       const duration = Date.now() - startTime;
       const statusCode = res.statusCode;
-      const level = statusCode >= 400 ? 'warn' : 'info';
+      const level = statusCode >= 400 ? "warn" : "info";
 
       log.winston[level](`${method} ${originalUrl}`, {
-        operation: 'http',
+        operation: "http",
         method,
         url: originalUrl,
         statusCode,
@@ -293,7 +326,7 @@ export function requestLogger() {
         ip,
         userAgent,
         userId,
-        responseSize: res.get('content-length'),
+        responseSize: res.get("content-length"),
         ...(responseBody && { response: responseBody }),
       });
     });
@@ -308,9 +341,9 @@ export function requestLogger() {
 export function errorLogger() {
   return (error: any, req: Request, res: Response, next: Function) => {
     const userId = (req as any).user?.id;
-    
-    log.error('Unhandled route error', error, {
-      operation: 'error',
+
+    log.error("Unhandled route error", error, {
+      operation: "error",
       method: req.method,
       url: req.originalUrl,
       userId,
@@ -327,19 +360,26 @@ export function errorLogger() {
  * Sanitize request data for logging (remove sensitive fields)
  */
 function sanitizeRequestForLogging(data: any): any {
-  if (!data || typeof data !== 'object') return data;
-  
-  const sensitiveFields = ['password', 'token', 'secret', 'key', 'authorization', 'cookie'];
+  if (!data || typeof data !== "object") return data;
+
+  const sensitiveFields = [
+    "password",
+    "token",
+    "secret",
+    "key",
+    "authorization",
+    "cookie",
+  ];
   const sanitized: any = {};
-  
+
   for (const [key, value] of Object.entries(data)) {
-    if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
-      sanitized[key] = '[REDACTED]';
+    if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
+      sanitized[key] = "[REDACTED]";
     } else {
       sanitized[key] = value;
     }
   }
-  
+
   return sanitized;
 }
 
@@ -347,13 +387,13 @@ function sanitizeRequestForLogging(data: any): any {
  * Sanitize response data for logging (remove sensitive fields)
  */
 function sanitizeResponseForLogging(data: any): any {
-  if (!data || typeof data !== 'object') return data;
-  
+  if (!data || typeof data !== "object") return data;
+
   // Don't log large response bodies
   if (JSON.stringify(data).length > 1000) {
-    return { size: 'large', type: typeof data };
+    return { size: "large", type: typeof data };
   }
-  
+
   return sanitizeRequestForLogging(data);
 }
 
@@ -363,27 +403,36 @@ function sanitizeResponseForLogging(data: any): any {
 export function replaceConsole() {
   // Override console methods to use structured logging
   const originalConsole = { ...console };
-  
+
   console.log = (message: any, ...args: any[]) => {
-    log.info(typeof message === 'string' ? message : JSON.stringify(message), 
-      args.length > 0 ? { args } : undefined);
+    log.info(
+      typeof message === "string" ? message : JSON.stringify(message),
+      args.length > 0 ? { args } : undefined
+    );
   };
-  
+
   console.warn = (message: any, ...args: any[]) => {
-    log.warn(typeof message === 'string' ? message : JSON.stringify(message), 
-      args.length > 0 ? { args } : undefined);
+    log.warn(
+      typeof message === "string" ? message : JSON.stringify(message),
+      args.length > 0 ? { args } : undefined
+    );
   };
-  
+
   console.error = (message: any, ...args: any[]) => {
-    log.error(typeof message === 'string' ? message : JSON.stringify(message), 
-      undefined, args.length > 0 ? { args } : undefined);
+    log.error(
+      typeof message === "string" ? message : JSON.stringify(message),
+      undefined,
+      args.length > 0 ? { args } : undefined
+    );
   };
-  
+
   console.debug = (message: any, ...args: any[]) => {
-    log.debug(typeof message === 'string' ? message : JSON.stringify(message), 
-      args.length > 0 ? { args } : undefined);
+    log.debug(
+      typeof message === "string" ? message : JSON.stringify(message),
+      args.length > 0 ? { args } : undefined
+    );
   };
-  
+
   // Keep original console methods available if needed
   (console as any).originalLog = originalConsole.log;
   (console as any).originalWarn = originalConsole.warn;
@@ -392,10 +441,10 @@ export function replaceConsole() {
 }
 
 // Initialize structured logging
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   replaceConsole();
-  log.info('Structured logging initialized', { 
-    logLevel: process.env.LOG_LEVEL || 'info',
-    environment: process.env.NODE_ENV || 'development'
+  log.info("Structured logging initialized", {
+    logLevel: process.env.LOG_LEVEL || "info",
+    environment: process.env.NODE_ENV || "development",
   });
 }

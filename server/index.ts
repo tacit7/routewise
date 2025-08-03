@@ -48,8 +48,10 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'"],
-      connectSrc: ["'self'", "https://maps.googleapis.com"]
+      scriptSrc: process.env.NODE_ENV === 'development' 
+        ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] 
+        : ["'self'"],
+      connectSrc: ["'self'", "https://maps.googleapis.com", "ws://localhost:*", "wss://localhost:*"]
     },
   },
   crossOriginEmbedderPolicy: false // Allow external resources like Google Maps
