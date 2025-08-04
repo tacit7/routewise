@@ -1,7 +1,11 @@
+import { useState } from "react";
 import RouteForm from "./route-form";
+import PlaceForm from "./place-form";
 import WizardEntryPoint from "./wizard-entry-point";
 
 export default function HeroSection() {
+  const [activeTab, setActiveTab] = useState<'route' | 'place'>('route');
+
   return (
     <section className="relative min-h-[60vh] flex items-center justify-center">
       <div 
@@ -17,17 +21,58 @@ export default function HeroSection() {
           Plan Your Perfect <span className="text-accent">Road Trip</span>
         </h2>
         <p className="text-xl text-slate-200 mb-12 max-w-2xl mx-auto">
-          Discover amazing stops along your route - from hidden gems to must-see attractions. Let's make every mile memorable.
+          Discover amazing stops along your route or explore places around any destination. Let's make every mile memorable.
         </p>
         
         <div className="space-y-8">
-          {/* Quick Route Form */}
+          {/* Quick Planning Forms */}
           <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
-            <div className="mb-4 text-center">
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">Quick Route</h3>
-              <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
+            {/* Tab Navigation */}
+            <div className="flex mb-6 bg-slate-100 rounded-lg p-1">
+              <button
+                onClick={() => setActiveTab('route')}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+                  activeTab === 'route'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                <i className="fas fa-route mr-2" />
+                Plan Route
+              </button>
+              <button
+                onClick={() => setActiveTab('place')}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+                  activeTab === 'place'
+                    ? 'bg-white text-purple-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                <i className="fas fa-compass mr-2" />
+                Explore Places
+              </button>
             </div>
-            <RouteForm />
+
+            {/* Tab Content */}
+            {activeTab === 'route' && (
+              <div>
+                <div className="mb-4 text-center">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Quick Route</h3>
+                  <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
+                </div>
+                <RouteForm />
+              </div>
+            )}
+
+            {activeTab === 'place' && (
+              <div>
+                <div className="mb-4 text-center">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Explore Places</h3>
+                  <p className="text-sm text-slate-600">Discover attractions around any city or destination</p>
+                </div>
+                <PlaceForm />
+              </div>
+            )}
           </div>
           
           {/* Advanced Trip Planner Option */}
