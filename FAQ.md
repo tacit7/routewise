@@ -1,6 +1,200 @@
 # Routewise Project FAQ
 
-## Latest Session Q&A (August 3, 2025 - Session 14)
+## Latest Session Q&A (January 4, 2025 - Session 15)
+
+### Flexible Locations Feature Implementation
+**Question:** How to add flexible locations option to trip planner step 2, similar to flexible dates in step 3?
+**Error/Issue:** Trip planner lacked flexibility for users who want to explore places around a general area rather than planning specific routes
+**Context:** User requested adding flexible locations checkbox that would allow users to only specify a starting location without requiring an end destination
+**Solution:** Implemented flexible locations feature with proper validation requiring at least one location, UI updates to show conditional inputs, and wizard completion logic to navigate to place-results page
+**Code:**
+```typescript
+// Added to TripWizardData interface
+export interface TripWizardData {
+  // ... existing fields
+  flexibleLocations: boolean;
+}
+
+// LocationStep.tsx - Flexible locations UI
+const handleFlexibleChange = (checked: boolean) => {
+  onFlexibleLocationsChange(checked);
+  if (checked) {
+    onEndLocationChange(null as any);
+    onStopsChange([]);
+  }
+};
+
+// Validation that always requires starting location
+export const locationSchema = z.object({
+  startLocation: placeSuggestionSchema.nullable(),
+  endLocation: placeSuggestionSchema.nullable(),
+  stops: z.array(placeSuggestionSchema).max(5),
+  flexibleLocations: z.boolean(),
+}).refine(data => {
+  return data.startLocation !== null;
+}, {
+  message: "Please select at least a starting location",
+  path: ["startLocation"],
+});
+```
+**Date:** January 4, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #trip-wizard #flexible-locations #validation #ui-enhancement #solved
+**Related:** [[Trip Planner Wizard]] [[Location Selection]] [[Form Validation]]
+
+---
+
+### Place Results Page Implementation
+**Question:** How to create a place results page that shows POIs for a single location using the same layout as route results?
+**Error/Issue:** Need dedicated page for exploring places around a single destination, matching existing route results design
+**Context:** Creating place exploration functionality that complements route planning by allowing users to discover POIs within a radius of any location
+**Solution:** Created place-results.tsx page with same sidebar/map layout as route-results, fetching POIs within 10km radius, category filtering, and integration with trip planning system
+**Code:**
+```typescript
+// place-results.tsx - Main component structure
+export default function PlaceResults() {
+  const [placeData, setPlaceData] = useState<PlaceData | null>(null);
+  
+  // Fetch POIs for the specific place
+  const { data: pois } = useQuery<Poi[]>({
+    queryKey: ["/api/pois/place", placeData?.placeName],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        location: placeData.placeName,
+        radius: "10000", // 10km radius
+      });
+      const response = await fetch(`/api/pois/nearby?${params}`);
+      return response.json();
+    },
+    enabled: !!placeData,
+  });
+  
+  // Same layout structure as route-results
+  return (
+    <div className="h-screen flex flex-col bg-slate-50">
+      {/* Left Sidebar - Compact POI Cards */}
+      <div className="w-80 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+        {/* POI list with category filtering */}
+      </div>
+      {/* Main Map Area */}
+      {isMapVisible && (
+        <div className="flex-1">
+          <InteractiveMap centerLocation={placeData.location} zoom={12} />
+        </div>
+      )}
+    </div>
+  );
+}
+```
+**Date:** January 4, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #place-exploration #poi-display #map-integration #sidebar-layout #solved
+**Related:** [[Route Results Page]] [[POI Management]] [[Interactive Map]]
+
+---
+
+### Trip Planner Completion Navigation Logic
+**Question:** How to make trip planner navigate to place-results instead of route-results when user selects flexible locations?
+**Error/Issue:** Trip planner always navigated to route-results even when user only specified a starting location with flexible destinations
+**Context:** Improving user experience by directing flexible location trips to appropriate destination page for place exploration
+**Solution:** Added conditional logic in handleWizardComplete to detect flexible single location trips and navigate to place-results with proper URL parameters and localStorage data
+**Code:**
+```typescript
+// trip-planner-wizard.tsx - Enhanced completion logic
+const handleWizardComplete = async (wizardData: TripWizardData) => {
+  const isFlexibleSingleLocation = wizardData.flexibleLocations && 
+    wizardData.startLocation && 
+    !wizardData.endLocation;
+
+  if (isFlexibleSingleLocation) {
+    const startLocationName = wizardData.startLocation?.main_text || "";
+    
+    // Store place data for place results page
+    localStorage.setItem("placeData", JSON.stringify({
+      placeName: startLocationName,
+      placeId: wizardData.startLocation?.place_id,
+      location: wizardData.startLocation?.geometry?.location,
+      wizardPreferences: { /* wizard data */ },
+      fromWizard: true,
+    }));
+
+    // Navigate with URL parameters
+    const placeParams = new URLSearchParams({ place: startLocationName });
+    setLocation(`/place-results?${placeParams.toString()}`);
+    return;
+  }
+  
+  // Continue with regular route calculation logic...
+};
+```
+**Date:** January 4, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #navigation #conditional-logic #trip-wizard #user-experience #solved
+**Related:** [[Trip Planner Wizard]] [[Place Results Page]] [[Navigation Logic]]
+
+---
+
+### Direct Place Exploration Form Implementation
+**Question:** How to create a command/form that allows users to access place-results without going through the full wizard?
+**Error/Issue:** Users needed a faster way to explore places around a destination without completing all 7 wizard steps
+**Context:** Providing quick access to place exploration functionality directly from the home page for improved user experience
+**Solution:** Created PlaceForm component and enhanced HeroSection with tabbed interface offering both route planning and place exploration options
+**Code:**
+```typescript
+// place-form.tsx - Quick place exploration form
+export default function PlaceForm() {
+  const onSubmit = async (data: PlaceFormData) => {
+    localStorage.setItem('placeData', JSON.stringify({
+      placeName: data.placeName,
+      fromForm: true,
+    }));
+    
+    const placeParams = new URLSearchParams({
+      place: data.placeName,
+    });
+    setLocation(`/place-results?${placeParams.toString()}`);
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <CityAutocomplete
+        placeholder="Enter city or place name"
+        icon={<MapPin className="h-4 w-4" />}
+      />
+      <Button className="w-full bg-purple-600 hover:bg-purple-700">
+        <Compass className="h-4 w-4 mr-2" />
+        Explore Places
+      </Button>
+    </form>
+  );
+}
+
+// hero-section.tsx - Tabbed interface
+const [activeTab, setActiveTab] = useState<'route' | 'place'>('route');
+
+return (
+  <div className="flex mb-6 bg-slate-100 rounded-lg p-1">
+    <button onClick={() => setActiveTab('route')}>Plan Route</button>
+    <button onClick={() => setActiveTab('place')}>Explore Places</button>
+  </div>
+);
+```
+**Date:** January 4, 2025
+**Project:** [[RouteWise]]
+**Status:** Solved
+
+#react #tabbed-interface #quick-access #place-exploration #hero-section #solved
+**Related:** [[Hero Section]] [[Form Components]] [[User Experience]]
+
+---
+
+## Previous Session Q&A (August 3, 2025 - Session 14)
 
 ### Add to Trip Button Functionality Implementation
 
