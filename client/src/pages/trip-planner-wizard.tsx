@@ -16,7 +16,70 @@ export default function TripPlannerWizardPage() {
   const [isCalculating, setIsCalculating] = useState(false);
 
   const handleWizardComplete = async (wizardData: TripWizardData) => {
-    // Validate wizard data
+    // Check if this is a flexible location trip with only starting location
+    const isFlexibleSingleLocation = wizardData.flexibleLocations && 
+      wizardData.startLocation && 
+      !wizardData.endLocation;
+
+    if (isFlexibleSingleLocation) {
+      // Navigate to place results for flexible single location trips
+      setIsCalculating(true);
+      
+      try {
+        const startLocationName = wizardData.startLocation?.main_text || "";
+        
+        // Store place data for place results page
+        localStorage.setItem("placeData", JSON.stringify({
+          placeName: startLocationName,
+          placeId: wizardData.startLocation?.place_id,
+          location: wizardData.startLocation?.geometry?.location,
+          wizardPreferences: {
+            tripType: wizardData.tripType,
+            transportation: wizardData.transportation,
+            lodging: wizardData.lodging,
+            budgetRange: wizardData.budgetRange,
+            intentions: wizardData.intentions,
+            specialNeeds: wizardData.specialNeeds,
+            accessibility: wizardData.accessibility,
+          },
+          fromWizard: true,
+        }));
+
+        // Navigate to place results with URL parameters
+        const placeParams = new URLSearchParams({
+          place: startLocationName,
+        });
+        
+        if (wizardData.startLocation?.place_id) {
+          placeParams.append('placeId', wizardData.startLocation.place_id);
+        }
+        
+        if (wizardData.startLocation?.geometry?.location) {
+          placeParams.append('lat', wizardData.startLocation.geometry.location.lat.toString());
+          placeParams.append('lng', wizardData.startLocation.geometry.location.lng.toString());
+        }
+
+        setLocation(`/place-results?${placeParams.toString()}`);
+
+        toast({
+          title: "Trip Plan Complete!",
+          description: `Exploring places around ${startLocationName}`,
+        });
+
+      } catch (error) {
+        console.error("Error completing wizard:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load place information. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsCalculating(false);
+      }
+      return;
+    }
+
+    // Validate wizard data for route calculation
     const validation = validateWizardForRouteCalculation(wizardData);
     if (!validation.isValid) {
       toast({
@@ -116,8 +179,8 @@ export default function TripPlannerWizardPage() {
 
   if (isCalculating) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white p-8 rounded-lg max-w-md mx-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 max-w-md mx-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold mb-2">Calculating Your Route</h3>
