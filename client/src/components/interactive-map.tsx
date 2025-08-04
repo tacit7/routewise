@@ -31,7 +31,54 @@ const getCategoryColor = (category: string): string => {
   return colors[category as keyof typeof colors] || colors.default;
 };
 
-// Create marker element with category-specific colors
+// Create custom owl-themed SVG marker
+const createOwlMarkerSVG = (
+  baseColor: string,
+  isSelected = false,
+  isHovered = false
+): string => {
+  const size = isSelected || isHovered ? 32 : 28;
+  const shadowIntensity = isHovered ? 0.4 : 0.3;
+  const glowEffect = isSelected ? `filter="drop-shadow(0 0 8px ${baseColor})"` : '';
+  
+  return `
+    <svg width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" ${glowEffect}>
+      <!-- Pin Drop Shadow -->
+      <ellipse cx="50" cy="115" rx="15" ry="3" fill="rgba(0,0,0,${shadowIntensity})" />
+      
+      <!-- Pin Body -->
+      <path d="M50 10 C30 10, 15 25, 15 45 C15 65, 50 100, 50 100 C50 100, 85 65, 85 45 C85 25, 70 10, 50 10 Z" 
+            fill="${baseColor}" stroke="white" stroke-width="2"/>
+      
+      <!-- Owl Face Background -->
+      <circle cx="50" cy="40" r="22" fill="rgba(255,255,255,0.9)"/>
+      
+      <!-- Owl Eyes -->
+      <circle cx="42" cy="35" r="8" fill="white"/>
+      <circle cx="58" cy="35" r="8" fill="white"/>
+      
+      <!-- Owl Eye Details -->
+      <circle cx="42" cy="35" r="5" fill="${baseColor}"/>
+      <circle cx="58" cy="35" r="5" fill="${baseColor}"/>
+      <circle cx="42" cy="35" r="2" fill="white"/>
+      <circle cx="58" cy="35" r="2" fill="white"/>
+      
+      <!-- Owl Beak -->
+      <path d="M47 42 L50 48 L53 42 Z" fill="${baseColor}"/>
+      
+      <!-- Owl Eyebrows -->
+      <path d="M35 28 C38 25, 46 25, 48 28" stroke="${baseColor}" stroke-width="2" fill="none"/>
+      <path d="M52 28 C54 25, 62 25, 65 28" stroke="${baseColor}" stroke-width="2" fill="none"/>
+      
+      <!-- Decorative Elements -->
+      <circle cx="65" cy="25" r="3" fill="rgba(255,255,255,0.6)"/>
+      <path d="M30 50 C25 45, 25 55, 30 50" fill="rgba(255,255,255,0.4)"/>
+      <path d="M70 50 C75 45, 75 55, 70 50" fill="rgba(255,255,255,0.4)"/>
+    </svg>
+  `;
+};
+
+// Create marker element with custom owl SVG
 const createMarkerElement = (
   category: string,
   poi: any,
@@ -39,46 +86,22 @@ const createMarkerElement = (
   isHovered = false
 ): HTMLElement => {
   let color = getCategoryColor(category);
-  let borderColor = "#FFFFFF";
-  let borderWidth = "2px";
-  let size = "24px"; // Base size
 
   if (isSelected) {
-    color = "#22C55E"; // Green color only when selected
-    borderColor = "#000000";
-    borderWidth = "3px";
-    size = "26px"; // Slight increase for selection
-  }
-
-  if (isHovered) {
-    borderColor = "#FFD700"; // Gold for hover
-    borderWidth = "4px";
-    size = "26px"; // Same slight increase for hover
+    color = "#22C55E"; // Green color when selected
   }
 
   const markerElement = document.createElement("div");
   markerElement.style.cssText = `
-    width: ${size};
-    height: ${size};
-    background-color: ${color};
-    border: ${borderWidth} solid ${borderColor};
-    border-radius: 50%;
     cursor: pointer;
-    opacity: ${isHovered ? "1.0" : "0.8"};
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: white;
-    font-weight: bold;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    opacity: ${isHovered ? "1.0" : "0.85"};
+    transition: all 0.3s ease;
+    transform: ${isHovered ? "scale(1.1)" : "scale(1)"};
+    z-index: ${isSelected ? "1000" : isHovered ? "999" : "1"};
+    position: relative;
   `;
 
-  // Add category initial as text content
-  const categoryInitial = category.charAt(0).toUpperCase();
-  markerElement.textContent = categoryInitial;
+  markerElement.innerHTML = createOwlMarkerSVG(color, isSelected, isHovered);
 
   return markerElement;
 };
@@ -375,6 +398,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Create or update POI markers
   const createPoiMarkers = useCallback(() => {
     if (!mapInstanceRef.current) return;
+    
+    console.log('Creating POI markers:', pois.length, 'POIs');
 
     // Remove markers for POIs that no longer exist
     const currentPoiIds = new Set(pois.map((poi) => poi.placeId || poi.id));
@@ -386,6 +411,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     pois.forEach((poi) => {
+      console.log('Processing POI:', poi.name, 'has address:', !!poi.address);
       if (!poi.address) return;
 
       // Skip if marker already exists

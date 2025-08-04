@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
+import Header from "@/components/header";
 import { TripPlannerWizardProps, TripWizardData } from "@/types/trip-wizard";
 import { WizardStep } from "./WizardStep";
-import { MobileProgressIndicator } from "./components/progress/MobileProgressIndicator";
-import { DesktopProgressSidebar } from "./components/progress/DesktopProgressSidebar";
 import { StepTransition } from "./components/progress/StepTransition";
 import { DraftRecoveryModal } from "./components/modals/DraftRecoveryModal";
 import { ExitConfirmationModal } from "./components/modals/ExitConfirmationModal";
@@ -46,6 +47,7 @@ export function TripPlannerWizard({
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Draft recovery
   const {
@@ -168,7 +170,8 @@ export function TripPlannerWizard({
     if (hasProgress) {
       setShowExitConfirmation(true);
     } else {
-      onCancel();
+      // Navigate back to home page instead of calling onCancel
+      setLocation('/');
     }
   }
 
@@ -184,7 +187,8 @@ export function TripPlannerWizard({
     }
     
     setShowExitConfirmation(false);
-    onCancel();
+    // Navigate back to home page instead of calling onCancel
+    setLocation('/');
   }
 
   // Render step content
@@ -208,9 +212,11 @@ export function TripPlannerWizard({
             startLocation={stepData.startLocation}
             endLocation={stepData.endLocation}
             stops={stepData.stops}
+            flexibleLocations={stepData.flexibleLocations}
             onStartLocationChange={(location) => form.setValue('startLocation', location)}
             onEndLocationChange={(location) => form.setValue('endLocation', location)}
             onStopsChange={(stops) => form.setValue('stops', stops)}
+            onFlexibleLocationsChange={(flexible) => form.setValue('flexibleLocations', flexible)}
             errors={{
               startLocation: errors.startLocation?.message,
               endLocation: errors.endLocation?.message,
@@ -285,11 +291,11 @@ export function TripPlannerWizard({
 
   if (isDraftLoading) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-slate-600">Loading...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading your trip planner...</p>
           </div>
         </div>
       </div>
@@ -298,42 +304,53 @@ export function TripPlannerWizard({
 
   return (
     <>
-      {/* Main wizard overlay */}
-      <div className="fixed inset-0 bg-black/50 z-50 overflow-hidden">
-        <div className="h-full flex flex-col lg:flex-row">
-          {/* Mobile progress indicator */}
-          <MobileProgressIndicator 
-            currentStep={currentStep} 
-            totalSteps={TOTAL_STEPS}
-          />
-
-          {/* Desktop sidebar */}
-          <div className="hidden lg:block lg:w-80 lg:flex-shrink-0 bg-slate-100 p-6">
-            <DesktopProgressSidebar
-              currentStep={currentStep}
-              totalSteps={TOTAL_STEPS}
-              completedSteps={completedSteps}
-              stepTitles={STEP_TITLES}
-            />
+      {/* Page Layout */}
+      <div className="min-h-screen bg-slate-50">
+        {/* Header */}
+        <Header />
+        
+        {/* Page Content */}
+        <div className="pt-4 pb-8">
+          {/* Breadcrumb and Back Navigation */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleExit}
+                  className="text-slate-600 hover:text-slate-900"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Home
+                </Button>
+                <div className="text-sm text-slate-500">
+                  Home → Trip Planner
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Main content area */}
-          <div className="flex-1 flex flex-col pt-16 lg:pt-0">
-            {/* Header with close button */}
-            <div className="flex justify-end p-4 lg:p-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleExit}
-                className="text-slate-500 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
+          {/* Main Content Area */}
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Unified Card */}
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+              {/* Progress Status Header */}
+              <div className="p-4 border-b border-slate-100">
+                <div className="text-center mb-2">
+                  <h2 className="text-lg font-semibold text-slate-800">
+                    Step {currentStep} of {TOTAL_STEPS}
+                  </h2>
+                </div>
+                <Progress 
+                  value={(currentStep / TOTAL_STEPS) * 100} 
+                  className="h-2 bg-slate-200"
+                  aria-label={`Trip planner progress: Step ${currentStep} of ${TOTAL_STEPS}`}
+                />
+              </div>
 
-            {/* Step content */}
-            <div className="flex-1 overflow-y-auto px-4 pb-4 lg:px-6 lg:pb-6">
-              <div className="max-w-4xl mx-auto">
+              {/* Main content */}
+              <div className="p-6 lg:p-8">
                 <StepTransition isActive={true} direction={direction}>
                   <WizardStep
                     title={STEP_TITLES[currentStep - 1]}

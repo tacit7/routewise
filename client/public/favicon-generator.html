@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Wise Favicon Creator</title>
+</head>
+<body>
+    <h2>Create Route Wise Favicon</h2>
+    
+    <canvas id="favicon16" width="16" height="16" style="border: 1px solid #ccc; image-rendering: pixelated; width: 64px; height: 64px;"></canvas>
+    <canvas id="favicon32" width="32" height="32" style="border: 1px solid #ccc; margin-left: 10px;"></canvas>
+    
+    <script>
+        // 16x16 favicon
+        const canvas16 = document.getElementById('favicon16');
+        const ctx16 = canvas16.getContext('2d');
+        
+        // Purple gradient background
+        const gradient16 = ctx16.createLinearGradient(0, 0, 16, 16);
+        gradient16.addColorStop(0, '#8B5CF6');
+        gradient16.addColorStop(1, '#7C3AED');
+        ctx16.fillStyle = gradient16;
+        ctx16.fillRect(0, 0, 16, 16);
+        
+        // White "R" for Route
+        ctx16.fillStyle = '#FFFFFF';
+        ctx16.font = 'bold 11px Arial';
+        ctx16.textAlign = 'center';
+        ctx16.textBaseline = 'middle';
+        ctx16.fillText('R', 8, 9);
+        
+        // 32x32 favicon
+        const canvas32 = document.getElementById('favicon32');
+        const ctx32 = canvas32.getContext('2d');
+        
+        // Purple gradient background
+        const gradient32 = ctx32.createLinearGradient(0, 0, 32, 32);
+        gradient32.addColorStop(0, '#8B5CF6');
+        gradient32.addColorStop(1, '#7C3AED');
+        ctx32.fillStyle = gradient32;
+        ctx32.fillRect(0, 0, 32, 32);
+        
+        // White "RW" for Route Wise
+        ctx32.fillStyle = '#FFFFFF';
+        ctx32.font = 'bold 16px Arial';
+        ctx32.textAlign = 'center';
+        ctx32.textBaseline = 'middle';
+        ctx32.fillText('RW', 16, 17);
+        
+        // Download function
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+    
+    <div style="margin-top: 20px;">
+        <button onclick="downloadCanvas(canvas16, 'favicon-16x16.png')">Download 16x16</button>
+        <button onclick="downloadCanvas(canvas32, 'favicon-32x32.png')">Download 32x32</button>
+    </div>
+    
+    <p><strong>Or create a custom design:</strong></p>
+    <textarea id="customCode" rows="10" cols="50">
+// Customize this code to create your own favicon
+const canvas = document.getElementById('favicon32');
+const ctx = canvas.getContext('2d');
+
+// Example: Map pin icon
+ctx.fillStyle = '#7C3AED'; // Purple
+ctx.beginPath();
+ctx.arc(16, 12, 10, 0, Math.PI * 2);
+ctx.fill();
+
+ctx.fillStyle = '#FFFFFF';
+ctx.beginPath();
+ctx.arc(16, 12, 5, 0, Math.PI * 2);
+ctx.fill();
+
+// Pin point
+ctx.fillStyle = '#7C3AED';
+ctx.beginPath();
+ctx.moveTo(16, 20);
+ctx.lineTo(12, 28);
+ctx.lineTo(20, 28);
+ctx.closePath();
+ctx.fill();
+    </textarea>
+    <button onclick="eval(document.getElementById('customCode').value)">Run Custom Code</button>
+</body>
+</html>

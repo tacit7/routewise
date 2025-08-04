@@ -10,7 +10,7 @@ export function DesktopProgressSidebar({
   completedSteps 
 }: SidebarProps) {
   return (
-    <Card className="p-6 sticky top-8 hidden lg:block">
+    <Card className="shadow-sm border border-slate-200">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Plan Your Trip</CardTitle>
         <CardDescription>

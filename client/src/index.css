@@ -3,67 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(215, 16%, 15%);
-  --muted: hsl(210, 40%, 98%);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --popover: hsl(214, 32%, 97%);
-  --popover-foreground: hsl(215, 16%, 15%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(215, 16%, 15%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(217, 91%, 60%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(142, 76%, 36%);
-  --secondary-foreground: hsl(355, 7%, 97%);
-  --accent: hsl(42, 96%, 48%);
-  --accent-foreground: hsl(24, 10%, 10%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(60, 9%, 98%);
-  --ring: hsl(215, 16%, 15%);
-  --radius: 0.5rem;
-}
+  --background: #ffffff;
+  --foreground: #1f2937;
 
-.dark {
-  --background: hsl(240, 10%, 4%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 4%, 16%);
-  --muted-foreground: hsl(240, 5%, 65%);
-  --popover: hsl(240, 10%, 4%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 4%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 4%, 16%);
-  --input: hsl(240, 4%, 16%);
-  --primary: hsl(217, 91%, 60%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(142, 76%, 36%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 4%, 16%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 63%, 31%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 5%, 84%);
-  --radius: 0.5rem;
-}
+  --card: #f9fafb;
+  --card-foreground: #1f2937;
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+  --primary: #10b981; /* Emerald 500 */
+  --primary-foreground: #ffffff;
 
-  body {
-    @apply font-sans antialiased bg-slate-50 text-slate-800;
-  }
-}
+  --primary-hover: #059669;
+  --ring: #10b981;
 
-/* Custom styles for travel theme */
-.hero-gradient {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(16, 185, 129, 0.6) 100%);
-}
+  --secondary: #6b7280;
+  --secondary-foreground: #ffffff;
 
-.glass-effect {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
+  --accent: #a7f3d0; /* Emerald 200 */
+  --accent-foreground: #065f46;
+
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 }

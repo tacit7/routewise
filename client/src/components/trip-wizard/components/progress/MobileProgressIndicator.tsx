@@ -6,9 +6,9 @@ export function MobileProgressIndicator({ currentStep, totalSteps }: ProgressPro
   const progressValue = calculateProgress(currentStep);
   
   return (
-    <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50 px-4 py-3 border-b border-slate-200 lg:hidden">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-slate-600">
+    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-medium text-slate-700">
           Step {currentStep} of {totalSteps}
         </span>
         <span className="text-xs text-slate-500">

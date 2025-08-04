@@ -63,6 +63,7 @@ export const useTrips = () => {
     if (!isAuthenticated || !user) {
       setTrips([]);
       setLoading(false);
+      setError(null); // Clear any previous errors when not authenticated
       return;
     }
 
@@ -76,6 +77,12 @@ export const useTrips = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          // Authentication error - silently handle and clear trips
+          setTrips([]);
+          setError(null);
+          return;
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -84,7 +91,13 @@ export const useTrips = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching trips:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch trips');
+      // Only set error for non-authentication issues
+      if (err instanceof Error && !err.message.includes('401')) {
+        setError(err.message);
+      } else {
+        setError(null);
+        setTrips([]);
+      }
     } finally {
       setLoading(false);
     }

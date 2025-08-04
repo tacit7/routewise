@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Route, User, LogOut, Settings, Menu, X, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,15 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useAuth } from '@/components/auth-context';
-import { LoginForm } from '@/components/login-form';
-import { RegisterForm } from '@/components/register-form';
-import { useLocation } from 'wouter';
+import { useAuth } from "@/components/auth-context";
+import { LoginForm } from "@/components/login-form";
+import { RegisterForm } from "@/components/register-form";
+import { useLocation } from "wouter";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [, setLocation] = useLocation();
 
@@ -34,7 +34,7 @@ export default function Header() {
     await logout();
   };
 
-  const openAuthDialog = (mode: 'login' | 'register') => {
+  const openAuthDialog = (mode: "login" | "register") => {
     setAuthMode(mode);
     setAuthDialogOpen(true);
   };
@@ -46,14 +46,19 @@ export default function Header() {
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <Route className="h-8 w-8 text-primary" />
+              <img
+                src="/logo.png"
+                alt="Custom map icon"
+                className="w-10 h-10"
+                title="Map icon"
+              />
               <h1 className="text-2xl font-bold text-slate-800">RouteWise</h1>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               {isAuthenticated && (
-                <button 
+                <button
                   onClick={() => setLocation("/interests")}
                   className="text-slate-600 hover:text-primary transition-colors flex items-center gap-1"
                 >
@@ -62,14 +67,17 @@ export default function Header() {
                 </button>
               )}
               {isAuthenticated && (
-                <button 
+                <button
                   onClick={() => setLocation("/dashboard")}
                   className="text-slate-600 hover:text-primary transition-colors"
                 >
                   My Trips
                 </button>
               )}
-              <a href="#" className="text-slate-600 hover:text-primary transition-colors">
+              <a
+                href="#"
+                className="text-slate-600 hover:text-primary transition-colors"
+              >
                 Help
               </a>
 
@@ -77,7 +85,10 @@ export default function Header() {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      className="flex items-center space-x-2"
+                    >
                       <User className="h-4 w-4" />
                       <span className="hidden sm:inline">{user?.username}</span>
                     </Button>
@@ -102,13 +113,13 @@ export default function Header() {
                 <div className="flex items-center space-x-3">
                   <Button
                     variant="ghost"
-                    onClick={() => openAuthDialog('login')}
+                    onClick={() => openAuthDialog("login")}
                     className="text-slate-600 hover:text-primary"
                   >
                     Sign in
                   </Button>
                   <Button
-                    onClick={() => openAuthDialog('register')}
+                    onClick={() => openAuthDialog("register")}
                     className="bg-primary hover:bg-primary/90"
                   >
                     Sign up
@@ -138,7 +149,7 @@ export default function Header() {
             <div className="md:hidden border-t border-slate-200 py-4">
               <nav className="flex flex-col space-y-3">
                 {isAuthenticated && (
-                  <button 
+                  <button
                     onClick={() => {
                       setLocation("/interests");
                       setMobileMenuOpen(false);
@@ -150,7 +161,7 @@ export default function Header() {
                   </button>
                 )}
                 {isAuthenticated && (
-                  <button 
+                  <button
                     onClick={() => {
                       setLocation("/dashboard");
                       setMobileMenuOpen(false);
@@ -160,7 +171,10 @@ export default function Header() {
                     My Trips
                   </button>
                 )}
-                <a href="#" className="text-slate-600 hover:text-primary transition-colors px-2 py-2">
+                <a
+                  href="#"
+                  className="text-slate-600 hover:text-primary transition-colors px-2 py-2"
+                >
                   Help
                 </a>
 
@@ -187,13 +201,13 @@ export default function Header() {
                   <div className="border-t border-slate-200 pt-3 mt-3 space-y-2">
                     <Button
                       variant="ghost"
-                      onClick={() => openAuthDialog('login')}
+                      onClick={() => openAuthDialog("login")}
                       className="w-full justify-start text-slate-600 hover:text-primary"
                     >
                       Sign in
                     </Button>
                     <Button
-                      onClick={() => openAuthDialog('register')}
+                      onClick={() => openAuthDialog("register")}
                       className="w-full bg-primary hover:bg-primary/90"
                     >
                       Sign up
@@ -211,18 +225,18 @@ export default function Header() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {authMode === 'login' ? 'Welcome back' : 'Create your account'}
+              {authMode === "login" ? "Welcome back" : "Create your account"}
             </DialogTitle>
           </DialogHeader>
-          
-          {authMode === 'login' ? (
+
+          {authMode === "login" ? (
             <LoginForm
-              onSwitchToRegister={() => setAuthMode('register')}
+              onSwitchToRegister={() => setAuthMode("register")}
               onSuccess={handleAuthSuccess}
             />
           ) : (
             <RegisterForm
-              onSwitchToLogin={() => setAuthMode('login')}
+              onSwitchToLogin={() => setAuthMode("login")}
               onSuccess={handleAuthSuccess}
             />
           )}

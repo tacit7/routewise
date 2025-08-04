@@ -15,32 +15,44 @@ export class InterestsService {
    * Get all available interest categories
    */
   async getInterestCategories(): Promise<InterestCategory[]> {
-    const cacheKey = CacheService.generateCacheKey("interests:categories");
+    const cacheKey = "interests:categories";
     
-    return cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const storage = getStorage();
-        return storage.getAllInterestCategories();
-      },
-      { ttl: this.CATEGORIES_CACHE_DURATION }
-    );
+    // Try to get from cache first
+    const cached = await cacheService.get<InterestCategory[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+    
+    // If not in cache, fetch from storage
+    const storage = getStorage();
+    const categories = await storage.getAllInterestCategories();
+    
+    // Store in cache for future requests
+    await cacheService.set(cacheKey, categories, this.CATEGORIES_CACHE_DURATION);
+    
+    return categories;
   }
 
   /**
    * Get user's current interest preferences
    */
   async getUserInterests(userId: number): Promise<(UserInterest & { category: InterestCategory })[]> {
-    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
+    const cacheKey = `interests:user:${userId}`;
     
-    return cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const storage = getStorage();
-        return storage.getUserInterests(userId);
-      },
-      { ttl: this.USER_INTERESTS_CACHE_DURATION }
-    );
+    // Try to get from cache first
+    const cached = await cacheService.get<(UserInterest & { category: InterestCategory })[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+    
+    // If not in cache, fetch from storage
+    const storage = getStorage();
+    const interests = await storage.getUserInterests(userId);
+    
+    // Store in cache for future requests
+    await cacheService.set(cacheKey, interests, this.USER_INTERESTS_CACHE_DURATION);
+    
+    return interests;
   }
 
   /**
@@ -64,8 +76,8 @@ export class InterestsService {
     await storage.setUserInterests(userId, insertInterests);
     
     // Invalidate user's interests cache
-    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
-    await cacheService.delete(cacheKey);
+    const cacheKey = `interests:user:${userId}`;
+    await cacheService.del(cacheKey);
     
     // Return updated interests with category details
     return this.getUserInterests(userId);
@@ -88,8 +100,8 @@ export class InterestsService {
     await storage.setUserInterests(userId, allInterests);
     
     // Invalidate user's interests cache
-    const cacheKey = CacheService.generateCacheKey("interests:user", userId);
-    await cacheService.delete(cacheKey);
+    const cacheKey = `interests:user:${userId}`;
+    await cacheService.del(cacheKey);
     
     return this.getUserInterests(userId);
   }

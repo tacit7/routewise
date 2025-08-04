@@ -144,11 +144,16 @@ export class NominatimService {
       return [];
     }
 
-    const cacheKey = CacheService.generateCacheKey("nominatim:searchCities", query, limit);
+    const cacheKey = `nominatim:searchCities:${query}:${limit}`;
 
-    return cacheService.getOrSet(
-      cacheKey,
-      async () => {
+    // Try to get from cache first
+    const cached = await cacheService.get<PlaceSuggestion[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // If not in cache, perform the search
+    const searchResults = await (async () => {
         await this.respectRateLimit();
 
         try {
@@ -205,8 +210,11 @@ export class NominatimService {
           console.error("Nominatim city search error:", error);
           return [];
         }
-      },
-      { ttl: this.CACHE_DURATION }
-    );
+    })();
+
+    // Store in cache for future requests
+    await cacheService.set(cacheKey, searchResults, this.CACHE_DURATION);
+    
+    return searchResults;
   }
 }
