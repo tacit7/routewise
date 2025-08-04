@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { MapPin, Flag, Plus, X } from "lucide-react";
+import { MapPin, Flag, Plus, X, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PlaceAutocomplete } from "@/components/place-autocomplete";
 import { AccessibleFormField } from "../shared/AccessibleFormField";
 import { ValidationMessage } from "../shared/ValidationMessage";
@@ -10,9 +11,11 @@ interface LocationStepProps {
   startLocation: PlaceSuggestion | null;
   endLocation: PlaceSuggestion | null;
   stops: PlaceSuggestion[];
+  flexibleLocations: boolean;
   onStartLocationChange: (location: PlaceSuggestion) => void;
   onEndLocationChange: (location: PlaceSuggestion) => void;
   onStopsChange: (stops: PlaceSuggestion[]) => void;
+  onFlexibleLocationsChange: (flexible: boolean) => void;
   errors?: {
     startLocation?: string;
     endLocation?: string;
@@ -24,12 +27,23 @@ export function LocationStep({
   startLocation,
   endLocation,
   stops,
+  flexibleLocations,
   onStartLocationChange,
   onEndLocationChange,
   onStopsChange,
+  onFlexibleLocationsChange,
   errors,
 }: LocationStepProps) {
   const [showAddStop, setShowAddStop] = useState(false);
+
+  const handleFlexibleChange = (checked: boolean) => {
+    onFlexibleLocationsChange(checked);
+    if (checked) {
+      // Clear end location and stops when flexible is enabled, but keep start location
+      onEndLocationChange(null as any);
+      onStopsChange([]);
+    }
+  };
 
   const handleAddStop = (place: PlaceSuggestion) => {
     const newStops = [...stops, place];
@@ -42,38 +56,77 @@ export function LocationStep({
     onStopsChange(newStops);
   };
 
-  const canAddStop = stops.length < 5 && startLocation && endLocation;
+  const canAddStop =
+    stops.length < 5 && startLocation && endLocation && !flexibleLocations;
 
   return (
     <div className="space-y-6">
-      {/* Primary locations */}
+      {/* Flexible locations option */}
+      <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <Checkbox
+          id="flexible-locations"
+          checked={flexibleLocations}
+          onCheckedChange={handleFlexibleChange}
+          className="mt-0.5"
+        />
+        <div className="flex-1">
+          <label
+            htmlFor="flexible-locations"
+            className="text-sm font-medium text-blue-900 cursor-pointer"
+          >
+            I'm flexible with my destinations
+          </label>
+          <p className="text-sm text-blue-800 mt-1">
+            Specify at least a starting area - we'll help you discover the best
+            destinations from there
+          </p>
+        </div>
+      </div>
+
+      {/* Location selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Start location */}
         <AccessibleFormField
           label="Starting Location"
-          description="Where will your trip begin?"
+          description={
+            flexibleLocations
+              ? "Specify at least a general area or region"
+              : "Where will your trip begin?"
+          }
           error={errors?.startLocation}
           required
         >
           <PlaceAutocomplete
             value={startLocation?.main_text || ""}
             onSelect={onStartLocationChange}
-            placeholder="Search for starting city..."
+            placeholder={
+              flexibleLocations
+                ? "Search for region, state, or general area..."
+                : "Search for starting city..."
+            }
             className="w-full"
           />
         </AccessibleFormField>
 
         {/* End location */}
         <AccessibleFormField
-          label="Destination"
-          description="Where do you want to end up?"
+          label={flexibleLocations ? "Destination (Optional)" : "Destination"}
+          description={
+            flexibleLocations
+              ? "Leave blank to discover destinations along the way"
+              : "Where do you want to end up?"
+          }
           error={errors?.endLocation}
-          required
+          required={!flexibleLocations}
         >
           <PlaceAutocomplete
             value={endLocation?.main_text || ""}
             onSelect={onEndLocationChange}
-            placeholder="Search for destination..."
+            placeholder={
+              flexibleLocations
+                ? "Optional - search for general destination area..."
+                : "Search for destination..."
+            }
             className="w-full"
           />
         </AccessibleFormField>
@@ -167,21 +220,35 @@ export function LocationStep({
       </div>
 
       {/* Route preview */}
-      {startLocation && endLocation && (
+      {startLocation && (flexibleLocations || endLocation) && (
         <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-          <h4 className="font-medium text-green-900 mb-2">Your Route:</h4>
+          <h4 className="font-medium text-green-900 mb-2">
+            {flexibleLocations ? "Starting Area:" : "Your Route:"}
+          </h4>
           <div className="flex items-center justify-center space-x-2 text-sm text-green-800">
             <MapPin className="w-4 h-4 text-green-600" />
             <span>{startLocation.main_text}</span>
-            {stops.map((stop, index) => (
-              <span key={index} className="flex items-center space-x-2">
+            {!flexibleLocations && (
+              <>
+                {stops.map((stop, index) => (
+                  <span key={index} className="flex items-center space-x-2">
+                    <span>→</span>
+                    <span>{stop.main_text}</span>
+                  </span>
+                ))}
                 <span>→</span>
-                <span>{stop.main_text}</span>
-              </span>
-            ))}
-            <span>→</span>
-            <Flag className="w-4 h-4 text-green-600" />
-            <span>{endLocation.main_text}</span>
+                <Flag className="w-4 h-4 text-green-600" />
+                <span>{endLocation.main_text}</span>
+              </>
+            )}
+            {flexibleLocations && (
+              <>
+                <span>→</span>
+                <span className="italic text-green-700">
+                  Flexible destinations from here
+                </span>
+              </>
+            )}
           </div>
         </div>
       )}

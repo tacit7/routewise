@@ -34,6 +34,7 @@ export interface TripWizardData {
   startLocation: PlaceSuggestion | null;
   endLocation: PlaceSuggestion | null;
   stops: PlaceSuggestion[];
+  flexibleLocations: boolean;
   startDate: Date | null;
   endDate: Date | null;
   flexibleDates: boolean;

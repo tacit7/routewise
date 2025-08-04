@@ -122,6 +122,7 @@ export const getInitialWizardData = (): TripWizardData => ({
   startLocation: null,
   endLocation: null,
   stops: [],
+  flexibleLocations: false,
   startDate: null,
   endDate: null,
   flexibleDates: false,
@@ -157,6 +158,11 @@ export const isStepComplete = (stepNumber: number, data: TripWizardData): boolea
     case 1:
       return !!data.tripType;
     case 2:
+      // Always require at least a starting location
+      if (!data.startLocation) return false;
+      // If flexible locations, only starting location is required
+      if (data.flexibleLocations) return true;
+      // If not flexible, require both start and end locations
       return !!(data.startLocation && data.endLocation);
     case 3:
       return data.flexibleDates || !!(data.startDate && data.endDate);
@@ -191,8 +197,10 @@ export const canProceedToStep = (stepNumber: number, data: TripWizardData): bool
 export const formatTripSummary = (data: TripWizardData): string => {
   const parts: string[] = [];
   
-  if (data.startLocation && data.endLocation) {
+  if (data.startLocation && data.endLocation && !data.flexibleLocations) {
     parts.push(`${data.startLocation.main_text} → ${data.endLocation.main_text}`);
+  } else if (data.flexibleLocations) {
+    parts.push('Flexible destinations');
   }
   
   if (data.startDate && data.endDate && !data.flexibleDates) {

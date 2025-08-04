@@ -78,6 +78,7 @@ export const useWizardForm = ({ initialData, onDataChange }: UseWizardFormProps 
           startLocation: currentData.startLocation,
           endLocation: currentData.endLocation,
           stops: currentData.stops,
+          flexibleLocations: currentData.flexibleLocations,
         };
       case 3:
         return {

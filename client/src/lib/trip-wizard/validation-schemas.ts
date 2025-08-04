@@ -39,18 +39,28 @@ export const tripTypeSchema = z.object({
 
 // Step 2: Locations
 export const locationSchema = z.object({
-  startLocation: placeSuggestionSchema.nullable().refine(val => val !== null, {
-    message: "Please select a starting location",
-  }),
-  endLocation: placeSuggestionSchema.nullable().refine(val => val !== null, {
-    message: "Please select a destination",
-  }),
+  startLocation: placeSuggestionSchema.nullable(),
+  endLocation: placeSuggestionSchema.nullable(),
   stops: z.array(placeSuggestionSchema).max(5, "Maximum 5 stops allowed"),
+  flexibleLocations: z.boolean(),
 }).refine(data => {
-  if (data.startLocation && data.endLocation) {
-    return data.startLocation.place_id !== data.endLocation.place_id;
+  // Always require at least a starting location
+  return data.startLocation !== null;
+}, {
+  message: "Please select at least a starting location",
+  path: ["startLocation"],
+}).refine(data => {
+  // If not flexible, require both start and end locations
+  if (!data.flexibleLocations) {
+    return data.startLocation && data.endLocation;
   }
   return true;
+}, {
+  message: "Please select a destination or mark as flexible",
+  path: ["endLocation"],
+}).refine(data => {
+  if (!data.startLocation || !data.endLocation) return true;
+  return data.startLocation.place_id !== data.endLocation.place_id;
 }, {
   message: "Start and destination locations must be different",
   path: ["endLocation"],
@@ -120,6 +130,7 @@ export const tripWizardSchema = z.object({
   startLocation: placeSuggestionSchema.nullable(),
   endLocation: placeSuggestionSchema.nullable(),
   stops: z.array(placeSuggestionSchema),
+  flexibleLocations: z.boolean(),
   
   // Step 3: Dates
   startDate: z.date().nullable(),
