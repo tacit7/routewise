@@ -3,11 +3,11 @@
  * Handles backend URL configuration and request utilities
  */
 
-// Phoenix backend configuration
-const PHOENIX_BACKEND_URL = 'http://localhost:4001';
+// Express.js backend configuration  
+const BACKEND_URL = 'http://localhost:4001';
 
 export const API_CONFIG = {
-  BASE_URL: PHOENIX_BACKEND_URL,
+  BASE_URL: BACKEND_URL,
   ENDPOINTS: {
     // Authentication
     LOGIN: '/api/auth/login',
@@ -51,7 +51,7 @@ export const getDefaultFetchOptions = (options: RequestInit = {}): RequestInit =
 };
 
 /**
- * API call wrapper with error handling for Phoenix backend
+ * API call wrapper with error handling for Express.js backend
  */
 export const apiCall = async <T>(
   endpoint: string,
@@ -61,7 +61,7 @@ export const apiCall = async <T>(
   const response = await fetch(url, getDefaultFetchOptions(options));
   
   if (!response.ok) {
-    // Try to get error details from Phoenix backend
+    // Try to get error details from Express.js backend
     try {
       const errorData = await response.json();
       const errorMessage = errorData.error || errorData.message || `HTTP error! status: ${response.status}`;
@@ -75,15 +75,14 @@ export const apiCall = async <T>(
 };
 
 /**
- * JWT Token utilities (for Phoenix backend with Bearer tokens)
+ * JWT Token utilities (for Express.js backend with Bearer tokens)
  */
 export const TokenManager = {
   /**
    * Get Bearer token from storage or cookie
    */
   getToken(): string | null {
-    // For Phoenix backend, we might need to handle JWT tokens differently
-    // This will be updated based on how Phoenix returns tokens
+    // For Express.js backend with JWT tokens
     return localStorage.getItem('auth_token');
   },
 
