@@ -8,6 +8,7 @@ import {
   userPreferences
 } from "@/hooks/use-interests";
 import Header from "@/components/header";
+import ReduxTest from "@/components/redux-test";
 import { Route, MapPin, CheckCircle, Settings, AlertTriangle } from "lucide-react";
 
 /**
@@ -33,6 +34,11 @@ const DashboardTest = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard Integration Test</h1>
           <p className="text-gray-600">Testing the complete interests data integration layer</p>
+        </div>
+
+        {/* Redux Integration Test */}
+        <div className="mb-8">
+          <ReduxTest />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

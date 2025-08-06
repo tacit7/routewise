@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import type { Poi } from '@shared/schema';
+import type { Poi } from '@/types/schema';
 import { useTripPlaces, type TripPlace } from './use-trip-places';
 
 // User interests interface (to be expanded based on actual user system)

@@ -13,27 +13,24 @@ and file edits
 
 ### Core Development
 
-- `npm run dev` - Start development server with hot reload on port 3001
-- `npm run dev:no-msw` - Start development server with MSW (Mock Service Worker) disabled
-- `npm run build` - Build for production (client + server bundle)
-- `npm run start` - Run production build on port 3001
+- `npm run dev` - Start Vite development server on port 3001
+- `npm run build` - Build for production using Vite
+- `npm run start` - Run production build using Vite preview
 - `npm run check` - TypeScript type checking
-
-### Database Operations
-
-- `npm run db:push` - Push database schema changes using Drizzle ORM
 
 ### Testing
 
 - `npm run test` - Run tests with Vitest
 - `npm run test:ui` - Run tests with Vitest UI
 - `npm run test:coverage` - Run tests with coverage report
+- `npm run test:e2e` - Run end-to-end tests with Playwright
+- `npm run test:performance` - Run performance tests
 
 ### MSW (Mock Service Worker)
 
 - `npm run msw:init` - Initialize MSW for API mocking
 - MSW can be disabled with `MSW_DISABLED=true` environment variable
-- Mock responses stored in `client/src/mocks/` and `server/` directories
+- Mock responses stored in `client/src/mocks/` directory
 
 ## Recent Updates - January 2, 2025
 
@@ -53,11 +50,11 @@ and file edits
 
 ### Project Structure
 
-This is a full-stack TypeScript application with a monorepo structure:
+This is a React frontend application that connects to a Phoenix backend:
 
 - **`client/`** - React frontend (Vite + React 18)
-- **`server/`** - Express.js backend with TypeScript
-- **`shared/`** - Shared types and database schema (Drizzle ORM)
+- **Backend**: Phoenix backend running on port 4001 (separate repository)
+- **Types**: Local type definitions in `client/src/types/schema.ts`
 
 ### Technology Stack
 
@@ -70,13 +67,13 @@ This is a full-stack TypeScript application with a monorepo structure:
 - Tailwind CSS + shadcn/ui components
 - React Hook Form + Zod validation
 
-**Backend:**
+**Backend (Phoenix):**
 
-- Express.js with TypeScript ES modules
-- PostgreSQL with Drizzle ORM (supports Neon Database)
-- In-memory storage fallback for development
-- JWT authentication with Google OAuth support
+- Phoenix/Elixir backend on port 4001
+- PostgreSQL database
+- JWT authentication
 - Google Places API integration
+- RESTful API endpoints
 
 ### Key Architecture Patterns
 
@@ -149,50 +146,51 @@ This is a full-stack TypeScript application with a monorepo structure:
 - `server/google-oauth-service.ts` - Google OAuth integration
 - `client/src/components/auth-context.tsx` - Client authentication state
 
-### API Services
+### State Management
 
-- `server/google-places.ts` - Google Places API with caching
-- `server/google-directions.ts` - Google Directions API
-- `server/nominatim-service.ts` - Open-source geocoding service
-- `server/routes.ts` - Main API routes including consolidated `/api/dashboard` endpoint
+- Redux Toolkit with redux-persist for global state
+- TanStack Query for server state and caching
+- Local storage integration for trip planning
 
 ### Frontend Core
 
-- `client/src/App.tsx` - Main app with providers (Query, Auth, Toast)
+- `client/src/App.tsx` - Main app with Redux and TanStack Query providers
 - `client/src/pages/home.tsx` - Landing page with route planning
 - `client/src/pages/route-results.tsx` - Route display with POI integration
+- `client/src/types/schema.ts` - TypeScript type definitions
 
 ## Important Notes
 
-### Google OAuth Setup
+### Phoenix Backend Integration
 
-- OAuth service singleton must be restarted after environment changes
-- Uses dynamic environment variable reading to handle initialization timing
-- Redirect URI must match Google Cloud Console configuration
+- Phoenix backend must be running on port 4001 for API endpoints
+- Vite proxy configuration handles API forwarding automatically
+- All authentication and data operations handled by Phoenix
 
 ### MSW Integration
 
-- Mock Service Worker can be toggled for development/testing
-- Mock responses stored in multiple locations for different services
-- Automatic fallback when real APIs unavailable
+- Mock Service Worker provides fallback when Phoenix unavailable
+- Mock responses stored in `client/src/mocks/handlers.ts`
+- Toggle with `MSW_DISABLED` environment variable
 
-### Database Schema
+### State Management Architecture
 
-- Users table supports both local and OAuth authentication
-- POIs table for points of interest with Google Places integration
-- Trips table for saving complete routes with JSON data
+- Redux Toolkit for global application state
+- TanStack Query for server state and API caching
+- Redux-persist for state persistence across sessions
 
 ### Development Server
 
-- Runs on port 3001 in development
-- Vite dev server proxy integrated with Express backend
-- Hot reload for both client and server code
+- Vite development server runs on port 3001
+- Hot module replacement for fast development
+- TypeScript support with strict type checking
+- Proxy configuration forwards API calls to Phoenix backend
 
-### Dashboard API Performance Optimization
+## Migration Notes - January 8, 2025
 
-- Consolidated `/api/dashboard` endpoint replaces multiple individual API calls
-- Parallel data fetching using Promise.all() for optimal performance
-- Single React Query hook (`useDashboardData`) replaces multiple individual hooks
-- Authentication-aware caching with 5-minute stale time
-- ~44% performance improvement (450ms → 250ms load time)
-- Property mapping: `start_city/end_city` in API response vs. `startLocation/endLocation` in components
+### Express to Phoenix Migration
+- **Removed**: Express.js backend, server directory, shared schema directory
+- **Added**: Local type definitions in `client/src/types/schema.ts`
+- **Updated**: Vite configuration to proxy API calls to Phoenix on port 4001
+- **Migrated**: All API calls now go through Phoenix backend
+- **State Management**: Implemented Redux Toolkit with redux-persist for global state

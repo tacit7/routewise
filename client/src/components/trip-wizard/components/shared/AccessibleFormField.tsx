@@ -18,7 +18,7 @@ export function AccessibleFormField({
     <div className="space-y-2">
       <Label 
         htmlFor={fieldId}
-        className="text-sm font-medium text-slate-700"
+        className="text-sm font-medium text-slate-900"
       >
         {label}
         {required && (
@@ -31,7 +31,7 @@ export function AccessibleFormField({
       {description && (
         <p 
           id={descriptionId}
-          className="text-sm text-slate-600"
+          className="text-sm text-slate-700"
         >
           {description}
         </p>

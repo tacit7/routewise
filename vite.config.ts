@@ -7,7 +7,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
@@ -17,6 +16,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    port: 3001,
     fs: {
       strict: true,
       deny: ["**/.*"],

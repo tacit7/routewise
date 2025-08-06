@@ -6,6 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/components/auth-context";
 import { useCityPrefetch } from "@/hooks/use-city-autocomplete";
 import { useEffect } from "react";
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from '@/store';
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import DashboardTest from "@/pages/dashboard-test";
@@ -65,15 +68,26 @@ function AuthenticatedRouter() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <AuthenticatedRouter />
-          <TripIndicator />
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <PersistGate 
+        loading={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        } 
+        persistor={persistor}
+      >
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <AuthenticatedRouter />
+              <TripIndicator />
+            </TooltipProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </PersistGate>
+    </Provider>
   );
 }
 

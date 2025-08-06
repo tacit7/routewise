@@ -27,7 +27,7 @@ export interface AccessibilityNeeds {
 
 export type TripType = 'road-trip' | 'flight-based' | 'combo';
 export type TransportationOption = 'my-car' | 'rental-car' | 'flights' | 'public-transport' | 'other';
-export type LodgingOption = 'hotels' | 'airbnb' | 'campgrounds' | 'free-camping' | 'friends';
+export type LodgingOption = 'hotels' | 'airbnb' | 'campgrounds' | 'free-camping' | 'friends' | 'no-lodging';
 
 export interface TripWizardData {
   tripType: TripType;

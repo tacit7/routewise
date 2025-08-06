@@ -1,6 +1,5 @@
 import { http, HttpResponse } from "msw";
-import type { InsertPoi } from "@shared/schema";
-import { createSafeFilename } from "../../../shared/filename-utils";
+import type { Poi } from "@/types/schema";
 // Helper function to generate mock coordinates for addresses
 function getMockCoordinatesForAddress(address: string): {
   lat: number;

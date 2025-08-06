@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import PoiCard from "@/components/poi-card";
 import ItineraryComponent from "@/components/itinerary-component-enhanced";
 import { InteractiveMap } from "@/components/interactive-map";
@@ -116,7 +116,7 @@ export default function RouteResults() {
   const mapsApiLoading = false;
 
   // Fetch POIs for things to do along the specific route
-  const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({
+  const { data: pois, isLoading: poisLoading, error: poisError } = useQuery<Poi[]>({
     queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity, routeData?.verified],
     queryFn: async () => {
       if (!routeData) return [];
@@ -124,14 +124,34 @@ export default function RouteResults() {
         start: routeData.startCity,
         end: routeData.endCity,
       });
+      console.log('🔍 Fetching POIs with params:', params.toString());
       const response = await fetch(`/api/pois?${params}`);
+      console.log('📊 POI API response status:', response.status);
       if (!response.ok) {
-        throw new Error("Failed to fetch places along route");
+        const errorText = await response.text();
+        console.error('❌ POI API error:', response.status, errorText);
+        throw new Error(`Failed to fetch places along route: ${response.status} ${errorText}`);
       }
-      return response.json();
+      const data = await response.json();
+      console.log('✅ POI API data received:', data.length, 'items');
+      console.log('📋 First few POIs:', data.slice(0, 3));
+      return data;
     },
     enabled: !!routeData, // Only run query when we have route data
   });
+
+  // Debug POI API state
+  console.log('🔍 POI Query State:', { 
+    loading: poisLoading, 
+    error: poisError, 
+    dataType: typeof pois,
+    dataLength: pois?.length,
+    routeDataExists: !!routeData 
+  });
+  
+  if (poisError) {
+    console.error('❌ POI Error:', poisError);
+  }
 
   // Remove duplicates based on placeId - with debugging
   console.log('Raw pois data:', pois);
@@ -360,6 +380,12 @@ export default function RouteResults() {
 
             {uniquePois.length > 0 && (
               <div className="p-2 space-y-2">
+                {console.log('🎯 Rendering POI Cards:', {
+                  uniquePoisLength: uniquePois.length,
+                  filteredPoisLength: filteredPois.length,
+                  firstFilteredPoi: filteredPois[0],
+                  selectedCity
+                })}
                 {filteredPois.map((poi, index) => (
                   <div
                     key={poi.placeId || poi.id || `poi-${index}`}

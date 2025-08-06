@@ -99,6 +99,12 @@ export const LODGING_OPTIONS = [
     title: 'Staying with Friends',
     description: 'Friends, family, or personal connections',
     icon: '👥'
+  },
+  {
+    value: 'no-lodging' as LodgingOption,
+    title: "Don't Need Lodging",
+    description: 'Day trip or other arrangements',
+    icon: '🚗'
   }
 ];
 

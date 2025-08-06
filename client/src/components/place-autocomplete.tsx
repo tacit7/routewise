@@ -111,10 +111,16 @@ export function PlaceAutocomplete({
           variant="outline"
           {...getToggleButtonProps()}
           className={cn(
-            "w-full justify-between font-normal px-4 py-3 border-slate-300 focus:ring-2 focus:ring-primary focus:border-transparent",
+            "w-full justify-between font-normal px-4 py-3 focus:ring-2 focus:border-transparent",
             !inputValue && "text-muted-foreground",
             disabled && "cursor-not-allowed opacity-50"
           )}
+          style={{ 
+            borderColor: 'var(--primary)',
+            backgroundColor: 'var(--muted)',
+            color: 'var(--foreground)',
+            '--tw-ring-color': 'var(--primary-hover)'
+          } as React.CSSProperties}
           disabled={disabled}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
@@ -164,16 +170,17 @@ export function PlaceAutocomplete({
                     className={cn(
                       "px-4 py-2 cursor-pointer transition-colors",
                       highlightedIndex === index
-                        ? "bg-slate-100"
-                        : "hover:bg-slate-50",
-                      isManualEntry && "bg-blue-50 border-t border-blue-200"
+                        ? "bg-green-200 text-green-950"
+                        : "hover:bg-green-100",
+                      isManualEntry && "bg-green-200 border-t border-green-400"
                     )}
                   >
                     <div className="flex flex-col">
                       <span 
                         className={cn(
                           "font-medium",
-                          isManualEntry ? "text-blue-800" : "text-slate-900"
+                          isManualEntry ? "text-green-900" : "text-slate-900",
+                          highlightedIndex === index && "text-green-950"
                         )}
                       >
                         {isManualEntry ? `Use "${item.main_text}" as entered` : item.main_text}
@@ -181,7 +188,8 @@ export function PlaceAutocomplete({
                       <span 
                         className={cn(
                           "text-sm",
-                          isManualEntry ? "text-blue-600" : "text-slate-500"
+                          isManualEntry ? "text-green-800" : "text-slate-500",
+                          highlightedIndex === index && "text-green-900"
                         )}
                       >
                         {isManualEntry ? "Proceed with manual entry" : item.secondary_text}

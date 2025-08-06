@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import type { Poi } from '@shared/schema';
+import type { Poi } from '@/types/schema';
 import { useToast } from './use-toast';
 
 export interface TripPlace extends Poi {
