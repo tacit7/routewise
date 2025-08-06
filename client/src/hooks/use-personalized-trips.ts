@@ -95,7 +95,7 @@ export function usePersonalizedTrips() {
         high: [3, 4]
       };
       
-      if (budgetMatch[interests.preferences.budget]?.includes(poi.priceLevel)) {
+      if (budgetMatch[interests.preferences?.budget]?.includes(poi.priceLevel)) {
         score += 0.2;
       }
     }
@@ -127,7 +127,7 @@ export function usePersonalizedTrips() {
     // Category balance analysis
     const categoryBalance = Object.entries(tripStats.categories).map(([category, count]) => {
       const percentage = (count / tripPlaces.length) * 100;
-      const isPreferred = userInterests.categories.includes(category);
+      const isPreferred = userInterests.categories?.includes(category) || false;
       
       let recommendation: 'good' | 'lacking' | 'excessive' = 'good';
       if (isPreferred && percentage < 20) recommendation = 'lacking';
@@ -143,11 +143,12 @@ export function usePersonalizedTrips() {
     const budgetRange: 'low' | 'medium' | 'high' = 
       avgPriceLevel <= 1.5 ? 'low' : avgPriceLevel <= 2.5 ? 'medium' : 'high';
 
-    const budgetMatch = budgetRange === userInterests.preferences.budget;
+    const userBudget = userInterests.preferences?.budget || 'medium';
+    const budgetMatch = budgetRange === userBudget;
     const budgetRecommendation = budgetMatch 
       ? 'Your trip aligns well with your budget preferences'
-      : `Consider ${userInterests.preferences.budget === 'low' ? 'more budget-friendly' : 
-          userInterests.preferences.budget === 'high' ? 'more premium' : 'moderately-priced'} options`;
+      : `Consider ${userBudget === 'low' ? 'more budget-friendly' : 
+          userBudget === 'high' ? 'more premium' : 'moderately-priced'} options`;
 
     // Time distribution
     const estimatedDuration = tripPlaces.length * 1.5; // 1.5 hours per place on average
@@ -179,7 +180,7 @@ export function usePersonalizedTrips() {
     const categoryScore = categoryBalance.filter(c => c.recommendation === 'good').length / categoryBalance.length;
     const budgetScore = budgetMatch ? 1 : 0.5;
     const interestScore = userInterests.preferences?.interests?.length 
-      ? 1 - (missingInterests.length / userInterests.preferences.interests.length)
+      ? 1 - (missingInterests.length / userInterests.preferences?.interests.length)
       : 0;
     const ratingScore = tripStats.averageRating / 5;
     
@@ -225,7 +226,7 @@ export function usePersonalizedTrips() {
         if (relevanceScore >= 0.8) {
           category = 'highly_recommended';
           reason = 'Perfect match for your interests';
-        } else if (userInterests.categories.includes(poi.category)) {
+        } else if (userInterests.categories?.includes(poi.category)) {
           category = 'similar_interests';
           reason = `Matches your interest in ${poi.category}`;
         } else if (poi.priceLevel && poi.priceLevel <= 2) {
