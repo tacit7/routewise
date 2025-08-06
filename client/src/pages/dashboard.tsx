@@ -37,7 +37,7 @@ const Dashboard = () => {
   const shouldShowFirstTimeExperience = !hasInterestsConfigured && !isLoading;
 
   const handlePlanRoadTrip = () => {
-    setLocation("/trip-planner");
+    setLocation("/trip-wizard");
   };
 
   const handleHelpMePlan = () => {
@@ -103,7 +103,7 @@ const Dashboard = () => {
             </div>
 
             {/* Trip Planning Icon */}
-            <div className="w-64 flex justify-center">
+            <div className="w-64 flex justify-center mx-auto">
               <img
                 src="/planning.png"
                 alt="Route planning illustration with road sign and map"
