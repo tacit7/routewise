@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/components/auth-context";
+import { useCityPrefetch } from "@/hooks/use-city-autocomplete";
+import { useEffect } from "react";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import DashboardTest from "@/pages/dashboard-test";
@@ -20,6 +22,16 @@ import AuthError from "@/pages/auth-error";
 
 function AuthenticatedRouter() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { prefetchPopularCities } = useCityPrefetch();
+
+  // Prefetch popular cities when router mounts (after QueryClient is available)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      prefetchPopularCities('us,ca,mx');
+    }, 2000); // Wait 2 seconds after app loads to avoid blocking initial render
+
+    return () => clearTimeout(timer);
+  }, [prefetchPopularCities]);
 
   // Show loading while checking authentication
   if (isLoading) {

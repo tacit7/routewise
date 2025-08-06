@@ -137,6 +137,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
+  const [isMounted, setIsMounted] = useState(false);
 
   // Fetch Google Maps API key
   useEffect(() => {
@@ -221,13 +222,20 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // Initialize map
   const initializeMap = useCallback(async () => {
-    if (!mapRef.current || !googleMapsKey) return;
+    if (!googleMapsKey || !mapRef.current) return;
+    
+    // Double-check that the DOM element is valid before passing to Google Maps
+    const mapElement = mapRef.current;
+    if (!(mapElement instanceof HTMLElement) || !mapElement.isConnected) {
+      console.warn("Map DOM element is not ready or not connected");
+      return;
+    }
 
     try {
       await loadGoogleMapsScript(googleMapsKey);
 
       // Initialize map centered on start city
-      const map = new google.maps.Map(mapRef.current, {
+      const map = new google.maps.Map(mapElement, {
         zoom: 8,
         center: { lat: 39.8283, lng: -98.5795 }, // Center of US, will be updated
         mapTypeId: "roadmap", // Use string constant instead of enum
@@ -259,9 +267,44 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   }, [googleMapsKey, loadGoogleMapsScript]);
 
+  // Verify city exists using geocoding
+  const verifyCity = useCallback((cityName: string): Promise<boolean> => {
+    if (!cityName?.trim()) return Promise.resolve(false);
+    
+    const geocoder = new google.maps.Geocoder();
+    return new Promise((resolve) => {
+      geocoder.geocode({ address: cityName }, (results, status) => {
+        const isValid = status === 'OK' && results && results.length > 0;
+        console.log(`City verification for "${cityName}":`, isValid);
+        resolve(isValid);
+      });
+    });
+  }, []);
+
   // Load route with waypoints
   const loadRoute = useCallback(async () => {
     if (!directionsServiceRef.current || !directionsRendererRef.current) return;
+
+    // First verify cities exist to avoid Google Directions NOT_FOUND errors
+    console.log('Verifying cities before routing...');
+    const [startValid, endValid] = await Promise.all([
+      verifyCity(startCity),
+      verifyCity(endCity)
+    ]);
+
+    if (!startValid) {
+      console.warn(`Start city "${startCity}" could not be found`);
+      setError(`Could not find location "${startCity}". Please check the city name.`);
+      return;
+    }
+
+    if (!endValid) {
+      console.warn(`End city "${endCity}" could not be found`);
+      setError(`Could not find location "${endCity}". Please check the city name.`);
+      return;
+    }
+
+    console.log('Cities verified successfully, calculating route...');
 
     const waypoints = checkpoints.map((checkpoint) => ({
       location: checkpoint,
@@ -295,9 +338,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       addRouteMarkers(result);
     } catch (err) {
       console.error("Failed to load route:", err);
-      setError("Failed to load route directions");
+      if (err.message.includes('NOT_FOUND')) {
+        setError(`No driving route found between ${startCity} and ${endCity}. Try different cities or check spelling.`);
+      } else {
+        setError("Failed to calculate route. Please try again.");
+      }
     }
-  }, [startCity, endCity, checkpoints]);
+  }, [startCity, endCity, checkpoints, verifyCity]);
 
   // Add markers for route points
   const addRouteMarkers = (directionsResult: google.maps.DirectionsResult) => {
@@ -561,12 +608,23 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     };
   }, [pois, addToTrip, isInTrip, isAddingToTrip]);
 
-  // Initialize map when API key is available
+  // Set mounted state when component mounts
   useEffect(() => {
-    if (googleMapsKey) {
-      initializeMap();
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
+  // Initialize map when API key is available and component is mounted
+  useEffect(() => {
+    if (googleMapsKey && isMounted && mapRef.current) {
+      // Add a small delay to ensure DOM is fully stable
+      const timeoutId = setTimeout(() => {
+        initializeMap();
+      }, 50);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [googleMapsKey, initializeMap]);
+  }, [googleMapsKey, isMounted, initializeMap]);
 
   // Create POI markers when pois change
   useEffect(() => {

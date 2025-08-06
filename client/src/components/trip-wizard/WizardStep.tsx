@@ -49,7 +49,7 @@ export function WizardStep({
       className="w-full"
     >
       <StepErrorBoundary>
-        <Card className="w-full shadow-lg border-0 bg-white">
+        <Card className="w-full card-elevated border-0">
           <CardHeader className="pb-6">
             <div className="text-center space-y-4">
               {/* Main heading */}

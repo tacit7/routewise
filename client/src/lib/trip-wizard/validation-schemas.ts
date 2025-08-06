@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const placeSuggestionSchema = z.object({
-  place_id: z.string(),
+  place_id: z.string().optional(), // Allow manual entries without place_id
   description: z.string(),
   main_text: z.string(),
   secondary_text: z.string(),
@@ -60,6 +60,12 @@ export const locationSchema = z.object({
   path: ["endLocation"],
 }).refine(data => {
   if (!data.startLocation || !data.endLocation) return true;
+  
+  // For manual entries, compare descriptions instead of place_id
+  if (!data.startLocation.place_id || !data.endLocation.place_id) {
+    return data.startLocation.description.toLowerCase() !== data.endLocation.description.toLowerCase();
+  }
+  
   return data.startLocation.place_id !== data.endLocation.place_id;
 }, {
   message: "Start and destination locations must be different",

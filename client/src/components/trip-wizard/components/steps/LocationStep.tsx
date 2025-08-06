@@ -70,7 +70,8 @@ export function LocationStep({
       </div>
 
       {/* Flexible locations option */}
-      <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+      <div className="card-elevated flex items-start space-x-3 p-4 border border-blue-200 rounded-lg interactive-element"
+           style={{ backgroundColor: 'rgba(96, 165, 250, 0.05)' }}>
         <Checkbox
           id="flexible-locations"
           checked={flexibleLocations}
@@ -80,11 +81,12 @@ export function LocationStep({
         <div className="flex-1">
           <label
             htmlFor="flexible-locations"
-            className="text-sm font-medium text-blue-900 cursor-pointer"
+            className="text-sm font-medium cursor-pointer"
+            style={{ color: 'var(--accent)' }}
           >
             I'm flexible with my destinations
           </label>
-          <p className="text-sm text-blue-600 mt-1">
+          <p className="text-sm mt-1" style={{ color: 'var(--accent-hover)' }}>
             Just tell us your starting area and we'll help you discover amazing destinations from there ✨
           </p>
         </div>
@@ -172,7 +174,7 @@ export function LocationStep({
               {stops.map((stop, index) => (
                 <div
                   key={`${stop.place_id || stop.description}-${index}`}
-                  className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors"
+                  className="card-elevated flex items-center justify-between p-3 rounded-lg border border-slate-200 interactive-element"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs font-medium text-primary">

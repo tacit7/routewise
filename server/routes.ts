@@ -203,6 +203,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch POI endpoint for multiple route segments
+  app.post("/api/pois/batch",
+    getRateLimiter('general'),
+    async (req, res) => {
+      try {
+        const { routeSegments, types = ['restaurant', 'tourist_attraction', 'park'] } = req.body;
+        
+        if (!routeSegments || !Array.isArray(routeSegments)) {
+          return res.status(400).json({ 
+            message: "routeSegments array is required" 
+          });
+        }
+        
+        if (!placesService) {
+          return res.status(503).json({ 
+            message: "Google Places API key is required for batch POI requests" 
+          });
+        }
+        
+        console.log(`Processing batch POI request for ${routeSegments.length} segments`);
+        
+        // Create all search promises for parallel execution
+        const searchPromises: Array<Promise<{segment: any, type: string, places: any[]}>> = [];
+        
+        for (const segment of routeSegments) {
+          const { lat, lng, radius = 25000 } = segment;
+          
+          if (typeof lat !== 'number' || typeof lng !== 'number') {
+            console.warn(`Invalid coordinates in segment:`, segment);
+            continue;
+          }
+          
+          for (const type of types) {
+            searchPromises.push(
+              placesService.searchNearbyPlacesWithCorridor(lat, lng, radius, type)
+                .then(places => ({ segment, type, places }))
+                .catch(error => {
+                  console.warn(`Batch search failed for ${type} at ${lat},${lng}:`, error);
+                  return { segment, type, places: [] };
+                })
+            );
+          }
+        }
+        
+        // Execute all searches in parallel
+        console.log(`Executing ${searchPromises.length} parallel searches for batch request`);
+        const searchResults = await Promise.allSettled(searchPromises);
+        
+        // Group results by segment
+        const segmentResults: { [key: string]: any[] } = {};
+        const allPlaces: InsertPoi[] = [];
+        const seenPlaceIds = new Set<string>();
+        
+        for (const result of searchResults) {
+          if (result.status !== 'fulfilled') continue;
+          
+          const { segment, type, places } = result.value;
+          const segmentKey = `${segment.lat},${segment.lng}`;
+          
+          if (!segmentResults[segmentKey]) {
+            segmentResults[segmentKey] = [];
+          }
+          
+          // Process places for this segment
+          for (const place of places.slice(0, 5)) { // Limit per type per segment
+            if (!place.name || !place.rating || seenPlaceIds.has(place.place_id)) {
+              continue;
+            }
+            
+            seenPlaceIds.add(place.place_id);
+            
+            try {
+              let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
+              
+              if (place.photos && place.photos.length > 0) {
+                imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
+              }
+              
+              const poi: InsertPoi = {
+                name: place.name,
+                description: placesService.generateDescription(place),
+                category: placesService.mapPlaceTypeToCategory(place.types),
+                rating: place.rating.toFixed(1),
+                reviewCount: place.user_ratings_total || 0,
+                timeFromStart: placesService.generateTimeFromStart(),
+                imageUrl: imageUrl,
+                placeId: place.place_id,
+                address: place.formatted_address || place.vicinity || null,
+                priceLevel: place.price_level || null,
+                isOpen: place.opening_hours?.open_now ?? null,
+              };
+              
+              allPlaces.push(poi);
+              segmentResults[segmentKey].push(poi);
+            } catch (error) {
+              console.warn(`Error processing place ${place.name}:`, error);
+            }
+          }
+        }
+        
+        console.log(`Batch POI request completed: ${allPlaces.length} total places across ${Object.keys(segmentResults).length} segments`);
+        
+        res.json({
+          places: allPlaces,
+          segmentResults: segmentResults,
+          totalSegments: routeSegments.length,
+          totalPlaces: allPlaces.length
+        });
+        
+      } catch (error) {
+        console.error("Error in batch POI request:", error);
+        res.status(500).json({ message: "Failed to process batch POI request" });
+      }
+    }
+  );
+
   // Get POIs for a specific route or checkpoint
   app.get("/api/pois", 
     getRateLimiter('general'),
@@ -248,38 +364,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const routePoints = placesService.generateRoutePoints(startCoords, endCoords, 4);
       const allPlaces: InsertPoi[] = [];
       
-      // Search for places at each point along the route
-      for (let i = 0; i < routePoints.length; i++) {
-        const point = routePoints[i];
-        const types = ['restaurant', 'tourist_attraction', 'park'];
-        
+      // Create all API requests in parallel instead of sequential
+      const types = ['restaurant', 'tourist_attraction', 'park'];
+      const searchPromises: Array<Promise<{point: {lat: number, lng: number}, type: string, places: any[]}>> = [];
+      
+      for (const point of routePoints) {
         for (const type of types) {
-          const places = await placesService.searchNearbyPlaces(
-            point.lat, 
-            point.lng, 
-            25000, // 25km radius
-            type
+          searchPromises.push(
+            placesService.searchNearbyPlacesWithCorridor(point.lat, point.lng, 25000, type)
+              .then(places => ({ point, type, places }))
+              .catch(error => {
+                console.warn(`Search failed for ${type} at ${point.lat},${point.lng}:`, error);
+                return { point, type, places: [] };
+              })
           );
+        }
+      }
+      
+      // Execute all searches in parallel with controlled concurrency
+      console.log(`Starting ${searchPromises.length} parallel place searches...`);
+      const searchResults = await Promise.allSettled(searchPromises);
+      
+      // Process all results
+      for (const result of searchResults) {
+        if (result.status !== 'fulfilled') continue;
+        
+        const { point, type, places } = result.value;
+        
+        // Convert Google Places to our POI format (limit to 3 per type/location)
+        for (let j = 0; j < Math.min(places.length, 3); j++) {
+          const place = places[j];
           
-          // Convert Google Places to our POI format
-          for (let j = 0; j < Math.min(places.length, 3); j++) {
-            const place = places[j];
-            
-            if (!place.name || !place.rating) continue;
-            
-            // Skip if we already have this place
-            if (allPlaces.some(p => p.placeId === place.place_id)) continue;
-            
+          if (!place.name || !place.rating) continue;
+          
+          // Skip if we already have this place
+          if (allPlaces.some(p => p.placeId === place.place_id)) continue;
+          
+          try {
             let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
             
             if (place.photos && place.photos.length > 0) {
               imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
             }
-            
-            const distanceFromStart = Math.sqrt(
-              Math.pow(point.lat - startCoords.lat, 2) + 
-              Math.pow(point.lng - startCoords.lng, 2)
-            );
             
             const poi: InsertPoi = {
               name: place.name,
@@ -296,11 +422,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             };
             
             allPlaces.push(poi);
+          } catch (error) {
+            console.warn(`Error processing place ${place.name}:`, error);
           }
         }
-        
-        // Small delay to respect API rate limits
-        await new Promise(resolve => setTimeout(resolve, 200));
       }
       
       console.log(`Found ${allPlaces.length} places along route`);
@@ -410,47 +535,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (startCoords && endCoords) {
         console.log(`Fetching route-specific places for ${startCity} to ${endCity}`);
         
-        // Generate points along the route and fetch places
+        // Generate points along the route and fetch places in parallel
         const routePoints = placesService.generateRoutePoints(startCoords, endCoords, 4);
         const allPlaces: InsertPoi[] = [];
-
+        
+        // Create all API requests in parallel
+        const placeTypes = ['restaurant', 'tourist_attraction', 'park', 'gas_station'];
+        const searchPromises: Array<Promise<{point: {lat: number, lng: number}, type: string, places: any[]}>> = [];
+        
         for (const point of routePoints) {
-          const placeTypes = ['restaurant', 'tourist_attraction', 'park', 'gas_station'];
-          
           for (const type of placeTypes) {
-            const places = await placesService.searchNearbyPlaces(point.lat, point.lng, 25000, type);
+            searchPromises.push(
+              placesService.searchNearbyPlacesWithCorridor(point.lat, point.lng, 25000, type)
+                .then(places => ({ point, type, places }))
+                .catch(error => {
+                  console.warn(`Search failed for ${type} at ${point.lat},${point.lng}:`, error);
+                  return { point, type, places: [] };
+                })
+            );
+          }
+        }
+        
+        console.log(`Starting ${searchPromises.length} parallel place searches for route-relevant POIs...`);
+        const searchResults = await Promise.allSettled(searchPromises);
+        
+        // Process all results
+        for (const result of searchResults) {
+          if (result.status !== 'fulfilled') continue;
+          
+          const { point, type, places } = result.value;
+          
+          for (const place of places.slice(0, 6)) {
+            // Skip if we already have this place
+            if (allPlaces.some(p => p.placeId === place.place_id)) continue;
             
-            for (const place of places.slice(0, 6)) {
-              // Skip if we already have this place
-              if (allPlaces.some(p => p.placeId === place.place_id)) continue;
+            if (!place.name || !place.rating) continue;
+            
+            try {
+              let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
               
-              if (!place.name || !place.rating) continue;
-              
-              try {
-                let imageUrl = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600';
-                
-                if (place.photos && place.photos.length > 0) {
-                  imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
-                }
-
-                const poi: InsertPoi = {
-                  name: place.name,
-                  description: placesService.generateDescription(place),
-                  category: placesService.mapPlaceTypeToCategory(place.types),
-                  rating: place.rating.toFixed(1),
-                  reviewCount: place.user_ratings_total || 0,
-                  timeFromStart: placesService.generateTimeFromStart(),
-                  imageUrl: imageUrl,
-                  placeId: place.place_id,
-                  address: place.formatted_address || place.vicinity || '',
-                  isOpen: place.opening_hours?.open_now || null,
-                  priceLevel: place.price_level || null
-                };
-
-                allPlaces.push(poi);
-              } catch (error) {
-                console.error(`Error processing place ${place.name}:`, error);
+              if (place.photos && place.photos.length > 0) {
+                imageUrl = await placesService.getPhotoUrl(place.photos[0].photo_reference);
               }
+
+              const poi: InsertPoi = {
+                name: place.name,
+                description: placesService.generateDescription(place),
+                category: placesService.mapPlaceTypeToCategory(place.types),
+                rating: place.rating.toFixed(1),
+                reviewCount: place.user_ratings_total || 0,
+                timeFromStart: placesService.generateTimeFromStart(),
+                imageUrl: imageUrl,
+                placeId: place.place_id,
+                address: place.formatted_address || place.vicinity || '',
+                isOpen: place.opening_hours?.open_now || null,
+                priceLevel: place.price_level || null
+              };
+
+              allPlaces.push(poi);
+            } catch (error) {
+              console.error(`Error processing place ${place.name}:`, error);
             }
           }
         }

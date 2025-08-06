@@ -77,7 +77,7 @@ export function usePersonalizedTrips() {
     let score = 0;
 
     // Category preference (40% weight)
-    if (interests.categories.includes(poi.category)) {
+    if (interests?.categories?.includes(poi.category)) {
       score += 0.4;
     }
 

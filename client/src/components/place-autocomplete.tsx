@@ -136,7 +136,7 @@ export function PlaceAutocomplete({
       <ul
         {...getMenuProps()}
         className={cn(
-          "absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto",
+          "card-elevated absolute z-50 w-full mt-1 border border-slate-200 rounded-md max-h-60 overflow-y-auto",
           !isOpen && "hidden"
         )}
       >

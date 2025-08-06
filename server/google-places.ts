@@ -55,6 +55,79 @@ export class GooglePlacesService {
     return `${method}:${params.map(p => String(p)).join(':')}`;
   }
 
+  /**
+   * Generate a geographic grid key for route corridor caching
+   * Rounds coordinates to create cache-friendly grid system
+   */
+  private generateCorridorCacheKey(lat: number, lng: number, type: string, radius: number): string {
+    // Round to ~11km grid cells (0.1 degree precision)
+    const gridLat = Math.round(lat * 10) / 10;
+    const gridLng = Math.round(lng * 10) / 10;
+    const gridRadius = Math.round(radius / 5000) * 5000; // Round radius to 5km increments
+    return `corridor:${gridLat},${gridLng}:${type}:${gridRadius}`;
+  }
+
+  /**
+   * Cache POI results for a route corridor segment
+   */
+  async cacheCorridorPOIs(lat: number, lng: number, type: string, radius: number, places: any[]): Promise<void> {
+    const cacheKey = this.generateCorridorCacheKey(lat, lng, type, radius);
+    const corridorData = {
+      places,
+      centerLat: lat,
+      centerLng: lng,
+      type,
+      radius,
+      timestamp: Date.now()
+    };
+    
+    await cacheService.set(cacheKey, corridorData, this.PLACES_CACHE_DURATION);
+    console.log(`🗄️ Cached ${places.length} places for corridor ${type} at ${lat.toFixed(2)},${lng.toFixed(2)}`);
+  }
+
+  /**
+   * Try to get cached POI results for a route corridor segment
+   */
+  async getCachedCorridorPOIs(lat: number, lng: number, type: string, radius: number): Promise<any[] | null> {
+    const cacheKey = this.generateCorridorCacheKey(lat, lng, type, radius);
+    const cached = await cacheService.get<any>(cacheKey);
+    
+    if (cached && cached.places) {
+      console.log(`🎯 Cache hit for corridor ${type} at ${lat.toFixed(2)},${lng.toFixed(2)} - ${cached.places.length} places`);
+      return cached.places;
+    }
+    
+    return null;
+  }
+
+  /**
+   * Enhanced search with corridor caching
+   */
+  async searchNearbyPlacesWithCorridor(
+    latitude: number,
+    longitude: number,
+    radius: number = 50000,
+    type?: string
+  ): Promise<any[]> {
+    // Try corridor cache first
+    if (type) {
+      const cachedPlaces = await this.getCachedCorridorPOIs(latitude, longitude, type, radius);
+      if (cachedPlaces) {
+        return cachedPlaces;
+      }
+    }
+    
+    // Fall back to regular search if no corridor cache hit
+    const places = await this.searchNearbyPlaces(latitude, longitude, radius, type);
+    
+    // Cache the results in corridor cache for future use
+    if (type && places.length > 0) {
+      await this.cacheCorridorPOIs(latitude, longitude, type, radius, places);
+    }
+    
+    return places;
+  }
+
   async geocodeCity(
     cityName: string
   ): Promise<{ lat: number; lng: number } | null> {

@@ -12,7 +12,7 @@ export function WizardEntryPoint({ variant = "card", className = "" }: WizardEnt
   const [, setLocation] = useLocation();
 
   const handleStartWizard = () => {
-    setLocation("/trip-planner");
+    setLocation("/trip-wizard");
   };
 
   if (variant === "button") {

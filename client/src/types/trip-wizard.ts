@@ -1,5 +1,5 @@
 export interface PlaceSuggestion {
-  place_id: string;
+  place_id?: string;
   description: string;
   main_text: string;
   secondary_text: string;

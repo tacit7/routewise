@@ -117,7 +117,7 @@ export default function RouteResults() {
 
   // Fetch POIs for things to do along the specific route
   const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({
-    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity],
+    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity, routeData?.verified],
     queryFn: async () => {
       if (!routeData) return [];
       const params = new URLSearchParams({
@@ -133,10 +133,19 @@ export default function RouteResults() {
     enabled: !!routeData, // Only run query when we have route data
   });
 
-  // Remove duplicates based on placeId
-  const uniquePois = (pois || []).filter(
-    (poi, index, self) =>
-      index === self.findIndex((p) => p.placeId === poi.placeId)
+  // Remove duplicates based on placeId - with debugging
+  console.log('Raw pois data:', pois);
+  const poisArray = Array.isArray(pois) ? pois : (pois?.data ? pois.data : []);
+  console.log('Processed poisArray:', poisArray);
+  
+  const uniquePois = poisArray.filter(
+    (poi, index, self) => {
+      if (!poi || typeof poi !== 'object') {
+        console.warn('Invalid POI data:', poi);
+        return false;
+      }
+      return index === self.findIndex((p) => p?.placeId === poi?.placeId);
+    }
   );
 
   // Generate available cities from actual POI data instead of hardcoded route cities
@@ -383,18 +392,27 @@ export default function RouteResults() {
         {/* Main Map Area - Full Width */}
         {isMapVisible && (
           <div className="flex-1">
-            <InteractiveMap
-              startCity={routeData.startCity}
-              endCity={routeData.endCity}
-              checkpoints={[]}
-              pois={uniquePois}
-              selectedPoiIds={selectedPoiIds}
-              hoveredPoi={hoveredPoi}
-              onPoiClick={handlePoiClick}
-              onPoiSelect={handlePoiSelect}
-              height="100%"
-              className="w-full h-full"
-            />
+            {poisLoading ? (
+              <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
+                  <p className="text-sm text-slate-600">Loading map and places...</p>
+                </div>
+              </div>
+            ) : (
+              <InteractiveMap
+                startCity={routeData.startCity}
+                endCity={routeData.endCity}
+                checkpoints={[]}
+                pois={uniquePois}
+                selectedPoiIds={selectedPoiIds}
+                hoveredPoi={hoveredPoi}
+                onPoiClick={handlePoiClick}
+                onPoiSelect={handlePoiSelect}
+                height="100%"
+                className="w-full h-full"
+              />
+            )}
           </div>
         )}
 

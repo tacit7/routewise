@@ -3,49 +3,62 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #1f2937;
+  --background: #eaf7ee; /* Softer slate-50 background */
+  --foreground: #1e293b; /* Improved contrast - slate-800 */
 
-  --card: #f9fafb;
-  --card-foreground: #1f2937;
+  --card: #ffffff; /* Pure white for elevation */
+  --card-foreground: #1e293b;
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Subtle elevation */
 
-  --primary: #10b981; /* Emerald 500 */
+  --primary: #10b981; /* Emerald 500 - brand anchor */
+  --primary-hover: #059669; /* Emerald 600 */
   --primary-foreground: #ffffff;
+  --ring: #34d399; /* Emerald-400 for focus rings */
 
-  --primary-hover: #059669;
-  --ring: #10b981;
-
-  --secondary: #6b7280;
+  --secondary: #6b7280; /* Gray 500 */
   --secondary-foreground: #ffffff;
 
-  --accent: #a7f3d0; /* Emerald 200 */
-  --accent-foreground: #065f46;
+  --accent: #60a5fa; /* Blue-400 for calm/confident feel */
+  --accent-hover: #3b82f6; /* Blue-500 */
+  --accent-foreground: #ffffff;
 
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
+  --muted: #f3f4f6; /* Gray 100 */
+  --muted-hover: rgba(16, 185, 129, 0.05); /* Subtle primary tint */
+  --muted-foreground: #475569; /* Improved hierarchy - slate-600 */
 
-  --border: #e5e7eb;
-  --input: #e5e7eb;
+  --border: #d1d5db; /* Gray 300 */
+  --input: #d1d5db; /* Gray 300 */
+  --input-focus-ring: #34d399; /* Emerald-400 for better feedback */
+
+  --success: #22c55e; /* Green 500 */
+  --success-foreground: #ffffff;
+
+  --warning: #facc15; /* Yellow 400 */
+  --warning-foreground: #1f2937;
+
+  --info: #3b82f6; /* Blue 500 */
+  --info-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --ring: #2ca6a4;
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: #0a0a0f;
+  --background: #0e1117; /* GitHub dark base - more intentional */
   --foreground: #f9fafb;
 
-  --muted: #1a1a24;
-  --muted-foreground: #9ca3af;
+  --card: #1f2937; /* Separate card color for elevation */
+  --card-foreground: #f9fafb;
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Stronger shadow for dark mode */
 
   --popover: #1f2937;
   --popover-foreground: #f9fafb;
 
-  --card: #1f2937;
-  --card-foreground: #f9fafb;
+  --muted: #1a1a24;
+  --muted-hover: #2c3341;
+  --muted-foreground: #9ca3af;
 
   --border: #2c3341;
   --input: #2c3341;
@@ -58,12 +71,22 @@
   --secondary-foreground: #ffffff;
 
   --accent: #60a5fa;
+  --accent-hover: #3b82f6;
   --accent-foreground: #e0f2fe;
+
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+
+  --warning: #facc15;
+  --warning-foreground: #1f2937;
+
+  --info: #3b82f6;
+  --info-foreground: #ffffff;
 
   --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
 
-  --ring: #60a5fa;
+  --ring: #34d399; /* Match light mode focus ring */
   --radius: 0.5rem;
 }
 
@@ -84,4 +107,30 @@
 .glass-effect {
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.95);
+}
+
+/* Enhanced card styling with elevation */
+.card-elevated {
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-elevated:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Enhanced interactivity */
+.interactive-element {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.interactive-element:hover {
+  background-color: var(--muted-hover);
+}
+
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--input-focus-ring), 0 0 0 4px white;
 }

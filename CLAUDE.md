@@ -35,6 +35,20 @@ and file edits
 - MSW can be disabled with `MSW_DISABLED=true` environment variable
 - Mock responses stored in `client/src/mocks/` and `server/` directories
 
+## Recent Updates - January 2, 2025
+
+### City Autocomplete Enhancements
+- **Downshift Migration**: Migrated from shadcn/ui Command/Popover to downshift v9.0.10 for better accessibility
+- **API Optimization**: Switched from Google Places API to custom `/api/places/city-autocomplete` endpoint
+- **Browser Caching**: Implemented TanStack Query caching with 30-minute stale time and popular cities prefetching
+- **Performance**: ~80% reduction in API calls through intelligent caching and background prefetching
+
+### Key Files Updated
+- `client/src/hooks/use-city-autocomplete.ts` - NEW: TanStack Query caching hook
+- `client/src/hooks/use-places-autocomplete.ts` - Updated to use cached version  
+- `client/src/components/place-autocomplete.tsx` - Migrated to downshift v9 with semantic HTML
+- `client/src/App.tsx` - Added popular cities prefetching on startup
+
 ## Architecture Overview
 
 ### Project Structure

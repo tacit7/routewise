@@ -305,7 +305,7 @@ export function TripPlannerWizard({
   return (
     <>
       {/* Page Layout */}
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
         {/* Header */}
         <Header />
         
@@ -334,7 +334,7 @@ export function TripPlannerWizard({
           {/* Main Content Area */}
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Unified Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+            <div className="card-elevated rounded-lg border border-slate-200">
               {/* Progress Status Header */}
               <div className="p-4 border-b border-slate-100">
                 <div className="text-center mb-2">
