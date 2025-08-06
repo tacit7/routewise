@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { WizardStepProps } from "@/types/trip-wizard";
 import { StepErrorBoundary } from "./components/shared/StepErrorBoundary";
@@ -51,16 +52,11 @@ export function WizardStep({
         <Card className="w-full shadow-lg border-0 bg-white">
           <CardHeader className="pb-6">
             <div className="text-center space-y-4">
-              {/* Step indicator */}
-              <div className="flex items-center justify-center space-x-2 text-sm text-slate-500">
-                <span>Step {stepNumber} of {totalSteps}</span>
-              </div>
-              
               {/* Main heading */}
               <h2 
                 id={`step-${stepNumber}-title`}
                 ref={headingRef}
-                className="text-2xl font-bold text-slate-800 focus:outline-none"
+                className="text-3xl font-bold text-slate-900 focus:outline-none"
                 tabIndex={-1}
               >
                 {title}
@@ -70,7 +66,7 @@ export function WizardStep({
               {stepDescription && (
                 <p 
                   id={`step-${stepNumber}-description`}
-                  className="text-slate-600 max-w-2xl mx-auto"
+                  className="text-slate-500 text-lg max-w-2xl mx-auto"
                 >
                   {stepDescription}
                 </p>
@@ -121,29 +117,45 @@ export function WizardStep({
             </div>
 
             {/* Next button */}
-            <Button
-              type="button"
-              onClick={onNext}
-              disabled={!canProceed}
-              className={cn(
-                "w-full sm:w-auto",
-                canProceed 
-                  ? "bg-primary hover:bg-primary/90 text-white" 
-                  : "bg-slate-200 text-slate-500"
-              )}
-            >
-              {stepNumber === totalSteps ? (
-                <>
-                  Complete Trip
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </>
-              ) : (
-                <>
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    onClick={onNext}
+                    disabled={!canProceed}
+                    className={cn(
+                      "w-full sm:w-auto",
+                      canProceed 
+                        ? "bg-primary hover:bg-primary/90 text-white" 
+                        : "bg-slate-200 text-slate-500"
+                    )}
+                  >
+                    {stepNumber === totalSteps ? (
+                      <>
+                        Complete Trip
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Next
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                {!canProceed && (
+                  <TooltipContent>
+                    <p>
+                      {stepNumber === 2 
+                        ? "Please enter both a start and destination city to continue"
+                        : "Please complete this step to continue"
+                      }
+                    </p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </CardFooter>
         </Card>
       </StepErrorBoundary>

@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useCombobox } from "downshift";
 import { Button } from "@/components/ui/button";
 import { MapPin, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePlacesAutocomplete } from "@/hooks/use-places-autocomplete";
 
 interface PlaceSuggestion {
-  place_id: string;
+  place_id?: string;
   description: string;
   main_text: string;
   secondary_text: string;
@@ -19,6 +18,8 @@ interface PlaceAutocompleteProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  limit?: number;
+  countries?: string;
 }
 
 export function PlaceAutocomplete({
@@ -27,11 +28,13 @@ export function PlaceAutocomplete({
   placeholder = "Search for a city...",
   className,
   disabled = false,
+  limit = 10,
+  countries = 'us,ca,mx',
 }: PlaceAutocompleteProps) {
-  const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value || "");
   const { suggestions, isLoading, error, fetchSuggestions, clearSuggestions } = usePlacesAutocomplete({
-    types: '(cities)',
+    limit,
+    countries,
     debounceMs: 300,
     minLength: 2,
   });
@@ -43,90 +46,154 @@ export function PlaceAutocomplete({
     }
   }, [value]);
 
+  // Prepare items for downshift (including manual entry option)
+  const items = [...suggestions];
+  if (inputValue.length >= 2 && suggestions.length === 0 && !isLoading) {
+    items.push({
+      description: inputValue,
+      main_text: inputValue,
+      secondary_text: "Manual entry",
+    });
+  }
+
+  const handleSelect = (suggestion: PlaceSuggestion | null) => {
+    if (suggestion) {
+      setInputValue(suggestion.main_text);
+      clearSuggestions();
+      onSelect(suggestion);
+    }
+  };
+
   const handleInputChange = (value: string) => {
     setInputValue(value);
     fetchSuggestions(value);
   };
 
-  const handleSelect = (suggestion: PlaceSuggestion) => {
-    setInputValue(suggestion.main_text);
-    setOpen(false);
-    clearSuggestions();
-    onSelect(suggestion);
-  };
-
-  const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen);
-    if (!newOpen) {
-      clearSuggestions();
-    }
-  };
+  const {
+    isOpen,
+    getLabelProps,
+    getMenuProps,
+    getInputProps,
+    getToggleButtonProps,
+    getItemProps,
+    highlightedIndex,
+    selectedItem,
+  } = useCombobox({
+    items,
+    itemToString: (item) => item ? item.main_text : '',
+    selectedItem: null,
+    inputValue,
+    onInputValueChange: ({ inputValue: newInputValue }) => {
+      if (newInputValue !== undefined) {
+        handleInputChange(newInputValue);
+      }
+    },
+    onSelectedItemChange: ({ selectedItem }) => {
+      handleSelect(selectedItem);
+    },
+    onIsOpenChange: ({ isOpen: newIsOpen }) => {
+      if (!newIsOpen) {
+        clearSuggestions();
+      }
+    },
+  });
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
+    <div className={cn("relative w-full", className)}>
+      {/* Hidden label for accessibility */}
+      <label {...getLabelProps()} className="sr-only">
+        {placeholder}
+      </label>
+      
+      {/* Input trigger button */}
+      <div className="relative">
         <Button
           variant="outline"
-          role="combobox"
-          aria-expanded={open}
+          {...getToggleButtonProps()}
           className={cn(
             "w-full justify-between font-normal px-4 py-3 border-slate-300 focus:ring-2 focus:ring-primary focus:border-transparent",
             !inputValue && "text-muted-foreground",
-            className
+            disabled && "cursor-not-allowed opacity-50"
           )}
           disabled={disabled}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
         >
-          <div className="flex items-center">
+          <div className="flex items-center w-full">
             <MapPin className="h-4 w-4 text-slate-400 mr-2" />
-            <span className="truncate">
-              {inputValue || placeholder}
-            </span>
+            <input
+              {...getInputProps()}
+              placeholder={placeholder}
+              className="flex-1 bg-transparent border-none outline-none text-left truncate"
+              disabled={disabled}
+            />
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Type to search cities..."
-            value={inputValue}
-            onValueChange={handleInputChange}
-          />
-          <CommandList>
+      </div>
+
+      {/* Dropdown menu */}
+      <ul
+        {...getMenuProps()}
+        className={cn(
+          "absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto",
+          !isOpen && "hidden"
+        )}
+      >
+        {isOpen && (
+          <>
             {isLoading ? (
-              <div className="p-4 text-sm text-center text-muted-foreground">
+              <li className="p-4 text-sm text-center text-slate-500">
                 Searching...
-              </div>
+              </li>
             ) : error ? (
-              <div className="p-4 text-sm text-center text-red-500">
+              <li className="p-4 text-sm text-center text-red-500">
                 {error}
-              </div>
-            ) : suggestions.length === 0 && inputValue.length >= 2 ? (
-              <CommandEmpty>No cities found.</CommandEmpty>
+              </li>
+            ) : items.length === 0 ? (
+              <li className="p-4 text-sm text-center text-slate-500">
+                No cities found
+              </li>
             ) : (
-              <CommandGroup>
-                {suggestions.map((suggestion) => (
-                  <CommandItem
-                    key={suggestion.place_id}
-                    value={suggestion.description}
-                    onSelect={() => handleSelect(suggestion)}
-                    className="cursor-pointer"
+              items.map((item, index) => {
+                const isManualEntry = item.secondary_text === "Manual entry";
+                return (
+                  <li
+                    key={item.place_id || `item-${index}`}
+                    {...getItemProps({ item, index })}
+                    className={cn(
+                      "px-4 py-2 cursor-pointer transition-colors",
+                      highlightedIndex === index
+                        ? "bg-slate-100"
+                        : "hover:bg-slate-50",
+                      isManualEntry && "bg-blue-50 border-t border-blue-200"
+                    )}
                   >
                     <div className="flex flex-col">
-                      <span className="font-medium">
-                        {suggestion.main_text}
+                      <span 
+                        className={cn(
+                          "font-medium",
+                          isManualEntry ? "text-blue-800" : "text-slate-900"
+                        )}
+                      >
+                        {isManualEntry ? `Use "${item.main_text}" as entered` : item.main_text}
                       </span>
-                      <span className="text-sm text-muted-foreground">
-                        {suggestion.secondary_text}
+                      <span 
+                        className={cn(
+                          "text-sm",
+                          isManualEntry ? "text-blue-600" : "text-slate-500"
+                        )}
+                      >
+                        {isManualEntry ? "Proceed with manual entry" : item.secondary_text}
                       </span>
                     </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                  </li>
+                );
+              })
             )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </>
+        )}
+      </ul>
+    </div>
   );
 }

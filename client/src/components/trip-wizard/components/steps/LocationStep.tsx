@@ -35,6 +35,7 @@ export function LocationStep({
   errors,
 }: LocationStepProps) {
   const [showAddStop, setShowAddStop] = useState(false);
+  const [showStopsOnMobile, setShowStopsOnMobile] = useState(false);
 
   const handleFlexibleChange = (checked: boolean) => {
     onFlexibleLocationsChange(checked);
@@ -61,8 +62,15 @@ export function LocationStep({
 
   return (
     <div className="space-y-6">
+      {/* Warm welcome message */}
+      <div className="text-center mb-6">
+        <p className="text-slate-600 text-lg">
+          Let's start planning your adventure! Where would you like to explore?
+        </p>
+      </div>
+
       {/* Flexible locations option */}
-      <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
         <Checkbox
           id="flexible-locations"
           checked={flexibleLocations}
@@ -76,9 +84,8 @@ export function LocationStep({
           >
             I'm flexible with my destinations
           </label>
-          <p className="text-sm text-blue-800 mt-1">
-            Specify at least a starting area - we'll help you discover the best
-            destinations from there
+          <p className="text-sm text-blue-600 mt-1">
+            Just tell us your starting area and we'll help you discover amazing destinations from there ✨
           </p>
         </div>
       </div>
@@ -136,87 +143,114 @@ export function LocationStep({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="font-medium text-slate-800">Optional Stops</h4>
-          <span className="text-sm text-slate-500">
-            {stops.length}/5 stops added
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-slate-500">
+              {stops.length}/5 stops added
+            </span>
+            {/* Mobile toggle button */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowStopsOnMobile(!showStopsOnMobile)}
+              className="md:hidden p-1"
+            >
+              {showStopsOnMobile ? (
+                <span className="text-xs">Hide</span>
+              ) : (
+                <span className="text-xs">Show</span>
+              )}
+            </Button>
+          </div>
         </div>
 
-        {/* Existing stops */}
-        {stops.length > 0 && (
-          <div className="space-y-2">
-            {stops.map((stop, index) => (
-              <div
-                key={`${stop.place_id}-${index}`}
-                className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs font-medium text-primary">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <div className="font-medium text-slate-800">
-                      {stop.main_text}
+        {/* Stops content - collapsible on mobile */}
+        <div className={`space-y-4 md:block ${showStopsOnMobile ? 'block' : 'hidden md:block'}`}>
+          {/* Existing stops */}
+          {stops.length > 0 && (
+            <div className="space-y-2">
+              {stops.map((stop, index) => (
+                <div
+                  key={`${stop.place_id || stop.description}-${index}`}
+                  className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs font-medium text-primary">
+                      {index + 1}
                     </div>
-                    <div className="text-sm text-slate-600">
-                      {stop.secondary_text}
+                    <div>
+                      <div className="font-medium text-slate-800">
+                        {stop.main_text}
+                      </div>
+                      <div className="text-sm text-slate-600">
+                        {stop.secondary_text}
+                      </div>
                     </div>
                   </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveStop(index)}
+                    className="text-slate-400 hover:text-red-500 h-8 w-8 p-0 transition-colors"
+                    aria-label={`Remove stop: ${stop.main_text}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add stop section */}
+          {showAddStop ? (
+            <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg">
+              <AccessibleFormField
+                label="Add a Stop"
+                description="Add a city or location to visit along the way"
+              >
+                <PlaceAutocomplete
+                  value=""
+                  onSelect={handleAddStop}
+                  placeholder="Search for a stop location..."
+                  className="w-full"
+                />
+              </AccessibleFormField>
+              <div className="flex justify-end space-x-2 mt-3">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleRemoveStop(index)}
-                  className="text-slate-400 hover:text-red-500 h-8 w-8 p-0"
-                  aria-label={`Remove stop: ${stop.main_text}`}
+                  onClick={() => setShowAddStop(false)}
+                  className="hover:bg-slate-100 transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  Cancel
                 </Button>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Add stop section */}
-        {showAddStop ? (
-          <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg">
-            <AccessibleFormField
-              label="Add a Stop"
-              description="Add a city or location to visit along the way"
-            >
-              <PlaceAutocomplete
-                value=""
-                onSelect={handleAddStop}
-                placeholder="Search for a stop location..."
-                className="w-full"
-              />
-            </AccessibleFormField>
-            <div className="flex justify-end space-x-2 mt-3">
+            </div>
+          ) : (
+            <div className="space-y-2">
               <Button
                 type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAddStop(false)}
+                variant="outline"
+                onClick={() => setShowAddStop(true)}
+                disabled={!canAddStop}
+                className="w-full border-dashed hover:bg-slate-50 hover:border-slate-400 transition-colors"
               >
-                Cancel
+                <Plus className="w-4 h-4 mr-2" />
+                Add a Stop Along the Way
               </Button>
+              {!canAddStop && (
+                <p className="text-xs text-slate-500 text-center">
+                  {stops.length >= 5 && "Maximum of 5 stops reached"}
+                  {!startLocation && !endLocation && "Please enter both start and destination cities first"}
+                  {!startLocation && endLocation && "Please enter a starting location first"}
+                  {startLocation && !endLocation && !flexibleLocations && "Please enter a destination first"}
+                </p>
+              )}
             </div>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowAddStop(true)}
-            disabled={!canAddStop}
-            className="w-full border-dashed"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add a Stop Along the Way
-            {!canAddStop && stops.length >= 5 && " (Maximum reached)"}
-            {!canAddStop && !startLocation && " (Set start location first)"}
-            {!canAddStop && !endLocation && " (Set destination first)"}
-          </Button>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Route preview */}

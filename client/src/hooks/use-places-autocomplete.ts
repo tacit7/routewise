@@ -1,21 +1,42 @@
 import { useState, useCallback, useRef } from 'react';
 
+interface City {
+  id: string;
+  place_id: string;
+  name: string;
+  display_name: string;
+  lat: number;
+  lon: number;
+  type: string;
+  state: string;
+  country: string;
+  country_code: string;
+}
+
 interface PlaceSuggestion {
   place_id: string;
   description: string;
   main_text: string;
   secondary_text: string;
+  geometry?: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 interface UsePlacesAutocompleteOptions {
-  types?: string;
+  limit?: number;
+  countries?: string;
   debounceMs?: number;
   minLength?: number;
 }
 
 export function usePlacesAutocomplete(options: UsePlacesAutocompleteOptions = {}) {
   const {
-    types = '(cities)',
+    limit = 10,
+    countries = 'us,ca,mx',
     debounceMs = 300,
     minLength = 2,
   } = options;
@@ -43,8 +64,14 @@ export function usePlacesAutocomplete(options: UsePlacesAutocompleteOptions = {}
     setError(null);
 
     try {
+      const params = new URLSearchParams({
+        q: query,
+        limit: limit.toString(),
+        countries: countries,
+      });
+
       const response = await fetch(
-        `/api/places/autocomplete?input=${encodeURIComponent(query)}&types=${encodeURIComponent(types)}`,
+        `/api/places/city-autocomplete?${params.toString()}`,
         { signal: abortControllerRef.current.signal }
       );
 
@@ -54,11 +81,27 @@ export function usePlacesAutocomplete(options: UsePlacesAutocompleteOptions = {}
 
       const data = await response.json();
       
-      if (data.predictions) {
-        setSuggestions(data.predictions);
+      if (data.status === 'success' && data.data?.cities) {
+        // Transform your API response to PlaceSuggestion format
+        const transformedSuggestions: PlaceSuggestion[] = data.data.cities.map((city: City) => ({
+          place_id: city.place_id,
+          description: city.display_name,
+          main_text: city.name,
+          secondary_text: `${city.state}, ${city.country}`,
+          geometry: {
+            location: {
+              lat: city.lat,
+              lng: city.lon,
+            },
+          },
+        }));
+        
+        setSuggestions(transformedSuggestions);
       } else {
         setSuggestions([]);
-        setError('No suggestions available');
+        if (data.status !== 'success') {
+          setError(data.message || 'No suggestions available');
+        }
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -66,13 +109,13 @@ export function usePlacesAutocomplete(options: UsePlacesAutocompleteOptions = {}
         return;
       }
       
-      console.error('Error fetching autocomplete suggestions:', err);
+      console.error('Error fetching city autocomplete suggestions:', err);
       setSuggestions([]);
       setError(err instanceof Error ? err.message : 'Failed to fetch suggestions');
     } finally {
       setIsLoading(false);
     }
-  }, [types, minLength]);
+  }, [limit, countries, minLength]);
 
   const debouncedFetch = useCallback((query: string) => {
     // Clear existing debounce
