@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -12,7 +13,8 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSuccess }) => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+  const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -20,6 +22,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  // Effect to handle redirect after authentication
+  useEffect(() => {
+    if (shouldRedirect && isAuthenticated && user) {
+      console.log('Redirecting to dashboard after login');
+      setLocation('/dashboard');
+      setShouldRedirect(false);
+    }
+  }, [shouldRedirect, isAuthenticated, user, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +43,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
       
       if (result.success) {
         onSuccess?.();
+        // Set flag to trigger redirect when auth state updates
+        setShouldRedirect(true);
       } else {
         setError(result.message || 'Login failed');
       }

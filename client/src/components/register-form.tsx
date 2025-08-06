@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -17,9 +18,11 @@ interface PasswordRequirement {
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onSuccess }) => {
-  const { register } = useAuth();
+  const { register, isAuthenticated, user } = useAuth();
+  const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     username: '',
+    email: '',
     password: '',
     confirmPassword: '',
   });
@@ -27,6 +30,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   // Password requirements
   const passwordRequirements: PasswordRequirement[] = [
@@ -37,9 +41,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
   ];
 
   const usernameValid = formData.username.length >= 3;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
   const passwordValid = passwordRequirements.every(req => req.met);
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
-  const formValid = usernameValid && passwordValid && passwordsMatch;
+  const formValid = usernameValid && emailValid && passwordValid && passwordsMatch;
+
+  // Effect to handle redirect after authentication
+  useEffect(() => {
+    if (shouldRedirect && isAuthenticated && user) {
+      console.log('Redirecting to dashboard after registration');
+      setLocation('/dashboard');
+      setShouldRedirect(false);
+    }
+  }, [shouldRedirect, isAuthenticated, user, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +67,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
     setError(null);
 
     try {
-      const result = await register(formData.username, formData.password);
+      const result = await register(formData.username, formData.password, formData.email);
       
       if (result.success) {
         onSuccess?.();
+        // Set flag to trigger redirect when auth state updates
+        setShouldRedirect(true);
       } else {
         setError(result.message || 'Registration failed');
       }
@@ -122,6 +138,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
             <p className={`text-xs flex items-center gap-1 ${usernameValid ? 'text-green-600' : 'text-red-500'}`}>
               {usernameValid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
               At least 3 characters
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium">
+            Email Address
+          </label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleInputChange}
+            disabled={isLoading}
+            required
+            autoComplete="email"
+            className={`w-full ${formData.email && !emailValid ? 'border-red-300' : ''}`}
+          />
+          {formData.email.length > 0 && (
+            <p className={`text-xs flex items-center gap-1 ${emailValid ? 'text-green-600' : 'text-red-500'}`}>
+              {emailValid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+              Valid email address
             </p>
           )}
         </div>

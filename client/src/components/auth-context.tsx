@@ -103,9 +103,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async (): Promise<void> => {
     try {
-      // Express.js backend uses HTTP-only cookies, so we don't need to check localStorage token
-      // Just make the /me request - if the cookie is valid, it will work
-      const data = await apiCall<{ success: boolean; user: User }>(API_CONFIG.ENDPOINTS.ME);
+      // Use authenticated API call since login/register store tokens
+      const data = await authenticatedApiCall<{ success: boolean; user: User }>(API_CONFIG.ENDPOINTS.ME);
       if (data.success && data.user) {
         setUser(data.user);
       }
