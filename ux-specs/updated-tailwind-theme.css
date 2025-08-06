@@ -1,31 +1,33 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #fcfcfc;
   --foreground: #1f2937;
 
-  --card: #f9fafb;
-  --card-foreground: #1f2937;
-
-  --primary: #10b981; /* Emerald 500 */
-  --primary-foreground: #ffffff;
-
-  --primary-hover: #059669;
-  --ring: #10b981;
-
-  --secondary: #6b7280;
-  --secondary-foreground: #ffffff;
-
-  --accent: #a7f3d0; /* Emerald 200 */
-  --accent-foreground: #065f46;
-
-  --muted: #f3f4f6;
+  --muted: #f1f5f9;
   --muted-foreground: #6b7280;
 
-  --border: #e5e7eb;
-  --input: #e5e7eb;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+
+  --card: #f7f9fa;
+  --card-foreground: #1f2937;
+
+  --border: #d2d8e0;
+  --input: #d2d8e0;
+
+  --primary: #2ca6a4;
+  --primary-hover: #238985;
+  --primary-foreground: #ffffff;
+
+  --secondary: #546981;
+  --secondary-foreground: #ffffff;
+
+  --accent: #60a5fa;
+  --accent-foreground: #1e3a8a;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -77,6 +79,7 @@
   }
 }
 
+/* Custom styles for travel theme */
 .hero-gradient {
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(16, 185, 129, 0.6) 100%);
 }

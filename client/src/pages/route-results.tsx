@@ -110,15 +110,10 @@ export default function RouteResults() {
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
-  // Fetch Google Maps API key
-  const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{
-    apiKey: string;
-  }>({
-    queryKey: ["/api/maps-key"],
-    // The default queryFn from queryClient will be used
-    staleTime: 1000 * 60 * 30, // 30 minutes - API key doesn't change often
-    gcTime: 1000 * 60 * 60, // 1 hour
-  });
+  // TODO: Phoenix backend doesn't provide Maps API key endpoint yet
+  // Disable Maps API key fetching for now
+  const mapsApiData = null;
+  const mapsApiLoading = false;
 
   // Fetch POIs for things to do along the specific route
   const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({

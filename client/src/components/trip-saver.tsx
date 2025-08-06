@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useTrips } from "@/hooks/use-trips";
 import { Save, Share } from "lucide-react";
 
 interface TripSaverProps {
@@ -29,6 +30,7 @@ export function TripSaver({
   const [isPublic, setIsPublic] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const { createTripFromWizard } = useTrips();
 
   const generateDefaultTitle = () => {
     if (checkpoints.length === 0) {
@@ -44,31 +46,29 @@ export function TripSaver({
     setIsSaving(true);
     
     try {
-      const tripData = {
-        title: title || generateDefaultTitle(),
-        startCity,
-        endCity,
-        checkpoints,
-        routeData,
-        poisData,
-        isPublic
+      // Convert to Phoenix backend wizard format
+      const wizardData = {
+        startLocation: {
+          main_text: startCity,
+          description: `${startCity}, CA, USA` // Default description
+        },
+        endLocation: {
+          main_text: endCity,
+          description: `${endCity}, CA, USA` // Default description
+        },
+        stops: checkpoints.map(checkpoint => ({
+          main_text: checkpoint,
+          description: `${checkpoint}, CA, USA` // Default description
+        })),
+        tripType: "road-trip" // Default trip type
       };
 
-      const response = await fetch("/api/trips/save-route", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(tripData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to save trip");
+      const savedTrip = await createTripFromWizard(wizardData, false);
+      
+      if (!savedTrip) {
+        throw new Error("Failed to save trip");
       }
 
-      const savedTrip = await response.json();
-      
       toast({
         title: "Trip Saved!",
         description: `Your trip "${savedTrip.title}" has been saved successfully.`,

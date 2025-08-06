@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth-context';
+import { authenticatedApiCall, API_CONFIG } from '@/lib/api-config';
 
 export interface Trip {
   id: number;
   title: string;
-  startCity: string;
-  endCity: string;
-  checkpoints: string[];
-  routeData: {
+  start_city: string;
+  end_city: string;
+  checkpoints: { stops: string[] } | string[];
+  route_data: {
     distance: string;
     duration: string;
     start_address: string;
@@ -22,8 +23,8 @@ export interface Trip {
       end_location: { lat: number; lng: number };
     }[];
     route_points: { lat: number; lng: number }[];
-  } | null;
-  poisData: Array<{
+  } | {};
+  pois_data: Array<{
     id: number;
     name: string;
     description: string;
@@ -36,11 +37,18 @@ export interface Trip {
     address: string | null;
     priceLevel: number | null;
     isOpen: boolean | null;
-  }>;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-  userId: number | null;
+  }> | {};
+  is_public: boolean;
+  user_id: number;
+  // For backwards compatibility with frontend expectations
+  startCity?: string;
+  endCity?: string;
+  routeData?: any;
+  poisData?: any[];
+  isPublic?: boolean;
+  userId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LegacyRoute {
@@ -51,6 +59,22 @@ export interface LegacyRoute {
   placesCount: number;
   createdAt: string;
 }
+
+// Utility function to normalize Phoenix backend response to frontend expectations
+const normalizeTrip = (trip: Trip): Trip => {
+  return {
+    ...trip,
+    // Add backwards compatibility properties
+    startCity: trip.start_city,
+    endCity: trip.end_city,
+    routeData: trip.route_data,
+    poisData: Array.isArray(trip.pois_data) ? trip.pois_data : [],
+    isPublic: trip.is_public,
+    userId: trip.user_id,
+    createdAt: trip.createdAt || new Date().toISOString(),
+    updatedAt: trip.updatedAt || new Date().toISOString(),
+  };
+};
 
 export const useTrips = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -68,26 +92,9 @@ export const useTrips = () => {
     }
 
     try {
-      const response = await fetch('/api/trips', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          // Authentication error - silently handle and clear trips
-          setTrips([]);
-          setError(null);
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const tripsData = await response.json();
-      setTrips(tripsData);
+      const data = await authenticatedApiCall<{ data: Trip[] }>(API_CONFIG.ENDPOINTS.TRIPS);
+      const normalizedTrips = (data.data || []).map(normalizeTrip);
+      setTrips(normalizedTrips);
       setError(null);
     } catch (err) {
       console.error('Error fetching trips:', err);
@@ -109,17 +116,9 @@ export const useTrips = () => {
     }
 
     try {
-      const response = await fetch(`/api/trips/${tripId}`, {
+      await authenticatedApiCall(`${API_CONFIG.ENDPOINTS.TRIPS}/${tripId}`, {
         method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
 
       // Remove the trip from local state
       setTrips(prev => prev.filter(trip => trip.id !== tripId));
@@ -129,6 +128,42 @@ export const useTrips = () => {
       console.error('Error deleting trip:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete trip');
       return false;
+    }
+  };
+
+  const createTripFromWizard = async (wizardData: {
+    startLocation: { main_text: string; description: string };
+    endLocation: { main_text: string; description: string };
+    stops?: Array<{ main_text: string; description: string }>;
+    tripType?: string;
+  }, calculateRoute = true): Promise<Trip | null> => {
+    if (!isAuthenticated || !user) {
+      return null;
+    }
+
+    try {
+      const data = await authenticatedApiCall<{ data: Trip }>(
+        API_CONFIG.ENDPOINTS.TRIPS_FROM_WIZARD,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            wizard_data: wizardData,
+            calculate_route: calculateRoute,
+          }),
+        }
+      );
+
+      const normalizedTrip = normalizeTrip(data.data);
+      
+      // Add to local state
+      setTrips(prev => [...prev, normalizedTrip]);
+      setError(null);
+      
+      return normalizedTrip;
+    } catch (err) {
+      console.error('Error creating trip:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create trip');
+      return null;
     }
   };
 
@@ -157,5 +192,6 @@ export const useTrips = () => {
     refetch: fetchTrips,
     deleteTrip,
     deleteLegacyRoute,
+    createTripFromWizard,
   };
 };

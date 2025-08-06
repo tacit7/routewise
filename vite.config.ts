@@ -21,6 +21,13 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   define: {
     // Pass MSW_DISABLED environment variable to client

@@ -40,14 +40,10 @@ export default function PlaceResults() {
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
-  // Fetch Google Maps API key
-  const { data: mapsApiData, isLoading: mapsApiLoading } = useQuery<{
-    apiKey: string;
-  }>({
-    queryKey: ["/api/maps-key"],
-    staleTime: 1000 * 60 * 30, // 30 minutes
-    gcTime: 1000 * 60 * 60, // 1 hour
-  });
+  // TODO: Phoenix backend doesn't provide Maps API key endpoint yet
+  // Disable Maps API key fetching for now
+  const mapsApiData = null;
+  const mapsApiLoading = false;
 
   // Fetch POIs for the specific place
   const { data: pois, isLoading: poisLoading } = useQuery<Poi[]>({

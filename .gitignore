@@ -7,4 +7,3 @@ vite.config.ts.*
 .env
 logs/
 phoenix-backend
-

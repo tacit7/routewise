@@ -6,10 +6,8 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import Header from "@/components/header";
-import { useTrips, type Trip } from "@/hooks/use-trips";
 import { useToast } from "@/hooks/use-toast";
-import { useSuggestedTrips, useUserInterests } from "@/hooks/use-interests";
-import { useFirstTimeUser } from "@/hooks/use-first-time-user";
+import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Route, CheckCircle, Settings } from "lucide-react";
 
@@ -18,20 +16,25 @@ const Dashboard = () => {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  // Use our new interests hooks
-  const {
-    trips: suggestedTrips,
-    isLoading: isLoadingSuggested,
-    isError: hasTripsError,
-  } = useSuggestedTrips(4);
-  const { enabledInterestNames, isLoading: isLoadingInterests } =
-    useUserInterests();
-  const { shouldShowFirstTimeExperience, hasInterestsConfigured } =
-    useFirstTimeUser();
-
-  // Check user's actual trips to determine empty state
-  const { trips: userTrips, loading: isLoadingUserTrips } = useTrips();
+  // Use the consolidated dashboard data hook
+  const { data: dashboardData, isLoading, error } = useDashboardData();
+  
+  // Extract data from consolidated response
+  const userTrips = dashboardData?.trips.user_trips || [];
+  const suggestedTrips = dashboardData?.trips.suggested_trips || [];
+  const enabledInterestNames = dashboardData?.suggested_interests || [];
+  const stats = dashboardData?.stats;
+  const categories = dashboardData?.categories;
+  
   const hasUserTrips = userTrips.length > 0;
+  const hasTripsError = !!error;
+  const isLoadingSuggested = isLoading;
+  const isLoadingInterests = isLoading;
+  const isLoadingUserTrips = isLoading;
+
+  // Simple first-time user logic based on dashboard data
+  const hasInterestsConfigured = enabledInterestNames.length > 0;
+  const shouldShowFirstTimeExperience = !hasInterestsConfigured && !isLoading;
 
   const handlePlanRoadTrip = () => {
     setLocation("/trip-planner");
@@ -50,8 +53,8 @@ const Dashboard = () => {
     localStorage.setItem(
       "routeRequest",
       JSON.stringify({
-        startLocation: trip.startLocation,
-        endLocation: trip.endLocation,
+        startLocation: trip.start_city,
+        endLocation: trip.end_city,
         timestamp: Date.now(),
       })
     );
@@ -191,7 +194,7 @@ const Dashboard = () => {
                   >
                     <div className="relative h-48">
                       <img
-                        src={trip.imageUrl}
+                        src={trip.image_url}
                         alt={trip.title}
                         className="w-full h-full object-cover"
                       />
@@ -199,7 +202,7 @@ const Dashboard = () => {
                     <CardContent className="p-4 flex flex-col flex-grow">
                       <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
                       <p className="text-sm text-gray-600 mb-2">
-                        {trip.startLocation} to {trip.endLocation}
+                        {trip.start_city} to {trip.end_city}
                       </p>
                       <p
                         className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"
@@ -357,7 +360,7 @@ const Dashboard = () => {
                 >
                   <div className="relative h-48">
                     <img
-                      src={trip.imageUrl}
+                      src={trip.image_url}
                       alt={trip.title}
                       className="w-full h-full object-cover"
                     />
@@ -365,7 +368,7 @@ const Dashboard = () => {
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      {trip.startLocation} to {trip.endLocation}
+                      {trip.start_city} to {trip.end_city}
                     </p>
                     <p
                       className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"

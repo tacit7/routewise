@@ -35,6 +35,7 @@ import { getRedisService } from "./redis-service";
 import type { InsertPoi } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const storage = getStorage();
   const googlePlacesApiKey = process.env.GOOGLE_PLACES_API_KEY;
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
   let placesService: GooglePlacesService | null = null;
@@ -913,6 +914,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Route calculation failed" });
     }
   });
+
+  // ===== DASHBOARD ENDPOINT =====
+  
+  // Get consolidated dashboard data (requires authentication)
+  app.get("/api/dashboard", 
+    AuthMiddleware.authenticate,
+    async (req, res) => {
+      try {
+        const userId = (req as any).user?.id;
+        if (!userId) {
+          return res.status(401).json({ message: "Authentication required" });
+        }
+
+        // Fetch all dashboard data in parallel
+        const [userTrips, suggestedTrips, interestCategories, userInterests] = await Promise.all([
+          // Get user's recent trips (limit to 5 for dashboard)
+          tripService.getUserTrips(userId, 5),
+          // Get suggested trips
+          suggestedTripsService.getSuggestedTripsWithRateLimit(userId, 4),
+          // Get available interest categories
+          interestsService.getInterestCategories(),
+          // Get user's enabled interests
+          interestsService.getUserInterests(userId)
+        ]);
+
+        // Calculate user stats from trips
+        const stats = userTrips.length > 0 ? {
+          total_trips: userTrips.length,
+          total_distance: "0 miles", // TODO: Calculate from route data
+          total_duration: "0 hours", // TODO: Calculate from route data  
+          favorite_categories: [] // TODO: Calculate from POI data
+        } : undefined;
+
+        // Extract suggested interests from user's enabled interests
+        const enabledInterestNames = userInterests
+          .filter(ui => ui.isEnabled)
+          .map(ui => ui.category.name);
+
+        // Get trip types and POI categories
+        const tripTypes = [
+          "road trip",
+          "city exploration", 
+          "nature adventure",
+          "cultural tour"
+        ];
+
+        const poiCategories = interestCategories.map(category => ({
+          id: category.id,
+          name: category.name,
+          display_name: category.displayName,
+          icon: category.iconName || "map-pin",
+          color: "#3B82F6" // Default color since color field doesn't exist
+        }));
+
+        // Structure response according to specification
+        const dashboardData = {
+          trips: {
+            user_trips: userTrips.map(trip => ({
+              id: trip.id,
+              title: trip.title,
+              start_city: trip.startCity,
+              end_city: trip.endCity,
+              route_data: trip.routeData ? {
+                distance: trip.routeData.distance || "unknown",
+                duration: trip.routeData.duration || "unknown"
+              } : {
+                distance: "unknown",
+                duration: "unknown"
+              },
+              pois_data: trip.poisData || [],
+              is_public: trip.isPublic || false,
+              user_id: trip.userId
+            })),
+            suggested_trips: suggestedTrips.map(trip => ({
+              id: trip.id,
+              title: trip.title,
+              start_city: trip.startCity,
+              end_city: trip.endCity,
+              route_data: {
+                distance: trip.estimatedDistance || "unknown",
+                duration: trip.estimatedDuration || "unknown"
+              },
+              is_public: true,
+              user_id: null,
+              image_url: trip.imageUrl || "",
+              description: trip.description
+            }))
+          },
+          suggested_interests: enabledInterestNames.slice(0, 8), // Limit to 8 for UI
+          categories: {
+            trip_types: tripTypes,
+            poi_categories: poiCategories
+          },
+          stats
+        };
+
+        res.json({
+          success: true,
+          data: dashboardData
+        });
+
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        res.status(500).json({ message: "Failed to fetch dashboard data" });
+      }
+    }
+  );
 
   // ===== TRIP MANAGEMENT ENDPOINTS =====
 

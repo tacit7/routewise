@@ -15,6 +15,8 @@ import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
 import NotFound from "@/pages/not-found";
 import TripIndicator from "@/components/trip-indicator";
+import AuthSuccess from "@/pages/auth-success";
+import AuthError from "@/pages/auth-error";
 
 function AuthenticatedRouter() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -42,6 +44,8 @@ function AuthenticatedRouter() {
       <Route path="/itinerary" component={ItineraryPage} />
       <Route path="/interests-demo" component={InterestsDemo} />
       <Route path="/dashboard-test" component={DashboardTest} />
+      <Route path="/auth/success" component={AuthSuccess} />
+      <Route path="/auth/error" component={AuthError} />
       <Route component={NotFound} />
     </Switch>
   );

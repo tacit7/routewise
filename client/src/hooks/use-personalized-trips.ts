@@ -101,7 +101,7 @@ export function usePersonalizedTrips() {
     }
 
     // Interest keywords in description (10% weight)
-    if (poi.description) {
+    if (poi.description && interests.preferences?.interests) {
       const descriptionLower = poi.description.toLowerCase();
       const matchingInterests = interests.preferences.interests.filter(interest =>
         descriptionLower.includes(interest.toLowerCase())
@@ -119,7 +119,7 @@ export function usePersonalizedTrips() {
         categoryBalance: [],
         budgetAnalysis: { estimatedCost: 0, budgetRange: 'low', recommendation: '' },
         timeDistribution: { estimatedDuration: 0, suggestedTimeOfDay: [], timeManagementTips: [] },
-        missingInterests: userInterests?.preferences.interests || [],
+        missingInterests: userInterests?.preferences?.interests || [],
         overallScore: 0
       };
     }
@@ -160,7 +160,7 @@ export function usePersonalizedTrips() {
 
     // Missing interests
     const tripCategories = new Set(tripPlaces.map(p => p.category));
-    const missingInterests = userInterests.preferences.interests.filter(interest => {
+    const missingInterests = userInterests.preferences?.interests?.filter(interest => {
       // Simple keyword matching - could be enhanced with better categorization
       const relatedCategories = {
         food: ['restaurant'],
@@ -173,12 +173,14 @@ export function usePersonalizedTrips() {
       
       const related = relatedCategories[interest as keyof typeof relatedCategories] || [];
       return !related.some(cat => tripCategories.has(cat));
-    });
+    }) || [];
 
     // Overall score (0-100)
     const categoryScore = categoryBalance.filter(c => c.recommendation === 'good').length / categoryBalance.length;
     const budgetScore = budgetMatch ? 1 : 0.5;
-    const interestScore = 1 - (missingInterests.length / userInterests.preferences.interests.length);
+    const interestScore = userInterests.preferences?.interests?.length 
+      ? 1 - (missingInterests.length / userInterests.preferences.interests.length)
+      : 0;
     const ratingScore = tripStats.averageRating / 5;
     
     const overallScore = Math.round((categoryScore * 0.3 + budgetScore * 0.2 + interestScore * 0.3 + ratingScore * 0.2) * 100);
