@@ -455,6 +455,51 @@ export interface DataEngineConfig {
 }
 
 /**
+ * Route results API types
+ */
+export interface POI {
+  id: number;
+  placeId: string;
+  name: string;
+  address: string;
+  rating: string;
+  category: string;
+  lat: number;
+  lng: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RouteInfo {
+  distance: string;
+  duration: string;
+  start_location: string;
+  end_location: string;
+  waypoints: any[];
+}
+
+export interface RouteMeta {
+  total_pois: number;
+  route_distance: string;
+  estimated_duration: string;
+  maps_available: boolean;
+}
+
+export interface RouteResultsData {
+  pois: POI[];
+  route: RouteInfo;
+  maps_api_key: string;
+  trip_places: any[];
+  meta: RouteMeta;
+}
+
+export interface RouteResultsAPIResponse {
+  success: boolean;
+  data: RouteResultsData;
+  timestamp: string;
+}
+
+/**
  * Export commonly used type combinations
  */
 export type StandardAPIResponse<T> = Promise<APIResponse<T>>;

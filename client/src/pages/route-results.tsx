@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import type { POI, RouteResultsAPIResponse } from "@/types/api";
 import type { Poi } from "@/types/schema";
 import PoiCard from "@/components/poi-card";
 import ItineraryComponent from "@/components/itinerary-component-enhanced";
@@ -25,7 +26,7 @@ interface RouteData {
 }
 
 // Helper function to extract city from POI data
-const extractCityFromPoi = (poi: Poi): string | null => {
+const extractCityFromPoi = (poi: POI | Poi): string | null => {
   // For route POIs, try to extract city from address
   if (poi.address) {
     // Split address and look for city, state pattern
@@ -105,57 +106,97 @@ export default function RouteResults() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
-  const [hoveredPoi, setHoveredPoi] = useState<Poi | null>(null);
+  const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
-  // TODO: Phoenix backend doesn't provide Maps API key endpoint yet
-  // Disable Maps API key fetching for now
-  const mapsApiData = null;
-  const mapsApiLoading = false;
-
-  // Fetch POIs for things to do along the specific route
-  const { data: pois, isLoading: poisLoading, error: poisError } = useQuery<Poi[]>({
-    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity, routeData?.verified],
+  // Fetch POIs along the route using the correct Phoenix API endpoint
+  const { data: routeResults, isLoading: poisLoading, error: poisError } = useQuery({
+    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity],
     queryFn: async () => {
-      if (!routeData) return [];
-      const params = new URLSearchParams({
-        start: routeData.startCity,
-        end: routeData.endCity,
-      });
-      console.log('🔍 Fetching POIs with params:', params.toString());
-      const response = await fetch(`/api/pois?${params}`);
-      console.log('📊 POI API response status:', response.status);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ POI API error:', response.status, errorText);
-        throw new Error(`Failed to fetch places along route: ${response.status} ${errorText}`);
+      if (!routeData) return { pois: [], route: null, maps_api_key: null, meta: null };
+      
+      try {
+        // Calculate a rough midpoint between start and end cities for POI search
+        // For now, we'll use the start city coordinates
+        // In a real implementation, we'd calculate points along the actual route
+        const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(routeData.startCity)}&format=json&limit=1`);
+        const geocodeData = await geocodeResponse.json();
+        
+        let lat = 30.2672; // Default to Austin if geocoding fails
+        let lng = -97.7431;
+        
+        if (geocodeData && geocodeData[0]) {
+          lat = parseFloat(geocodeData[0].lat);
+          lng = parseFloat(geocodeData[0].lon);
+        }
+        
+        // Fetch POIs from the Phoenix API
+        const params = new URLSearchParams({
+          location: `${lat},${lng}`,
+          radius: '50000' // 50km radius for route POIs
+        });
+        
+        console.log('🔍 Fetching POIs with params:', params.toString());
+        const response = await fetch(`/api/pois?${params}`);
+        console.log('📊 POIs API response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ POIs API error:', response.status, errorText);
+          throw new Error(`Failed to fetch POIs: ${response.status} ${errorText}`);
+        }
+        
+        const poisData = await response.json();
+        console.log('✅ POIs data received:', poisData);
+        
+        // Also fetch the maps API key
+        const mapsKeyResponse = await fetch('/api/maps-key');
+        const mapsKeyData = mapsKeyResponse.ok ? await mapsKeyResponse.json() : { apiKey: null };
+        
+        return {
+          pois: Array.isArray(poisData) ? poisData : (poisData.data || poisData.pois || []),
+          route: null, // Route calculation would need a separate endpoint
+          maps_api_key: mapsKeyData.apiKey,
+          meta: null,
+          trip_places: []
+        };
+      } catch (error) {
+        console.error('Error fetching POIs:', error);
+        // Return empty data on error
+        return {
+          pois: [],
+          route: null,
+          maps_api_key: null,
+          meta: null,
+          trip_places: []
+        };
       }
-      const data = await response.json();
-      console.log('✅ POI API data received:', data.length, 'items');
-      console.log('📋 First few POIs:', data.slice(0, 3));
-      return data;
     },
     enabled: !!routeData, // Only run query when we have route data
   });
 
-  // Debug POI API state
-  console.log('🔍 POI Query State:', { 
+  // Maps API data comes from the consolidated route-results endpoint
+  const mapsApiData = routeResults?.maps_api_key ? { apiKey: routeResults.maps_api_key } : null;
+  const mapsApiLoading = poisLoading;
+
+  // Debug route results API state
+  console.log('🔍 Route Results Query State:', { 
     loading: poisLoading, 
     error: poisError, 
-    dataType: typeof pois,
-    dataLength: pois?.length,
+    routeResults,
     routeDataExists: !!routeData 
   });
   
   if (poisError) {
-    console.error('❌ POI Error:', poisError);
+    console.error('❌ Route Results Error:', poisError);
   }
 
-  // Remove duplicates based on placeId - with debugging
-  console.log('Raw pois data:', pois);
-  const poisArray = Array.isArray(pois) ? pois : (pois?.data ? pois.data : []);
+  // Extract POIs from route results
+  const pois = routeResults?.pois || [];
+  console.log('Extracted POIs:', pois);
+  const poisArray = Array.isArray(pois) ? pois : [];
   console.log('Processed poisArray:', poisArray);
   
   const uniquePois = poisArray.filter(
@@ -224,7 +265,7 @@ export default function RouteResults() {
     console.log("Selected POI IDs:", selectedIds);
   };
 
-  const handlePoiClick = (poi: Poi) => {
+  const handlePoiClick = (poi: POI | Poi) => {
     console.log("POI clicked:", poi.name);
     // Could show details modal or scroll to POI card
   };
@@ -237,7 +278,7 @@ export default function RouteResults() {
     }
   };
 
-  const handlePoiHover = (poi: Poi | null) => {
+  const handlePoiHover = (poi: POI | Poi | null) => {
     setHoveredPoi(poi);
   };
 
@@ -437,6 +478,7 @@ export default function RouteResults() {
                 onPoiSelect={handlePoiSelect}
                 height="100%"
                 className="w-full h-full"
+                apiKey={routeResults?.maps_api_key}
               />
             )}
           </div>

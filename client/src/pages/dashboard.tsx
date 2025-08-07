@@ -18,14 +18,14 @@ const Dashboard = () => {
 
   // Use the consolidated dashboard data hook
   const { data: dashboardData, isLoading, error } = useDashboardData();
-  
+
   // Extract data from consolidated response
   const userTrips = dashboardData?.trips.user_trips || [];
   const suggestedTrips = dashboardData?.trips.suggested_trips || [];
   const enabledInterestNames = dashboardData?.suggested_interests || [];
   const stats = dashboardData?.stats;
   const categories = dashboardData?.categories;
-  
+
   const hasUserTrips = userTrips.length > 0;
   const hasTripsError = !!error;
   const isLoadingSuggested = isLoading;
@@ -74,21 +74,18 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <div className="bg-gray-50 min-h-screen">
+      <div className="min-h-screen">
         <Header />
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
           {/* Empty State Hero Section */}
           <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
             {/* Heading */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">
-              Let's get your next adventure started!
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-8">Let's get your next adventure started!</h1>
 
             {/* Subtext */}
             <p className="text-xl text-gray-600 mb-12">
-              You haven't planned any trips yet. Start your first adventure
-              below.
+              You haven't planned any trips yet. Start your first adventure below.
             </p>
 
             {/* Action Button */}
@@ -118,9 +115,7 @@ const Dashboard = () => {
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Personalize Your Trip Suggestions
-                  </h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
                 </div>
                 <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                   Tell us what you're into to get tailored recommendations.
@@ -141,32 +136,20 @@ const Dashboard = () => {
 
           {/* Suggested Trips Section */}
           <section className="text-center flex-shrink-0">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
-              Suggested Trips
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
 
             {hasTripsError ? (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Failed to load suggestions
-                  </h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load suggestions</h3>
                   <p className="text-gray-600 mb-6">
-                    We couldn't load your personalized trip suggestions. Please
-                    try again later.
+                    We couldn't load your personalized trip suggestions. Please try again later.
                   </p>
-                  <Button
-                    onClick={() => window.location.reload()}
-                    variant="outline"
-                    className="mr-2"
-                  >
+                  <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                     Try Again
                   </Button>
-                  <Button
-                    onClick={handleCustomizeInterests}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
+                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                     <Settings className="w-4 h-4 mr-2" />
                     Update Interests
                   </Button>
@@ -188,16 +171,9 @@ const Dashboard = () => {
             ) : suggestedTrips.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {suggestedTrips.map((trip) => (
-                  <Card
-                    key={trip.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                  >
+                  <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                     <div className="relative h-48">
-                      <img
-                        src={trip.image_url}
-                        alt={trip.title}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover" />
                     </div>
                     <CardContent className="p-4 flex flex-col flex-grow">
                       <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
@@ -228,17 +204,9 @@ const Dashboard = () => {
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No trips available
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Customize your interests to get personalized trip
-                    suggestions.
-                  </p>
-                  <Button
-                    onClick={handleCustomizeInterests}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No trips available</h3>
+                  <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
+                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                     <Settings className="w-4 h-4 mr-2" />
                     Set Your Interests
                   </Button>
@@ -284,9 +252,7 @@ const Dashboard = () => {
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                   <CheckCircle className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Personalize Your Trip Suggestions
-                </h2>
+                <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
               </div>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                 Tell us what you're into to get tailored recommendations.
@@ -307,32 +273,20 @@ const Dashboard = () => {
 
         {/* Suggested Trips Section */}
         <section className="text-center flex-shrink-0">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Suggested Trips
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
 
           {hasTripsError ? (
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Failed to load suggestions
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load suggestions</h3>
                 <p className="text-gray-600 mb-6">
-                  We couldn't load your personalized trip suggestions. Please
-                  try again later.
+                  We couldn't load your personalized trip suggestions. Please try again later.
                 </p>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="outline"
-                  className="mr-2"
-                >
+                <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                   Try Again
                 </Button>
-                <Button
-                  onClick={handleCustomizeInterests}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
+                <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                   <Settings className="w-4 h-4 mr-2" />
                   Update Interests
                 </Button>
@@ -354,16 +308,9 @@ const Dashboard = () => {
           ) : suggestedTrips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {suggestedTrips.map((trip) => (
-                <Card
-                  key={trip.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                >
+                <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <div className="relative h-48">
-                    <img
-                      src={trip.image_url}
-                      alt={trip.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover" />
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
@@ -394,16 +341,9 @@ const Dashboard = () => {
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No trips available
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Customize your interests to get personalized trip suggestions.
-                </p>
-                <Button
-                  onClick={handleCustomizeInterests}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No trips available</h3>
+                <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
+                <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                   <Settings className="w-4 h-4 mr-2" />
                   Set Your Interests
                 </Button>

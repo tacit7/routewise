@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Loader2, ExternalLink, MapPin, Flag, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 
 interface InteractiveMapProps {
@@ -15,6 +15,7 @@ interface InteractiveMapProps {
   onPoiSelect?: (poiId: number, selected: boolean) => void;
   className?: string;
   height?: string;
+  apiKey?: string; // Optional API key to avoid fetching separately
 }
 
 // POI category to marker color mapping
@@ -117,6 +118,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   onPoiSelect,
   className = "",
   height = "400px",
+  apiKey,
 }) => {
   // Trip management hook
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
@@ -139,25 +141,31 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
 
-  // Fetch Google Maps API key
+  // Set Google Maps API key (either from prop or fetch from API)
   useEffect(() => {
-    const fetchMapsKey = async () => {
-      try {
-        const response = await fetch("/api/maps-key");
-        const data = await response.json();
-        if (data.apiKey) {
-          setGoogleMapsKey(data.apiKey);
-        } else {
-          setError("Google Maps API key not configured");
+    if (apiKey) {
+      // Use API key provided as prop (from consolidated endpoint)
+      setGoogleMapsKey(apiKey);
+    } else {
+      // Fallback to fetching from separate endpoint
+      const fetchMapsKey = async () => {
+        try {
+          const response = await fetch("/api/maps-key");
+          const data = await response.json();
+          if (data.apiKey) {
+            setGoogleMapsKey(data.apiKey);
+          } else {
+            setError("Google Maps API key not configured");
+          }
+        } catch (err) {
+          console.error("Failed to fetch Maps API key:", err);
+          setError("Failed to load map configuration");
         }
-      } catch (err) {
-        console.error("Failed to fetch Maps API key:", err);
-        setError("Failed to load map configuration");
-      }
-    };
+      };
 
-    fetchMapsKey();
-  }, []);
+      fetchMapsKey();
+    }
+  }, [apiKey]);
 
   // Load Google Maps JavaScript API with async loading pattern
   const loadGoogleMapsScript = useCallback((apiKey: string): Promise<void> => {

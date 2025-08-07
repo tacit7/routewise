@@ -19,8 +19,7 @@
     "test:performance:bundle": "node test/performance/run-performance-tests.js bundle",
     "test:a11y": "playwright test test/accessibility/a11y.spec.ts",
     "test:a11y:report": "playwright test test/accessibility/a11y.spec.ts --reporter=html",
-    "test:all": "npm run test && npm run test:e2e && npm run test:performance && npm run test:a11y",
-    "msw:init": "msw init client/public --save"
+    "test:all": "npm run test && npm run test:e2e && npm run test:performance && npm run test:a11y"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
@@ -99,7 +98,6 @@
     "happy-dom": "^18.0.1",
     "k6": "^0.0.0",
     "lighthouse": "^12.8.1",
-    "msw": "^2.10.4",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
@@ -109,10 +107,5 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
-  },
-  "msw": {
-    "workerDirectory": [
-      "client/public"
-    ]
   }
 }

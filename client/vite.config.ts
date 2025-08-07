@@ -25,8 +25,4 @@ export default defineConfig({
       },
     },
   },
-  define: {
-    // Disable MSW for Phoenix backend integration
-    "import.meta.env.VITE_MSW_DISABLED": JSON.stringify("true"),
-  },
 });
