@@ -26,13 +26,26 @@ and file edits
 - `npm run test:e2e` - Run end-to-end tests with Playwright
 - `npm run test:performance` - Run performance tests
 
-### MSW (Mock Service Worker)
+## Recent Updates - August 7, 2025 - Session 21
 
-- `npm run msw:init` - Initialize MSW for API mocking
-- MSW can be disabled with `MSW_DISABLED=true` environment variable
-- Mock responses stored in `client/src/mocks/` directory
+### MSW Complete Removal
+- **REMOVED**: MSW (Mock Service Worker) completely removed from project
+- **Reason**: Migrated to Phoenix backend, MSW no longer needed
+- **Deleted**: All mock files, MSW dependencies, Vite configuration
+- **Replaced**: Mock data with inline DEFAULT_INTEREST_CATEGORIES in types/interests.ts
 
-## Recent Updates - January 2, 2025
+### Phoenix Backend Integration Complete
+- **Endpoint**: `/api/route-results` working correctly with 15 POIs
+- **City Autocomplete**: Fixed to use `/api/places/autocomplete` with `input` parameter
+- **API Key**: Google Maps API key configuration resolved by backend team
+
+### Critical Fixes Applied
+- **TypeScript Runtime Errors**: Added optional chaining to prevent "Cannot read properties of undefined"
+- **Variable Naming Conflicts**: Resolved scope conflicts in route-results query function
+- **React Query Caching**: Disabled for development debugging (needs re-enabling for prod)
+- **404 Import Errors**: Fixed all references to deleted MSW files
+
+## Previous Updates - January 2, 2025
 
 ### City Autocomplete Enhancements
 - **Downshift Migration**: Migrated from shadcn/ui Command/Popover to downshift v9.0.10 for better accessibility
