@@ -74,7 +74,7 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
         <Header />
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
@@ -219,7 +219,7 @@ const Dashboard = () => {
     );
   }
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <Header />
 

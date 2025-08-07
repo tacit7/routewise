@@ -5,7 +5,7 @@ import type {
   FrontendInterestCategory,
   FrontendSuggestedTrip,
 } from "@/types/interests";
-import { MOCK_INTEREST_CATEGORIES } from "@/mocks/interests-data";
+import { DEFAULT_INTEREST_CATEGORIES } from "@/types/interests";
 
 /**
  * Image mapping for interest categories
@@ -166,7 +166,7 @@ export function transformInterestSelectionsToBackend(
  * Fallback to mock data when API is unavailable
  */
 export function getFallbackInterestCategories(): FrontendInterestCategory[] {
-  return MOCK_INTEREST_CATEGORIES;
+  return DEFAULT_INTEREST_CATEGORIES;
 }
 
 /**

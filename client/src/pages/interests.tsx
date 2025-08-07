@@ -43,7 +43,7 @@ const InterestsPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       <Header />
       
       {/* Welcome section for new users */}

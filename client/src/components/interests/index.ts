@@ -25,13 +25,10 @@ export type {
   CustomizeInterestsModalProps
 } from '../../types/interests';
 
-// Mock Data
+// Default Data (previously mock data)
 export {
-  MOCK_INTEREST_CATEGORIES,
-  MOCK_SUGGESTED_TRIPS,
-  getPersonalizedTrips,
-  MOCK_USER_INTERESTS
-} from '../../mocks/interests-data';
+  DEFAULT_INTEREST_CATEGORIES
+} from '../../types/interests';
 
 /**
  * Component Architecture Overview

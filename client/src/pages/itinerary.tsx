@@ -7,6 +7,27 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/components/auth-context';
 import { Clock } from 'lucide-react';
 import type { Poi } from '@shared/schema';
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragEndEvent,
+  DragOverEvent,
+  closestCenter,
+  rectIntersection,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import {
+  CSS,
+} from '@dnd-kit/utilities';
 
 // Extended interface for itinerary organization
 export interface ItineraryPlace extends Poi {
@@ -15,6 +36,107 @@ export interface ItineraryPlace extends Poi {
   dayOrder?: number;
   notes?: string;
 }
+
+// Sortable Place Item Component
+const SortablePlaceItem = ({ 
+  place, 
+  onTimeChange, 
+  onRemove 
+}: {
+  place: ItineraryPlace;
+  onTimeChange: (placeId: string | number, newTime: string) => void;
+  onRemove: (placeId: string | number) => void;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: place.placeId || place.id,
+    data: {
+      type: 'place',
+      place,
+    }
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const handleTimeChange = (newTime: string) => {
+    onTimeChange(place.placeId || place.id, newTime);
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`itinerary-card group ${
+        isDragging ? 'itinerary-card-dragging' : ''
+      }`}
+    >
+      {/* Header Row */}
+      <div className="flex items-start justify-between mb-3 p-3 pb-0">
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-base mb-1" style={{ color: 'var(--text)' }}>
+            {place.name}
+          </div>
+          <div className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>
+            {place.category}
+          </div>
+        </div>
+        
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 transition-colors"
+        >
+          <GripVertical 
+            className="h-4 w-4 transition-colors" 
+            style={{ color: 'var(--text-muted)' }}
+          />
+        </div>
+      </div>
+
+      {/* Body Row */}
+      <div className="flex items-center justify-between px-3 pb-3">
+        <div className="flex items-center gap-3">
+          {/* Time pill */}
+          <div className="time-pill">
+            <Clock className="h-3 w-3 mr-2 inline" style={{ color: 'var(--text-muted)' }} />
+            <input
+              type="time"
+              value={place.scheduledTime || '09:00'}
+              onChange={(e) => handleTimeChange(e.target.value)}
+              className="bg-transparent border-none outline-none text-sm"
+              style={{ color: 'var(--text)' }}
+            />
+          </div>
+          
+          {/* Rating pill */}
+          {place.rating && (
+            <div className="rating-pill">
+              <span style={{ color: 'var(--warning)' }}>⭐</span>
+              <span>{place.rating}</span>
+            </div>
+          )}
+        </div>
+        
+        <button
+          onClick={() => onRemove(place.placeId || place.id)}
+          className="text-xs opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded hover:bg-red-50 hover:text-red-500"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export interface DayData {
   date: Date;
@@ -31,16 +153,19 @@ const DayTabNavigation = ({ days, activeDay, onDaySelect, onAddDay }: {
   onDaySelect: (index: number) => void;
   onAddDay: () => void;
 }) => (
-  <div className="border-b bg-white px-6 py-3">
+  <div className="border-b px-6 py-3" style={{ 
+    background: 'var(--surface)', 
+    borderColor: 'var(--border)' 
+  }}>
     <div className="flex items-center gap-2 overflow-x-auto">
       {days.map((day, index) => (
         <button
           key={index}
           onClick={() => onDaySelect(index)}
-          className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+          className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
             activeDay === index
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'day-tab-active'
+              : 'day-tab'
           }`}
         >
           Day {index + 1}
@@ -51,7 +176,7 @@ const DayTabNavigation = ({ days, activeDay, onDaySelect, onAddDay }: {
       ))}
       <button
         onClick={onAddDay}
-        className="flex-shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 transition-colors"
+        className="flex-shrink-0 px-3 py-2 rounded-lg day-tab"
       >
         <Plus className="h-4 w-4" />
       </button>
@@ -65,15 +190,18 @@ const DailyItinerarySidebar = ({
   dayIndex, 
   onPlaceUpdate,
   onPlaceRemove,
-  onPlaceAssignment
+  onPlaceAssignment,
+  onPlaceReorder
 }: {
   day: DayData;
   dayIndex: number;
   onPlaceUpdate?: (placeId: string | number, updates: Partial<ItineraryPlace>) => void;
   onPlaceRemove?: (placeId: string | number) => void;
   onPlaceAssignment?: (place: ItineraryPlace, dayIndex: number) => void;
+  onPlaceReorder?: (dayIndex: number, places: ItineraryPlace[]) => void;
 }) => {
   const [draggedOver, setDraggedOver] = useState(false);
+  
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDraggedOver(false);
@@ -112,20 +240,34 @@ const DailyItinerarySidebar = ({
     onPlaceUpdate?.(placeId, { scheduledTime: newTime });
   };
 
-  // Sort places by scheduled time
+  // Use dayOrder for sorting instead of time, fallback to time if no dayOrder
   const sortedPlaces = [...day.places].sort((a, b) => {
+    if (a.dayOrder !== undefined && b.dayOrder !== undefined) {
+      return a.dayOrder - b.dayOrder;
+    }
     const timeA = a.scheduledTime || '00:00';
     const timeB = b.scheduledTime || '00:00';
     return timeA.localeCompare(timeB);
   });
 
+  const placeIds = sortedPlaces.map(place => place.placeId || place.id);
 
   return (
-    <div className="w-96 bg-white border-r border-gray-200 h-full overflow-y-auto">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Day {dayIndex + 1}</h2>
-        {day.title && <p className="text-sm text-gray-600">{day.title}</p>}
-        <p className="text-xs text-gray-500">
+    <div className="w-96 h-full overflow-y-auto" style={{ 
+      background: 'var(--surface)', 
+      borderRight: '1px solid var(--border)' 
+    }}>
+      {/* Section Header */}
+      <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+          Day {dayIndex + 1}
+        </h2>
+        {day.title && (
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            {day.title}
+          </p>
+        )}
+        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
           {day.date.toLocaleDateString()}
         </p>
       </div>
@@ -133,10 +275,10 @@ const DailyItinerarySidebar = ({
       {/* Drop zone for places */}
       <div className="p-4">
         <div 
-          className={`min-h-32 border-2 border-dashed rounded-lg p-4 transition-colors ${
+          className={`min-h-32 p-4 transition-all ${
             draggedOver 
-              ? 'border-blue-400 bg-blue-50' 
-              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              ? 'drop-zone-active' 
+              : 'drop-zone'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -145,61 +287,30 @@ const DailyItinerarySidebar = ({
         >
           {sortedPlaces.length === 0 && (
             <div className="text-center py-8">
-              <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Drag places here to schedule them</p>
-              <p className="text-xs text-gray-400">Set custom times for each place</p>
+              <Clock className="h-8 w-8 mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
+              <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
+                Drag places here to start your day
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Set custom times for each place
+              </p>
             </div>
           )}
           
-          <div className="space-y-3">
-            {sortedPlaces.map((place) => (
-              <div
-                key={place.placeId || place.id}
-                className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow group cursor-move"
-                draggable
-                onDragStart={(e) => {
-                  console.log('Dragging place from sidebar:', place.name);
-                  e.dataTransfer.setData('application/json', JSON.stringify(place));
-                  e.dataTransfer.effectAllowed = 'move';
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm mb-1">{place.name}</div>
-                    <div className="text-xs text-gray-500 capitalize mb-2">{place.category}</div>
-                    
-                    {/* Time input */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-gray-400" />
-                      <input
-                        type="time"
-                        value={place.scheduledTime || '09:00'}
-                        onChange={(e) => handleTimeChange(place.placeId || place.id, e.target.value)}
-                        className="text-sm border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    {place.rating && (
-                      <div className="flex items-center text-xs text-gray-500">
-                        <span className="text-yellow-500">⭐</span>
-                        <span className="ml-1">{place.rating}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col gap-1">
-                    <GripVertical className="h-4 w-4 text-gray-400 cursor-move opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <button
-                      onClick={() => onPlaceRemove?.(place.placeId || place.id)}
-                      className="text-gray-400 hover:text-red-500 text-sm opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
+          {sortedPlaces.length > 0 && (
+            <SortableContext items={placeIds} strategy={verticalListSortingStrategy}>
+              <div className="space-y-3">
+                {sortedPlaces.map((place) => (
+                  <SortablePlaceItem
+                    key={place.placeId || place.id}
+                    place={place}
+                    onTimeChange={handleTimeChange}
+                    onRemove={onPlaceRemove!}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          )}
         </div>
       </div>
     </div>
@@ -267,49 +378,72 @@ const TripPlacesGrid = ({ places, onPlaceReturn }: {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Your Trip Places</h2>
-        <p className="text-gray-600 text-sm">
+      {/* Panel container with UX spec styling */}
+      <div className="trip-places-panel mb-4">
+        <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
+          Your Trip Places
+        </h2>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
           Drag places to schedule them, or drag scheduled places back here to unschedule
         </p>
+        
         {isDraggedOver && (
-          <div className="mt-2 p-2 bg-blue-100 border border-blue-200 rounded text-blue-700 text-sm">
+          <div className="mb-4 p-3 rounded border-2 border-dashed" 
+               style={{ 
+                 borderColor: 'var(--primary-200)', 
+                 background: 'var(--primary-50)',
+                 color: 'var(--text-muted)'
+               }}>
             Drop here to unschedule this place
           </div>
         )}
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {places.map((place) => (
-          <div
-            key={place.id}
-            className={`bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all cursor-move ${
-              draggedItem?.id === place.id ? 'opacity-50 scale-95' : ''
-            }`}
-            draggable
-            onDragStart={(e) => handleDragStart(e, place)}
-            onDragEnd={handleDragEnd}
-          >
-            {place.imageUrl && (
-              <img
-                src={place.imageUrl}
-                alt={place.name}
-                className="w-full h-32 object-cover"
-              />
-            )}
-            <div className="p-3">
-              <h3 className="font-medium text-sm mb-1">{place.name}</h3>
-              <p className="text-xs text-gray-600 mb-2 capitalize">{place.category}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-xs text-gray-500">
-                  <span className="text-yellow-500">⭐</span>
-                  <span className="ml-1">{place.rating}</span>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {places.map((place) => (
+            <div
+              key={place.id}
+              className={`itinerary-card overflow-hidden cursor-move ${
+                draggedItem?.id === place.id ? 'itinerary-card-dragging' : ''
+              }`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, place)}
+              onDragEnd={handleDragEnd}
+            >
+              {place.imageUrl && (
+                <img
+                  src={place.imageUrl}
+                  alt={place.name}
+                  className="w-full h-32 object-cover rounded-t-2xl"
+                />
+              )}
+              <div className="p-3">
+                {/* Header Row */}
+                <div className="mb-3">
+                  <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text)' }}>
+                    {place.name}
+                  </h3>
+                  <p className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>
+                    {place.category}
+                  </p>
                 </div>
-                <GripVertical className="h-4 w-4 text-gray-400" />
+                
+                {/* Body Row */}
+                <div className="flex items-center justify-between">
+                  {place.rating && (
+                    <div className="rating-pill">
+                      <span style={{ color: 'var(--warning)' }}>⭐</span>
+                      <span>{place.rating}</span>
+                    </div>
+                  )}
+                  <GripVertical 
+                    className="h-4 w-4" 
+                    style={{ color: 'var(--text-muted)' }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -332,6 +466,16 @@ export default function ItineraryPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState('');
+  const [activeDragId, setActiveDragId] = useState<string | number | null>(null);
+
+  // Drag sensors for dnd-kit
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px drag distance before activating
+      },
+    })
+  );
 
   // Track which places are already assigned to avoid duplicates
   const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
@@ -414,7 +558,7 @@ export default function ItineraryPage() {
       ...place,
       dayIndex,
       scheduledTime: '09:00', // Default time
-      dayOrder: days[dayIndex].places.length,
+      dayOrder: days[dayIndex].places.length, // Add to end of day
     };
 
     setDays(prevDays => {
@@ -470,6 +614,70 @@ export default function ItineraryPage() {
         }),
       }))
     );
+  };
+
+  const handlePlaceReorder = (dayIndex: number, newPlaces: ItineraryPlace[]) => {
+    setDays(prevDays => {
+      const newDays = [...prevDays];
+      // Update dayOrder for each place based on new position
+      const updatedPlaces = newPlaces.map((place, index) => ({
+        ...place,
+        dayOrder: index,
+      }));
+      newDays[dayIndex] = {
+        ...newDays[dayIndex],
+        places: updatedPlaces,
+      };
+      return newDays;
+    });
+  };
+
+  // Drag event handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragId(null);
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // Get the data from the dragged item
+    const activeData = active.data.current;
+    
+    if (activeData?.type === 'place') {
+      // This is a place being reordered within a day
+      const activePlace = activeData.place as ItineraryPlace;
+      const activeDayIndex = activePlace.dayIndex;
+      
+      if (activeDayIndex !== undefined) {
+        const activeDay = days[activeDayIndex];
+        const oldIndex = activeDay.places.findIndex(
+          p => (p.placeId || p.id) === active.id
+        );
+        const newIndex = activeDay.places.findIndex(
+          p => (p.placeId || p.id) === over.id
+        );
+
+        if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+          const newPlaces = arrayMove(activeDay.places, oldIndex, newIndex);
+          handlePlaceReorder(activeDayIndex, newPlaces);
+          
+          toast({
+            title: "Place reordered",
+            description: `${activePlace.name} moved to position ${newIndex + 1}`,
+          });
+        }
+      }
+    }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    // Handle drag over for potential future cross-day dragging
+    // For now, we keep reordering within the same day
   };
 
 
@@ -620,13 +828,22 @@ export default function ItineraryPage() {
 
   if (tripPlaces.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">No Trip Places Found</h1>
-          <p className="text-gray-600 mb-6">
-            You need to add places to your trip first.
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="text-center p-8 rounded-2xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>
+            You've scheduled all your places
+          </h1>
+          <p className="mb-6" style={{ color: 'var(--text-muted)' }}>
+            Add more places to your trip or go back to see your route.
           </p>
-          <Button onClick={handleGoBack}>
+          <Button 
+            onClick={handleGoBack}
+            className="font-medium text-white transition-all"
+            style={{ 
+              backgroundColor: 'var(--primary)',
+              borderRadius: 'var(--radius)'
+            }}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Route Results
           </Button>
@@ -636,108 +853,134 @@ export default function ItineraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoBack}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Route Results
-            </Button>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <input
-                  type="text"
-                  placeholder={generateTripTitle()}
-                  value={tripTitle}
-                  onChange={(e) => setTripTitle(e.target.value)}
-                  className="text-2xl font-bold bg-transparent border-none outline-none focus:bg-gray-50 rounded px-2 py-1 flex-1"
-                  style={{ minWidth: '200px' }}
-                />
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+        {/* Header */}
+        <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+          <div className="px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="hover:bg-gray-100 transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Route Results
+              </Button>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <input
+                    type="text"
+                    placeholder={generateTripTitle()}
+                    value={tripTitle}
+                    onChange={(e) => setTripTitle(e.target.value)}
+                    className="text-2xl font-bold bg-transparent border-none outline-none focus:bg-gray-50 rounded px-2 py-1 flex-1"
+                    style={{ 
+                      minWidth: '200px',
+                      color: 'var(--text)'
+                    }}
+                  />
+                </div>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Organize your {tripPlaces.length} saved places into daily plans
+                  {!isAuthenticated && (
+                    <span className="ml-2" style={{ color: 'var(--warning)' }}>
+                      • Sign in to save your trip
+                    </span>
+                  )}
+                </p>
               </div>
-              <p className="text-sm text-gray-600">
-                Organize your {tripPlaces.length} saved places into daily plans
-                {!isAuthenticated && (
-                  <span className="ml-2 text-amber-600">• Sign in to save your trip</span>
+            </div>
+            <div className="flex items-center gap-3">
+              {lastSavedAt && (
+                <div className="text-sm flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                  <Check className="h-4 w-4" style={{ color: 'var(--success)' }} />
+                  Saved {lastSavedAt.toLocaleTimeString()}
+                </div>
+              )}
+              <Button
+                onClick={isAuthenticated ? handleSaveTrip : () => {
+                  toast({
+                    title: "Sign in to save your trip",
+                    description: "Go to the home page to sign in with Google or create an account. Your progress is saved locally.",
+                  });
+                  setLocation('/');
+                }}
+                disabled={isSaving || days.every(day => day.places.length === 0)}
+                className="font-medium text-white transition-all"
+                style={{ 
+                  backgroundColor: 'var(--primary)',
+                  borderRadius: 'var(--radius)'
+                }}
+              >
+                {isSaving ? (
+                  <>
+                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Saving...
+                  </>
+                ) : isAuthenticated ? (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Trip
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign In to Save
+                  </>
                 )}
-              </p>
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {lastSavedAt && (
-              <div className="text-sm text-gray-500 flex items-center gap-1">
-                <Check className="h-4 w-4 text-green-600" />
-                Saved {lastSavedAt.toLocaleTimeString()}
-              </div>
-            )}
-            <Button
-              onClick={isAuthenticated ? handleSaveTrip : () => {
-                toast({
-                  title: "Sign in to save your trip",
-                  description: "Go to the home page to sign in with Google or create an account. Your progress is saved locally.",
-                });
-                setLocation('/');
-              }}
-              disabled={isSaving || days.every(day => day.places.length === 0)}
-              className={isAuthenticated 
-                ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                : "bg-green-600 hover:bg-green-700 text-white"
-              }
-            >
-              {isSaving ? (
-                <>
-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                  Saving...
-                </>
-              ) : isAuthenticated ? (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Trip
-                </>
-              ) : (
-                <>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In to Save
-                </>
-              )}
-            </Button>
-          </div>
         </div>
-      </div>
 
-      {/* Day Navigation */}
-      <DayTabNavigation
-        days={days}
-        activeDay={activeDay}
-        onDaySelect={setActiveDay}
-        onAddDay={handleAddDay}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Daily Itinerary Sidebar */}
-        <DailyItinerarySidebar
-          day={days[activeDay] || days[0]}
-          dayIndex={activeDay}
-          onPlaceUpdate={handlePlaceUpdate}
-          onPlaceRemove={handlePlaceRemove}
-          onPlaceAssignment={handlePlaceAssignment}
+        {/* Day Navigation */}
+        <DayTabNavigation
+          days={days}
+          activeDay={activeDay}
+          onDaySelect={setActiveDay}
+          onAddDay={handleAddDay}
         />
 
-        {/* Trip Places Grid */}
-        <TripPlacesGrid 
-          places={itineraryPlaces.filter(place => {
-            const placeIdentifier = place.placeId || place.id;
-            return !assignedPlaceIds.has(placeIdentifier);
-          })}
-          onPlaceReturn={handlePlaceRemove}
-        />
+        {/* Main Content */}
+        <div className="flex-1 flex">
+          {/* Daily Itinerary Sidebar */}
+          <DailyItinerarySidebar
+            day={days[activeDay] || days[0]}
+            dayIndex={activeDay}
+            onPlaceUpdate={handlePlaceUpdate}
+            onPlaceRemove={handlePlaceRemove}
+            onPlaceAssignment={handlePlaceAssignment}
+            onPlaceReorder={handlePlaceReorder}
+          />
+
+          {/* Trip Places Grid */}
+          <TripPlacesGrid 
+            places={itineraryPlaces.filter(place => {
+              const placeIdentifier = place.placeId || place.id;
+              return !assignedPlaceIds.has(placeIdentifier);
+            })}
+            onPlaceReturn={handlePlaceRemove}
+          />
+        </div>
+
+        {/* Drag Overlay */}
+        <DragOverlay>
+          {activeDragId ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-lg opacity-90">
+              <div className="font-medium text-sm">Reordering...</div>
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-    </div>
+    </DndContext>
   );
 }

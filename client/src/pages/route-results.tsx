@@ -21,6 +21,13 @@ import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useTripPlaces } from "@/hooks/use-trip-places";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface RouteData {
   startCity: string;
@@ -110,8 +117,7 @@ export default function RouteResults() {
   const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
-  const [sidebarWidth, setSidebarWidth] = useState(320);
-  const [isDragging, setIsDragging] = useState(false);
+  const [sidebarSizePercent, setSidebarSizePercent] = useState(30); // Default 30% width
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
@@ -274,38 +280,31 @@ export default function RouteResults() {
     setHoveredPoi(poi);
   };
 
-  // Dragging functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    e.preventDefault();
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const newWidth = e.clientX;
-      const minWidth = 280;
-      const maxWidth = window.innerWidth * 0.7; // 70% of screen width
-      
-      if (newWidth >= minWidth && newWidth <= maxWidth) {
-        setSidebarWidth(newWidth);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Determine grid columns based on sidebar width
+  // Calculate grid columns based on sidebar size percentage
   const getGridColumns = () => {
-    if (sidebarWidth < 400) return 1; // Single column for narrow
-    if (sidebarWidth < 600) return 2; // Two columns for medium
-    if (sidebarWidth < 800) return 3; // Three columns for wider
+    // Estimate sidebar pixel width based on percentage of window width
+    const estimatedWidth = (window.innerWidth * sidebarSizePercent) / 100;
+    
+    if (estimatedWidth < 400) return 1; // Single column for narrow
+    if (estimatedWidth < 600) return 2; // Two columns for medium
+    if (estimatedWidth < 800) return 3; // Three columns for wider
     return 4; // Four columns for very wide
   };
 
   const gridColumns = getGridColumns();
   const isGridLayout = gridColumns > 1;
+
+  // Handle panel resize
+  const handlePanelResize = (size: number) => {
+    setSidebarSizePercent(size);
+    // Trigger map resize after a short delay
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+      if (window.google && window.google.maps) {
+        window.dispatchEvent(new CustomEvent('mapResize'));
+      }
+    }, 100);
+  };
 
   useEffect(() => {
     // Get route data from URL parameters or localStorage
@@ -332,37 +331,6 @@ export default function RouteResults() {
     }
   }, [setLocation]);
 
-  // Handle global mouse events for dragging
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, [isDragging]);
-
-  // Trigger map resize when sidebar width changes
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Trigger resize event for any map instance that might be listening
-      window.dispatchEvent(new Event('resize'));
-      // If Google Maps is available, trigger its resize event
-      if (window.google && window.google.maps) {
-        // This will be handled by the InteractiveMap component
-        window.dispatchEvent(new CustomEvent('mapResize'));
-      }
-    }, 100); // Shorter delay for smoother resizing
-
-    return () => clearTimeout(timer);
-  }, [sidebarWidth]);
 
   // Don't render anything until we have route data
   if (!routeData) {
@@ -434,34 +402,38 @@ export default function RouteResults() {
         </div>
       </header>
 
-      {/* Full-width layout with no gaps */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - Draggable Width */}
-        <div 
-          className="bg-white border-r border-slate-200 flex flex-col overflow-hidden relative"
-          style={{ width: `${sidebarWidth}px` }}
+      {/* Main Content Area with Resizable Panels */}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="flex-1"
+      >
+        {/* Left Sidebar - Resizable Panel */}
+        <ResizablePanel 
+          defaultSize={30}
+          minSize={20}
+          maxSize={70}
+          className="bg-white"
+          onResize={handlePanelResize}
         >
-          {/* Sidebar Header */}
-          <div className="p-3 border-b border-slate-200 bg-slate-50">
-            <h2 className="text-lg font-semibold text-slate-800">
-              Places Along Route
-            </h2>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => setSelectedCity("all")}
-                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                  selectedCity === "all"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                }`}
-              >
-                All ({uniquePois.length})
-              </button>
+          <div className="flex flex-col h-full">
+            {/* Sidebar Header */}
+            <div className="p-3 border-b border-slate-200 bg-slate-50">
+              <h2 className="text-lg font-semibold text-slate-800">
+                Places Along Route
+              </h2>
+              <div className="flex gap-2 mt-2">
+                <Badge
+                  variant={selectedCity === "all" ? "default" : "secondary"}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedCity("all")}
+                >
+                  All ({uniquePois.length})
+                </Badge>
+              </div>
             </div>
-          </div>
 
-          {/* Scrollable POI List */}
-          <div className="flex-1 overflow-y-auto">
+            {/* Scrollable POI List */}
+            <ScrollArea className="flex-1">
             {poisLoading && (
               <div className="p-4 text-center">
                 <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
@@ -479,33 +451,31 @@ export default function RouteResults() {
               </div>
             )}
 
-            {uniquePois.length > 0 && (
-              <div 
-                className={`p-2 ${isGridLayout ? 'grid gap-3' : 'space-y-2'}`}
-                style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
-              >
-                {console.log('🎯 Rendering POI Cards:', {
-                  uniquePoisLength: uniquePois.length,
-                  filteredPoisLength: filteredPois.length,
-                  firstFilteredPoi: filteredPois[0],
-                  selectedCity,
-                  sidebarWidth,
-                  gridColumns,
-                  isGridLayout
-                })}
-                {filteredPois.map((poi, index) => (
-                  <div
-                    key={poi.placeId || poi.id || `poi-${index}`}
-                    onMouseEnter={() => handlePoiHover(poi)}
-                    onMouseLeave={() => handlePoiHover(null)}
-                    className="transition-all"
-                  >
-                    <PoiCard poi={poi} variant={isGridLayout ? "grid" : "compact"} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+              {uniquePois.length > 0 && (
+                <div 
+                  className={`p-2 ${isGridLayout ? 'grid gap-3' : 'space-y-2'}`}
+                  style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
+                >
+                  {console.log('🎯 Rendering POI Cards:', {
+                    uniquePoisLength: uniquePois.length,
+                    filteredPoisLength: filteredPois.length,
+                    sidebarSizePercent,
+                    gridColumns,
+                    isGridLayout
+                  })}
+                  {filteredPois.map((poi, index) => (
+                    <div
+                      key={poi.placeId || poi.id || `poi-${index}`}
+                      onMouseEnter={() => handlePoiHover(poi)}
+                      onMouseLeave={() => handlePoiHover(null)}
+                      className="transition-all"
+                    >
+                      <PoiCard poi={poi} variant={isGridLayout ? "grid" : "compact"} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
 
           {/* Start Itinerary Button */}
           {tripPlaces.length > 0 && (
@@ -521,28 +491,15 @@ export default function RouteResults() {
             </div>
           )}
 
-          {/* Draggable Resizer Handle */}
-          <div
-            className={`absolute top-0 bottom-0 right-0 w-1 bg-slate-300 hover:bg-slate-400 cursor-col-resize z-50 transition-colors ${
-              isDragging ? 'bg-blue-500' : ''
-            }`}
-            onMouseDown={handleMouseDown}
-            title="Drag to resize sidebar"
-          >
-            {/* Visual grip indicator */}
-            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-full">
-              <div className={`w-3 h-8 bg-slate-300 hover:bg-slate-400 rounded-r-md flex items-center justify-center transition-colors ${
-                isDragging ? 'bg-blue-500' : ''
-              }`}>
-                <div className="w-0.5 h-4 bg-white rounded-full opacity-70"></div>
-              </div>
-            </div>
           </div>
-        </div>
+        </ResizablePanel>
 
-        {/* Main Map Area - Full Width */}
+        {/* Resizable Handle */}
+        <ResizableHandle withHandle className="bg-slate-200" />
+
+        {/* Main Map Area - Resizable Panel */}
         {isMapVisible && (
-          <div className="flex-1">
+          <ResizablePanel defaultSize={70}>
             {poisLoading ? (
               <div className="w-full h-full flex items-center justify-center bg-slate-100">
                 <div className="text-center">
@@ -565,12 +522,14 @@ export default function RouteResults() {
                 apiKey={routeResults?.maps_api_key}
               />
             )}
-          </div>
+          </ResizablePanel>
         )}
+      </ResizablePanelGroup>
 
-        {/* When map is hidden, show full-width POI grid */}
-        {!isMapVisible && (
-          <div className="flex-1 p-4 overflow-y-auto bg-slate-50">
+      {/* When map is hidden, show full-width POI grid */}
+      {!isMapVisible && (
+        <ScrollArea className="flex-1">
+          <div className="p-4 bg-slate-50">
             <div className="max-w-7xl mx-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredPois.map((poi, index) => (
@@ -586,8 +545,8 @@ export default function RouteResults() {
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </ScrollArea>
+      )}
     </div>
   );
 }

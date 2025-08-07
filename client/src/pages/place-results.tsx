@@ -178,7 +178,7 @@ export default function PlaceResults() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50">
+    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">

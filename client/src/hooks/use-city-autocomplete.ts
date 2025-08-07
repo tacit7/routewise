@@ -76,23 +76,27 @@ export function useCityAutocomplete(
       }
 
       const params = new URLSearchParams({
-        q: normalizedQuery,
-        limit: limit.toString(),
-        countries: countries,
+        input: normalizedQuery,
       });
 
       const response = await fetch(
-        `/api/places/city-autocomplete?${params.toString()}`
+        `/api/places/autocomplete?${params.toString()}`
       );
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data: CityAutocompleteResponse = await response.json();
+      const data = await response.json();
       
-      if (data.status === 'success' && data.data?.cities) {
-        return transformCitiesToSuggestions(data.data.cities);
+      if (data.status === 'success' && data.data?.suggestions) {
+        // Phoenix returns suggestions directly from Google Places API
+        return data.data.suggestions.map((suggestion: any) => ({
+          place_id: suggestion.place_id,
+          description: suggestion.description,
+          main_text: suggestion.structured_formatting.main_text,
+          secondary_text: suggestion.structured_formatting.secondary_text,
+        }));
       } else {
         throw new Error(data.message || 'No suggestions available');
       }
@@ -124,20 +128,23 @@ export function useCityPrefetch() {
         queryKey: ['cities', query, 10, countries],
         queryFn: async () => {
           const params = new URLSearchParams({
-            q: query,
-            limit: '10',
-            countries,
+            input: query,
           });
 
           try {
             const response = await fetch(
-              `/api/places/city-autocomplete?${params.toString()}`
+              `/api/places/autocomplete?${params.toString()}`
             );
             
             if (response.ok) {
-              const data: CityAutocompleteResponse = await response.json();
-              if (data.status === 'success' && data.data?.cities) {
-                return transformCitiesToSuggestions(data.data.cities);
+              const data = await response.json();
+              if (data.status === 'success' && data.data?.suggestions) {
+                return data.data.suggestions.map((suggestion: any) => ({
+                  place_id: suggestion.place_id,
+                  description: suggestion.description,
+                  main_text: suggestion.structured_formatting.main_text,
+                  secondary_text: suggestion.structured_formatting.secondary_text,
+                }));
               }
             }
           } catch (error) {

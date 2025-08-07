@@ -299,7 +299,7 @@ export default function TripWizardPage() {
 
   if (isCalculating) {
     return (
-      <div className="min-h-screen shadow-md bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen shadow-md flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
         <p>hello</p>
         <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 max-w-md mx-4">
           <div className="text-center">

@@ -105,7 +105,7 @@ export function DatesStep({
                   {startDate ? format(startDate, "PPP") : "Select start date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-white" align="start">
                 <CalendarComponent
                   mode="single"
                   selected={startDate || undefined}
@@ -119,6 +119,7 @@ export function DatesStep({
                   }}
                   disabled={(date) => date < minDate}
                   initialFocus
+                  className="bg-white"
                 />
               </PopoverContent>
             </Popover>
@@ -146,7 +147,7 @@ export function DatesStep({
                   {endDate ? format(endDate, "PPP") : "Select end date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-white" align="start">
                 <CalendarComponent
                   mode="single"
                   selected={endDate || undefined}
@@ -156,6 +157,7 @@ export function DatesStep({
                   }}
                   disabled={(date) => date < minEndDate}
                   initialFocus
+                  className="bg-white"
                 />
               </PopoverContent>
             </Popover>

@@ -3,46 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --background: #eaf7ee; /* Softer slate-50 background */
-  --foreground: #1e293b; /* Improved contrast - slate-800 */
+  /* UX Spec Design Tokens */
+  --bg: hsl(210 20% 98%); /* App background */
+  --surface: hsl(0 0% 100%); /* Cards, tab active background */
+  --surface-alt: hsl(210 25% 97%); /* Pills, subtle panels */
+  --text: hsl(215 18% 18%); /* Primary text */
+  --text-muted: hsl(215 12% 42%); /* Secondary text */
+  --border: hsl(214 28% 88%); /* Dividers, card borders */
+  --primary: hsl(160 84% 36%); /* Brand green (actions, active tab) */
+  --primary-50: hsl(160 60% 96%); /* Tint backgrounds */
+  --primary-100: hsl(160 55% 92%); /* Subtle borders */
+  --primary-200: hsl(160 46% 86%); /* Drop slot border */
+  --warning: hsl(42 95% 45%); /* Rating star color */
+  --focus: hsl(217 92% 60%); /* Focus ring */
 
-  --card: #ffffff; /* Pure white for elevation */
-  --card-foreground: #1e293b;
-  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Subtle elevation */
-
-  --primary: #10b981; /* Emerald 500 - brand anchor */
-  --primary-hover: #059669; /* Emerald 600 */
+  /* Legacy support - map to UX spec tokens */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --primary-hover: hsl(160 84% 32%);
   --primary-foreground: #ffffff;
-  --ring: #34d399; /* Emerald-400 for focus rings */
-
-  --secondary: #6b7280; /* Gray 500 */
+  --ring: var(--focus);
+  --secondary: var(--text-muted);
   --secondary-foreground: #ffffff;
-
-  --accent: #60a5fa; /* Blue-400 for calm/confident feel */
-  --accent-hover: #3b82f6; /* Blue-500 */
+  --accent: #60a5fa;
+  --accent-hover: #3b82f6;
   --accent-foreground: #ffffff;
-
-  --muted: #f3f4f6; /* Gray 100 */
-  --muted-hover: rgba(16, 185, 129, 0.05); /* Subtle primary tint */
-  --muted-foreground: #475569; /* Improved hierarchy - slate-600 */
-
-  --border: #d1d5db; /* Gray 300 */
-  --input: #d1d5db; /* Gray 300 */
-  --input-focus-ring: #34d399; /* Emerald-400 for better feedback */
-
-  --success: #22c55e; /* Green 500 */
+  --muted: var(--surface-alt);
+  --muted-hover: var(--primary-50);
+  --muted-foreground: var(--text-muted);
+  --input: var(--border);
+  --input-focus-ring: var(--focus);
+  --success: #22c55e;
   --success-foreground: #ffffff;
-
-  --warning: #facc15; /* Yellow 400 */
-  --warning-foreground: #1f2937;
-
-  --info: #3b82f6; /* Blue 500 */
+  --warning-foreground: var(--text);
+  --info: #3b82f6;
   --info-foreground: #ffffff;
-
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-
-  --radius: 0.5rem;
+  --radius: 1rem; /* 16px for spec compliance */
 }
 
 .dark {
@@ -132,5 +133,81 @@
 
 .focus-ring:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--input-focus-ring), 0 0 0 4px white;
+  box-shadow: 0 0 0 2px var(--focus) with 2px offset;
+}
+
+/* UX Spec Styling */
+.itinerary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 120ms ease-out;
+}
+
+.itinerary-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.itinerary-card-dragging {
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 50;
+}
+
+.drop-zone {
+  border: 2px dashed var(--primary-200);
+  background: var(--primary-50);
+  border-radius: var(--radius);
+  transition: all 180ms ease-in;
+}
+
+.drop-zone-active {
+  border-color: var(--primary);
+  background: var(--primary-50);
+}
+
+.time-pill {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.rating-pill {
+  background: var(--surface-alt);
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trip-places-panel {
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.day-tab {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  transition: all 120ms ease-out;
+}
+
+.day-tab:hover {
+  background: var(--primary-50);
+}
+
+.day-tab-active {
+  background: var(--primary);
+  color: white;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }

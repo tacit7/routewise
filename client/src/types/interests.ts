@@ -158,8 +158,14 @@ export interface CustomizeInterestsModalProps {
   availableCategories: FrontendInterestCategory[];
 }
 
-// Re-export from mock data for consistency
-export { MOCK_INTEREST_CATEGORIES as DEFAULT_INTEREST_CATEGORIES } from '@/mocks/interests-data';
+// Default interest categories (previously from mock data)
+export const DEFAULT_INTEREST_CATEGORIES: FrontendInterestCategory[] = [
+  { id: '1', name: 'Restaurants', description: 'Dining and food experiences', imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=400&fit=crop&crop=center' },
+  { id: '2', name: 'Attractions', description: 'Tourist attractions and landmarks', imageUrl: 'https://images.unsplash.com/photo-1566127992631-137a642a90f4?w=400&h=400&fit=crop&crop=center' },
+  { id: '3', name: 'Parks', description: 'Parks and outdoor spaces', imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop&crop=center' },
+  { id: '4', name: 'Museums', description: 'Museums and cultural sites', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=center' },
+  { id: '5', name: 'Shopping', description: 'Shopping centers and stores', imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop&crop=center' }
+];
 
 // API Request/Response Types
 
