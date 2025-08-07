@@ -466,95 +466,95 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     pois.forEach((poi) => {
-      console.log('Processing POI:', poi.name, 'has address:', !!poi.address);
-      if (!poi.address) return;
+      console.log('Processing POI:', poi.name, 'has coordinates:', !!(poi.lat && poi.lng), 'has address:', !!poi.address);
+      
+      // Skip if no coordinates available
+      if (!poi.lat || !poi.lng) {
+        console.warn('POI missing coordinates:', poi.name);
+        return;
+      }
 
       // Skip if marker already exists
       const poiIdentifier = poi.placeId || poi.id;
       if (poiMarkersRef.current.has(poiIdentifier)) return;
 
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address: poi.address }, (results, status) => {
-        if (status === "OK" && results && results[0]) {
-          const isSelected = selectedPoiIds.includes(poi.id);
-          const isHovered =
-            hoveredPoi &&
-            (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id);
+      const isSelected = selectedPoiIds.includes(poi.id);
+      const isHovered =
+        hoveredPoi &&
+        (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id);
 
-          // Create marker element
-          const markerElement = createMarkerElement(
-            poi.category,
-            poi,
-            isSelected,
-            isHovered
-          );
+      // Create marker element
+      const markerElement = createMarkerElement(
+        poi.category,
+        poi,
+        isSelected,
+        isHovered
+      );
 
-          const marker = new google.maps.marker.AdvancedMarkerElement({
-            position: results[0].geometry.location,
-            map: mapInstanceRef.current,
-            title: poi.name,
-            content: markerElement,
-          });
+      // Use lat/lng coordinates directly instead of geocoding
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+        position: { lat: poi.lat, lng: poi.lng },
+        map: mapInstanceRef.current,
+        title: poi.name,
+        content: markerElement,
+      });
 
-          // Add click listener
-          marker.addListener("click", () => {
-            if (onPoiClick) {
-              onPoiClick(poi);
-            }
+      // Add click listener
+      marker.addListener("click", () => {
+        if (onPoiClick) {
+          onPoiClick(poi);
+        }
 
-            // Show info window with image and Add to Trip functionality
-            if (infoWindowRef.current) {
-              const isAddedToTrip = isInTrip(poi);
-              const isCurrentlyAdding = isAddingToTrip; // Get current loading state
+        // Show info window with image and Add to Trip functionality
+        if (infoWindowRef.current) {
+          const isAddedToTrip = isInTrip(poi);
+          const isCurrentlyAdding = isAddingToTrip; // Get current loading state
+          
+          const content = `
+            <div class="p-3 max-w-sm">
+              ${poi.imageUrl ? `
+                <img 
+                  src="${poi.imageUrl}" 
+                  alt="${poi.name}" 
+                  class="w-full h-32 object-cover rounded mb-2"
+                />
+              ` : ''}
+              <h3 class="font-semibold text-base mb-1">${poi.name}</h3>
+              <p class="text-xs text-gray-600 capitalize mb-2">${poi.category}</p>
+              ${poi.description ? `<p class="text-sm text-gray-700 mb-2">${poi.description}</p>` : ''}
+              <div class="flex items-center text-xs mb-1">
+                <span class="text-yellow-500">⭐</span>
+                <span class="ml-1">${poi.rating} (${poi.reviewCount || 0} reviews)</span>
+              </div>
+              ${poi.address ? `<p class="text-xs text-gray-500 mb-3">${poi.address}</p>` : ''}
               
-              const content = `
-                <div class="p-3 max-w-sm">
-                  ${poi.imageUrl ? `
-                    <img 
-                      src="${poi.imageUrl}" 
-                      alt="${poi.name}" 
-                      class="w-full h-32 object-cover rounded mb-2"
-                    />
-                  ` : ''}
-                  <h3 class="font-semibold text-base mb-1">${poi.name}</h3>
-                  <p class="text-xs text-gray-600 capitalize mb-2">${poi.category}</p>
-                  ${poi.description ? `<p class="text-sm text-gray-700 mb-2">${poi.description}</p>` : ''}
-                  <div class="flex items-center text-xs mb-1">
-                    <span class="text-yellow-500">⭐</span>
-                    <span class="ml-1">${poi.rating} (${poi.reviewCount} reviews)</span>
-                  </div>
-                  ${poi.address ? `<p class="text-xs text-gray-500 mb-3">${poi.address}</p>` : ''}
-                  
-                  <div class="flex justify-center">
-                    <button
-                      onclick="window.addPoiToTrip('${poi.placeId || poi.id}')"
-                      ${isAddedToTrip ? 'disabled' : ''}
-                      class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center ${
-                        isAddedToTrip
-                          ? 'bg-purple-100 text-purple-700 border border-purple-200 cursor-not-allowed'
-                          : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md cursor-pointer'
-                      }"
-                      id="add-to-trip-btn-${poi.placeId || poi.id}"
-                    >
-                      ${isAddedToTrip ? 
-                          '✓ In Trip' : 
-                          '+ Add to Trip'
-                      }
-                    </button>
-                  </div>
-                </div>
-              `;
+              <div class="flex justify-center">
+                <button
+                  onclick="window.addPoiToTrip('${poi.placeId || poi.id}')"
+                  ${isAddedToTrip ? 'disabled' : ''}
+                  class="py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center ${
+                    isAddedToTrip
+                      ? 'bg-purple-100 text-purple-700 border border-purple-200 cursor-not-allowed'
+                      : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md cursor-pointer'
+                  }"
+                  id="add-to-trip-btn-${poi.placeId || poi.id}"
+                >
+                  ${isAddedToTrip ? 
+                      '✓ In Trip' : 
+                      '+ Add to Trip'
+                  }
+                </button>
+              </div>
+            </div>
+          `;
 
-              infoWindowRef.current.setContent(content);
-              infoWindowRef.current.open(mapInstanceRef.current, marker);
-            }
-          });
-
-          // Store the marker for future updates
-          const poiIdentifier = poi.placeId || poi.id;
-          poiMarkersRef.current.set(poiIdentifier, marker);
+          infoWindowRef.current.setContent(content);
+          infoWindowRef.current.open(mapInstanceRef.current, marker);
         }
       });
+
+      // Store the marker for future updates
+      poiMarkersRef.current.set(poiIdentifier, marker);
     });
   }, [pois, onPoiClick, onPoiSelect]);
 

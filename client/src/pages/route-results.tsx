@@ -8,6 +8,8 @@ import {
   Map as MapIcon,
   Star,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +30,7 @@ interface RouteData {
 // Helper function to extract city from POI data
 const extractCityFromPoi = (poi: POI | Poi): string | null => {
   // For route POIs, try to extract city from address
-  if (poi.address) {
+  if (poi.address && poi.address !== "Address not available") {
     // Split address and look for city, state pattern
     const addressParts = poi.address.split(",").map((part) => part.trim());
 
@@ -108,60 +110,49 @@ export default function RouteResults() {
   const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
   // Fetch POIs along the route using the correct Phoenix API endpoint
   const { data: routeResults, isLoading: poisLoading, error: poisError } = useQuery({
-    queryKey: ["/api/pois", routeData?.startCity, routeData?.endCity],
+    queryKey: ["/api/route-results", routeData?.startCity, routeData?.endCity],
     queryFn: async () => {
       if (!routeData) return { pois: [], route: null, maps_api_key: null, meta: null };
       
       try {
-        // Calculate a rough midpoint between start and end cities for POI search
-        // For now, we'll use the start city coordinates
-        // In a real implementation, we'd calculate points along the actual route
-        const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(routeData.startCity)}&format=json&limit=1`);
-        const geocodeData = await geocodeResponse.json();
-        
-        let lat = 30.2672; // Default to Austin if geocoding fails
-        let lng = -97.7431;
-        
-        if (geocodeData && geocodeData[0]) {
-          lat = parseFloat(geocodeData[0].lat);
-          lng = parseFloat(geocodeData[0].lon);
-        }
-        
-        // Fetch POIs from the Phoenix API
+        // Use the correct Phoenix route-results endpoint
         const params = new URLSearchParams({
-          location: `${lat},${lng}`,
-          radius: '50000' // 50km radius for route POIs
+          start: routeData.startCity,
+          end: routeData.endCity
         });
         
-        console.log('🔍 Fetching POIs with params:', params.toString());
-        const response = await fetch(`/api/pois?${params}`);
-        console.log('📊 POIs API response status:', response.status);
+        console.log('🔍 Fetching route results with params:', params.toString());
+        const response = await fetch(`/api/route-results?${params}`);
+        console.log('📊 Route Results API response status:', response.status);
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ POIs API error:', response.status, errorText);
-          throw new Error(`Failed to fetch POIs: ${response.status} ${errorText}`);
+          console.error('❌ Route Results API error:', response.status, errorText);
+          throw new Error(`Failed to fetch route results: ${response.status} ${errorText}`);
         }
         
-        const poisData = await response.json();
-        console.log('✅ POIs data received:', poisData);
+        const routeResponse = await response.json();
+        console.log('✅ Route Results data received:', routeResponse);
         
-        // Also fetch the maps API key
-        const mapsKeyResponse = await fetch('/api/maps-key');
-        const mapsKeyData = mapsKeyResponse.ok ? await mapsKeyResponse.json() : { apiKey: null };
-        
-        return {
-          pois: Array.isArray(poisData) ? poisData : (poisData.data || poisData.pois || []),
-          route: null, // Route calculation would need a separate endpoint
-          maps_api_key: mapsKeyData.apiKey,
-          meta: null,
-          trip_places: []
-        };
+        // Phoenix API returns structured data
+        if (routeResponse.success && routeResponse.data) {
+          return {
+            pois: routeResponse.data.pois || [],
+            route: routeResponse.data.route || null,
+            maps_api_key: routeResponse.data.maps_api_key || null,
+            meta: routeResponse.data.meta || null,
+            trip_places: routeResponse.data.trip_places || []
+          };
+        } else {
+          throw new Error('Invalid response format from route results API');
+        }
       } catch (error) {
         console.error('Error fetching POIs:', error);
         // Return empty data on error
@@ -175,6 +166,11 @@ export default function RouteResults() {
       }
     },
     enabled: !!routeData, // Only run query when we have route data
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache data
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnReconnect: true, // Refetch when reconnecting
   });
 
   // Maps API data comes from the consolidated route-results endpoint
@@ -238,7 +234,7 @@ export default function RouteResults() {
     const categoryMatch =
       selectedCategory === "all" || poi.category === selectedCategory;
 
-    // City filtering
+    // City filtering - simplified since addresses are often null for nearby search results
     let cityMatch = selectedCity === "all";
 
     if (!cityMatch && selectedCity !== "all") {
@@ -247,13 +243,9 @@ export default function RouteResults() {
       if (poiCity) {
         cityMatch = poiCity === selectedCity.toLowerCase();
       } else {
-        // If we can't determine the POI's city, include it for route cities
-        const routeCitiesLower = [
-          routeData?.startCity.toLowerCase(),
-          routeData?.endCity.toLowerCase(),
-        ].filter(Boolean);
-
-        cityMatch = routeCitiesLower.includes(selectedCity.toLowerCase());
+        // When address is null (common for Google nearby search), include all POIs
+        // as they are already filtered to be along the route
+        cityMatch = true;
       }
     }
 
@@ -282,6 +274,39 @@ export default function RouteResults() {
     setHoveredPoi(poi);
   };
 
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const newWidth = e.clientX;
+      const minWidth = 280;
+      const maxWidth = window.innerWidth * 0.7; // 70% of screen width
+      
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setSidebarWidth(newWidth);
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Determine grid columns based on sidebar width
+  const getGridColumns = () => {
+    if (sidebarWidth < 400) return 1; // Single column for narrow
+    if (sidebarWidth < 600) return 2; // Two columns for medium
+    if (sidebarWidth < 800) return 3; // Three columns for wider
+    return 4; // Four columns for very wide
+  };
+
+  const gridColumns = getGridColumns();
+  const isGridLayout = gridColumns > 1;
+
   useEffect(() => {
     // Get route data from URL parameters or localStorage
     const searchParams = new URLSearchParams(window.location.search);
@@ -306,6 +331,38 @@ export default function RouteResults() {
       }
     }
   }, [setLocation]);
+
+  // Handle global mouse events for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging]);
+
+  // Trigger map resize when sidebar width changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Trigger resize event for any map instance that might be listening
+      window.dispatchEvent(new Event('resize'));
+      // If Google Maps is available, trigger its resize event
+      if (window.google && window.google.maps) {
+        // This will be handled by the InteractiveMap component
+        window.dispatchEvent(new CustomEvent('mapResize'));
+      }
+    }, 100); // Shorter delay for smoother resizing
+
+    return () => clearTimeout(timer);
+  }, [sidebarWidth]);
 
   // Don't render anything until we have route data
   if (!routeData) {
@@ -347,7 +404,7 @@ export default function RouteResults() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50">
+    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -379,8 +436,11 @@ export default function RouteResults() {
 
       {/* Full-width layout with no gaps */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - Compact POI Cards */}
-        <div className="w-80 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+        {/* Left Sidebar - Draggable Width */}
+        <div 
+          className="bg-white border-r border-slate-200 flex flex-col overflow-hidden relative"
+          style={{ width: `${sidebarWidth}px` }}
+        >
           {/* Sidebar Header */}
           <div className="p-3 border-b border-slate-200 bg-slate-50">
             <h2 className="text-lg font-semibold text-slate-800">
@@ -420,12 +480,18 @@ export default function RouteResults() {
             )}
 
             {uniquePois.length > 0 && (
-              <div className="p-2 space-y-2">
+              <div 
+                className={`p-2 ${isGridLayout ? 'grid gap-3' : 'space-y-2'}`}
+                style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
+              >
                 {console.log('🎯 Rendering POI Cards:', {
                   uniquePoisLength: uniquePois.length,
                   filteredPoisLength: filteredPois.length,
                   firstFilteredPoi: filteredPois[0],
-                  selectedCity
+                  selectedCity,
+                  sidebarWidth,
+                  gridColumns,
+                  isGridLayout
                 })}
                 {filteredPois.map((poi, index) => (
                   <div
@@ -434,7 +500,7 @@ export default function RouteResults() {
                     onMouseLeave={() => handlePoiHover(null)}
                     className="transition-all"
                   >
-                    <PoiCard poi={poi} variant="compact" />
+                    <PoiCard poi={poi} variant={isGridLayout ? "grid" : "compact"} />
                   </div>
                 ))}
               </div>
@@ -454,6 +520,24 @@ export default function RouteResults() {
               </Button>
             </div>
           )}
+
+          {/* Draggable Resizer Handle */}
+          <div
+            className={`absolute top-0 bottom-0 right-0 w-1 bg-slate-300 hover:bg-slate-400 cursor-col-resize z-50 transition-colors ${
+              isDragging ? 'bg-blue-500' : ''
+            }`}
+            onMouseDown={handleMouseDown}
+            title="Drag to resize sidebar"
+          >
+            {/* Visual grip indicator */}
+            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-full">
+              <div className={`w-3 h-8 bg-slate-300 hover:bg-slate-400 rounded-r-md flex items-center justify-center transition-colors ${
+                isDragging ? 'bg-blue-500' : ''
+              }`}>
+                <div className="w-0.5 h-4 bg-white rounded-full opacity-70"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Map Area - Full Width */}
