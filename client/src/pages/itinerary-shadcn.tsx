@@ -13,19 +13,26 @@ import DailyItinerarySidebar from "@/components/DailyItinerarySidebar";
 import TripPlacesGrid from "@/components/TripPlacesGrid";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
+import { InteractiveMap } from "@/components/interactive-map";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
-  const { tripPlaces } = useTripPlaces();
-  const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
 
+  const [showMap, setShowMap] = useState<boolean>(() => {
+  try { return JSON.parse(localStorage.getItem("itinerary.showMap") || "false"); } catch { return false; }
+});
+
+useEffect(() => localStorage.setItem("itinerary.showMap", JSON.stringify(showMap)), [showMap]);
   const [activeDay, setActiveDay] = useState(0);
+  const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
   const [days, setDays] = useState<DayData[]>([{ date: new Date(), title: "", places: [] }]);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState("");
-  const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
+
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const { tripPlaces } = useTripPlaces();
 
   useEffect(() => {
     const saved = localStorage.getItem("itineraryData");
@@ -203,6 +210,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
               </TabsTrigger>
             ))}
+
             <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2">
               <Plus className="h-4 w-4" />
             </Button>
@@ -217,7 +225,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
             onPlaceRemove={handlePlaceRemove}
             onPlaceAssignment={handlePlaceAssignment}
           />
-          <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} mapsApiKey={undefined /* pass your API key */} />
+          <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} />
         </div>
       </Tabs>
     </div>

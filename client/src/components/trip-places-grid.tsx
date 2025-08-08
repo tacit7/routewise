@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Map as MapIcon, EyeOff, MapPin, Star } from "lucide-react";
 import type { ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
-import { InteractiveMap } from "@/components/interactive-map";
 
 export default function TripPlacesGrid({
   places,
@@ -60,13 +59,6 @@ export default function TripPlacesGrid({
           {showMap ? <EyeOff className="h-4 w-4" /> : <MapIcon className="h-4 w-4" />}
         </Button>
       </div>
-      {showMap && mapsApiKey && places.length > 0 && (
-        <div className="h-64 rounded-2xl overflow-hidden mb-4">
-          <InteractiveMap startCity="" endCity="" checkpoints={[]} pois={places}
-            selectedPoiIds={[]} hoveredPoi={null} onPoiClick={() => {}} onPoiSelect={() => {}}
-            height="100%" className="w-full h-full" apiKey={mapsApiKey} />
-        </div>
-      )}
       {isDraggedOver && (
         <Card className="mt-2 border-primary bg-primary/10">
           <CardContent className="p-2">

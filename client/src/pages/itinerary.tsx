@@ -1,5 +1,3 @@
-// this file is at client/src/pages dir
-
 import {
   closestCenter,
   DndContext,
@@ -313,7 +311,7 @@ const DailyItinerarySidebar = ({
                 checkpoints={[]}
                 pois={sortedPlaces}
                 selectedPoiIds={[]}
-                hoveredPoi={null}
+                hoveredPoi={hoveredPoi}
                 onPoiClick={() => {}}
                 onPoiSelect={() => {}}
                 height="100%"
@@ -499,6 +497,11 @@ export default function ItineraryPage() {
 
   // Track which places are already assigned to avoid duplicates
   const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
+  const [hoveredPoi, setHoveredPoi] = useState<ItineraryPlace | null>(null);
+
+  const handlePoiHover = (poi: ItineraryPlace | null) => {
+    setHoveredPoi(poi);
+  };
 
   // Get maps API key from route results (similar to route-results page)
   const [mapsApiKey, setMapsApiKey] = useState<string | null>(null);

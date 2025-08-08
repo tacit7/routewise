@@ -16,6 +16,7 @@ import RouteResults from "@/pages/route-results";
 import ExploreResults from "@/pages/explore-results";
 import PlaceResults from "@/pages/place-results";
 import ItineraryPage from "@/pages/itinerary";
+import ItineraryShadcnPage from "@/pages/itinerary-shadcn";
 import TripWizardPage from "@/pages/trip-wizard";
 import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
@@ -59,6 +60,7 @@ function AuthenticatedRouter() {
       <Route path="/explore-results" component={ExploreResults} />
       <Route path="/place-results" component={PlaceResults} />
       <Route path="/itinerary" component={ItineraryPage} />
+      <Route path="/it-v2" component={ItineraryShadcnPage} />
       <Route path="/interests-demo" component={InterestsDemo} />
       <Route path="/dashboard-test" component={DashboardTest} />
       <Route path="/auth/success" component={AuthSuccess} />
