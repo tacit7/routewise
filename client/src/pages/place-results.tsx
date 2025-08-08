@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import PoiCard from "@/components/poi-card";
 import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";

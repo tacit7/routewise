@@ -13,6 +13,18 @@ export interface Poi {
   createdAt: string;
   updatedAt: string;
   scheduledTime?: string; // Format: "HH:MM" (24-hour)
+  
+  // Additional fields for UI display
+  imageUrl?: string;
+  description?: string;
+  isOpen?: boolean | null;
+  priceLevel?: number;
+  reviewCount?: number;
+  timeFromStart?: string;
+  
+  // Alternative coordinate format support
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface User {

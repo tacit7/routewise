@@ -79,6 +79,18 @@ const createOwlMarkerSVG = (
   `;
 };
 
+// Helper function to normalize POI coordinates
+const getPoiCoordinates = (poi: any): { lat: number; lng: number } | null => {
+  const lat = poi.lat ?? poi.latitude;
+  const lng = poi.lng ?? poi.longitude;
+  
+  if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+    return { lat, lng };
+  }
+  
+  return null;
+};
+
 // Create marker element with custom owl SVG
 const createMarkerElement = (
   category: string,
@@ -167,17 +179,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       return { lat: 39.8283, lng: -98.5795 };
     }
 
-    const validPois = poisList.filter(poi => 
-      (poi.lat && poi.lng) || (poi.latitude && poi.longitude)
-    );
+    const validPois = poisList.filter(poi => getPoiCoordinates(poi) !== null);
 
     if (validPois.length === 0) {
       return { lat: 39.8283, lng: -98.5795 };
     }
 
     const bounds = validPois.reduce((acc, poi) => {
-      const lat = poi.lat || poi.latitude;
-      const lng = poi.lng || poi.longitude;
+      const coords = getPoiCoordinates(poi);
+      const { lat, lng } = coords!; // We know it's not null from the filter above
       
       return {
         minLat: Math.min(acc.minLat, lat),
@@ -186,10 +196,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         maxLng: Math.max(acc.maxLng, lng)
       };
     }, {
-      minLat: validPois[0].lat || validPois[0].latitude,
-      maxLat: validPois[0].lat || validPois[0].latitude,
-      minLng: validPois[0].lng || validPois[0].longitude,
-      maxLng: validPois[0].lng || validPois[0].longitude
+      minLat: getPoiCoordinates(validPois[0])!.lat,
+      maxLat: getPoiCoordinates(validPois[0])!.lat,
+      minLng: getPoiCoordinates(validPois[0])!.lng,
+      maxLng: getPoiCoordinates(validPois[0])!.lng
     });
 
     return {
@@ -371,12 +381,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     pois.forEach((poi) => {
-      console.log('Processing POI:', poi.name, 'coordinates:', { lat: poi.lat, lng: poi.lng, latitude: poi.latitude, longitude: poi.longitude }, 'has address:', !!poi.address);
+      const coords = getPoiCoordinates(poi);
+      console.log('Processing POI:', poi.name, 'coordinates:', coords, 'has address:', !!poi.address);
       
-      // Skip if no coordinates available (check both lat/lng and latitude/longitude)
-      const hasCoords = (poi.lat && poi.lng) || (poi.latitude && poi.longitude);
-      if (!hasCoords) {
-        console.warn('POI missing coordinates:', poi.name, poi);
+      // Skip if no coordinates available
+      if (!coords) {
+        console.warn('POI missing valid coordinates:', poi.name, poi);
         return;
       }
 
@@ -384,7 +394,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const poiIdentifier = poi.placeId || poi.id;
       if (poiMarkersRef.current.has(poiIdentifier)) return;
 
-      const isSelected = selectedPoiIds.includes(poi.id);
+      const isSelected = selectedPoiIds.includes(Number(poi.id));
       const isHovered =
         hoveredPoi &&
         (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id);
@@ -397,9 +407,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         isHovered
       );
 
-      // Use lat/lng coordinates directly (handle both formats)
-      const lat = poi.lat || poi.latitude;
-      const lng = poi.lng || poi.longitude;
+      // Use normalized coordinates
+      const { lat, lng } = coords;
       
       console.log(`Creating marker for ${poi.name} at:`, { lat, lng });
       
@@ -501,7 +510,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const poiIdentifier = poi.placeId || poi.id;
       const marker = poiMarkersRef.current.get(poiIdentifier);
       if (marker) {
-        const isSelected = selectedPoiIds.includes(poi.id);
+        const isSelected = selectedPoiIds.includes(Number(poi.id));
         const isHovered =
           hoveredPoi && (hoveredPoi.placeId || hoveredPoi.id) === poiIdentifier;
 

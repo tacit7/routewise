@@ -8,7 +8,7 @@ import {
   Map,
   Loader2,
 } from "lucide-react";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -141,9 +141,9 @@ export default function PoiCard({
       <img
         src={poi.imageUrl}
         alt={poi.name}
-        className={`w-full object-cover ${isGridVariant ? 'h-56' : 'h-48'}`}
+        className={`w-full object-cover ${isGridVariant ? 'h-40' : 'h-48'}`}
       />
-      <div className={`${isGridVariant ? 'p-4 flex-1 flex flex-col' : 'p-6'}`}>
+      <div className={`${isGridVariant ? 'p-3 flex-1 flex flex-col' : 'p-6'}`}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span

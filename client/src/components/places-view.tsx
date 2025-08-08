@@ -158,6 +158,7 @@ export default function PlacesView({
   }, [showRouting]);
 
   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
+  const [panelKey, setPanelKey] = useState(0); // Force re-render on panel resize
   const { tripPlaces } = useTripPlaces();
 
   // Filter and dedupe POIs
@@ -208,24 +209,33 @@ export default function PlacesView({
     return categoryMatch && cityMatch;
   });
 
-  // Grid layout calculation (restored original)
-  const getGridColumns = () => {
-    // Force single column for explore mode
-    if (!showRouting) return 1;
+  // Calculate optimal card width based on panel size
+  const getCardFlexBasis = () => {
+    // Force full width for mobile or explore mode
+    if (!showRouting || isMobile) return '100%';
 
-    // Keep existing dynamic logic for route mode
-    const estimatedWidth = (window.innerWidth * sidebarSizePercent) / 100;
-    if (estimatedWidth < 400) return 1;
-    if (estimatedWidth < 600) return 2;
-    if (estimatedWidth < 800) return 3;
-    return 4;
+    // Calculate actual sidebar width for desktop
+    const containerWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40;
+    
+    // Responsive flex-basis that adapts to container width
+    // Cards will wrap naturally and never be cut off
+    if (containerWidth < 300) return '100%';      // 1 per row
+    if (containerWidth < 500) return 'calc(50% - 8px)';  // 2 per row
+    if (containerWidth < 700) return 'calc(33.333% - 8px)'; // 3 per row
+    if (containerWidth < 900) return 'calc(25% - 8px)';     // 4 per row
+    if (containerWidth < 1100) return 'calc(20% - 8px)';    // 5 per row
+    return 'calc(16.666% - 8px)'; // 6 per row for very wide panels
   };
 
-  const gridColumns = getGridColumns();
-  const isGridLayout = gridColumns > 1;
+  const cardFlexBasis = getCardFlexBasis();
+  const isFlexLayout = cardFlexBasis !== '100%';
 
   const handlePanelResize = (size: number) => {
     setSidebarSizePercent(size);
+    // Force re-render of grid layout
+    setPanelKey(prev => prev + 1);
+    
+    // Trigger map resize with debouncing
     setTimeout(() => {
       window.dispatchEvent(new Event("resize"));
       if (window.google && window.google.maps) {
@@ -490,8 +500,12 @@ export default function PlacesView({
 
                 {uniquePois.length > 0 && (
                   <div
-                    className={`p-2 ${isGridLayout ? "grid gap-3" : "space-y-2"}`}
-                    style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
+                    key={`poi-flex-${panelKey}`}
+                    className={`p-2 ${isFlexLayout ? "flex flex-wrap gap-2" : "space-y-2"}`}
+                    style={{
+                      maxWidth: '100%',
+                      overflow: 'hidden'
+                    }}
                   >
                     {filteredPois.map((poi, index) => (
                       <div
@@ -499,10 +513,15 @@ export default function PlacesView({
                         onMouseEnter={() => onPoiHover(poi)}
                         onMouseLeave={() => onPoiHover(null)}
                         className="transition-all"
+                        style={{
+                          flexBasis: isFlexLayout ? cardFlexBasis : 'auto',
+                          minWidth: '200px', // Prevent cards from getting too small
+                          maxWidth: '100%'   // Prevent cards from overflowing
+                        }}
                       >
                         <PoiCard
                           poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
-                          variant={isGridLayout ? "grid" : "compact"}
+                          variant={cardFlexBasis === '100%' ? "compact" : "grid"}
                           showTimeScheduler={true}
                           onTimeChange={handleTimeChange}
                         />
