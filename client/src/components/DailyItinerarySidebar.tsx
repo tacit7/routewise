@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, GripVertical, Star, Trash2 } from "lucide-react";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
-import { sortByTime } from "@/utils/itinerary";
+import { getIdentifier, sortByTime } from "@/utils/itinerary";
 
 export default function DailyItinerarySidebar({
   day,
@@ -26,14 +26,14 @@ export default function DailyItinerarySidebar({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDraggedOver(false);
-    const data = e.dataTransfer.getData("application/json");
-    if (!data) return;
-    const place = JSON.parse(data) as ItineraryPlace;
-    if (place.dayIndex !== undefined) onPlaceRemove?.(place.placeId ?? place.id);
+    const placeData = e.dataTransfer.getData("application/json");
+    if (!placeData) return;
+    const place = JSON.parse(placeData) as ItineraryPlace;
+    if (place.dayIndex !== undefined) onPlaceRemove?.(getIdentifier(place));
     onPlaceAssignment?.(place, dayIndex);
   };
 
-  const sorted = sortByTime(day.places);
+  const sortedPlaces = sortByTime(day.places);
 
   return (
     <Card className="w-96 h-full rounded-none border-0 border-r">
@@ -48,36 +48,42 @@ export default function DailyItinerarySidebar({
           {day.date.toLocaleDateString()}
         </CardDescription>
       </CardHeader>
-
       <CardContent className="p-4">
         <div
           className={`min-h-32 border-2 border-dashed rounded-lg p-4 transition-colors ${
             draggedOver ? "border-primary bg-primary/5" : "border-border hover:border-muted-foreground"
           }`}
           onDrop={handleDrop}
-          onDragOver={(e) => (e.preventDefault(), (e.dataTransfer.dropEffect = "copy"))}
-          onDragEnter={(e) => (e.preventDefault(), setDraggedOver(true))}
-          onDragLeave={(e) => {
+          onDragOver={(e) => {
             e.preventDefault();
-            if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) setDraggedOver(false);
+            e.dataTransfer.dropEffect = "copy";
+          }}
+          onDragEnter={() => setDraggedOver(true)}
+          onDragLeave={(e) => {
+            if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
+              setDraggedOver(false);
+            }
           }}
         >
-          {sorted.length === 0 && (
+          {sortedPlaces.length === 0 && (
             <div className="text-center py-8">
               <Clock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">Drag places here to schedule them</p>
               <p className="text-xs text-muted-foreground mt-1">Set custom times for each place</p>
             </div>
           )}
-
           <ScrollArea className="h-[calc(100vh-300px)]">
             <div className="space-y-3">
-              {sorted.map((place) => (
-                <Card key={place.placeId ?? place.id} className="group cursor-move hover:shadow-sm transition-shadow" draggable
+              {sortedPlaces.map((place) => (
+                <Card
+                  key={getIdentifier(place)}
+                  className="group cursor-move hover:shadow-sm transition-shadow"
+                  draggable
                   onDragStart={(e) => {
                     e.dataTransfer.setData("application/json", JSON.stringify(place));
                     e.dataTransfer.effectAllowed = "move";
-                  }}>
+                  }}
+                >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
@@ -85,9 +91,12 @@ export default function DailyItinerarySidebar({
                         <Badge variant="outline" className="text-xs mb-2">{place.category}</Badge>
                         <div className="flex items-center gap-2 mt-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <Input type="time" value={place.scheduledTime ?? "09:00"}
-                            onChange={(e) => onPlaceUpdate?.(place.placeId ?? place.id, { scheduledTime: e.target.value })}
-                            className="h-7 w-24 text-sm" />
+                          <Input
+                            type="time"
+                            value={place.scheduledTime || "09:00"}
+                            onChange={(e) => onPlaceUpdate?.(getIdentifier(place), { scheduledTime: e.target.value })}
+                            className="h-7 w-24 text-sm"
+                          />
                         </div>
                         {place.rating && (
                           <div className="flex items-center text-xs text-muted-foreground mt-2">
@@ -110,9 +119,11 @@ export default function DailyItinerarySidebar({
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <button className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => onPlaceRemove?.(place.placeId ?? place.id)}>
-                                <Trash2 className="h-3 w-3" />
+                              <button
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => onPlaceRemove?.(getIdentifier(place))}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
                               </button>
                             </TooltipTrigger>
                             <TooltipContent><p>Remove from itinerary</p></TooltipContent>

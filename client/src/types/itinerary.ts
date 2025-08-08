@@ -1,6 +1,8 @@
+import type { Poi } from "@shared/schema";
+
 export interface ItineraryPlace extends Poi {
   dayIndex?: number;
-  scheduledTime?: string; // "HH:MM"
+  scheduledTime?: string; // "HH:MM" (24-hour)
   dayOrder?: number;
   notes?: string;
 }
