@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { ArrowLeft, Plus, GripVertical, Save, Check, LogIn, Eye, EyeOff, Map } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useTripPlaces } from "@/hooks/use-trip-places";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/components/auth-context";
-import { Clock } from "lucide-react";
-import type { Poi } from "@shared/schema";
-import { InteractiveMap } from "@/components/interactive-map";
+// this file is at client/src/pages dir
+
 import {
+  closestCenter,
   DndContext,
+  type DragEndEvent,
+  type DragOverEvent,
   DragOverlay,
+  type DragStartEvent,
   PointerSensor,
+  rectIntersection,
   useSensor,
   useSensors,
-  DragStartEvent,
-  DragEndEvent,
-  DragOverEvent,
-  closestCenter,
-  rectIntersection,
 } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import type { Poi } from "@shared/schema";
+import { ArrowLeft, Check, Clock, Eye, EyeOff, GripVertical, LogIn, Map, Plus, Save } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/components/auth-context";
+import { InteractiveMap } from "@/components/interactive-map";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useTripPlaces } from "@/hooks/use-trip-places";
 
 // Extended interface for itinerary organization
 export interface ItineraryPlace extends Poi {
@@ -59,11 +61,7 @@ const SortablePlaceItem = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`itinerary-card group ${isDragging ? "itinerary-card-dragging" : ""}`}
-    >
+    <div ref={setNodeRef} style={style} className={`itinerary-card group ${isDragging ? "itinerary-card-dragging" : ""}`}>
       {/* Header Row */}
       <div className="flex items-start justify-between mb-3 p-3 pb-0">
         <div className="flex-1 min-w-0">
@@ -75,11 +73,7 @@ const SortablePlaceItem = ({
           </div>
         </div>
 
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 transition-colors"
-        >
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 transition-colors">
           <GripVertical className="h-4 w-4 transition-colors" style={{ color: "var(--text-muted)" }} />
         </div>
       </div>
@@ -261,12 +255,7 @@ const DailyItinerarySidebar = ({
               {day.date.toLocaleDateString()}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsMapVisible(!isMapVisible)}
-            className="flex items-center gap-1"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setIsMapVisible(!isMapVisible)} className="flex items-center gap-1">
             {isMapVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
@@ -311,29 +300,35 @@ const DailyItinerarySidebar = ({
       </div>
 
       {/* Map Section */}
-      {isMapVisible && sortedPlaces.length > 0 && mapsApiKey && (
+      {isMapVisible && sortedPlaces.length > 0 && (
         <div className="p-4 border-t" style={{ borderColor: "var(--border)" }}>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text)" }}>
             Day {dayIndex + 1} Route
           </h3>
           <div className="h-64 itinerary-card overflow-hidden">
-            <InteractiveMap
-              startCity={sortedPlaces[0]?.address?.split(",")[0] || sortedPlaces[0]?.name || ""}
-              endCity={
-                sortedPlaces[sortedPlaces.length - 1]?.address?.split(",")[0] ||
-                sortedPlaces[sortedPlaces.length - 1]?.name ||
-                ""
-              }
-              checkpoints={[]}
-              pois={sortedPlaces}
-              selectedPoiIds={[]}
-              hoveredPoi={null}
-              onPoiClick={() => {}}
-              onPoiSelect={() => {}}
-              height="100%"
-              className="w-full h-full"
-              apiKey={mapsApiKey}
-            />
+            {mapsApiKey ? (
+              <InteractiveMap
+                startCity={sortedPlaces[0]?.address?.split(",")[0] || sortedPlaces[0]?.name || ""}
+                endCity={sortedPlaces[sortedPlaces.length - 1]?.address?.split(",")[0] || sortedPlaces[sortedPlaces.length - 1]?.name || ""}
+                checkpoints={[]}
+                pois={sortedPlaces}
+                selectedPoiIds={[]}
+                hoveredPoi={null}
+                onPoiClick={() => {}}
+                onPoiSelect={() => {}}
+                height="100%"
+                className="w-full h-full"
+                apiKey={mapsApiKey}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                <div className="text-center p-4">
+                  <Map className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600 mb-1">Map not available</p>
+                  <p className="text-xs text-gray-500">Google Maps API key not found</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -341,13 +336,7 @@ const DailyItinerarySidebar = ({
   );
 };
 
-const TripPlacesGrid = ({
-  places,
-  onPlaceReturn,
-}: {
-  places: ItineraryPlace[];
-  onPlaceReturn?: (placeId: string | number) => void;
-}) => {
+const TripPlacesGrid = ({ places, onPlaceReturn }: { places: ItineraryPlace[]; onPlaceReturn?: (placeId: string | number) => void }) => {
   const [draggedItem, setDraggedItem] = useState<ItineraryPlace | null>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
 
@@ -441,18 +430,14 @@ const TripPlacesGrid = ({
             {places.map((place) => (
               <div
                 key={place.id}
-                className={`itinerary-card overflow-hidden cursor-move ${
-                  draggedItem?.id === place.id ? "itinerary-card-dragging" : ""
-                }`}
+                className={`itinerary-card overflow-hidden cursor-move ${draggedItem?.id === place.id ? "itinerary-card-dragging" : ""}`}
                 draggable
                 onDragStart={(e) => handleDragStart(e, place)}
                 onDragEnd={handleDragEnd}
                 onMouseEnter={() => handlePoiHover(place)}
                 onMouseLeave={() => handlePoiHover(null)}
               >
-                {place.imageUrl && (
-                  <img src={place.imageUrl} alt={place.name} className="w-full h-32 object-cover rounded-t-2xl" />
-                )}
+                {place.imageUrl && <img src={place.imageUrl} alt={place.name} className="w-full h-32 object-cover rounded-t-2xl" />}
                 <div className="p-3">
                   {/* Header Row */}
                   <div className="mb-3">
@@ -509,7 +494,7 @@ export default function ItineraryPage() {
       activationConstraint: {
         distance: 8, // 8px drag distance before activating
       },
-    })
+    }),
   );
 
   // Track which places are already assigned to avoid duplicates
@@ -519,20 +504,46 @@ export default function ItineraryPage() {
   const [mapsApiKey, setMapsApiKey] = useState<string | null>(null);
 
   useEffect(() => {
-    // Try to get maps API key from route results data or fallback method
-    const fetchMapsApiKey = async () => {
+    let foundApiKey = null;
+
+    // First, try to get API key from stored route data (set by route-results page)
+    const storedRouteData = localStorage.getItem("routeData");
+    if (storedRouteData && !foundApiKey) {
       try {
-        const response = await fetch("/api/maps-api-key");
-        if (response.ok) {
-          const data = await response.json();
-          setMapsApiKey(data.apiKey);
+        const routeData = JSON.parse(storedRouteData);
+        // Phoenix API returns maps_api_key in the route data
+        if (routeData.maps_api_key) {
+          foundApiKey = routeData.maps_api_key;
+          console.log("✅ Using maps API key from route data");
+        } else if (routeData.routeData?.maps_api_key) {
+          // Sometimes nested in routeData
+          foundApiKey = routeData.routeData.maps_api_key;
+          console.log("✅ Using maps API key from nested route data");
         }
       } catch (error) {
-        console.log("Could not fetch maps API key:", error);
+        console.log("❌ Could not parse route data for API key:", error);
       }
-    };
+    }
 
-    fetchMapsApiKey();
+    // Also check explore data as fallback
+    const storedExploreData = localStorage.getItem("exploreData");
+    if (!foundApiKey && storedExploreData) {
+      try {
+        const exploreData = JSON.parse(storedExploreData);
+        if (exploreData.maps_api_key) {
+          foundApiKey = exploreData.maps_api_key;
+          console.log("✅ Using maps API key from explore data");
+        }
+      } catch (error) {
+        console.log("❌ Could not parse explore data for API key:", error);
+      }
+    }
+
+    if (foundApiKey) {
+      setMapsApiKey(foundApiKey);
+    } else {
+      console.log("⚠️ No maps API key found in localStorage");
+    }
   }, []);
 
   // Load persisted itinerary data on mount
@@ -641,7 +652,7 @@ export default function ItineraryPage() {
           const identifier = p.placeId || p.id;
           return identifier !== placeId;
         }),
-      }))
+      })),
     );
 
     setAssignedPlaceIds((prev) => {
@@ -667,7 +678,7 @@ export default function ItineraryPage() {
           }
           return place;
         }),
-      }))
+      })),
     );
   };
 
@@ -880,10 +891,7 @@ export default function ItineraryPage() {
   if (tripPlaces.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
-        <div
-          className="text-center p-8 rounded-2xl"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-        >
+        <div className="text-center p-8 rounded-2xl" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
           <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--text)" }}>
             You've scheduled all your places
           </h1>
@@ -967,8 +975,7 @@ export default function ItineraryPage() {
                     : () => {
                         toast({
                           title: "Sign in to save your trip",
-                          description:
-                            "Go to the home page to sign in with Google or create an account. Your progress is saved locally.",
+                          description: "Go to the home page to sign in with Google or create an account. Your progress is saved locally.",
                         });
                         setLocation("/");
                       }
@@ -1024,6 +1031,7 @@ export default function ItineraryPage() {
               return !assignedPlaceIds.has(placeIdentifier);
             })}
             onPlaceReturn={handlePlaceRemove}
+            mapsApiKey={mapsApiKey || undefined}
           />
         </div>
 
