@@ -1,13 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import {
-  ArrowLeft,
-  Loader2,
-  Map as MapIcon,
-  Calendar,
-  List,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { ArrowLeft, Loader2, Map as MapIcon, Calendar, List, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import type { POI } from "@/types/api";
@@ -16,11 +8,7 @@ import PoiCard from "@/components/poi-card";
 import { InteractiveMap } from "@/components/interactive-map";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import CategoryFilter from "@/components/category-filter";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
 
 interface PlacesViewProps {
@@ -54,20 +42,14 @@ const extractCityFromPoi = (poi: POI | Poi): string | null => {
   if (poi.address && poi.address !== "Address not available") {
     const addressParts = poi.address.split(",").map((part) => part.trim());
     const statePattern = /\b[A-Z]{2}\b/;
-    const stateIndex = addressParts.findIndex((part) =>
-      statePattern.test(part)
-    );
+    const stateIndex = addressParts.findIndex((part) => statePattern.test(part));
 
     if (stateIndex > 0) {
       const cityPart = addressParts[stateIndex - 1];
       const cityMatch = cityPart.match(/([A-Za-z\s]+)/);
       if (cityMatch) {
         const city = cityMatch[1].trim().toLowerCase();
-        if (
-          !city.match(
-            /\b(street|road|avenue|drive|boulevard|lane|way|place|court|circle)\b/i
-          )
-        ) {
+        if (!city.match(/\b(street|road|avenue|drive|boulevard|lane|way|place|court|circle)\b/i)) {
           return city;
         }
       }
@@ -75,12 +57,35 @@ const extractCityFromPoi = (poi: POI | Poi): string | null => {
 
     // Common cities fallback
     const commonCities = [
-      "austin", "dallas", "houston", "san antonio", "fort worth", "el paso",
-      "arlington", "corpus christi", "plano", "lubbock", "irving", "garland",
-      "amarillo", "grand prairie", "brownsville", "pasadena", "mesquite",
-      "mckinney", "carrollton", "beaumont", "abilene", "round rock",
-      "richardson", "midland", "lewisville", "college station", "pearland",
-      "denton", "sugar land"
+      "austin",
+      "dallas",
+      "houston",
+      "san antonio",
+      "fort worth",
+      "el paso",
+      "arlington",
+      "corpus christi",
+      "plano",
+      "lubbock",
+      "irving",
+      "garland",
+      "amarillo",
+      "grand prairie",
+      "brownsville",
+      "pasadena",
+      "mesquite",
+      "mckinney",
+      "carrollton",
+      "beaumont",
+      "abilene",
+      "round rock",
+      "richardson",
+      "midland",
+      "lewisville",
+      "college station",
+      "pearland",
+      "denton",
+      "sugar land",
     ];
 
     const addressLower = poi.address.toLowerCase();
@@ -107,17 +112,17 @@ export default function PlacesView({
   hoveredPoi,
   headerTitle,
   sidebarTitle,
-  backUrl = "/"
+  backUrl = "/",
 }: PlacesViewProps) {
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
-  
+
   // POI scheduling state
   const [scheduledTimes, setScheduledTimes] = useState<Map<number, string>>(new Map());
 
   const handleTimeChange = (poiId: number, newTime: string) => {
-    setScheduledTimes(prev => {
+    setScheduledTimes((prev) => {
       const updated = new Map(prev);
       updated.set(poiId, newTime);
       return updated;
@@ -133,7 +138,7 @@ export default function PlacesView({
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       // Mobile-first logic:
       // - Explore mode: POI list first on mobile, map optional on desktop
       // - Route mode: always show map (both mobile and desktop)
@@ -148,22 +153,20 @@ export default function PlacesView({
     checkMobile();
 
     // Add resize listener
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, [showRouting]);
 
   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
   const { tripPlaces } = useTripPlaces();
 
   // Filter and dedupe POIs
-  const uniquePois = pois.filter(
-    (poi, index, self) => {
-      if (!poi || typeof poi !== 'object') {
-        return false;
-      }
-      return index === self.findIndex((p) => p?.placeId === poi?.placeId);
+  const uniquePois = pois.filter((poi, index, self) => {
+    if (!poi || typeof poi !== "object") {
+      return false;
     }
-  );
+    return index === self.findIndex((p) => p?.placeId === poi?.placeId);
+  });
 
   // Generate available cities
   const availableCities = useMemo(() => {
@@ -224,34 +227,29 @@ export default function PlacesView({
   const handlePanelResize = (size: number) => {
     setSidebarSizePercent(size);
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event("resize"));
       if (window.google && window.google.maps) {
-        window.dispatchEvent(new CustomEvent('mapResize'));
+        window.dispatchEvent(new CustomEvent("mapResize"));
       }
     }, 100);
   };
 
   // Compute display values
-  const displayHeaderTitle = headerTitle || (showRouting
-    ? `${startLocation} → ${endLocation}`
-    : `Exploring ${startLocation}`
-  );
+  const displayHeaderTitle =
+    headerTitle || (showRouting ? `${startLocation} → ${endLocation}` : `Exploring ${startLocation}`);
 
-  const displaySidebarTitle = sidebarTitle || (showRouting
-    ? "Places Along Route"
-    : "Places to Explore"
-  );
+  const displaySidebarTitle = sidebarTitle || (showRouting ? "Places Along Route" : "Places to Explore");
 
   // Debug logging
-  console.log('PlacesView render:', { 
-    isMapVisible, 
-    showRouting, 
+  console.log("PlacesView render:", {
+    isMapVisible,
+    showRouting,
     isMobile,
-    poisCount: uniquePois.length
+    poisCount: uniquePois.length,
   });
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: "var(--bg)" }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -268,22 +266,21 @@ export default function PlacesView({
               <div className="text-sm text-slate-600 hidden sm:block">
                 {displayHeaderTitle} • {uniquePois.length} places
               </div>
-              <div className="text-xs text-slate-600 sm:hidden">
-                {uniquePois.length} places
-              </div>
-              
+              <div className="text-xs text-slate-600 sm:hidden">{uniquePois.length} places</div>
+
               {/* Mobile-optimized toggle button */}
               <button
                 onClick={() => {
-                  console.log('Toggle map clicked:', { before: isMapVisible, after: !isMapVisible });
+                  console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
                   setIsMapVisible(!isMapVisible);
                 }}
                 className={`
                   flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation
-                  ${isMobile ? 'min-w-[44px] min-h-[44px]' : 'px-3 py-1.5'} 
-                  ${isMapVisible 
-                    ? 'bg-slate-600 hover:bg-slate-700 text-white' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
+                  ${
+                    isMapVisible
+                      ? "bg-slate-600 hover:bg-slate-700 text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
                   }
                 `}
                 aria-label={isMapVisible ? "Hide map, show POI list" : "Show map"}
@@ -307,7 +304,7 @@ export default function PlacesView({
 
       {/* Main Content */}
       {(() => {
-        console.log('Rendering decision:', { isMapVisible, showingPanel: isMapVisible, showingGrid: !isMapVisible });
+        console.log("Rendering decision:", { isMapVisible, showingPanel: isMapVisible, showingGrid: !isMapVisible });
         return null;
       })()}
       {isMobile ? (
@@ -325,7 +322,7 @@ export default function PlacesView({
             ) : (
               <InteractiveMap
                 startCity={startLocation}
-                endCity={endLocation || ''}
+                endCity={endLocation || ""}
                 checkpoints={showRouting ? [] : undefined}
                 pois={uniquePois}
                 selectedPoiIds={selectedPoiIds}
@@ -343,14 +340,11 @@ export default function PlacesView({
           <div className="flex-1 flex flex-col">
             {/* Category Filter for POI-only view */}
             <div className="bg-white border-b border-slate-200 flex-shrink-0">
-              <CategoryFilter
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-              />
+              <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
             </div>
-            
+
             {/* POI Grid with Mobile Optimization */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto" style={{ backgroundColor: "var(--bg)" }}>
               <div className="p-3 bg-slate-50">
                 <div className="max-w-7xl mx-auto">
                   {/* Loading State */}
@@ -365,9 +359,7 @@ export default function PlacesView({
                   {!isLoading && filteredPois.length === 0 && (
                     <div className="p-8 text-center">
                       <div className="text-4xl mb-3">🗺️</div>
-                      <h3 className="text-lg font-semibold text-slate-700 mb-2">
-                        No places found
-                      </h3>
+                      <h3 className="text-lg font-semibold text-slate-700 mb-2">No places found</h3>
                       <p className="text-sm text-slate-600">
                         Try adjusting your filters or explore a different location.
                       </p>
@@ -384,8 +376,8 @@ export default function PlacesView({
                           onMouseLeave={() => onPoiHover(null)}
                           className="transition-all"
                         >
-                          <PoiCard 
-                            poi={{...poi, scheduledTime: scheduledTimes.get(poi.id)}} 
+                          <PoiCard
+                            poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
                             variant="compact"
                             showTimeScheduler={true}
                             onTimeChange={handleTimeChange}
@@ -402,7 +394,7 @@ export default function PlacesView({
             {tripPlaces.length > 0 && (
               <div className="p-3 border-t border-slate-200 bg-white flex-shrink-0">
                 <Button
-                  onClick={() => setLocation('/itinerary')}
+                  onClick={() => setLocation("/itinerary")}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white min-h-[48px] touch-manipulation"
                   size="lg"
                 >
@@ -417,151 +409,142 @@ export default function PlacesView({
         // Desktop: Original ResizablePanelGroup layout
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left Sidebar */}
-          <ResizablePanel 
+          <ResizablePanel
             defaultSize={30}
             minSize={20}
             maxSize={50}
             className="bg-card"
-            style={{ backgroundColor: 'var(--card)' }}
+            style={{ backgroundColor: "var(--card)" }}
             onResize={handlePanelResize}
           >
             <div className="flex flex-col h-full">
-            {/* Category Filter */}
-            <CategoryFilter
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
-            
-            {/* Sidebar Header */}
-            <div 
-              className="p-3 border-b" 
-              style={{ 
-                borderColor: 'var(--border)', 
-                backgroundColor: 'var(--surface-alt)' 
-              }}
-            >
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
-                {displaySidebarTitle}
-              </h2>
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => setSelectedCity("all")}
-                  className="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
-                  style={selectedCity === "all" 
-                    ? { 
-                        backgroundColor: 'var(--primary)', 
-                        color: 'var(--primary-foreground)' 
-                      }
-                    : { 
-                        backgroundColor: 'var(--muted)',
-                        color: 'var(--text-muted)'
-                      }
-                  }
-                  onMouseEnter={(e) => {
-                    if (selectedCity !== "all") {
-                      e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                      e.currentTarget.style.color = 'var(--primary)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedCity !== "all") {
-                      e.currentTarget.style.backgroundColor = 'var(--muted)';
-                      e.currentTarget.style.color = 'var(--text-muted)';
-                    }
-                  }}
-                >
-                  All ({uniquePois.length})
-                </button>
-              </div>
-            </div>
+              {/* Category Filter */}
+              <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
 
-            {/* POI List */}
-            <div className="flex-1 overflow-y-auto">
-              {isLoading && (
-                <div className="p-4 text-center">
-                  <Loader2 
-                    className="h-6 w-6 animate-spin mx-auto mb-2" 
-                    style={{ color: 'var(--primary)' }}
-                  />
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    Loading places...
-                  </p>
-                </div>
-              )}
-
-              {!isLoading && uniquePois.length === 0 && (
-                <div className="p-4 text-center">
-                  <div className="text-2xl mb-2">🗺️</div>
-                  <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text)' }}>
-                    No places found
-                  </h3>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    Try a different {showRouting ? 'route' : 'location'}.
-                  </p>
-                </div>
-              )}
-
-              {uniquePois.length > 0 && (
-                <div
-                  className={`p-2 ${isGridLayout ? 'grid gap-3' : 'space-y-2'}`}
-                  style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
-                >
-                  {filteredPois.map((poi, index) => (
-                    <div
-                      key={poi.placeId || poi.id || `poi-${index}`}
-                      onMouseEnter={() => onPoiHover(poi)}
-                      onMouseLeave={() => onPoiHover(null)}
-                      className="transition-all"
-                    >
-                      <PoiCard 
-                        poi={{...poi, scheduledTime: scheduledTimes.get(poi.id)}} 
-                        variant={isGridLayout ? "grid" : "compact"}
-                        showTimeScheduler={true}
-                        onTimeChange={handleTimeChange}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Itinerary Button */}
-            {tripPlaces.length > 0 && (
-              <div 
-                className="p-3 border-t" 
-                style={{ 
-                  borderColor: 'var(--border)', 
-                  backgroundColor: 'var(--surface-alt)' 
+              {/* Sidebar Header */}
+              <div
+                className="p-3 border-b"
+                style={{
+                  borderColor: "var(--border)",
+                  backgroundColor: "var(--surface-alt)",
                 }}
               >
-                <Button
-                  onClick={() => setLocation('/itinerary')}
-                  className="w-full transition-all"
-                  size="sm"
-                  style={{ 
-                    backgroundColor: 'var(--primary)', 
-                    color: 'var(--primary-foreground)' 
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--primary)';
+                <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+                  {displaySidebarTitle}
+                </h2>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => setSelectedCity("all")}
+                    className="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
+                    style={
+                      selectedCity === "all"
+                        ? {
+                            backgroundColor: "var(--primary)",
+                            color: "var(--primary-foreground)",
+                          }
+                        : {
+                            backgroundColor: "var(--muted)",
+                            color: "var(--text-muted)",
+                          }
+                    }
+                    onMouseEnter={(e) => {
+                      if (selectedCity !== "all") {
+                        e.currentTarget.style.backgroundColor = "var(--primary-50)";
+                        e.currentTarget.style.color = "var(--primary)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedCity !== "all") {
+                        e.currentTarget.style.backgroundColor = "var(--muted)";
+                        e.currentTarget.style.color = "var(--text-muted)";
+                      }
+                    }}
+                  >
+                    All ({uniquePois.length})
+                  </button>
+                </div>
+              </div>
+
+              {/* POI List */}
+              <div className="flex-1 overflow-y-auto">
+                {isLoading && (
+                  <div className="p-4 text-center">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" style={{ color: "var(--primary)" }} />
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                      Loading places...
+                    </p>
+                  </div>
+                )}
+
+                {!isLoading && uniquePois.length === 0 && (
+                  <div className="p-4 text-center">
+                    <div className="text-2xl mb-2">🗺️</div>
+                    <h3 className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>
+                      No places found
+                    </h3>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                      Try a different {showRouting ? "route" : "location"}.
+                    </p>
+                  </div>
+                )}
+
+                {uniquePois.length > 0 && (
+                  <div
+                    className={`p-2 ${isGridLayout ? "grid gap-3" : "space-y-2"}`}
+                    style={isGridLayout ? { gridTemplateColumns: `repeat(${gridColumns}, 1fr)` } : {}}
+                  >
+                    {filteredPois.map((poi, index) => (
+                      <div
+                        key={poi.placeId || poi.id || `poi-${index}`}
+                        onMouseEnter={() => onPoiHover(poi)}
+                        onMouseLeave={() => onPoiHover(null)}
+                        className="transition-all"
+                      >
+                        <PoiCard
+                          poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
+                          variant={isGridLayout ? "grid" : "compact"}
+                          showTimeScheduler={true}
+                          onTimeChange={handleTimeChange}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Itinerary Button */}
+              {tripPlaces.length > 0 && (
+                <div
+                  className="p-3 border-t"
+                  style={{
+                    borderColor: "var(--border)",
+                    backgroundColor: "var(--surface-alt)",
                   }}
                 >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Start Itinerary ({tripPlaces.length} places)
-                </Button>
-              </div>
-            )}
+                  <Button
+                    onClick={() => setLocation("/itinerary")}
+                    className="w-full transition-all"
+                    size="sm"
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--primary-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--primary)";
+                    }}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Start Itinerary ({tripPlaces.length} places)
+                  </Button>
+                </div>
+              )}
             </div>
           </ResizablePanel>
 
-          <ResizableHandle 
-            withHandle 
-            className="transition-colors" 
-            style={{ backgroundColor: 'var(--border)' }}
-          />
+          <ResizableHandle withHandle className="transition-colors" style={{ backgroundColor: "var(--border)" }} />
 
           {/* Map Panel */}
           <ResizablePanel defaultSize={70}>
@@ -575,7 +558,7 @@ export default function PlacesView({
             ) : (
               <InteractiveMap
                 startCity={startLocation}
-                endCity={endLocation || ''}
+                endCity={endLocation || ""}
                 checkpoints={showRouting ? [] : undefined}
                 pois={uniquePois}
                 selectedPoiIds={selectedPoiIds}
