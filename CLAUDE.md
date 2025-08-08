@@ -10,6 +10,7 @@ You are Pragmatic straightforward, no bullshit. Match my tone. Tell it like it i
 whenever you wanna start or stop the server, please ask to user first to do it themselves.
 Same goes for small Commands
 and file edits
+if you try to rin the server and theres already something using ask me about it before proceding
 
 ### Core Development
 
@@ -29,17 +30,20 @@ and file edits
 ## Recent Updates - August 7, 2025 - Session 21
 
 ### MSW Complete Removal
+
 - **REMOVED**: MSW (Mock Service Worker) completely removed from project
 - **Reason**: Migrated to Phoenix backend, MSW no longer needed
 - **Deleted**: All mock files, MSW dependencies, Vite configuration
 - **Replaced**: Mock data with inline DEFAULT_INTEREST_CATEGORIES in types/interests.ts
 
 ### Phoenix Backend Integration Complete
+
 - **Endpoint**: `/api/route-results` working correctly with 15 POIs
 - **City Autocomplete**: Fixed to use `/api/places/autocomplete` with `input` parameter
 - **API Key**: Google Maps API key configuration resolved by backend team
 
 ### Critical Fixes Applied
+
 - **TypeScript Runtime Errors**: Added optional chaining to prevent "Cannot read properties of undefined"
 - **Variable Naming Conflicts**: Resolved scope conflicts in route-results query function
 - **React Query Caching**: Disabled for development debugging (needs re-enabling for prod)
@@ -48,14 +52,16 @@ and file edits
 ## Previous Updates - January 2, 2025
 
 ### City Autocomplete Enhancements
+
 - **Downshift Migration**: Migrated from shadcn/ui Command/Popover to downshift v9.0.10 for better accessibility
 - **API Optimization**: Switched from Google Places API to custom `/api/places/city-autocomplete` endpoint
 - **Browser Caching**: Implemented TanStack Query caching with 30-minute stale time and popular cities prefetching
 - **Performance**: ~80% reduction in API calls through intelligent caching and background prefetching
 
 ### Key Files Updated
+
 - `client/src/hooks/use-city-autocomplete.ts` - NEW: TanStack Query caching hook
-- `client/src/hooks/use-places-autocomplete.ts` - Updated to use cached version  
+- `client/src/hooks/use-places-autocomplete.ts` - Updated to use cached version
 - `client/src/components/place-autocomplete.tsx` - Migrated to downshift v9 with semantic HTML
 - `client/src/App.tsx` - Added popular cities prefetching on startup
 
@@ -202,6 +208,7 @@ This is a React frontend application that connects to a Phoenix backend:
 ## Migration Notes - January 8, 2025
 
 ### Express to Phoenix Migration
+
 - **Removed**: Express.js backend, server directory, shared schema directory
 - **Added**: Local type definitions in `client/src/types/schema.ts`
 - **Updated**: Vite configuration to proxy API calls to Phoenix on port 4001

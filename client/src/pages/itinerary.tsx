@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Plus, GripVertical, Save, Check, LogIn } from 'lucide-react';
+import { ArrowLeft, Plus, GripVertical, Save, Check, LogIn, Eye, EyeOff, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTripPlaces } from '@/hooks/use-trip-places';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/components/auth-context';
 import { Clock } from 'lucide-react';
 import type { Poi } from '@shared/schema';
+import { InteractiveMap } from '@/components/interactive-map';
 import {
   DndContext,
   DragOverlay,
@@ -191,7 +192,8 @@ const DailyItinerarySidebar = ({
   onPlaceUpdate,
   onPlaceRemove,
   onPlaceAssignment,
-  onPlaceReorder
+  onPlaceReorder,
+  mapsApiKey
 }: {
   day: DayData;
   dayIndex: number;
@@ -199,8 +201,10 @@ const DailyItinerarySidebar = ({
   onPlaceRemove?: (placeId: string | number) => void;
   onPlaceAssignment?: (place: ItineraryPlace, dayIndex: number) => void;
   onPlaceReorder?: (dayIndex: number, places: ItineraryPlace[]) => void;
+  mapsApiKey?: string;
 }) => {
   const [draggedOver, setDraggedOver] = useState(false);
+  const [isMapVisible, setIsMapVisible] = useState(true);
   
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -259,17 +263,29 @@ const DailyItinerarySidebar = ({
     }}>
       {/* Section Header */}
       <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
-        <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
-          Day {dayIndex + 1}
-        </h2>
-        {day.title && (
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {day.title}
-          </p>
-        )}
-        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-          {day.date.toLocaleDateString()}
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+              Day {dayIndex + 1}
+            </h2>
+            {day.title && (
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                {day.title}
+              </p>
+            )}
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+              {day.date.toLocaleDateString()}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMapVisible(!isMapVisible)}
+            className="flex items-center gap-1"
+          >
+            {isMapVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
       
       {/* Drop zone for places */}
@@ -313,16 +329,44 @@ const DailyItinerarySidebar = ({
           )}
         </div>
       </div>
+      
+      {/* Map Section */}
+      {isMapVisible && sortedPlaces.length > 0 && mapsApiKey && (
+        <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text)' }}>
+            Day {dayIndex + 1} Route
+          </h3>
+          <div className="h-64 itinerary-card overflow-hidden">
+            <InteractiveMap
+              startCity={sortedPlaces[0]?.address?.split(',')[0] || sortedPlaces[0]?.name || ''}
+              endCity={sortedPlaces[sortedPlaces.length - 1]?.address?.split(',')[0] || sortedPlaces[sortedPlaces.length - 1]?.name || ''}
+              checkpoints={[]}
+              pois={sortedPlaces}
+              selectedPoiIds={[]}
+              hoveredPoi={null}
+              onPoiClick={() => {}}
+              onPoiSelect={() => {}}
+              height="100%"
+              className="w-full h-full"
+              apiKey={mapsApiKey}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const TripPlacesGrid = ({ places, onPlaceReturn }: { 
+const TripPlacesGrid = ({ 
+  places, 
+  onPlaceReturn
+}: { 
   places: ItineraryPlace[]; 
   onPlaceReturn?: (placeId: string | number) => void;
 }) => {
   const [draggedItem, setDraggedItem] = useState<ItineraryPlace | null>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
+
 
   const handleDragStart = (e: React.DragEvent, place: ItineraryPlace) => {
     e.dataTransfer.setData('application/json', JSON.stringify(place));
@@ -378,73 +422,88 @@ const TripPlacesGrid = ({ places, onPlaceReturn }: {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >
-      {/* Panel container with UX spec styling */}
-      <div className="trip-places-panel mb-4">
-        <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
-          Your Trip Places
-        </h2>
-        <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-          Drag places to schedule them, or drag scheduled places back here to unschedule
-        </p>
-        
-        {isDraggedOver && (
-          <div className="mb-4 p-3 rounded border-2 border-dashed" 
-               style={{ 
-                 borderColor: 'var(--primary-200)', 
-                 background: 'var(--primary-50)',
-                 color: 'var(--text-muted)'
-               }}>
-            Drop here to unschedule this place
+      {places.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Check className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--primary)' }} />
+            <p className="text-lg font-medium mb-2" style={{ color: 'var(--text)' }}>
+              All places scheduled!
+            </p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              You've successfully organized all your trip places into daily itineraries.
+            </p>
           </div>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {places.map((place) => (
-            <div
-              key={place.id}
-              className={`itinerary-card overflow-hidden cursor-move ${
-                draggedItem?.id === place.id ? 'itinerary-card-dragging' : ''
-              }`}
-              draggable
-              onDragStart={(e) => handleDragStart(e, place)}
-              onDragEnd={handleDragEnd}
-            >
-              {place.imageUrl && (
-                <img
-                  src={place.imageUrl}
-                  alt={place.name}
-                  className="w-full h-32 object-cover rounded-t-2xl"
-                />
-              )}
-              <div className="p-3">
-                {/* Header Row */}
-                <div className="mb-3">
-                  <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text)' }}>
-                    {place.name}
-                  </h3>
-                  <p className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>
-                    {place.category}
-                  </p>
-                </div>
-                
-                {/* Body Row */}
-                <div className="flex items-center justify-between">
-                  {place.rating && (
-                    <div className="rating-pill">
-                      <span style={{ color: 'var(--warning)' }}>⭐</span>
-                      <span>{place.rating}</span>
-                    </div>
-                  )}
-                  <GripVertical 
-                    className="h-4 w-4" 
-                    style={{ color: 'var(--text-muted)' }}
+        </div>
+      ) : (
+        <div className="trip-places-panel mb-4">
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
+            Your Trip Places
+          </h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+            Drag places to schedule them, or drag scheduled places back here to unschedule
+          </p>
+          
+          {isDraggedOver && (
+            <div className="mb-4 p-3 rounded border-2 border-dashed" 
+                 style={{ 
+                   borderColor: 'var(--primary-200)', 
+                   background: 'var(--primary-50)',
+                   color: 'var(--text-muted)'
+                 }}>
+              Drop here to unschedule this place
+            </div>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {places.map((place) => (
+              <div
+                key={place.id}
+                className={`itinerary-card overflow-hidden cursor-move ${
+                  draggedItem?.id === place.id ? 'itinerary-card-dragging' : ''
+                }`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, place)}
+                onDragEnd={handleDragEnd}
+                onMouseEnter={() => handlePoiHover(place)}
+                onMouseLeave={() => handlePoiHover(null)}
+              >
+                {place.imageUrl && (
+                  <img
+                    src={place.imageUrl}
+                    alt={place.name}
+                    className="w-full h-32 object-cover rounded-t-2xl"
                   />
+                )}
+                <div className="p-3">
+                  {/* Header Row */}
+                  <div className="mb-3">
+                    <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text)' }}>
+                      {place.name}
+                    </h3>
+                    <p className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>
+                      {place.category}
+                    </p>
+                  </div>
+                  
+                  {/* Body Row */}
+                  <div className="flex items-center justify-between">
+                    {place.rating && (
+                      <div className="rating-pill">
+                        <span style={{ color: 'var(--warning)' }}>⭐</span>
+                        <span>{place.rating}</span>
+                      </div>
+                    )}
+                    <GripVertical 
+                      className="h-4 w-4" 
+                      style={{ color: 'var(--text-muted)' }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -479,6 +538,26 @@ export default function ItineraryPage() {
 
   // Track which places are already assigned to avoid duplicates
   const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
+
+  // Get maps API key from route results (similar to route-results page)
+  const [mapsApiKey, setMapsApiKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Try to get maps API key from route results data or fallback method
+    const fetchMapsApiKey = async () => {
+      try {
+        const response = await fetch('/api/maps-api-key');
+        if (response.ok) {
+          const data = await response.json();
+          setMapsApiKey(data.apiKey);
+        }
+      } catch (error) {
+        console.log('Could not fetch maps API key:', error);
+      }
+    };
+    
+    fetchMapsApiKey();
+  }, []);
 
   // Load persisted itinerary data on mount
   useEffect(() => {
@@ -960,6 +1039,7 @@ export default function ItineraryPage() {
             onPlaceRemove={handlePlaceRemove}
             onPlaceAssignment={handlePlaceAssignment}
             onPlaceReorder={handlePlaceReorder}
+            mapsApiKey={mapsApiKey || undefined}
           />
 
           {/* Trip Places Grid */}

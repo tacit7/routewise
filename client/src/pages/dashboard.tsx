@@ -9,7 +9,7 @@ import Header from "@/components/header";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Settings } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Settings, Search } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -37,6 +37,14 @@ const Dashboard = () => {
   const shouldShowFirstTimeExperience = !hasInterestsConfigured && !isLoading;
 
   const handlePlanRoadTrip = () => {
+    // Store trip type in localStorage before navigating
+    localStorage.setItem("tripType", "route");
+    setLocation("/trip-wizard");
+  };
+
+  const handleExplore = () => {
+    // Store trip type in localStorage before navigating
+    localStorage.setItem("tripType", "explore");
     setLocation("/trip-wizard");
   };
 
@@ -74,7 +82,7 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
         <Header />
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
@@ -88,14 +96,21 @@ const Dashboard = () => {
               You haven't planned any trips yet. Start your first adventure below.
             </p>
 
-            {/* Action Button */}
-            <div className="flex justify-center">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={handlePlanRoadTrip}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
               >
                 <Route className="w-6 h-6 mr-3" />
-                Start Planning
+                Plan Route
+              </Button>
+              <Button
+                onClick={handleExplore}
+                className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+              >
+                <Search className="w-6 h-6 mr-3" />
+                Explore Places
               </Button>
             </div>
 
@@ -219,7 +234,7 @@ const Dashboard = () => {
     );
   }
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
       <Header />
 
@@ -236,9 +251,16 @@ const Dashboard = () => {
               Plan a Road Trip
             </Button>
             <Button
+              onClick={handleExplore}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Explore Places
+            </Button>
+            <Button
               onClick={handleHelpMePlan}
               variant="outline"
-              className="bg-green-600 hover:bg-green-700 text-white border-green-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
             >
               <MapPin className="w-5 h-5 mr-2" />
               Help Me Plan a Trip

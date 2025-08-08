@@ -468,6 +468,7 @@ export interface POI {
   lng: number;
   createdAt: string;
   updatedAt: string;
+  scheduledTime?: string; // Format: "HH:MM" (24-hour)
 }
 
 export interface RouteInfo {

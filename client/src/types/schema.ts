@@ -12,6 +12,7 @@ export interface Poi {
   lng: number;
   createdAt: string;
   updatedAt: string;
+  scheduledTime?: string; // Format: "HH:MM" (24-hour)
 }
 
 export interface User {
@@ -22,12 +23,15 @@ export interface User {
   updatedAt: string;
 }
 
+export type TripType = 'route' | 'explore';
+
 export interface Trip {
   id: number;
   name: string;
   startLocation: string;
   endLocation: string;
   tripDate: string;
+  tripType: TripType;
   createdAt: string;
   updatedAt: string;
 }

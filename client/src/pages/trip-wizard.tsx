@@ -15,8 +15,60 @@ export default function TripWizardPage() {
   const { toast } = useToast();
   const [isCalculating, setIsCalculating] = useState(false);
   const [loadingStage, setLoadingStage] = useState<string>("");
+  
+  // Get trip type from localStorage (set by dashboard buttons)
+  const tripType = localStorage.getItem("tripType") || "route";
 
   const handleWizardComplete = async (wizardData: TripWizardData) => {
+    // Handle explore mode - just show places around start location, no routing
+    if (tripType === "explore") {
+      setIsCalculating(true);
+      
+      try {
+        const startLocationName = wizardData.startLocation?.main_text || "";
+        
+        // Store explore data for explore results page
+        localStorage.setItem(
+          "exploreData",
+          JSON.stringify({
+            startLocation: startLocationName,
+            wizardPreferences: {
+              tripType: wizardData.tripType,
+              transportation: wizardData.transportation,
+              lodging: wizardData.lodging,
+              budgetRange: wizardData.budgetRange,
+              intentions: wizardData.intentions,
+              specialNeeds: wizardData.specialNeeds,
+              accessibility: wizardData.accessibility,
+            },
+            fromWizard: true,
+          })
+        );
+        
+        // Navigate to explore results
+        const exploreParams = new URLSearchParams({
+          location: startLocationName,
+        });
+        
+        setLocation(`/explore-results?${exploreParams.toString()}`);
+        
+        toast({
+          title: "Ready to Explore!",
+          description: `Finding interesting places around ${startLocationName}`,
+        });
+      } catch (error) {
+        console.error("Error completing explore wizard:", error);
+        toast({
+          title: "Error",
+          description: "Failed to start exploration. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsCalculating(false);
+      }
+      return;
+    }
+    
     // Check if this is a flexible location trip with only starting location
     const isFlexibleSingleLocation =
       wizardData.flexibleLocations && wizardData.startLocation && !wizardData.endLocation;

@@ -13,6 +13,7 @@ import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import DashboardTest from "@/pages/dashboard-test";
 import RouteResults from "@/pages/route-results";
+import ExploreResults from "@/pages/explore-results";
 import PlaceResults from "@/pages/place-results";
 import ItineraryPage from "@/pages/itinerary";
 import TripWizardPage from "@/pages/trip-wizard";
@@ -55,6 +56,7 @@ function AuthenticatedRouter() {
       <Route path="/trip-wizard" component={TripWizardPage} />
       <Route path="/route" component={RouteResults} />
       <Route path="/route-results" component={RouteResults} />
+      <Route path="/explore-results" component={ExploreResults} />
       <Route path="/place-results" component={PlaceResults} />
       <Route path="/itinerary" component={ItineraryPage} />
       <Route path="/interests-demo" component={InterestsDemo} />

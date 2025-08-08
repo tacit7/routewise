@@ -14,14 +14,23 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { usePersonalizedTrips } from "@/hooks/use-personalized-trips";
+import TimeScheduler from "@/components/time-scheduler";
 
 interface PoiCardProps {
   poi: Poi;
   variant?: 'default' | 'grid' | 'compact';
   showRelevanceScore?: boolean;
+  onTimeChange?: (poiId: number, newTime: string) => void;
+  showTimeScheduler?: boolean;
 }
 
-export default function PoiCard({ poi, variant = 'default', showRelevanceScore = false }: PoiCardProps) {
+export default function PoiCard({ 
+  poi, 
+  variant = 'default', 
+  showRelevanceScore = false,
+  onTimeChange,
+  showTimeScheduler = false
+}: PoiCardProps) {
   const categoryIcon = getCategoryIcon(poi.category);
   const categoryColor = getCategoryColor(poi.category);
   const [showDetails, setShowDetails] = useState(false);
@@ -49,6 +58,10 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
     addToTrip(poi);
   };
 
+  const handleTimeChange = (newTime: string) => {
+    onTimeChange?.(poi.id, newTime);
+  };
+
   const isGridVariant = variant === 'grid';
   const isCompactVariant = variant === 'compact';
   
@@ -74,9 +87,17 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
                 <Star className="h-3 w-3 text-yellow-400 mr-1" />
                 {poi.rating}
               </div>
-              <span className="text-xs text-slate-500">
-                {poi.timeFromStart}
-              </span>
+              {showTimeScheduler ? (
+                <TimeScheduler
+                  scheduledTime={poi.scheduledTime}
+                  onTimeChange={handleTimeChange}
+                  size="sm"
+                />
+              ) : (
+                <span className="text-xs text-slate-500">
+                  {poi.timeFromStart}
+                </span>
+              )}
             </div>
             {/* Centered Add to Trip Button */}
             <div className="flex justify-center">
@@ -137,7 +158,15 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
               </span>
             )}
           </div>
-          <span className="text-slate-500 text-sm">{poi.timeFromStart}</span>
+          {showTimeScheduler ? (
+            <TimeScheduler
+              scheduledTime={poi.scheduledTime}
+              onTimeChange={handleTimeChange}
+              size="md"
+            />
+          ) : (
+            <span className="text-slate-500 text-sm">{poi.timeFromStart}</span>
+          )}
         </div>
 
         <h4 className={`font-semibold text-slate-800 mb-2 ${isGridVariant ? 'text-lg' : 'text-xl'}`}>
@@ -241,9 +270,17 @@ export default function PoiCard({ poi, variant = 'default', showRelevanceScore =
                   <i className={`${categoryIcon} mr-1`} />
                   {poi.category.charAt(0).toUpperCase() + poi.category.slice(1)}
                 </span>
-                <span className="text-slate-500 text-sm">
-                  {poi.timeFromStart}
-                </span>
+                {showTimeScheduler ? (
+                  <TimeScheduler
+                    scheduledTime={poi.scheduledTime}
+                    onTimeChange={handleTimeChange}
+                    size="md"
+                  />
+                ) : (
+                  <span className="text-slate-500 text-sm">
+                    {poi.timeFromStart}
+                  </span>
+                )}
               </div>
 
               <h3 className="text-2xl font-bold text-slate-800 mb-3">

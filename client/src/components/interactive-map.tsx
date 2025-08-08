@@ -124,30 +124,23 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const poiMarkersRef = useRef<
     Map<number, google.maps.marker.AdvancedMarkerElement>
   >(new Map());
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
-  const directionsServiceRef = useRef<google.maps.DirectionsService | null>(
-    null
-  );
-  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(
-    null
-  );
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
 
-  // Set Google Maps API key (either from prop or fetch from API)
+  // Set Google Maps API key (prefer provided prop, minimal API usage)
   useEffect(() => {
     if (apiKey) {
       // Use API key provided as prop (from consolidated endpoint)
       setGoogleMapsKey(apiKey);
     } else {
-      // Fallback to fetching from separate endpoint
+      // For POI-only display, we still need basic Maps API but with minimal calls
       const fetchMapsKey = async () => {
         try {
           const response = await fetch("/api/maps-key");
@@ -166,6 +159,86 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       fetchMapsKey();
     }
   }, [apiKey]);
+
+  // Calculate center point from POI coordinates
+  const calculateCenterFromPois = useCallback((poisList: Poi[]): { lat: number; lng: number } => {
+    if (!poisList || poisList.length === 0) {
+      // Default center (US center)
+      return { lat: 39.8283, lng: -98.5795 };
+    }
+
+    const validPois = poisList.filter(poi => 
+      (poi.lat && poi.lng) || (poi.latitude && poi.longitude)
+    );
+
+    if (validPois.length === 0) {
+      return { lat: 39.8283, lng: -98.5795 };
+    }
+
+    const bounds = validPois.reduce((acc, poi) => {
+      const lat = poi.lat || poi.latitude;
+      const lng = poi.lng || poi.longitude;
+      
+      return {
+        minLat: Math.min(acc.minLat, lat),
+        maxLat: Math.max(acc.maxLat, lat),
+        minLng: Math.min(acc.minLng, lng),
+        maxLng: Math.max(acc.maxLng, lng)
+      };
+    }, {
+      minLat: validPois[0].lat || validPois[0].latitude,
+      maxLat: validPois[0].lat || validPois[0].latitude,
+      minLng: validPois[0].lng || validPois[0].longitude,
+      maxLng: validPois[0].lng || validPois[0].longitude
+    });
+
+    return {
+      lat: (bounds.minLat + bounds.maxLat) / 2,
+      lng: (bounds.minLng + bounds.maxLng) / 2
+    };
+  }, []);
+
+  // Center map on POI locations instead of route calculation
+  const centerMapOnPois = useCallback(() => {
+    if (!mapInstanceRef.current || !pois || pois.length === 0) return;
+
+    console.log('Centering map on POI locations, POI count:', pois.length);
+
+    // Calculate center and bounds from POI coordinates
+    const center = calculateCenterFromPois(pois);
+    
+    // Create bounds from POI locations
+    const bounds = new google.maps.LatLngBounds();
+    let hasValidCoords = false;
+
+    pois.forEach(poi => {
+      const lat = poi.lat || poi.latitude;
+      const lng = poi.lng || poi.longitude;
+      
+      if (lat && lng) {
+        bounds.extend({ lat, lng });
+        hasValidCoords = true;
+      }
+    });
+
+    if (hasValidCoords) {
+      // Fit map to show all POIs
+      mapInstanceRef.current.fitBounds(bounds);
+      
+      // Add some padding around the bounds
+      const listener = google.maps.event.addListener(mapInstanceRef.current, 'idle', () => {
+        const currentZoom = mapInstanceRef.current?.getZoom();
+        if (currentZoom && currentZoom > 15) {
+          mapInstanceRef.current?.setZoom(13); // Max zoom for better overview
+        }
+        google.maps.event.removeListener(listener);
+      });
+    } else {
+      // Fallback to calculated center
+      mapInstanceRef.current.setCenter(center);
+      mapInstanceRef.current.setZoom(10);
+    }
+  }, [pois, calculateCenterFromPois]);
 
   // Load Google Maps JavaScript API with async loading pattern
   const loadGoogleMapsScript = useCallback((apiKey: string): Promise<void> => {
@@ -242,11 +315,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     try {
       await loadGoogleMapsScript(googleMapsKey);
 
-      // Initialize map centered on start city
+      // Calculate initial center based on POI coordinates
+      const initialCenter = calculateCenterFromPois(pois);
+
+      // Initialize map centered on POI locations
       const map = new google.maps.Map(mapElement, {
-        zoom: 8,
-        center: { lat: 39.8283, lng: -98.5795 }, // Center of US, will be updated
-        mapTypeId: "roadmap", // Use string constant instead of enum
+        zoom: 10,
+        center: initialCenter,
+        mapTypeId: "roadmap",
         mapId: "routewise-map", // Required for AdvancedMarkerElement
         zoomControl: true,
         mapTypeControl: false,
@@ -257,204 +333,33 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       });
 
       mapInstanceRef.current = map;
-      directionsServiceRef.current = new google.maps.DirectionsService();
-      directionsRendererRef.current = new google.maps.DirectionsRenderer({
-        draggable: false,
-        panel: null,
-        suppressMarkers: true, // We'll add our own markers
-      });
-
-      directionsRendererRef.current.setMap(map);
       infoWindowRef.current = new google.maps.InfoWindow();
 
       setIsLoading(false);
+
+      // Center map on POIs once initialized
+      setTimeout(() => {
+        centerMapOnPois();
+      }, 100);
+
     } catch (err) {
       console.error("Map initialization error:", err);
       setError("Failed to initialize map");
       setIsLoading(false);
     }
-  }, [googleMapsKey, loadGoogleMapsScript]);
-
-  // Verify city exists using geocoding
-  const verifyCity = useCallback((cityName: string): Promise<boolean> => {
-    if (!cityName?.trim()) return Promise.resolve(false);
-    
-    const geocoder = new google.maps.Geocoder();
-    return new Promise((resolve) => {
-      geocoder.geocode({ address: cityName }, (results, status) => {
-        const isValid = status === 'OK' && results && results.length > 0;
-        console.log(`City verification for "${cityName}":`, isValid);
-        resolve(isValid);
-      });
-    });
-  }, []);
-
-  // Load route with waypoints
-  const loadRoute = useCallback(async () => {
-    if (!directionsServiceRef.current || !directionsRendererRef.current) return;
-
-    // First verify cities exist to avoid Google Directions NOT_FOUND errors
-    console.log('Verifying cities before routing...');
-    const [startValid, endValid] = await Promise.all([
-      verifyCity(startCity),
-      verifyCity(endCity)
-    ]);
-
-    if (!startValid) {
-      console.warn(`Start city "${startCity}" could not be found`);
-      setError(`Could not find location "${startCity}". Please check the city name.`);
-      return;
-    }
-
-    if (!endValid) {
-      console.warn(`End city "${endCity}" could not be found`);
-      setError(`Could not find location "${endCity}". Please check the city name.`);
-      return;
-    }
-
-    console.log('Cities verified successfully, calculating route...');
-
-    const waypoints = checkpoints.map((checkpoint) => ({
-      location: checkpoint,
-      stopover: true,
-    }));
-
-    const request: google.maps.DirectionsRequest = {
-      origin: startCity,
-      destination: endCity,
-      waypoints: waypoints,
-      optimizeWaypoints: false,
-      travelMode: "DRIVING" as google.maps.TravelMode,
-    };
-
-    try {
-      const result = await new Promise<google.maps.DirectionsResult>(
-        (resolve, reject) => {
-          directionsServiceRef.current!.route(request, (result, status) => {
-            if (status === "OK" && result) {
-              resolve(result);
-            } else {
-              reject(new Error(`Directions request failed: ${status}`));
-            }
-          });
-        }
-      );
-
-      directionsRendererRef.current.setDirections(result);
-
-      // Add custom markers for start, end, and waypoints
-      addRouteMarkers(result);
-    } catch (err) {
-      console.error("Failed to load route:", err);
-      if (err.message.includes('NOT_FOUND')) {
-        setError(`No driving route found between ${startCity} and ${endCity}. Try different cities or check spelling.`);
-      } else {
-        setError("Failed to calculate route. Please try again.");
-      }
-    }
-  }, [startCity, endCity, checkpoints, verifyCity]);
-
-  // Add markers for route points
-  const addRouteMarkers = (directionsResult: google.maps.DirectionsResult) => {
-    if (!mapInstanceRef.current) return;
-
-    const route = directionsResult.routes[0];
-    if (!route) return;
-
-    // Clear existing route markers
-    markersRef.current.forEach((marker) => (marker.map = null));
-    markersRef.current = [];
-
-    // Create start marker element
-    const startElement = document.createElement("div");
-    startElement.style.cssText = `
-      width: 20px;
-      height: 20px;
-      background-color: #22C55E;
-      border: 2px solid #FFFFFF;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: white;
-      font-weight: bold;
-    `;
-    startElement.textContent = "S";
-
-    // Add start marker
-    const startMarker = new google.maps.marker.AdvancedMarkerElement({
-      position: route.legs[0].start_location,
-      map: mapInstanceRef.current,
-      title: `Start: ${startCity}`,
-      content: startElement,
-    });
-
-    // Create end marker element
-    const endElement = document.createElement("div");
-    endElement.style.cssText = `
-      width: 20px;
-      height: 20px;
-      background-color: #EF4444;
-      border: 2px solid #FFFFFF;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: white;
-      font-weight: bold;
-    `;
-    endElement.textContent = "E";
-
-    // Add end marker
-    const endMarker = new google.maps.marker.AdvancedMarkerElement({
-      position: route.legs[route.legs.length - 1].end_location,
-      map: mapInstanceRef.current,
-      title: `End: ${endCity}`,
-      content: endElement,
-    });
-
-    markersRef.current.push(startMarker, endMarker);
-
-    // Add checkpoint markers
-    checkpoints.forEach((checkpoint, index) => {
-      if (route.legs[index] && route.legs[index].end_location) {
-        const checkpointElement = document.createElement("div");
-        checkpointElement.style.cssText = `
-          width: 16px;
-          height: 16px;
-          background-color: #F59E0B;
-          border: 2px solid #FFFFFF;
-          border-radius: 50%;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 8px;
-          color: white;
-          font-weight: bold;
-        `;
-        checkpointElement.textContent = (index + 1).toString();
-
-        const checkpointMarker = new google.maps.marker.AdvancedMarkerElement({
-          position: route.legs[index].end_location,
-          map: mapInstanceRef.current,
-          title: `Checkpoint: ${checkpoint}`,
-          content: checkpointElement,
-        });
-        markersRef.current.push(checkpointMarker);
-      }
-    });
-  };
+  }, [googleMapsKey, loadGoogleMapsScript, pois, calculateCenterFromPois, centerMapOnPois]);
 
   // Create or update POI markers
   const createPoiMarkers = useCallback(() => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current) {
+      console.warn('Map instance not ready for markers');
+      return;
+    }
     
     console.log('Creating POI markers:', pois.length, 'POIs');
+    console.log('Map instance ready:', !!mapInstanceRef.current);
+    console.log('First POI sample:', pois[0]);
+    console.log('Advanced marker available:', !!google.maps.marker?.AdvancedMarkerElement);
 
     // Remove markers for POIs that no longer exist
     const currentPoiIds = new Set(pois.map((poi) => poi.placeId || poi.id));
@@ -466,11 +371,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     pois.forEach((poi) => {
-      console.log('Processing POI:', poi.name, 'has coordinates:', !!(poi.lat && poi.lng), 'has address:', !!poi.address);
+      console.log('Processing POI:', poi.name, 'coordinates:', { lat: poi.lat, lng: poi.lng, latitude: poi.latitude, longitude: poi.longitude }, 'has address:', !!poi.address);
       
-      // Skip if no coordinates available
-      if (!poi.lat || !poi.lng) {
-        console.warn('POI missing coordinates:', poi.name);
+      // Skip if no coordinates available (check both lat/lng and latitude/longitude)
+      const hasCoords = (poi.lat && poi.lng) || (poi.latitude && poi.longitude);
+      if (!hasCoords) {
+        console.warn('POI missing coordinates:', poi.name, poi);
         return;
       }
 
@@ -491,16 +397,41 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         isHovered
       );
 
-      // Use lat/lng coordinates directly instead of geocoding
-      const marker = new google.maps.marker.AdvancedMarkerElement({
-        position: { lat: poi.lat, lng: poi.lng },
-        map: mapInstanceRef.current,
-        title: poi.name,
-        content: markerElement,
-      });
-
-      // Add click listener
-      marker.addListener("click", () => {
+      // Use lat/lng coordinates directly (handle both formats)
+      const lat = poi.lat || poi.latitude;
+      const lng = poi.lng || poi.longitude;
+      
+      console.log(`Creating marker for ${poi.name} at:`, { lat, lng });
+      
+      try {
+        let marker;
+        
+        // Check if AdvancedMarkerElement is available
+        if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+          marker = new google.maps.marker.AdvancedMarkerElement({
+            position: { lat, lng },
+            map: mapInstanceRef.current,
+            title: poi.name,
+            content: markerElement,
+          });
+        } else {
+          console.warn('AdvancedMarkerElement not available, using regular Marker');
+          marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: mapInstanceRef.current,
+            title: poi.name,
+            icon: {
+              url: 'data:image/svg+xml;base64,' + btoa(createOwlMarkerSVG(getCategoryColor(poi.category))),
+              scaledSize: new google.maps.Size(28, 34),
+              anchor: new google.maps.Point(14, 34),
+            },
+          });
+        }
+        
+        console.log('Marker created successfully for:', poi.name);
+        
+        // Add click listener
+        marker.addListener("click", () => {
         if (onPoiClick) {
           onPoiClick(poi);
         }
@@ -551,10 +482,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           infoWindowRef.current.setContent(content);
           infoWindowRef.current.open(mapInstanceRef.current, marker);
         }
-      });
+        });
 
-      // Store the marker for future updates
-      poiMarkersRef.current.set(poiIdentifier, marker);
+        // Store the marker for future updates
+        poiMarkersRef.current.set(poiIdentifier, marker);
+        
+      } catch (error) {
+        console.error('Error creating marker for', poi.name, ':', error);
+      }
     });
   }, [pois, onPoiClick, onPoiSelect]);
 
@@ -648,12 +583,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   }, [selectedPoiIds, hoveredPoi, updateMarkerIcons, isLoading]);
 
-  // Update route when checkpoints change
+  // Center map when POIs change
   useEffect(() => {
-    if (!isLoading && mapInstanceRef.current) {
-      loadRoute();
+    if (!isLoading && mapInstanceRef.current && pois.length > 0) {
+      centerMapOnPois();
     }
-  }, [checkpoints, loadRoute, isLoading]);
+  }, [pois, centerMapOnPois, isLoading]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -661,10 +596,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       // Clear all POI markers
       poiMarkersRef.current.forEach((marker) => (marker.map = null));
       poiMarkersRef.current.clear();
-
-      // Clear route markers
-      markersRef.current.forEach((marker) => (marker.map = null));
-      markersRef.current = [];
     };
   }, []);
 
@@ -704,7 +635,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   return (
     <div
-      className={`relative rounded-lg overflow-hidden border border-slate-200 ${className}`}
+      className={`relative overflow-hidden border border-slate-200 ${className}`}
       style={{ height }}
     >
       {isLoading && (
@@ -755,22 +686,16 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         </div>
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span>Start</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <span>End</span>
-          </div>
-          {checkpoints.length > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-              <span>Checkpoint</span>
+            <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-white"></div>
             </div>
-          )}
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
             <span>Points of Interest</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-white"></div>
+            </div>
+            <span>Selected POI</span>
           </div>
         </div>
       </div>
