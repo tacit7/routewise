@@ -159,7 +159,7 @@ export default function PlacesView({
 
   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
   const [panelKey, setPanelKey] = useState(0); // Force re-render on panel resize
-  const { tripPlaces } = useTripPlaces();
+  const { tripPlaces, addToTrip, isInTrip, isAddingToTrip } = useTripPlaces();
 
   // Filter and dedupe POIs
   const uniquePois = pois.filter((poi, index, self) => {
@@ -217,20 +217,29 @@ export default function PlacesView({
     // Calculate actual sidebar width for desktop
     const containerWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40;
     
-    // Responsive flex-basis that adapts to container width
-    // Cards will wrap naturally and never be cut off
-    if (containerWidth < 300) return '100%';      // 1 per row
-    if (containerWidth < 500) return 'calc(50% - 8px)';  // 2 per row
-    if (containerWidth < 700) return 'calc(33.333% - 8px)'; // 3 per row
-    if (containerWidth < 900) return 'calc(25% - 8px)';     // 4 per row
-    if (containerWidth < 1100) return 'calc(20% - 8px)';    // 5 per row
-    return 'calc(16.666% - 8px)'; // 6 per row for very wide panels
+    // Force single-column list until panel is quite wide
+    // Default 30% (~360px equivalent) should show single column
+    if (containerWidth < 500) return '100%';      // Single column list (default behavior)
+    if (containerWidth < 700) return 'calc(50% - 8px)';  // 2 per row only when wider
+    if (containerWidth < 900) return 'calc(33.333% - 8px)'; // 3 per row when very wide
+    if (containerWidth < 1100) return 'calc(25% - 8px)';     // 4 per row when extra wide
+    return 'calc(20% - 8px)'; // 5 per row for ultrawide panels
   };
 
   const cardFlexBasis = getCardFlexBasis();
   const isFlexLayout = cardFlexBasis !== '100%';
+  
+  // Debug panel sizing
+  console.log('Panel Debug:', {
+    sidebarSizePercent,
+    windowWidth: window.innerWidth,
+    calculatedWidth: (window.innerWidth * (sidebarSizePercent / 100)) - 40,
+    cardFlexBasis,
+    isFlexLayout
+  });
 
   const handlePanelResize = (size: number) => {
+    console.log('Panel resized to:', size, '%');
     setSidebarSizePercent(size);
     // Force re-render of grid layout
     setPanelKey(prev => prev + 1);
@@ -500,7 +509,7 @@ export default function PlacesView({
 
                 {uniquePois.length > 0 && (
                   <div
-                    key={`poi-flex-${panelKey}`}
+                    key={`poi-container-${panelKey}`}
                     className={`p-2 ${isFlexLayout ? "flex flex-wrap gap-2" : "space-y-2"}`}
                     style={{
                       maxWidth: '100%',
@@ -508,24 +517,78 @@ export default function PlacesView({
                     }}
                   >
                     {filteredPois.map((poi, index) => (
-                      <div
-                        key={poi.placeId || poi.id || `poi-${index}`}
-                        onMouseEnter={() => onPoiHover(poi)}
-                        onMouseLeave={() => onPoiHover(null)}
-                        className="transition-all"
-                        style={{
-                          flexBasis: isFlexLayout ? cardFlexBasis : 'auto',
-                          minWidth: '200px', // Prevent cards from getting too small
-                          maxWidth: '100%'   // Prevent cards from overflowing
-                        }}
-                      >
-                        <PoiCard
-                          poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
-                          variant={cardFlexBasis === '100%' ? "compact" : "grid"}
-                          showTimeScheduler={true}
-                          onTimeChange={handleTimeChange}
-                        />
-                      </div>
+                      cardFlexBasis === '100%' ? (
+                        // Single-column list layout using your grid spec
+                        <div
+                          key={poi.placeId || poi.id || `poi-list-${index}`}
+                          onMouseEnter={() => onPoiHover(poi)}
+                          onMouseLeave={() => onPoiHover(null)}
+                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+                        >
+                          {/* Thumbnail - 64px */}
+                          <img
+                            src={poi.imageUrl || '/placeholder-poi.jpg'}
+                            alt={poi.name}
+                            className="h-16 w-16 rounded object-cover"
+                          />
+                          
+                          {/* Main content - 1fr */}
+                          <div className="min-w-0">
+                            <h4 className="truncate font-medium text-sm">{poi.name}</h4>
+                            <p className="text-xs text-gray-500 truncate">{poi.description || poi.address}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-yellow-500">⭐ {poi.rating}</span>
+                              {poi.timeFromStart && (
+                                <span className="text-xs text-gray-500">{poi.timeFromStart}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Action/Tag - auto */}
+                          <div className="flex flex-col items-end gap-1">
+                            <div className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
+                              {poi.category}
+                            </div>
+                            <button
+                              onClick={() => {
+                                if (!isInTrip(poi)) {
+                                  addToTrip(poi);
+                                }
+                              }}
+                              disabled={isInTrip(poi) || isAddingToTrip}
+                              className={`text-[10px] px-2 py-1 rounded transition-colors ${
+                                isInTrip(poi)
+                                  ? "bg-purple-100 text-purple-700 cursor-not-allowed"
+                                  : isAddingToTrip
+                                  ? "bg-purple-400 text-white cursor-not-allowed"
+                                  : "bg-purple-600 hover:bg-purple-700 text-white"
+                              }`}
+                            >
+                              {isInTrip(poi) ? "✓ In Trip" : isAddingToTrip ? "Adding..." : "+ Trip"}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Multi-column card layout for wider panels
+                        <div
+                          key={poi.placeId || poi.id || `poi-card-${index}`}
+                          onMouseEnter={() => onPoiHover(poi)}
+                          onMouseLeave={() => onPoiHover(null)}
+                          className="transition-all"
+                          style={{
+                            flexBasis: cardFlexBasis,
+                            minWidth: '200px',
+                            maxWidth: '100%'
+                          }}
+                        >
+                          <PoiCard
+                            poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
+                            variant="grid"
+                            showTimeScheduler={true}
+                            onTimeChange={handleTimeChange}
+                          />
+                        </div>
+                      )
                     ))}
                   </div>
                 )}
