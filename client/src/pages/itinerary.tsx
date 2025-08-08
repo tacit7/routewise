@@ -22,7 +22,6 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   try { return JSON.parse(localStorage.getItem("itinerary.showMap") || "false"); } catch { return false; }
 });
 
-useEffect(() => localStorage.setItem("itinerary.showMap", JSON.stringify(showMap)), [showMap]);
   const [activeDay, setActiveDay] = useState(0);
   const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
   const [days, setDays] = useState<DayData[]>([{ date: new Date(), title: "", places: [] }]);
@@ -224,8 +223,21 @@ useEffect(() => localStorage.setItem("itinerary.showMap", JSON.stringify(showMap
             onPlaceUpdate={handlePlaceUpdate}
             onPlaceRemove={handlePlaceRemove}
             onPlaceAssignment={handlePlaceAssignment}
+            showMap={showMap}
+            onToggleMap={() => setShowMap(!showMap)}
           />
+          <div className="flex-1">
+          {showMap ? (
+              <InteractiveMap
+                pois={itineraryPlaces}
+                height="100%"
+                className="w-full h-full"
+            />
+          ) : (
           <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} />
+          )
+          }
+          </div>
         </div>
       </Tabs>
     </div>

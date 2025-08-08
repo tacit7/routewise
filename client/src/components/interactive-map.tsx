@@ -41,36 +41,36 @@ const createOwlMarkerSVG = (
   const size = isSelected || isHovered ? 32 : 28;
   const shadowIntensity = isHovered ? 0.4 : 0.3;
   const glowEffect = isSelected ? `filter="drop-shadow(0 0 8px ${baseColor})"` : '';
-  
+
   return `
     <svg width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" ${glowEffect}>
       <!-- Pin Drop Shadow -->
       <ellipse cx="50" cy="115" rx="15" ry="3" fill="rgba(0,0,0,${shadowIntensity})" />
-      
+
       <!-- Pin Body -->
-      <path d="M50 10 C30 10, 15 25, 15 45 C15 65, 50 100, 50 100 C50 100, 85 65, 85 45 C85 25, 70 10, 50 10 Z" 
+      <path d="M50 10 C30 10, 15 25, 15 45 C15 65, 50 100, 50 100 C50 100, 85 65, 85 45 C85 25, 70 10, 50 10 Z"
             fill="${baseColor}" stroke="white" stroke-width="2"/>
-      
+
       <!-- Owl Face Background -->
       <circle cx="50" cy="40" r="22" fill="rgba(255,255,255,0.9)"/>
-      
+
       <!-- Owl Eyes -->
       <circle cx="42" cy="35" r="8" fill="white"/>
       <circle cx="58" cy="35" r="8" fill="white"/>
-      
+
       <!-- Owl Eye Details -->
       <circle cx="42" cy="35" r="5" fill="${baseColor}"/>
       <circle cx="58" cy="35" r="5" fill="${baseColor}"/>
       <circle cx="42" cy="35" r="2" fill="white"/>
       <circle cx="58" cy="35" r="2" fill="white"/>
-      
+
       <!-- Owl Beak -->
       <path d="M47 42 L50 48 L53 42 Z" fill="${baseColor}"/>
-      
+
       <!-- Owl Eyebrows -->
       <path d="M35 28 C38 25, 46 25, 48 28" stroke="${baseColor}" stroke-width="2" fill="none"/>
       <path d="M52 28 C54 25, 62 25, 65 28" stroke="${baseColor}" stroke-width="2" fill="none"/>
-      
+
       <!-- Decorative Elements -->
       <circle cx="65" cy="25" r="3" fill="rgba(255,255,255,0.6)"/>
       <path d="M30 50 C25 45, 25 55, 30 50" fill="rgba(255,255,255,0.4)"/>
@@ -83,11 +83,11 @@ const createOwlMarkerSVG = (
 const getPoiCoordinates = (poi: any): { lat: number; lng: number } | null => {
   const lat = poi.lat ?? poi.latitude;
   const lng = poi.lng ?? poi.longitude;
-  
+
   if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
     return { lat, lng };
   }
-  
+
   return null;
 };
 
@@ -188,7 +188,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     const bounds = validPois.reduce((acc, poi) => {
       const coords = getPoiCoordinates(poi);
       const { lat, lng } = coords!; // We know it's not null from the filter above
-      
+
       return {
         minLat: Math.min(acc.minLat, lat),
         maxLat: Math.max(acc.maxLat, lat),
@@ -216,7 +216,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
     // Calculate center and bounds from POI coordinates
     const center = calculateCenterFromPois(pois);
-    
+
     // Create bounds from POI locations
     const bounds = new google.maps.LatLngBounds();
     let hasValidCoords = false;
@@ -224,7 +224,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     pois.forEach(poi => {
       const lat = poi.lat || poi.latitude;
       const lng = poi.lng || poi.longitude;
-      
+
       if (lat && lng) {
         bounds.extend({ lat, lng });
         hasValidCoords = true;
@@ -234,7 +234,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     if (hasValidCoords) {
       // Fit map to show all POIs
       mapInstanceRef.current.fitBounds(bounds);
-      
+
       // Add some padding around the bounds
       const listener = google.maps.event.addListener(mapInstanceRef.current, 'idle', () => {
         const currentZoom = mapInstanceRef.current?.getZoom();
@@ -314,7 +314,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Initialize map
   const initializeMap = useCallback(async () => {
     if (!googleMapsKey || !mapRef.current) return;
-    
+
     // Double-check that the DOM element is valid before passing to Google Maps
     const mapElement = mapRef.current;
     if (!(mapElement instanceof HTMLElement) || !mapElement.isConnected) {
@@ -365,7 +365,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.warn('Map instance not ready for markers');
       return;
     }
-    
+
     console.log('Creating POI markers:', pois.length, 'POIs');
     console.log('Map instance ready:', !!mapInstanceRef.current);
     console.log('First POI sample:', pois[0]);
@@ -383,7 +383,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     pois.forEach((poi) => {
       const coords = getPoiCoordinates(poi);
       console.log('Processing POI:', poi.name, 'coordinates:', coords, 'has address:', !!poi.address);
-      
+
       // Skip if no coordinates available
       if (!coords) {
         console.warn('POI missing valid coordinates:', poi.name, poi);
@@ -409,12 +409,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
       // Use normalized coordinates
       const { lat, lng } = coords;
-      
+
       console.log(`Creating marker for ${poi.name} at:`, { lat, lng });
-      
+
       try {
         let marker;
-        
+
         // Check if AdvancedMarkerElement is available
         if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
           marker = new google.maps.marker.AdvancedMarkerElement({
@@ -436,9 +436,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             },
           });
         }
-        
+
         console.log('Marker created successfully for:', poi.name);
-        
+
         // Add click listener
         marker.addListener("click", () => {
         if (onPoiClick) {
@@ -449,13 +449,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         if (infoWindowRef.current) {
           const isAddedToTrip = isInTrip(poi);
           const isCurrentlyAdding = isAddingToTrip; // Get current loading state
-          
+
           const content = `
             <div class="p-3 max-w-sm">
               ${poi.imageUrl ? `
-                <img 
-                  src="${poi.imageUrl}" 
-                  alt="${poi.name}" 
+                <img
+                  src="${poi.imageUrl}"
+                  alt="${poi.name}"
                   class="w-full h-32 object-cover rounded mb-2"
                 />
               ` : ''}
@@ -467,7 +467,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 <span class="ml-1">${poi.rating} (${poi.reviewCount || 0} reviews)</span>
               </div>
               ${poi.address ? `<p class="text-xs text-gray-500 mb-3">${poi.address}</p>` : ''}
-              
+
               <div class="flex justify-center">
                 <button
                   onclick="window.addPoiToTrip('${poi.placeId || poi.id}')"
@@ -479,8 +479,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   }"
                   id="add-to-trip-btn-${poi.placeId || poi.id}"
                 >
-                  ${isAddedToTrip ? 
-                      '✓ In Trip' : 
+                  ${isAddedToTrip ?
+                      '✓ In Trip' :
                       '+ Add to Trip'
                   }
                 </button>
@@ -495,7 +495,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
         // Store the marker for future updates
         poiMarkersRef.current.set(poiIdentifier, marker);
-        
+
       } catch (error) {
         console.error('Error creating marker for', poi.name, ':', error);
       }
@@ -542,10 +542,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             'bg-purple-400 text-white cursor-not-allowed'
           );
         }
-        
+
         // Add to trip
         addToTrip(poi);
-        
+
         // The InfoWindow will be closed and updated by the trip state change
         setTimeout(() => {
           if (infoWindowRef.current) {
@@ -573,7 +573,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const timeoutId = setTimeout(() => {
         initializeMap();
       }, 50);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [googleMapsKey, isMounted, initializeMap]);

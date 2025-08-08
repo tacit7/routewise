@@ -56,9 +56,6 @@ export default function TripPlacesGrid({
             Drag places to schedule them, or drag scheduled places back here to unschedule
           </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setShowMap(v => !v)} aria-pressed={showMap}>
-          {showMap ? <EyeOff className="h-4 w-4" /> : <MapIcon className="h-4 w-4" />}
-        </Button>
       </div>
       {showMap && mapsApiKey && places.length > 0 && (
         <div className="h-64 rounded-2xl overflow-hidden mb-4">

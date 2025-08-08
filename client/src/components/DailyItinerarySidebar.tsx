@@ -7,19 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Calendar, Clock, GripVertical, Star, Trash2 } from "lucide-react";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier, sortByTime } from "@/utils/itinerary";
-
+import { Map as MapIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 export default function DailyItinerarySidebar({
   day,
   dayIndex,
   onPlaceUpdate,
   onPlaceRemove,
   onPlaceAssignment,
+  showMap,
+  onToggleMap,
 }: {
   day: DayData;
   dayIndex: number;
   onPlaceUpdate?: (placeId: string | number, updates: Partial<ItineraryPlace>) => void;
   onPlaceRemove?: (placeId: string | number) => void;
   onPlaceAssignment?: (place: ItineraryPlace, dayIndex: number) => void;
+  showMap: boolean;
+  onToggleMap: () => void;
 }) {
   const [draggedOver, setDraggedOver] = useState(false);
 
@@ -40,7 +45,18 @@ export default function DailyItinerarySidebar({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <span>Day {dayIndex + 1}</span>
-          <Badge variant="secondary">{day.places.length} places</Badge>
+                <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggleMap}
+        aria-pressed={showMap}
+        aria-label="Toggle map"
+        title={showMap ? "Hide map" : "Show map"}
+         >
+        <MapIcon
+          className={`h-4 w-4 ${showMap ? "text-green-500" : "text-gray-400"}`}
+        />
+      </Button>
         </CardTitle>
         {day.title && <CardDescription>{day.title}</CardDescription>}
         <CardDescription className="flex items-center gap-1">
