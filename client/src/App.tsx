@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,6 +8,7 @@ import { useCityPrefetch } from "@/hooks/use-city-autocomplete";
 import { useEffect } from "react";
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import './debug-env';
 import { store, persistor } from '@/store';
 import Home from "@/pages/home";
 import LoginPage from "@/pages/login";
@@ -28,6 +29,7 @@ import AuthError from "@/pages/auth-error";
 function AuthenticatedRouter() {
   const { isAuthenticated, isLoading } = useAuth();
   const { prefetchPopularCities } = useCityPrefetch();
+  const [location] = useLocation();
 
   // Prefetch popular cities when router mounts (after QueryClient is available)
   useEffect(() => {
@@ -47,26 +49,32 @@ function AuthenticatedRouter() {
     );
   }
 
+  // Only show TripIndicator on route-results and explore-results pages
+  const showTripIndicator = location === '/route-results' || location === '/explore-results';
+
   return (
-    <Switch>
-      {/* Authenticated users go to dashboard, non-authenticated to landing page */}
-      <Route path="/" component={isAuthenticated ? Dashboard : Home} />
-      <Route path="/login" component={isAuthenticated ? Dashboard : LoginPage} />
-      <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
-      <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
-      <Route path="/plan" component={Home} />
-      <Route path="/trip-wizard" component={TripWizardPage} />
-      <Route path="/route" component={RouteResults} />
-      <Route path="/route-results" component={RouteResults} />
-      <Route path="/explore-results" component={ExploreResults} />
-      <Route path="/place-results" component={PlaceResults} />
-      <Route path="/itinerary" component={ItineraryPage} />
-      <Route path="/interests-demo" component={InterestsDemo} />
-      <Route path="/dashboard-test" component={DashboardTest} />
-      <Route path="/auth/success" component={AuthSuccess} />
-      <Route path="/auth/error" component={AuthError} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <Switch>
+        {/* Authenticated users go to dashboard, non-authenticated to landing page */}
+        <Route path="/" component={isAuthenticated ? Dashboard : Home} />
+        <Route path="/login" component={isAuthenticated ? Dashboard : LoginPage} />
+        <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
+        <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
+        <Route path="/plan" component={Home} />
+        <Route path="/trip-wizard" component={TripWizardPage} />
+        <Route path="/route" component={RouteResults} />
+        <Route path="/route-results" component={RouteResults} />
+        <Route path="/explore-results" component={ExploreResults} />
+        <Route path="/place-results" component={PlaceResults} />
+        <Route path="/itinerary" component={ItineraryPage} />
+        <Route path="/interests-demo" component={InterestsDemo} />
+        <Route path="/dashboard-test" component={DashboardTest} />
+        <Route path="/auth/success" component={AuthSuccess} />
+        <Route path="/auth/error" component={AuthError} />
+        <Route component={NotFound} />
+      </Switch>
+      {showTripIndicator && <TripIndicator />}
+    </>
   );
 }
 
@@ -86,7 +94,6 @@ function App() {
             <TooltipProvider>
               <Toaster />
               <AuthenticatedRouter />
-              <TripIndicator />
             </TooltipProvider>
           </AuthProvider>
         </QueryClientProvider>

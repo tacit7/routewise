@@ -1,6 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Log environment variables to terminal on startup
+console.log('\n🔧 ENVIRONMENT VARIABLES CHECK:');
+console.log('VITE_GOOGLE_CLIENT_ID:', process.env.VITE_GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
+console.log('VITE_API_URL:', process.env.VITE_API_URL || 'Not set (using default)');
+console.log('MSW_DISABLED:', process.env.MSW_DISABLED);
+
+if (process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID) {
+  const clientId = process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+  console.log('Google Client ID Preview:', `${clientId?.substring(0, 12)}...${clientId?.substring(clientId.length - 12)}`);
+} else {
+  console.log('❌ Google OAuth will fail - no client ID found');
+}
+console.log('🔧 Environment check complete\n');
 
 export default defineConfig({
   plugins: [react()],
@@ -23,23 +42,16 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:4001',
-        changeOrigin: true,
-        secure: false,
-      },
-      '/auth': {
-        target: process.env.VITE_API_URL || 'http://localhost:4001',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    // Removed proxy - using frontend-only authentication
   },
   define: {
     // Pass MSW_DISABLED environment variable to client
     "import.meta.env.VITE_MSW_DISABLED": JSON.stringify(
       process.env.MSW_DISABLED || "false"
+    ),
+    // Pass Google Client ID from parent directory .env file
+    "import.meta.env.VITE_GOOGLE_CLIENT_ID": JSON.stringify(
+      process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || ""
     ),
   },
 });

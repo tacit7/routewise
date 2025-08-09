@@ -1,7 +1,9 @@
 /**
  * API Configuration for Route Wise Frontend
- * Handles backend URL configuration and request utilities
+ * Handles backend URL configuration and request utilities with Google OAuth integration
  */
+
+import { googleAuth } from '@/services/GoogleAuth';
 
 // Dynamic backend URL configuration for development and mobile access
 const getBackendUrl = (): string => {
@@ -27,23 +29,20 @@ const BACKEND_URL = getBackendUrl();
 export const API_CONFIG = {
   BASE_URL: BACKEND_URL,
   ENDPOINTS: {
-    // Authentication
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    ME: '/api/auth/me',
-    GOOGLE_AUTH: '/auth/google',
-    
     // Trips
     TRIPS: '/api/trips',
     TRIPS_FROM_WIZARD: '/api/trips/from_wizard',
     
-    // Places (if needed)
+    // Places
     PLACES_SEARCH: '/api/places/search',
     PLACES_DETAILS: '/api/places/details',
     
-    // Routes (if needed)
+    // Routes
     ROUTES: '/api/routes',
+    ROUTE_RESULTS: '/api/route-results',
+    
+    // Places Autocomplete
+    PLACES_AUTOCOMPLETE: '/api/places/autocomplete',
   }
 } as const;
 
@@ -55,15 +54,23 @@ export const createApiUrl = (endpoint: string): string => {
 };
 
 /**
- * Default fetch options for API calls
+ * Default fetch options for API calls with Google authentication
  */
 export const getDefaultFetchOptions = (options: RequestInit = {}): RequestInit => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>,
+  };
+
+  // Add Google ID token if user is authenticated
+  const idToken = googleAuth.getIdToken();
+  if (idToken && googleAuth.isAuthenticated()) {
+    headers['Authorization'] = `Bearer ${idToken}`;
+  }
+
   return {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
     ...options,
   };
 };
@@ -93,29 +100,21 @@ export const apiCall = async <T>(
 };
 
 /**
- * JWT Token utilities (for Express.js backend with Bearer tokens)
+ * Google Authentication utilities for API calls
  */
-export const TokenManager = {
+export const AuthManager = {
   /**
-   * Get Bearer token from storage or cookie
+   * Get Google ID token
    */
   getToken(): string | null {
-    // For Express.js backend with JWT tokens
-    return localStorage.getItem('auth_token');
+    return googleAuth.getIdToken();
   },
 
   /**
-   * Set Bearer token in storage
+   * Check if user is authenticated
    */
-  setToken(token: string): void {
-    localStorage.setItem('auth_token', token);
-  },
-
-  /**
-   * Remove Bearer token from storage
-   */
-  removeToken(): void {
-    localStorage.removeItem('auth_token');
+  isAuthenticated(): boolean {
+    return googleAuth.isAuthenticated();
   },
 
   /**
@@ -123,18 +122,38 @@ export const TokenManager = {
    */
   getAuthHeader(): Record<string, string> {
     const token = this.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return token && this.isAuthenticated() ? { Authorization: `Bearer ${token}` } : {};
+  },
+
+  /**
+   * Get current user information
+   */
+  getCurrentUser() {
+    return googleAuth.getCurrentUser();
   },
 };
 
+// Legacy TokenManager for backward compatibility
+export const TokenManager = {
+  getToken: () => AuthManager.getToken(),
+  setToken: () => { /* No-op - Google tokens are managed by GoogleAuth service */ },
+  removeToken: () => { /* No-op - Google tokens are managed by GoogleAuth service */ },
+  getAuthHeader: () => AuthManager.getAuthHeader(),
+};
+
 /**
- * Enhanced API call with authentication
+ * Enhanced API call with Google authentication
  */
 export const authenticatedApiCall = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  const authHeaders = TokenManager.getAuthHeader();
+  // Check if user is authenticated
+  if (!AuthManager.isAuthenticated()) {
+    throw new Error('User not authenticated');
+  }
+
+  const authHeaders = AuthManager.getAuthHeader();
   const enhancedOptions = {
     ...options,
     headers: {
@@ -145,4 +164,15 @@ export const authenticatedApiCall = async <T>(
   };
 
   return apiCall<T>(endpoint, enhancedOptions);
+};
+
+/**
+ * API call wrapper that automatically includes Google ID token if available
+ */
+export const googleApiCall = async <T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> => {
+  // Use enhanced fetch options that automatically include Google ID token
+  return apiCall<T>(endpoint, options);
 };

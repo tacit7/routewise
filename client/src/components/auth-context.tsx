@@ -1,25 +1,24 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from "@/hooks/use-toast";
-import { apiCall, authenticatedApiCall, TokenManager, API_CONFIG } from '@/lib/api-config';
+import { googleAuth, GoogleUser } from '@/services/GoogleAuth';
 
+// User interface matching GoogleUser structure
 interface User {
-  id: string; // Phoenix uses binary UUID
-  username: string;
+  id: string;
   email: string;
-  full_name?: string;
-  avatar?: string;
-  provider: string;
-  created_at: string;
+  name: string;
+  picture?: string;
+  email_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<AuthResult>;
-  register: (username: string, password: string, email: string, fullName?: string) => Promise<AuthResult>;
+  signInWithGoogle: () => Promise<AuthResult>;
   logout: () => Promise<void>;
-  checkAuth: () => Promise<void>;
 }
 
 interface AuthResult {
@@ -49,153 +48,93 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = user !== null;
 
-  // Check if user is authenticated on mount and handle OAuth redirects
+  // Initialize GoogleAuth and check authentication on mount
   useEffect(() => {
-    handleOAuthRedirect();
-    checkAuth();
+    initializeAuth();
   }, []);
 
-  const handleOAuthRedirect = (): void => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const success = urlParams.get('success');
-    const error = urlParams.get('error');
-    const message = urlParams.get('message');
-
-    if (success === 'google_auth') {
-      toast({
-        title: "Welcome!",
-        description: message || "Successfully signed in with Google",
-      });
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (error) {
-      let errorMessage = "Authentication failed";
-      
-      switch (error) {
-        case 'oauth_error':
-          errorMessage = "Google authentication was cancelled or failed";
-          break;
-        case 'missing_code':
-          errorMessage = "Authentication code was missing";
-          break;
-        case 'missing_state':
-          errorMessage = "Authentication state was missing";
-          break;
-        case 'auth_failed':
-          errorMessage = message || "Authentication failed";
-          break;
-        case 'server_error':
-          errorMessage = "Server error during authentication";
-          break;
-        default:
-          errorMessage = message || "Authentication failed";
+  // Listen for Google auth state changes
+  useEffect(() => {
+    const handleAuthStateChange = (event: CustomEvent) => {
+      const { user: googleUser } = event.detail;
+      if (googleUser) {
+        setUser(googleUser);
+      } else {
+        setUser(null);
       }
+    };
 
-      toast({
-        title: "Authentication Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  };
+    window.addEventListener('googleAuthStateChanged', handleAuthStateChange as EventListener);
+    return () => {
+      window.removeEventListener('googleAuthStateChanged', handleAuthStateChange as EventListener);
+    };
+  }, []);
 
-  const checkAuth = async (): Promise<void> => {
+  const initializeAuth = async () => {
     try {
-      // Use authenticated API call since login/register store tokens
-      const data = await authenticatedApiCall<{ success: boolean; user: User }>(API_CONFIG.ENDPOINTS.ME);
-      if (data.success && data.user) {
-        setUser(data.user);
+      await googleAuth.initialize();
+      
+      // Check if user is already authenticated from stored credentials
+      const currentUser = googleAuth.getCurrentUser();
+      if (currentUser && googleAuth.isAuthenticated()) {
+        setUser(currentUser);
+      } else {
+        // MOCK USER FOR DEVELOPMENT - Remove this in production
+        const mockUser: User = {
+          id: "mock-user-123",
+          email: "test@example.com",
+          name: "Mock User",
+          picture: "https://via.placeholder.com/96",
+          email_verified: true,
+          given_name: "Mock",
+          family_name: "User"
+        };
+        setUser(mockUser);
+        console.log('🎭 Using mock user for development');
       }
     } catch (error) {
-      // 401 Unauthorized is expected when user is not logged in - don't log as error
-      if (error instanceof Error && error.message.includes('401')) {
-        // Silently handle - user is not authenticated, which is normal
-      } else {
-        console.error('Auth check failed:', error);
-      }
-      // Clear any stored token
-      TokenManager.removeToken();
+      console.error('Failed to initialize Google Auth:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (username: string, password: string): Promise<AuthResult> => {
+  const signInWithGoogle = async (): Promise<AuthResult> => {
     try {
-      const data = await apiCall<{ success: boolean; message: string; user: User; token: string }>(
-        API_CONFIG.ENDPOINTS.LOGIN,
-        {
-          method: 'POST',
-          body: JSON.stringify({ username, password }),
-        }
-      );
-
-      if (data.success && data.user) {
-        // Phoenix backend sets HTTP-only cookie, but also returns token for localStorage
-        if (data.token) {
-          TokenManager.setToken(data.token);
-        }
-        setUser(data.user);
-        return { success: true, user: data.user, message: data.message };
-      }
-
-      return { success: false, message: data.message || 'Login failed' };
+      const googleUser = await googleAuth.signIn();
+      
+      toast({
+        title: "Welcome!",
+        description: "Successfully signed in with Google",
+      });
+      
+      return { success: true, user: googleUser, message: 'Successfully signed in' };
     } catch (error) {
-      console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Network error occurred' 
-      };
-    }
-  };
-
-  const register = async (username: string, password: string, email: string, fullName?: string): Promise<AuthResult> => {
-    try {
-      const requestBody: any = { username, password, email };
-      if (fullName) {
-        requestBody.full_name = fullName;
-      }
-
-      const data = await apiCall<{ success: boolean; message: string; user: User; token: string }>(
-        API_CONFIG.ENDPOINTS.REGISTER,
-        {
-          method: 'POST',
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (data.success && data.user) {
-        // Phoenix backend sets HTTP-only cookie, but also returns token for localStorage
-        if (data.token) {
-          TokenManager.setToken(data.token);
-        }
-        setUser(data.user);
-        return { success: true, user: data.user, message: data.message };
-      }
-
-      return { success: false, message: data.message || 'Registration failed' };
-    } catch (error) {
-      console.error('Registration error:', error);
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Network error occurred' 
-      };
+      console.error('Google sign-in error:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Google sign-in failed';
+      toast({
+        title: "Sign-in Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      return { success: false, message: errorMessage };
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
-      // Call Phoenix logout to clear HTTP-only cookie
-      await apiCall<{ success: boolean; message: string }>(API_CONFIG.ENDPOINTS.LOGOUT, {
-        method: 'POST',
+      // Sign out from Google Auth service only (no backend call)
+      googleAuth.signOut();
+      
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
       });
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      // Always clear local state and token
-      TokenManager.removeToken();
+      // Force clear user state even if logout fails
       setUser(null);
     }
   };
@@ -204,10 +143,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isLoading,
     isAuthenticated,
-    login,
-    register,
+    signInWithGoogle,
     logout,
-    checkAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
