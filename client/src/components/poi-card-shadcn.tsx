@@ -8,7 +8,7 @@ import {
   Map,
   Loader2,
 } from "lucide-react";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 import { useState } from "react";
 import { useTripPlaces } from "@/hooks/use-trip-places";

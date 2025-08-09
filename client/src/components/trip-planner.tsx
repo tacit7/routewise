@@ -16,7 +16,7 @@ import {
   Users,
   DollarSign,
 } from "lucide-react";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import { getCategoryIcon, getCategoryColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useTripPlaces } from "@/hooks/use-trip-places";

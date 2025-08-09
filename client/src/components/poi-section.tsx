@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 import PoiCard from "./poi-card";
 import { Skeleton } from "@/components/ui/skeleton";
 

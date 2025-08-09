@@ -13,7 +13,11 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(grep:*)",
       "Bash(mkdir:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(say \"All 6 broken imports fixed. Route Wise naming preserved. Ready to commit and create PR.\")"
     ],
     "deny": []
   }
