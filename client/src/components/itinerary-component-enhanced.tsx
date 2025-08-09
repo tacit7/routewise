@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useQuery } from '@tanstack/react-query';
-import type { Poi } from '@shared/schema';
+import type { Poi } from '@/types/schema';
 
 interface ItineraryComponentProps {
   startCity: string;

@@ -1,4 +1,4 @@
-import type { Poi } from "@shared/schema";
+import type { Poi } from "@/types/schema";
 
 export interface ItineraryPlace extends Poi {
   dayIndex?: number;

@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
 })
 
 const persistConfig = {
-  key: 'route-wise',
+  key: 'inspector-owllie',
   storage,
   // Only persist specific slices to avoid bloating localStorage
   whitelist: ['auth', 'wizard'] // Don't persist UI state or temporary data
