@@ -20,6 +20,7 @@ import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useTripPlaces } from "@/hooks/use-trip-places";
+import Header from "@/components/header";
 
 interface PlaceData {
   placeName: string;
@@ -178,43 +179,45 @@ export default function PlaceResults() {
   };
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation("/")}
-              className="flex items-center text-slate-600 hover:text-primary"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-slate-600">
-                <MapPin className="h-4 w-4 inline mr-1" />
-                {placeData.placeName} • {uniquePois.length} nearby places
-              </div>
-              <button
-                onClick={() => setIsMapVisible(!isMapVisible)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-              >
-                <MapIcon className="h-4 w-4" />
-                {isMapVisible ? "Hide Map" : "Show Map"}
-              </button>
-            </div>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+      <Header
+        leftContent={
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/")}
+            className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={{ color: 'var(--text)' }}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        }
+        centerContent={
+          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <MapPin className="h-4 w-4 inline mr-1" />
+            {placeData.placeName} • {uniquePois.length} nearby places
           </div>
-        </div>
-      </header>
+        }
+        rightContent={
+          <Button
+            onClick={() => setIsMapVisible(!isMapVisible)}
+            className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={{ backgroundColor: 'var(--primary)', color: 'white' }}
+          >
+            <MapIcon className="h-4 w-4" />
+            {isMapVisible ? "Hide Map" : "Show Map"}
+          </Button>
+        }
+      />
 
       {/* Full-width layout with no gaps */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Compact POI Cards */}
-        <div className="w-80 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+        <div className="w-80 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--surface)', borderRight: '1px solid var(--border)' }}>
           {/* Sidebar Header */}
-          <div className="p-3 border-b border-slate-200 bg-slate-50">
-            <h2 className="text-lg font-semibold text-slate-800">
+          <div className="p-3 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-alt)' }}>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
               Places Near {placeData.placeName}
             </h2>
             
@@ -222,11 +225,21 @@ export default function PlaceResults() {
             <div className="flex flex-wrap gap-1 mt-2">
               <button
                 onClick={() => setSelectedCategory("all")}
-                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                  selectedCategory === "all"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                }`}
+                className="px-2 py-1 rounded text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={selectedCategory === "all" 
+                  ? { backgroundColor: 'var(--primary)', color: 'white' }
+                  : { backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }
+                }
+                onMouseEnter={(e) => {
+                  if (selectedCategory !== "all") {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-50)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedCategory !== "all") {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-alt)';
+                  }
+                }}
               >
                 All ({uniquePois.length})
               </button>
@@ -236,11 +249,21 @@ export default function PlaceResults() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-2 py-1 rounded text-xs font-medium transition-colors capitalize ${
-                      selectedCategory === category
-                        ? "bg-blue-600 text-white"
-                        : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                    }`}
+                    className="px-2 py-1 rounded text-xs font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                    style={selectedCategory === category
+                      ? { backgroundColor: 'var(--primary)', color: 'white' }
+                      : { backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }
+                    }
+                    onMouseEnter={(e) => {
+                      if (selectedCategory !== category) {
+                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedCategory !== category) {
+                        e.currentTarget.style.backgroundColor = 'var(--surface-alt)';
+                      }
+                    }}
                   >
                     {category} ({count})
                   </button>
@@ -253,18 +276,18 @@ export default function PlaceResults() {
           <div className="flex-1 overflow-y-auto">
             {poisLoading && (
               <div className="p-4 text-center">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
-                <p className="text-xs text-slate-600">Loading nearby places...</p>
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" style={{ color: 'var(--primary)' }} />
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Loading nearby places...</p>
               </div>
             )}
 
             {!poisLoading && uniquePois.length === 0 && (
               <div className="p-4 text-center">
                 <div className="text-2xl mb-2">📍</div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-1">
+                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-muted)' }}>
                   No places found
                 </h3>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   No nearby attractions found for this location.
                 </p>
               </div>
@@ -288,10 +311,11 @@ export default function PlaceResults() {
 
           {/* Start Itinerary Button */}
           {tripPlaces.length > 0 && (
-            <div className="p-3 border-t border-slate-200 bg-slate-50">
+            <div className="p-3 border-t" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-alt)' }}>
               <Button
                 onClick={() => setLocation('/itinerary')}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                className="w-full focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ backgroundColor: 'var(--primary)', color: 'white' }}
                 size="sm"
               >
                 <Calendar className="h-4 w-4 mr-2" />
@@ -301,38 +325,35 @@ export default function PlaceResults() {
           )}
         </div>
 
-        {/* Main Map Area - Full Width */}
+        {/* Main Map Area - Full Width with Restored Interactive Features */}
         {isMapVisible && (
           <div className="flex-1">
             <InteractiveMap
               startCity={placeData.placeName}
-              endCity={placeData.placeName}
-              checkpoints={[]}
-              pois={uniquePois}
+              endCity=""
+              pois={filteredPois}
               selectedPoiIds={selectedPoiIds}
               hoveredPoi={hoveredPoi}
               onPoiClick={handlePoiClick}
               onPoiSelect={handlePoiSelect}
               height="100%"
               className="w-full h-full"
-              centerLocation={placeData.location}
-              zoom={12}
             />
           </div>
         )}
 
         {/* When map is hidden, show full-width POI grid */}
         {!isMapVisible && (
-          <div className="flex-1 p-4 overflow-y-auto bg-slate-50">
+          <div className="flex-1 p-4 overflow-y-auto" style={{ backgroundColor: 'var(--bg)' }}>
             <div className="max-w-7xl mx-auto">
               {/* Place Information Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+              <div className="rounded-lg shadow-sm border p-6 mb-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-slate-800 mb-2">
+                    <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text)' }}>
                       {placeData.placeName}
                     </h1>
-                    <div className="flex items-center text-slate-600 mb-4">
+                    <div className="flex items-center mb-4" style={{ color: 'var(--text-muted)' }}>
                       <MapPin className="h-4 w-4 mr-2" />
                       <span className="text-sm">
                         {uniquePois.length} nearby attractions and places to visit
@@ -342,7 +363,8 @@ export default function PlaceResults() {
                   <Button
                     onClick={handleSavePlace}
                     variant="outline"
-                    className="ml-4"
+                    className="ml-4 focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                    style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
                   >
                     <Star className="h-4 w-4 mr-2" />
                     Save Place

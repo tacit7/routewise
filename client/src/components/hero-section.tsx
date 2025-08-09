@@ -26,15 +26,15 @@ export default function HeroSection() {
         
         <div className="space-y-8">
           {/* Quick Planning Forms */}
-          <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
+          <div className="bg-surface rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl mx-auto">
             {/* Tab Navigation */}
-            <div className="flex mb-6 bg-slate-100 rounded-lg p-1">
+            <div className="flex mb-6 bg-surface-alt rounded-lg p-1">
               <button
                 onClick={() => setActiveTab('route')}
                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                   activeTab === 'route'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-800'
+                    ? 'bg-surface text-blue-600 shadow-sm'
+                    : 'text-muted-fg hover:text-fg'
                 }`}
               >
                 <i className="fas fa-route mr-2" />
@@ -44,8 +44,8 @@ export default function HeroSection() {
                 onClick={() => setActiveTab('place')}
                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                   activeTab === 'place'
-                    ? 'bg-white text-purple-600 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-800'
+                    ? 'bg-surface text-purple-600 shadow-sm'
+                    : 'text-muted-fg hover:text-fg'
                 }`}
               >
                 <i className="fas fa-compass mr-2" />
@@ -57,7 +57,7 @@ export default function HeroSection() {
             {activeTab === 'route' && (
               <div>
                 <div className="mb-4 text-center">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Quick Route</h3>
+                  <h3 className="text-lg font-semibold text-fg mb-2">Quick Route</h3>
                   <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
                 </div>
                 <RouteForm />
@@ -67,7 +67,7 @@ export default function HeroSection() {
             {activeTab === 'place' && (
               <div>
                 <div className="mb-4 text-center">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">Explore Places</h3>
+                  <h3 className="text-lg font-semibold text-fg mb-2">Explore Places</h3>
                   <p className="text-sm text-slate-600">Discover attractions around any city or destination</p>
                 </div>
                 <PlaceForm />

@@ -27,13 +27,36 @@ const DashboardTest = () => {
   const cacheStats = userPreferences.getCacheStats();
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Header />
+    <div className="bg-bg min-h-screen">
+      <Header
+        leftContent={
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>
+              RouteWise Test
+            </h1>
+          </div>
+        }
+        centerContent={
+          <div className="flex items-center justify-center">
+            <h2 className="text-lg font-medium" style={{ color: 'var(--text)' }}>
+              Dashboard Integration Test
+            </h2>
+          </div>
+        }
+        rightContent={
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              Test Mode
+            </span>
+          </div>
+        }
+      />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard Integration Test</h1>
-          <p className="text-gray-600">Testing the complete interests data integration layer</p>
+          <h1 className="text-3xl font-bold text-fg mb-4">Dashboard Integration Test</h1>
+          <p className="text-muted-fg">Testing the complete interests data integration layer</p>
         </div>
 
         {/* Redux Integration Test */}
@@ -93,7 +116,7 @@ const DashboardTest = () => {
                         </span>
                       ))}
                       {enabledInterestNames.length > 5 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                        <span className="px-2 py-1 bg-surface-alt text-muted-fg text-xs rounded">
                           +{enabledInterestNames.length - 5} more
                         </span>
                       )}
@@ -209,7 +232,7 @@ const DashboardTest = () => {
                 </Button>
                 <Button 
                   variant="outline"
-                  className="bg-green-600 hover:bg-green-700 text-white border-green-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+                  className="bg-primary hover:bg-primary/90 text-primary-fg border-green-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
                 >
                   <MapPin className="w-5 h-5 mr-2" />
                   Help Me Plan a Trip
@@ -222,9 +245,9 @@ const DashboardTest = () => {
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
+                  <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
                 </div>
-                <p className="text-gray-600 mb-6">Tell us what you're into to get tailored recommendations.</p>
+                <p className="text-muted-fg mb-6">Tell us what you're into to get tailored recommendations.</p>
                 
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">
                   Customize Interests

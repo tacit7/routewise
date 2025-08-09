@@ -4,7 +4,7 @@
 
 :root {
   /* UX Spec Design Tokens */
-  --bg: hsl(210 20% 98%); /* App background */
+  --bg: hsl(156 30% 96); /* App background */
   --surface: hsl(0 0% 100%); /* Cards, tab active background */
   --surface-alt: hsl(210 25% 97%); /* Pills, subtle panels */
   --text: hsl(215 18% 18%); /* Primary text */
@@ -188,7 +188,7 @@
 }
 
 .trip-places-panel {
-  background: var(--primary-50);
+  background: var(--bg);
   border: 1px solid var(--primary-100);
   border-radius: var(--radius);
   padding: 16px;

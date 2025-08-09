@@ -66,8 +66,8 @@ export default function DailyItinerarySidebar({
       </CardHeader>
       <CardContent className="p-4">
         <div
-          className={`min-h-32 border-2 border-dashed rounded-lg p-4 transition-colors ${
-            draggedOver ? "border-primary bg-primary/5" : "border-border hover:border-muted-foreground"
+          className={`min-h-32 border-2 border-dashed rounded-lg p-4 transition-colors bg-bg ${
+            draggedOver ? "border-primary !bg-primary/5" : "border-border hover:border-muted-fg"
           }`}
           onDrop={handleDrop}
           onDragOver={(e) => {

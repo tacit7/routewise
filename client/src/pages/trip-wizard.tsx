@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/header";
 import { TripPlannerWizard } from "@/components/trip-wizard/TripPlannerWizard";
 import { TripWizardData } from "@/types/trip-wizard";
 import {
@@ -351,9 +354,30 @@ export default function TripWizardPage() {
 
   if (isCalculating) {
     return (
-      <div className="min-h-screen shadow-md flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <p>hello</p>
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 max-w-md mx-4">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+        <Header
+          leftContent={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleWizardCancel}
+              className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              style={{ color: 'var(--text)' }}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+          }
+          centerContent={
+            <div className="flex items-center justify-center">
+              <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+                Planning Your Trip
+              </h1>
+            </div>
+          }
+        />
+        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 73px)' }}>
+          <div className="bg-surface p-8 rounded-lg shadow-sm border border-border max-w-md mx-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <h3 className="text-lg font-semibold mb-2">{loadingStage || "Calculating Your Route"}</h3>
@@ -405,6 +429,7 @@ export default function TripWizardPage() {
 
             <div className="mt-4 text-xs text-slate-400">This usually takes 5-15 seconds</div>
           </div>
+        </div>
         </div>
       </div>
     );

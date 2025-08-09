@@ -18,11 +18,11 @@ export function OptionCard({
       disabled={disabled}
       className={cn(
         "relative w-full p-4 rounded-lg border-2 transition-all duration-200",
-        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-bg",
         "hover:shadow-md transform hover:-translate-y-1",
         selected
           ? "border-primary bg-primary/5 shadow-sm"
-          : "border-slate-200 bg-white hover:border-slate-300",
+          : "border-border bg-surface hover:border-border",
         disabled && "opacity-50 cursor-not-allowed hover:transform-none hover:shadow-none",
         className
       )}
@@ -52,7 +52,7 @@ export function OptionCard({
         {/* Title */}
         <h3 className={cn(
           "font-semibold text-sm",
-          selected ? "text-primary" : "text-slate-800"
+          selected ? "text-primary" : "text-fg"
         )}>
           {title}
         </h3>
@@ -61,7 +61,7 @@ export function OptionCard({
         {description && (
           <p 
             id={`${title}-description`}
-            className="text-xs text-slate-600 leading-relaxed"
+            className="text-xs text-muted-fg leading-relaxed"
           >
             {description}
           </p>

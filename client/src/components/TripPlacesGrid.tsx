@@ -57,17 +57,19 @@ export default function TripPlacesGrid({
           </p>
         </div>
       </div>
-      {showMap && mapsApiKey && places.length > 0 && (
+      {showMap && places.length > 0 && (
         <div className="h-64 rounded-2xl overflow-hidden mb-4">
           <InteractiveMap
-            startCity=""
-            endCity=""
-            checkpoints={[]}
-            pois={places}
-            selectedPoiIds={[]}
-            hoveredPoi={null}
-            onPoiClick={() => {}}
-            onPoiSelect={() => {}}
+            initialViewport={{
+              north: 40.7829,
+              south: 40.7489,
+              east: -73.9441,
+              west: -73.9901
+            }}
+            initialZoom={10}
+            filters={{
+              min_rating: 3.0,
+            }}
             height="100%"
             className="w-full h-full"
             apiKey={mapsApiKey}

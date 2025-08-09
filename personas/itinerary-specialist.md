@@ -159,70 +159,92 @@ const { tripPlaces } = useTripPlaces();
 
 ## Design System Guidelines
 
-### shadcn/ui Component Usage
-The itinerary page follows RouteWise's design system built on shadcn/ui components:
+### RouteWise Design System Tokens
+The itinerary page follows RouteWise's comprehensive design system with standardized tokens:
 
 **Core Components Used**:
 - `Button` - All interactive actions (save, back, add day, toggle)
 - `Card` - Place cards, day containers, main layout sections  
 - `Badge` - Category tags, status indicators
-- `Input` - Trip title, time scheduling
+- `Input` - Trip title, time scheduling with proper token usage
 - `Tabs` - Day navigation system
 - `ScrollArea` - Scrollable content areas
 - `Tooltip` - Help text and action descriptions
 
-### Color Scheme Consistency
+### Design System Token Reference
 
-**Official Design System Colors** (from `index.css`):
-- **Primary Brand**: `--primary: hsl(160 84% 36%)` (Green) - Main actions, active states
-- **Primary Tints**: `--primary-50`, `--primary-100`, `--primary-200` - Backgrounds, subtle borders
-- **Focus**: `--focus: hsl(217 92% 60%)` (Blue) - Focus rings, accessibility
-- **Warning**: `--warning: hsl(42 95% 45%)` (Orange) - Rating stars, alerts
+**Background Tokens**:
+- `bg-bg` - Main page background
+- `bg-surface` - Card and panel backgrounds
+- `bg-surface-alt` - Alternate surface color for contrast
+- `bg-primary` - Primary brand color for actions
+- `bg-primary/90` - Primary hover state (90% opacity)
+- `bg-primary/10` - Primary tinted backgrounds
 
-**Semantic Colors**:
-- `--primary` - Main actions (Save Trip, Add to Trip)
-- `--secondary` - Supporting actions, muted states
-- `--text-muted` - Secondary text, timestamps
-- `--destructive` - Delete/remove actions
-- `--success` - Success states, confirmations
+**Text Tokens**:
+- `text-fg` - Primary text color (replaces `text-gray-900`)
+- `text-muted-fg` - Secondary text (replaces `text-gray-500`, `text-gray-600`)
+- `text-primary` - Primary brand text color
+- `text-primary-fg` - Text on primary backgrounds (white)
 
-**⚠️ Color Inconsistency Bug Found**:
-The `interactive-map.tsx` component uses hardcoded purple colors (`purple-600`, `purple-700`) which violates the design system. These should be changed to use CSS custom properties (`--primary`, `--primary-hover`).
+**Border & Ring Tokens**:
+- `border-border` - Standard border color
+- `ring-ring` - Focus ring color
+- `ring-offset-bg` - Focus ring offset color
 
-**Interactive States**:
-- Hover: `--primary-hover` for brand elements
-- Disabled: `--muted`/`--muted-foreground` with opacity
-- Focus: `--focus` ring following accessibility patterns
-- Active: `--primary` background with white text
+**Required Interactive Patterns**:
+```tsx
+// Input fields MUST use this pattern
+<Input className="bg-surface text-fg border border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg hover:bg-surface/95 active:bg-surface/90" />
+
+// Buttons MUST use consistent primary styling  
+<Button className="bg-primary text-primary-fg hover:bg-primary/90">Save Trip</Button>
+
+// Cards and surfaces MUST use proper tokens
+<Card className="bg-surface border border-border hover:bg-surface/95">
+
+// Text links MUST follow this pattern
+<a className="text-primary hover:opacity-90">Link Text</a>
+```
 
 ### Design Patterns to Follow
 
 **Card Layouts**:
-```typescript
-// Use CSS classes from index.css for consistent styling
-<Card className="itinerary-card group cursor-move">
+```tsx
+// REQUIRED: Use design system tokens for all card components
+<Card className="bg-surface border border-border hover:bg-surface/95 group cursor-move">
   <CardContent className="p-3">
-    // Consistent with design system
+    <h3 className="text-fg font-semibold">Place Name</h3>
+    <p className="text-muted-fg text-sm">Place details</p>
   </CardContent>
 </Card>
 ```
 
-**Button Hierarchy**:
-- `variant="default"` - Uses `--primary` color for main actions
-- `variant="secondary"` - Uses `--secondary` for supporting actions  
-- `variant="ghost"` - Minimal actions (back button, toggles)
-- `variant="outline"` - Category badges, secondary states
+**Button Hierarchy** (ALL buttons must use these exact patterns):
+```tsx
+// Primary actions - Save, Create, Add to Trip
+<Button className="bg-primary text-primary-fg hover:bg-primary/90">Save Trip</Button>
 
-**CSS Custom Properties Usage**:
-```css
-/* Use design tokens instead of hardcoded colors */
-.primary-button {
-  background: var(--primary);
-  color: var(--primary-foreground);
-}
-.primary-button:hover {
-  background: var(--primary-hover);
-}
+// Secondary actions - Back, Cancel
+<Button variant="outline" className="border-border text-fg hover:bg-surface/95">Back</Button>
+
+// Ghost actions - Map toggle, minimal interactions  
+<Button variant="ghost" className="text-fg hover:bg-surface/95">Toggle Map</Button>
+
+// Destructive actions - Delete, Remove
+<Button variant="destructive" className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remove</Button>
+```
+
+**Standardized Interactive States**:
+```tsx
+// Surfaces (cards, panels, dropzones)
+className="bg-surface hover:bg-surface/95 active:bg-surface/90"
+
+// Text links
+className="text-primary hover:opacity-90"  
+
+// Focus rings (REQUIRED on ALL interactive elements)
+className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
 ```
 
 **Spacing & Layout**:
@@ -268,9 +290,19 @@ The `interactive-map.tsx` component uses hardcoded purple colors (`purple-600`, 
 2. Add useEffect for localStorage persistence of showMap
 3. Implement save functionality
 4. Standardize localStorage keys across components
-5. **Fix color inconsistency**: Replace hardcoded purple colors in `interactive-map.tsx` with CSS custom properties
-6. Use `itinerary-card`, `drop-zone`, and other CSS classes from index.css
-7. Ensure all new components follow design system tokens
+5. **CRITICAL: Update ALL components to use design system tokens**:
+   - Replace ALL hardcoded colors (`bg-white`, `text-gray-900`, `text-slate-500`, etc.)
+   - Use required interactive patterns for inputs, buttons, cards
+   - Apply standardized focus rings to ALL interactive elements
+   - Use `bg-surface hover:bg-surface/95 active:bg-surface/90` for surfaces
+   - Use `text-primary hover:opacity-90` for text links
+   - Ensure primary buttons use `bg-primary text-primary-fg hover:bg-primary/90`
+6. **Update existing itinerary components**:
+   - `itinerary.tsx` - Apply design tokens to main page
+   - `DailyItinerarySidebar.tsx` - Update cards and dropzones 
+   - `TripPlacesGrid.tsx` - Update place cards and interactions
+   - `interactive-map.tsx` - Replace hardcoded colors with tokens
+7. Ensure all new components follow mandatory design system patterns
 
 ## File Locations
 - Main: `client/src/pages/itinerary.tsx`

@@ -22,7 +22,7 @@ export default function AuthError() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-      <div className="max-w-md w-full mx-auto p-8 bg-white rounded-lg shadow-lg text-center">
+      <div className="max-w-md w-full mx-auto p-8 bg-surface rounded-lg shadow-lg text-center">
         <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
           <svg
             className="w-8 h-8 text-red-600"

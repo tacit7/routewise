@@ -156,7 +156,7 @@ export default function DevCacheDashboard() {
         <CardContent className="space-y-4">
           {/* Cache Status Overview */}
           {isLoading && (
-            <div className="flex items-center gap-2 text-sm text-slate-600">
+            <div className="flex items-center gap-2 text-sm text-muted-fg">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Loading cache stats...
             </div>
@@ -173,58 +173,58 @@ export default function DevCacheDashboard() {
             <>
               {/* Cache Type and Status */}
               <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="text-center p-2 bg-white rounded border">
-                  <div className="font-medium text-slate-700">Places</div>
+                <div className="text-center p-2 bg-surface rounded border">
+                  <div className="font-medium text-fg">Places</div>
                   <div className="flex items-center justify-center gap-1 mt-1">
                     {cacheStats.places.connected ? (
                       <CheckCircle className="h-3 w-3 text-green-500" />
                     ) : (
                       <AlertCircle className="h-3 w-3 text-yellow-500" />
                     )}
-                    <span className="text-slate-600">
+                    <span className="text-muted-fg">
                       {cacheStats.places.type}
                     </span>
                   </div>
                   {cacheStats.places.totalEntries && (
-                    <div className="text-slate-500 mt-1">
+                    <div className="text-muted-fg mt-1">
                       {cacheStats.places.totalEntries} entries
                     </div>
                   )}
                 </div>
 
-                <div className="text-center p-2 bg-white rounded border">
-                  <div className="font-medium text-slate-700">Routes</div>
+                <div className="text-center p-2 bg-surface rounded border">
+                  <div className="font-medium text-fg">Routes</div>
                   <div className="flex items-center justify-center gap-1 mt-1">
                     {cacheStats.directions.connected ? (
                       <CheckCircle className="h-3 w-3 text-green-500" />
                     ) : (
                       <AlertCircle className="h-3 w-3 text-yellow-500" />
                     )}
-                    <span className="text-slate-600">
+                    <span className="text-muted-fg">
                       {cacheStats.directions.type}
                     </span>
                   </div>
                   {cacheStats.directions.totalEntries && (
-                    <div className="text-slate-500 mt-1">
+                    <div className="text-muted-fg mt-1">
                       {cacheStats.directions.totalEntries} entries
                     </div>
                   )}
                 </div>
 
-                <div className="text-center p-2 bg-white rounded border">
-                  <div className="font-medium text-slate-700">Static</div>
+                <div className="text-center p-2 bg-surface rounded border">
+                  <div className="font-medium text-fg">Static</div>
                   <div className="flex items-center justify-center gap-1 mt-1">
                     {cacheStats.static.connected ? (
                       <CheckCircle className="h-3 w-3 text-green-500" />
                     ) : (
                       <AlertCircle className="h-3 w-3 text-yellow-500" />
                     )}
-                    <span className="text-slate-600">
+                    <span className="text-muted-fg">
                       {cacheStats.static.type}
                     </span>
                   </div>
                   {cacheStats.static.totalEntries && (
-                    <div className="text-slate-500 mt-1">
+                    <div className="text-muted-fg mt-1">
                       {cacheStats.static.totalEntries} entries
                     </div>
                   )}
@@ -234,12 +234,12 @@ export default function DevCacheDashboard() {
               {/* Suggestions */}
               {cacheStats.suggestions.length > 0 && (
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-slate-700 flex items-center gap-1">
+                  <div className="text-xs font-medium text-fg flex items-center gap-1">
                     <Info className="h-3 w-3" />
                     Cache Info
                   </div>
                   {cacheStats.suggestions.map((suggestion, index) => (
-                    <div key={index} className="text-xs text-slate-600 pl-4">
+                    <div key={index} className="text-xs text-muted-fg pl-4">
                       • {suggestion}
                     </div>
                   ))}
@@ -282,7 +282,7 @@ export default function DevCacheDashboard() {
               </div>
 
               {/* Development Indicators */}
-              <div className="text-xs text-center text-slate-500 border-t border-slate-200 pt-2">
+              <div className="text-xs text-center text-muted-fg border-t border-border pt-2">
                 🚀 Extended TTLs active • Cache-first development mode
               </div>
             </>

@@ -83,13 +83,40 @@ const Dashboard = () => {
   if (!hasUserTrips) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
-        <Header />
+        <Header
+          centerContent={
+            <div className="flex items-center justify-center">
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+                Dashboard
+              </h1>
+            </div>
+          }
+          rightContent={
+            user && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Welcome, {user.name || user.email}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm" 
+                  onClick={() => setLocation("/interests")}
+                  className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              </div>
+            )
+          }
+        />
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
           {/* Empty State Hero Section */}
           <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
             {/* Heading */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">Let's get your next adventure started!</h1>
+            <h1 className="text-4xl font-bold text-fg mb-8">Let's get your next adventure started!</h1>
 
             {/* Subtext */}
             <p className="text-xl text-gray-600 mb-12">
@@ -107,7 +134,7 @@ const Dashboard = () => {
               </Button>
               <Button
                 onClick={handleExplore}
-                className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+                className="bg-primary hover:bg-primary/90 text-primary-fg px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
               >
                 <Search className="w-6 h-6 mr-3" />
                 Explore Places
@@ -130,7 +157,7 @@ const Dashboard = () => {
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
+                  <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
                 </div>
                 <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                   Tell us what you're into to get tailored recommendations.
@@ -151,13 +178,13 @@ const Dashboard = () => {
 
           {/* Suggested Trips Section */}
           <section className="text-center flex-shrink-0">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
+            <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
 
             {hasTripsError ? (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load suggestions</h3>
+                  <h3 className="text-lg font-medium text-fg mb-2">Failed to load suggestions</h3>
                   <p className="text-gray-600 mb-6">
                     We couldn't load your personalized trip suggestions. Please try again later.
                   </p>
@@ -219,7 +246,7 @@ const Dashboard = () => {
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No trips available</h3>
+                  <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
                   <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
                   <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                     <Settings className="w-4 h-4 mr-2" />
@@ -236,7 +263,34 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
-      <Header />
+      <Header
+        centerContent={
+          <div className="flex items-center justify-center">
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+              Dashboard
+            </h1>
+          </div>
+        }
+        rightContent={
+          user && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Welcome, {user.name || user.email}
+              </span>
+              <Button
+                variant="outline"
+                size="sm" 
+                onClick={() => setLocation("/interests")}
+                className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          )
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
@@ -252,7 +306,7 @@ const Dashboard = () => {
             </Button>
             <Button
               onClick={handleExplore}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              className="bg-primary hover:bg-primary/90 text-primary-fg px-6 py-3 rounded-lg font-medium flex items-center justify-center"
             >
               <Search className="w-5 h-5 mr-2" />
               Explore Places
@@ -260,7 +314,7 @@ const Dashboard = () => {
             <Button
               onClick={handleHelpMePlan}
               variant="outline"
-              className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              className="bg-primary hover:bg-primary/90 text-primary-fg border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
             >
               <MapPin className="w-5 h-5 mr-2" />
               Help Me Plan a Trip
@@ -274,7 +328,7 @@ const Dashboard = () => {
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                   <CheckCircle className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Personalize Your Trip Suggestions</h2>
+                <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
               </div>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                 Tell us what you're into to get tailored recommendations.
@@ -295,13 +349,13 @@ const Dashboard = () => {
 
         {/* Suggested Trips Section */}
         <section className="text-center flex-shrink-0">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Suggested Trips</h2>
+          <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
 
           {hasTripsError ? (
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load suggestions</h3>
+                <h3 className="text-lg font-medium text-fg mb-2">Failed to load suggestions</h3>
                 <p className="text-gray-600 mb-6">
                   We couldn't load your personalized trip suggestions. Please try again later.
                 </p>
@@ -363,7 +417,7 @@ const Dashboard = () => {
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No trips available</h3>
+                <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
                 <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
                 <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
                   <Settings className="w-4 h-4 mr-2" />

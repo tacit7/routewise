@@ -72,22 +72,65 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header
+        leftContent={
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>
+              RouteWise
+            </h1>
+          </div>
+        }
+        rightContent={
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation("/dashboard")}
+                className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLocation("/login")}
+                  className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                  style={{ color: 'var(--text)' }}
+                >
+                  Login
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setLocation("/register")}
+                  className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                  style={{ backgroundColor: 'var(--primary)', color: 'white' }}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
+          </div>
+        }
+      />
       <HeroSection />
       
       {/* Saved Routes/Trips Section */}
       {(trips.length > 0 || legacyRoutes.length > 0) && (
-        <section className="py-16 bg-slate-50">
+        <section className="py-16 bg-bg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-800 mb-4">
+              <h2 className="text-3xl font-bold text-fg mb-4">
                 {isAuthenticated ? "My Saved Trips" : "My Saved Routes"}
               </h2>
-              <p className="text-slate-600 max-w-2xl mx-auto">
+              <p className="text-muted-fg max-w-2xl mx-auto">
                 Quick access to your previously planned routes and discovered places
               </p>
               {loading && (
-                <p className="text-slate-500 mt-2">Loading your trips...</p>
+                <p className="text-muted-fg mt-2">Loading your trips...</p>
               )}
               {error && (
                 <p className="text-red-500 mt-2">Error loading trips: {error}</p>
@@ -97,45 +140,45 @@ export default function Home() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Backend Trips (for authenticated users) */}
               {trips.map((trip) => (
-                <div key={`trip-${trip.id}`} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                <div key={`trip-${trip.id}`} className="bg-surface rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-slate-800">{trip.title}</h3>
+                    <h3 className="font-semibold text-fg">{trip.title}</h3>
                     <button
                       onClick={() => handleDeleteTrip(trip.id)}
-                      className="text-slate-400 hover:text-red-500 transition-colors"
+                      className="text-muted-fg hover:text-red-500 transition-colors"
                     >
                       <i className="fas fa-trash text-sm" />
                     </button>
                   </div>
                   
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-map-marker-alt mr-2 text-green-600" />
                       <span>{trip.startCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-flag mr-2 text-red-600" />
                       <span>{trip.endCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-star mr-2 text-amber-500" />
                       <span>{trip.poisData.length} places discovered</span>
                     </div>
                     {trip.routeData && (
-                      <div className="flex items-center text-sm text-slate-600">
+                      <div className="flex items-center text-sm text-muted-fg">
                         <i className="fas fa-clock mr-2 text-blue-500" />
                         <span>{trip.routeData.duration} • {trip.routeData.distance}</span>
                       </div>
                     )}
                   </div>
                   
-                  <div className="text-xs text-slate-500 mb-4">
+                  <div className="text-xs text-muted-fg mb-4">
                     Saved {new Date(trip.createdAt).toLocaleDateString()}
                   </div>
                   
                   <Button
                     onClick={() => loadTrip(trip)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-fg"
                   >
                     <i className="fas fa-route mr-2" />
                     View Trip
@@ -145,43 +188,43 @@ export default function Home() {
 
               {/* Legacy Routes (from localStorage) */}
               {legacyRoutes.map((route) => (
-                <div key={`legacy-${route.id}`} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow relative">
+                <div key={`legacy-${route.id}`} className="bg-surface rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow relative">
                   <div className="absolute top-2 right-2">
                     <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Legacy</span>
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-slate-800">{route.name}</h3>
+                    <h3 className="font-semibold text-fg">{route.name}</h3>
                     <button
                       onClick={() => handleDeleteLegacyRoute(route.id)}
-                      className="text-slate-400 hover:text-red-500 transition-colors"
+                      className="text-muted-fg hover:text-red-500 transition-colors"
                     >
                       <i className="fas fa-trash text-sm" />
                     </button>
                   </div>
                   
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-map-marker-alt mr-2 text-green-600" />
                       <span>{route.startCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-flag mr-2 text-red-600" />
                       <span>{route.endCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-muted-fg">
                       <i className="fas fa-star mr-2 text-amber-500" />
                       <span>{route.placesCount} places discovered</span>
                     </div>
                   </div>
                   
-                  <div className="text-xs text-slate-500 mb-4">
+                  <div className="text-xs text-muted-fg mb-4">
                     Saved {new Date(route.createdAt).toLocaleDateString()}
                   </div>
                   
                   <Button
                     onClick={() => loadLegacyRoute(route)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-fg"
                   >
                     <i className="fas fa-route mr-2" />
                     View Route

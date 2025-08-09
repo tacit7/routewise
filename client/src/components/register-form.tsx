@@ -107,7 +107,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-muted-foreground">Or create account with</span>
+          <span className="bg-surface px-2 text-muted-fg">Or create account with</span>
         </div>
       </div>
 
@@ -186,7 +186,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-fg hover:text-fg"
               disabled={isLoading}
             >
               {showPassword ? (
@@ -229,7 +229,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-fg hover:text-fg"
               disabled={isLoading}
             >
               {showConfirmPassword ? (
@@ -266,12 +266,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, onS
 
       {onSwitchToLogin && (
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-fg">
             Already have an account?{' '}
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+              className="font-medium text-primary hover:text-primary/90 transition-colors"
               disabled={isLoading}
             >
               Sign in

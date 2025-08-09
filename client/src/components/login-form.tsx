@@ -79,7 +79,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
+          <span className="bg-surface px-2 text-muted-fg">Or continue with</span>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-fg hover:text-fg"
               disabled={isLoading}
             >
               {showPassword ? (
@@ -158,12 +158,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
 
       {onSwitchToRegister && (
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-fg">
             Don't have an account?{' '}
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+              className="font-medium text-primary hover:text-primary/90 transition-colors"
               disabled={isLoading}
             >
               Create one

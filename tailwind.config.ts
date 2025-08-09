@@ -16,6 +16,16 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // Design system tokens
+        bg: "var(--bg)",
+        surface: "var(--surface)",
+        "surface-alt": "var(--surface-alt)",
+        fg: "var(--text)",
+        "muted-fg": "var(--text-muted)",
+        "primary-fg": "#ffffff",
+        ring: "var(--focus)",
+        
+        // Legacy shadcn tokens
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {

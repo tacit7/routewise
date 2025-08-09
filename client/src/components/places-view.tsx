@@ -117,6 +117,7 @@ export default function PlacesView({
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedPoiId, setSelectedPoiId] = useState<number | null>(null);
 
   // POI scheduling state
   const [scheduledTimes, setScheduledTimes] = useState<Map<number, string>>(new Map());
@@ -132,6 +133,17 @@ export default function PlacesView({
   // Mobile detection and map visibility state
   const [isMobile, setIsMobile] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
+
+  // Info window close handler
+  const handleInfoWindowClose = () => {
+    setSelectedPoiId(null);
+  };
+
+  // Enhanced POI click handler that sets selected POI for info window
+  const handleEnhancedPoiClick = (poi: POI | Poi) => {
+    setSelectedPoiId(poi.id);
+    onPoiClick(poi);
+  };
 
   // Detect mobile and set mobile-first map visibility
   useEffect(() => {
@@ -216,7 +228,7 @@ export default function PlacesView({
 
     // Calculate actual sidebar width for desktop
     const containerWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40;
-    
+
     // Force single-column list until panel is quite wide
     // Default 30% (~360px equivalent) should show single column
     if (containerWidth < 500) return '100%';      // Single column list (default behavior)
@@ -228,7 +240,7 @@ export default function PlacesView({
 
   const cardFlexBasis = getCardFlexBasis();
   const isFlexLayout = cardFlexBasis !== '100%';
-  
+
   // Debug panel sizing
   console.log('Panel Debug:', {
     sidebarSizePercent,
@@ -243,7 +255,7 @@ export default function PlacesView({
     setSidebarSizePercent(size);
     // Force re-render of grid layout
     setPanelKey(prev => prev + 1);
-    
+
     // Trigger map resize with debouncing
     setTimeout(() => {
       window.dispatchEvent(new Event("resize"));
@@ -270,7 +282,7 @@ export default function PlacesView({
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: "var(--bg)" }}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200 flex-shrink-0">
+      <header className="bg-surface shadow-sm border-b border-border flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-3">
             <Button
@@ -332,7 +344,7 @@ export default function PlacesView({
           // Mobile map view (full screen)
           <div className="flex-1">
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center bg-slate-100">
+              <div className="w-full h-full flex items-center justify-center bg-surface-alt">
                 <div className="text-center">
                   <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
                   <p className="text-sm text-slate-600">Loading map and places...</p>
@@ -342,8 +354,7 @@ export default function PlacesView({
               <InteractiveMap
                 startCity={startLocation}
                 endCity={endLocation || ""}
-                checkpoints={showRouting ? [] : undefined}
-                pois={uniquePois}
+                pois={filteredPois}
                 selectedPoiIds={selectedPoiIds}
                 hoveredPoi={hoveredPoi}
                 onPoiClick={onPoiClick}
@@ -358,7 +369,7 @@ export default function PlacesView({
           // Mobile POI list view (full screen)
           <div className="flex-1 flex flex-col">
             {/* Category Filter for POI-only view */}
-            <div className="bg-white border-b border-slate-200 flex-shrink-0">
+            <div className="bg-surface border-b border-border flex-shrink-0">
               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
             </div>
 
@@ -411,7 +422,7 @@ export default function PlacesView({
 
             {/* Mobile Itinerary Button - Fixed at bottom */}
             {tripPlaces.length > 0 && (
-              <div className="p-3 border-t border-slate-200 bg-white flex-shrink-0">
+              <div className="p-3 border-t border-border bg-surface flex-shrink-0">
                 <Button
                   onClick={() => setLocation("/itinerary")}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white min-h-[48px] touch-manipulation"
@@ -523,7 +534,7 @@ export default function PlacesView({
                           key={poi.placeId || poi.id || `poi-list-${index}`}
                           onMouseEnter={() => onPoiHover(poi)}
                           onMouseLeave={() => onPoiHover(null)}
-                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border bg-surface hover:border-border hover:shadow-sm transition-all cursor-pointer"
                         >
                           {/* Thumbnail - 64px */}
                           <img
@@ -531,7 +542,7 @@ export default function PlacesView({
                             alt={poi.name}
                             className="h-16 w-16 rounded object-cover"
                           />
-                          
+
                           {/* Main content - 1fr */}
                           <div className="min-w-0">
                             <h4 className="truncate font-medium text-sm">{poi.name}</h4>
@@ -543,7 +554,7 @@ export default function PlacesView({
                               )}
                             </div>
                           </div>
-                          
+
                           {/* Action/Tag - auto */}
                           <div className="flex flex-col items-end gap-1">
                             <div className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
@@ -631,7 +642,7 @@ export default function PlacesView({
           {/* Map Panel */}
           <ResizablePanel defaultSize={70}>
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center bg-slate-100">
+              <div className="w-full h-full flex items-center justify-center bg-surface-alt">
                 <div className="text-center">
                   <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
                   <p className="text-sm text-slate-600">Loading map and places...</p>
@@ -641,8 +652,7 @@ export default function PlacesView({
               <InteractiveMap
                 startCity={startLocation}
                 endCity={endLocation || ""}
-                checkpoints={showRouting ? [] : undefined}
-                pois={uniquePois}
+                pois={filteredPois}
                 selectedPoiIds={selectedPoiIds}
                 hoveredPoi={hoveredPoi}
                 onPoiClick={onPoiClick}

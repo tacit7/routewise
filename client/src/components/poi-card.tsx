@@ -68,7 +68,7 @@ export default function PoiCard({
   // Compact variant for sidebar display
   if (isCompactVariant) {
     return (
-      <div className="bg-white rounded border hover:shadow-sm transition-all p-2">
+      <div className="rounded border hover:shadow-sm transition-all p-2" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
         <div className="flex gap-2">
           <img
             src={poi.imageUrl}
@@ -76,15 +76,15 @@ export default function PoiCard({
             className="w-12 h-12 rounded object-cover flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-slate-800 text-sm truncate">
+            <h4 className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>
               {poi.name}
             </h4>
-            <p className="text-xs text-slate-600 line-clamp-1 mb-1">
+            <p className="text-xs line-clamp-1 mb-1" style={{ color: 'var(--text-muted)' }}>
               {poi.description}
             </p>
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center text-xs text-slate-500">
-                <Star className="h-3 w-3 text-yellow-400 mr-1" />
+              <div className="flex items-center text-xs" style={{ color: 'var(--text-muted)' }}>
+                <Star className="h-3 w-3 mr-1" style={{ color: 'var(--warning)' }} />
                 {poi.rating}
               </div>
               {showTimeScheduler ? (
@@ -94,7 +94,7 @@ export default function PoiCard({
                   size="sm"
                 />
               ) : (
-                <span className="text-xs text-slate-500">
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   {poi.timeFromStart}
                 </span>
               )}
@@ -104,13 +104,23 @@ export default function PoiCard({
               <button
                 onClick={handleAddToTrip}
                 disabled={isAddedToTrip || isAddingToTrip}
-                className={`py-1 px-3 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center ${
-                  isAddedToTrip
-                    ? "bg-purple-100 text-purple-700 border border-purple-200"
-                    : isAddingToTrip
-                    ? "bg-purple-400 text-white cursor-not-allowed"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
-                }`}
+                className="py-1 px-3 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={isAddedToTrip
+                  ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
+                  : isAddingToTrip
+                  ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
+                  : { backgroundColor: 'var(--primary)', color: 'white' }
+                }
+                onMouseEnter={(e) => {
+                  if (!isAddedToTrip && !isAddingToTrip) {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isAddedToTrip && !isAddingToTrip) {
+                    e.currentTarget.style.backgroundColor = 'var(--primary)';
+                  }
+                }}
               >
                 {isAddingToTrip ? (
                   <>
@@ -137,7 +147,7 @@ export default function PoiCard({
   }
   
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
+    <div className="rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col" style={{ backgroundColor: 'var(--surface)' }}>
       <img
         src={poi.imageUrl}
         alt={poi.name}
@@ -153,7 +163,7 @@ export default function PoiCard({
               {poi.category.charAt(0).toUpperCase() + poi.category.slice(1)}
             </span>
             {showRelevanceScore && isPersonalized && relevanceScore > 0.6 && (
-              <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+              <span className="px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--warning)', color: 'var(--text)' }}>
                 {Math.round(relevanceScore * 100)}% match
               </span>
             )}
@@ -165,17 +175,17 @@ export default function PoiCard({
               size="md"
             />
           ) : (
-            <span className="text-slate-500 text-sm">{poi.timeFromStart}</span>
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{poi.timeFromStart}</span>
           )}
         </div>
 
-        <h4 className={`font-semibold text-slate-800 mb-2 ${isGridVariant ? 'text-lg' : 'text-xl'}`}>
+        <h4 className={`font-semibold mb-2 ${isGridVariant ? 'text-lg' : 'text-xl'}`} style={{ color: 'var(--text)' }}>
           {poi.name}
         </h4>
-        <p className={`text-slate-600 ${isGridVariant ? 'mb-2 text-sm flex-1' : 'mb-3'}`}>{poi.description}</p>
+        <p className={`${isGridVariant ? 'mb-2 text-sm flex-1' : 'mb-3'}`} style={{ color: 'var(--text-muted)' }}>{poi.description}</p>
 
         {poi.address && (
-          <div className="flex items-center text-slate-500 text-sm mb-2">
+          <div className="flex items-center text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
             <MapPin className="h-3 w-3 mr-1" />
             <span className="truncate">{poi.address}</span>
           </div>
@@ -184,11 +194,11 @@ export default function PoiCard({
         {poi.isOpen !== null && (
           <div className="flex items-center text-sm mb-3">
             <Clock className="h-3 w-3 mr-1" />
-            <span className={poi.isOpen ? "text-green-600" : "text-red-600"}>
+            <span style={{ color: poi.isOpen ? 'var(--success)' : 'var(--destructive)' }}>
               {poi.isOpen ? "Open now" : "Closed"}
             </span>
             {poi.priceLevel && (
-              <span className="ml-2 text-slate-500">
+              <span className="ml-2" style={{ color: 'var(--text-muted)' }}>
                 {"$".repeat(poi.priceLevel)}
               </span>
             )}
@@ -197,15 +207,18 @@ export default function PoiCard({
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-1">
-            <Star className="h-4 w-4 text-accent fill-current" />
-            <span className="font-medium">{poi.rating}</span>
-            <span className="text-slate-500 text-sm">
+            <Star className="h-4 w-4 fill-current" style={{ color: 'var(--warning)' }} />
+            <span className="font-medium" style={{ color: 'var(--text)' }}>{poi.rating}</span>
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
               • {poi.reviewCount} reviews
             </span>
           </div>
           <button
             onClick={() => setShowDetails(true)}
-            className="text-primary hover:text-blue-700 font-medium flex items-center"
+            className="font-medium flex items-center transition-colors focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded px-2 py-1"
+            style={{ color: 'var(--primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             View Details <ArrowRight className="h-4 w-4 ml-1" />
           </button>
@@ -216,13 +229,23 @@ export default function PoiCard({
           <button
             onClick={handleAddToTrip}
             disabled={isAddedToTrip || isAddingToTrip}
-            className={`py-2 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
-              isAddedToTrip
-                ? "bg-purple-100 text-purple-700 border border-purple-200"
-                : isAddingToTrip
-                ? "bg-purple-400 text-white cursor-not-allowed"
-                : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
-            }`}
+            className="py-2 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={isAddedToTrip
+              ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
+              : isAddingToTrip
+              ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
+              : { backgroundColor: 'var(--primary)', color: 'white' }
+            }
+            onMouseEnter={(e) => {
+              if (!isAddedToTrip && !isAddingToTrip) {
+                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isAddedToTrip && !isAddingToTrip) {
+                e.currentTarget.style.backgroundColor = 'var(--primary)';
+              }
+            }}
           >
             {isAddingToTrip ? (
               <>
@@ -247,7 +270,7 @@ export default function PoiCard({
       {/* Details Modal */}
       {showDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--surface)' }}>
             <div className="relative">
               <img
                 src={poi.imageUrl}
@@ -256,9 +279,12 @@ export default function PoiCard({
               />
               <button
                 onClick={() => setShowDetails(false)}
-                className="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all"
+                className="absolute top-4 right-4 rounded-full p-2 transition-all focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ backgroundColor: 'var(--surface)', opacity: '0.9' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surface)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface)'}
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" style={{ color: 'var(--text)' }} />
               </button>
             </div>
 
@@ -277,29 +303,29 @@ export default function PoiCard({
                     size="md"
                   />
                 ) : (
-                  <span className="text-slate-500 text-sm">
+                  <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
                     {poi.timeFromStart}
                   </span>
                 )}
               </div>
 
-              <h3 className="text-2xl font-bold text-slate-800 mb-3">
+              <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text)' }}>
                 {poi.name}
               </h3>
-              <p className="text-slate-600 mb-4">{poi.description}</p>
+              <p className="mb-4" style={{ color: 'var(--text-muted)' }}>{poi.description}</p>
 
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {poi.address && (
-                  <div className="flex items-start text-slate-600">
+                  <div className="flex items-start" style={{ color: 'var(--text-muted)' }}>
                     <MapPin className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                     <span>{poi.address}</span>
                   </div>
                 )}
 
-                <div className="flex items-center text-slate-600">
-                  <Star className="h-5 w-5 mr-2 text-accent fill-current" />
-                  <span className="font-medium">{poi.rating}</span>
-                  <span className="text-slate-500 ml-1">
+                <div className="flex items-center" style={{ color: 'var(--text-muted)' }}>
+                  <Star className="h-5 w-5 mr-2 fill-current" style={{ color: 'var(--warning)' }} />
+                  <span className="font-medium" style={{ color: 'var(--text)' }}>{poi.rating}</span>
+                  <span className="ml-1" style={{ color: 'var(--text-muted)' }}>
                     ({poi.reviewCount} reviews)
                   </span>
                 </div>
@@ -308,11 +334,8 @@ export default function PoiCard({
                   <div className="flex items-center">
                     <Clock className="h-5 w-5 mr-2" />
                     <span
-                      className={
-                        poi.isOpen
-                          ? "text-green-600 font-medium"
-                          : "text-red-600 font-medium"
-                      }
+                      className="font-medium"
+                      style={{ color: poi.isOpen ? 'var(--success)' : 'var(--destructive)' }}
                     >
                       {poi.isOpen ? "Open now" : "Closed"}
                     </span>
@@ -320,7 +343,7 @@ export default function PoiCard({
                 )}
 
                 {poi.priceLevel && (
-                  <div className="flex items-center text-slate-600">
+                  <div className="flex items-center" style={{ color: 'var(--text-muted)' }}>
                     <span className="mr-2">Price:</span>
                     <span className="font-medium">
                       {"$".repeat(poi.priceLevel)}
@@ -333,13 +356,23 @@ export default function PoiCard({
                 <button
                   onClick={handleAddToTrip}
                   disabled={isAddedToTrip || isAddingToTrip}
-                  className={`py-3 px-8 rounded-lg font-medium transition-all duration-200 flex items-center justify-center ${
-                    isAddedToTrip
-                      ? "bg-purple-100 text-purple-700 border border-purple-200"
-                      : isAddingToTrip
-                      ? "bg-purple-400 text-white cursor-not-allowed"
-                      : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
-                  }`}
+                  className="py-3 px-8 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                  style={isAddedToTrip
+                    ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
+                    : isAddingToTrip
+                    ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
+                    : { backgroundColor: 'var(--primary)', color: 'white' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!isAddedToTrip && !isAddingToTrip) {
+                      e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isAddedToTrip && !isAddingToTrip) {
+                      e.currentTarget.style.backgroundColor = 'var(--primary)';
+                    }
+                  }}
                 >
                   {isAddingToTrip ? (
                     <>
@@ -366,7 +399,10 @@ export default function PoiCard({
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
+                    className="flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ml-3 focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                    style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-50)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-alt)'}
                   >
                     <ExternalLink className="h-5 w-5 mr-2" />
                     View on Maps

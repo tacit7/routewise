@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Check, LogIn, Plus, Save } from "lucide-react";
+import { Check, LogIn, Plus, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BackButton from "@/components/header/BackButton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import TripPlacesGrid from "@/components/TripPlacesGrid";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { InteractiveMap } from "@/components/interactive-map";
+import Header from "@/components/header";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
@@ -120,14 +122,18 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
   if (itineraryPlaces.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <Card className="max-w-md" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
           <CardHeader>
-            <CardTitle>No Trip Places Found</CardTitle>
-            <CardDescription>You need to add places to your trip first.</CardDescription>
+            <CardTitle style={{ color: 'var(--text)' }}>No Trip Places Found</CardTitle>
+            <CardDescription style={{ color: 'var(--text-muted)' }}>You need to add places to your trip first.</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={handleGoBack}>
+            <Button 
+              onClick={handleGoBack}
+              className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              style={{ backgroundColor: 'var(--primary)', color: 'white' }}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Route Results
             </Button>
@@ -143,34 +149,33 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="bg-card border-b">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={handleGoBack}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Route Results
-            </Button>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <Input
-                  type="text"
-                  placeholder={generateTripTitle()}
-                  value={tripTitle}
-                  onChange={(e) => setTripTitle(e.target.value)}
-                  className="text-2xl font-bold h-auto py-1 px-2 border-0 shadow-none focus-visible:ring-0"
-                  style={{ minWidth: "200px" }}
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Organize your {itineraryPlaces.length} saved places into daily plans
-                {!isAuthenticated && <Badge variant="secondary" className="ml-2">Sign in to save</Badge>}
-              </p>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+      <Header
+        leftContent={
+          <BackButton onClick={handleGoBack} text="Back to Route Results" />
+        }
+        centerContent={
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Input
+                type="text"
+                placeholder={generateTripTitle()}
+                value={tripTitle}
+                onChange={(e) => setTripTitle(e.target.value)}
+                className="text-lg sm:text-xl lg:text-2xl font-bold h-auto py-1 px-2 border-0 shadow-none w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-0 focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ backgroundColor: 'var(--surface)', color: 'var(--text)' }}
+              />
             </div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              Organize your {itineraryPlaces.length} saved places into daily plans
+              {!isAuthenticated && <Badge variant="secondary" className="ml-2" style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}>Sign in to save</Badge>}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
+        }
+        rightContent={
+          <>
             {lastSavedAt && (
-              <div className="text-sm text-muted-foreground flex items-center gap-1">
+              <div className="text-sm flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
                 <Check className="h-4 w-4" />
                 Saved {lastSavedAt.toLocaleTimeString()}
               </div>
@@ -178,11 +183,12 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
             <Button
               onClick={isAuthenticated ? () => {} : () => setLocation("/")}
               disabled={isSaving || days.every((d) => d.places.length === 0)}
-              variant={isAuthenticated ? "default" : "secondary"}
+              className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              style={isAuthenticated ? { backgroundColor: 'var(--primary)', color: 'white' } : { backgroundColor: 'var(--surface-alt)', color: 'var(--text)' }}
             >
               {isSaving ? (
                 <>
-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: 'var(--surface)', borderTopColor: 'transparent' }}></div>
                   Saving...
                 </>
               ) : isAuthenticated ? (
@@ -197,20 +203,29 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 </>
               )}
             </Button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <Tabs value={`day-${activeDay}`} onValueChange={(v) => setActiveDay(parseInt(v.replace("day-", "")))} className="flex-1 flex flex-col">
-        <div className="bg-card border-b px-6">
+        <div className="border-b px-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
           <TabsList className="h-auto p-0 bg-transparent">
             {days.map((day, index) => (
-              <TabsTrigger key={index} value={`day-${index}`} className="rounded-b-none data-[state=active]:bg-background data-[state=active]:shadow-none">
+              <TabsTrigger 
+                key={index} 
+                value={`day-${index}`} 
+                className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                style={{ 
+                  backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
+                  color: activeDay === index ? 'white' : 'var(--text)',
+                  borderColor: 'var(--border)'
+                }}
+              >
                 Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
               </TabsTrigger>
             ))}
 
-            <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2">
+            <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>
               <Plus className="h-4 w-4" />
             </Button>
           </TabsList>
@@ -229,7 +244,11 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           <div className="flex-1">
           {showMap ? (
               <InteractiveMap
-                pois={itineraryPlaces}
+                startCity="My Trip"
+                endCity=""
+                pois={[]}
+                selectedPoiIds={[]}
+                hoveredPoi={null}
                 height="100%"
                 className="w-full h-full"
             />

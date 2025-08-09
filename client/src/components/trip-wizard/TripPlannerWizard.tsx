@@ -307,7 +307,51 @@ export function TripPlannerWizard({
       {/* Page Layout */}
       <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
         {/* Header */}
-        <Header />
+        <Header
+          leftContent={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExit}
+              className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              style={{ color: 'var(--text)' }}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          }
+          centerContent={
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+                  Plan Your Trip
+                </h1>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Step {currentStep} of {TOTAL_STEPS}: {STEP_TITLES[currentStep]}
+                </p>
+              </div>
+            </div>
+          }
+          rightContent={
+            <div className="flex items-center gap-3">
+              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Progress: {Math.round((currentStep / TOTAL_STEPS) * 100)}%
+              </div>
+              <div 
+                className="w-16 h-2 rounded-full border"
+                style={{ backgroundColor: 'var(--surface-alt)', borderColor: 'var(--border)' }}
+              >
+                <div 
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ 
+                    backgroundColor: 'var(--primary)', 
+                    width: `${(currentStep / TOTAL_STEPS) * 100}%`
+                  }}
+                />
+              </div>
+            </div>
+          }
+        />
         
         {/* Page Content */}
         <div className="pt-4 pb-8">

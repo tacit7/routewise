@@ -87,19 +87,19 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center">
-            <Map className="h-6 w-6 text-purple-600 mr-2" />
-            <h2 className="text-2xl font-bold text-gray-800">My Trip</h2>
-            <span className="ml-3 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+            <Map className="h-6 w-6 text-primary mr-2" />
+            <h2 className="text-2xl font-bold text-fg">My Trip</h2>
+            <span className="ml-3 px-2 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
               {tripPlaces.length} {tripPlaces.length === 1 ? 'place' : 'places'}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-muted-fg hover:text-fg transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
@@ -107,11 +107,10 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
         {/* Actions Bar */}
         {tripPlaces.length > 0 && (
-          <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+          <div className="px-6 py-3 border-b border-border flex items-center justify-between bg-surface-alt">
             <button
               onClick={exportTrip}
-              className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+              className="flex items-center px-4 py-2 bg-surface border border-border rounded-lg hover:bg-surface-alt transition-colors">
               <Download className="h-4 w-4 mr-2" />
               Export Trip
             </button>
@@ -128,14 +127,14 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
         {/* Trip Insights */}
         {tripPlaces.length > 0 && isPersonalized && (
-          <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+          <div className="px-6 py-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+              <h3 className="text-lg font-semibold text-fg flex items-center">
+                <BarChart3 className="h-5 w-5 mr-2 text-primary" />
                 Trip Insights
               </h3>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Personalization Score:</span>
+                <span className="text-sm text-muted-fg">Personalization Score:</span>
                 <span className={`px-2 py-1 rounded-full text-sm font-medium ${
                   tripInsights.overallScore >= 80 ? 'bg-green-100 text-green-700' :
                   tripInsights.overallScore >= 60 ? 'bg-yellow-100 text-yellow-700' :
@@ -145,37 +144,37 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                 </span>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-green-600" />
                 <div>
-                  <div className="font-medium text-gray-700">Budget</div>
-                  <div className="text-gray-600 capitalize">{tripInsights.budgetAnalysis.budgetRange}</div>
+                  <div className="font-medium text-fg">Budget</div>
+                  <div className="text-muted-fg capitalize">{tripInsights.budgetAnalysis.budgetRange}</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-blue-600" />
+                <Clock className="h-4 w-4 text-primary" />
                 <div>
-                  <div className="font-medium text-gray-700">Duration</div>
-                  <div className="text-gray-600">{tripInsights.timeDistribution.estimatedDuration.toFixed(1)}h</div>
+                  <div className="font-medium text-fg">Duration</div>
+                  <div className="text-muted-fg">{tripInsights.timeDistribution.estimatedDuration.toFixed(1)}h</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-yellow-600" />
                 <div>
-                  <div className="font-medium text-gray-700">Avg Rating</div>
-                  <div className="text-gray-600">{tripStats.averageRating.toFixed(1)}</div>
+                  <div className="font-medium text-fg">Avg Rating</div>
+                  <div className="text-muted-fg">{tripStats.averageRating.toFixed(1)}</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-purple-600" />
+                <TrendingUp className="h-4 w-4 text-primary" />
                 <div>
-                  <div className="font-medium text-gray-700">Categories</div>
-                  <div className="text-gray-600">{Object.keys(tripStats.categories).length}</div>
+                  <div className="font-medium text-fg">Categories</div>
+                  <div className="text-muted-fg">{Object.keys(tripStats.categories).length}</div>
                 </div>
               </div>
             </div>
@@ -197,9 +196,9 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {tripPlaces.length === 0 ? (
             <div className="text-center py-12">
-              <Map className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-600 mb-2">No places added yet</h3>
-              <p className="text-gray-500">
+              <Map className="h-16 w-16 text-muted-fg mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-muted-fg mb-2">No places added yet</h3>
+              <p className="text-muted-fg">
                 Start adding places to your trip by clicking "Add to Trip" on any location card.
               </p>
             </div>
@@ -211,12 +210,12 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                 const isExpanded = expandedCards.has(place.id);
 
                 return (
-                  <div key={place.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <div key={place.id} className="bg-surface border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                     <div className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center mb-2">
-                            <span className="text-sm font-medium text-gray-500 mr-3">
+                            <span className="text-sm font-medium text-muted-fg mr-3">
                               Stop #{index + 1}
                             </span>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColor}`}>
@@ -224,12 +223,12 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                               {place.category}
                             </span>
                           </div>
-                          
-                          <h4 className="text-lg font-semibold text-gray-800 mb-1">
+
+                          <h4 className="text-lg font-semibold text-fg mb-1">
                             {place.name}
                           </h4>
-                          
-                          <div className="flex items-center text-sm text-gray-600 space-x-4 mb-2">
+
+                          <div className="flex items-center text-sm text-muted-fg space-x-4 mb-2">
                             {place.rating && (
                               <div className="flex items-center">
                                 <Star key={`star-${place.id}`} className="h-3 w-3 text-yellow-500 fill-current mr-1" />
@@ -252,7 +251,7 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
                           {/* Expandable Description */}
                           {place.description && (
-                            <div className={`text-sm text-gray-600 ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                            <div className={`text-sm text-muted-fg ${!isExpanded ? 'line-clamp-2' : ''}`}>
                               {place.description}
                             </div>
                           )}
@@ -262,7 +261,7 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
                           {place.description && place.description.length > 100 && (
                             <button
                               onClick={() => toggleCardExpansion(place.id)}
-                              className="text-gray-400 hover:text-gray-600 transition-colors"
+                              className="text-muted-fg hover:text-fg transition-colors"
                             >
                               {isExpanded ? (
                                 <ChevronUp key={`chevron-up-${place.id}`} className="h-5 w-5" />
@@ -289,13 +288,13 @@ export default function TripPlanner({ isOpen, onClose }: TripPlannerProps) {
 
         {/* Footer */}
         {tripPlaces.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-t border-border bg-surface-alt">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-fg">
                 <Route className="h-4 w-4 inline mr-1" />
                 Ready to plan your route with {tripPlaces.length} stops
               </div>
-              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+              <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-fg rounded-lg font-medium transition-colors">
                 Plan Route
               </button>
             </div>
