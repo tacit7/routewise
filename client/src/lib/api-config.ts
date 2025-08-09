@@ -3,8 +3,26 @@
  * Handles backend URL configuration and request utilities
  */
 
-// Express.js backend configuration  
-const BACKEND_URL = 'http://localhost:4001';
+// Dynamic backend URL configuration for development and mobile access
+const getBackendUrl = (): string => {
+  // Check if we have an environment override
+  if (typeof window !== 'undefined' && import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // For mobile/network access, use the current host's IP with backend port
+  if (typeof window !== 'undefined') {
+    const currentHost = window.location.hostname;
+    if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+      return `http://${currentHost}:4001`;
+    }
+  }
+  
+  // Default to localhost for local development
+  return 'http://localhost:4001';
+};
+
+const BACKEND_URL = getBackendUrl();
 
 export const API_CONFIG = {
   BASE_URL: BACKEND_URL,
@@ -14,7 +32,7 @@ export const API_CONFIG = {
     REGISTER: '/api/auth/register',
     LOGOUT: '/api/auth/logout',
     ME: '/api/auth/me',
-    GOOGLE_AUTH: '/api/auth/google',
+    GOOGLE_AUTH: '/auth/google',
     
     // Trips
     TRIPS: '/api/trips',

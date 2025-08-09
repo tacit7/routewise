@@ -13,8 +13,8 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   text = 'Continue with Google'
 }) => {
   const handleGoogleSignIn = () => {
-    // Redirect to Google OAuth endpoint
-    window.location.href = 'http://localhost:4001/api/auth/google';
+    // Redirect to Google OAuth endpoint (uses correct /auth/google route from OAuth solution)
+    window.location.href = '/auth/google';
   };
 
   return (

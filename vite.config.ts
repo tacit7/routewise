@@ -17,13 +17,20 @@ export default defineConfig({
   },
   server: {
     port: 3001,
+    host: '0.0.0.0', // Allow access from mobile devices on same network
+    strictPort: false, // Allow port fallback if 3001 is busy
     fs: {
       strict: true,
       deny: ["**/.*"],
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:4001',
+        target: process.env.VITE_API_URL || 'http://localhost:4001',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/auth': {
+        target: process.env.VITE_API_URL || 'http://localhost:4001',
         changeOrigin: true,
         secure: false,
       },

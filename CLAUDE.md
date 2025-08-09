@@ -2,15 +2,28 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## OAuth Authentication Reference
+
+**🚨 CRITICAL**: For any OAuth-related issues, always check the comprehensive solution at:
+`/Users/urielmaldonado/projects/route-wise/frontend/OAUTH_SOLUTION.md`
+
+This file contains the complete, tested solution for Google OAuth authentication that has been verified multiple times. Reference this file before making any OAuth-related changes.
+
 ## Development Commands
 
 ## special instructions
 
-You are Pragmatic straightforward, no bullshit. Match my tone. Tell it like it is. No sugar-coating.No pseudo-questions.Full sentences, real clarity. Sound smart, grounded, direct like you're actually helping. If you think Im making bad design decssions you should tell me.
+You are Pragmatic straightforward, no bullshit. Match my tone. Tell it like it is. No sugar-coding.No pseudo-questions.Full sentences, real clarity. Sound smart, grounded, direct like you're actually helping. If you think Im making bad design decssions you should tell me.
 whenever you wanna start or stop the server, please ask to user first to do it themselves.
 Same goes for small Commands
 and file edits
 if you try to rin the server and theres already something using ask me about it before proceding
+
+**IMPORTANT**: When user says "good night" to end current session, at the START of the NEXT session automatically provide a quick summary of where we left off and what we accomplished in the previous session (brief overview to jog memory, not full details). User will start new session, and you should immediately give this summary by checking STATUS.md for latest session info.
+
+**IMPORTANT**: User is currently running their own development server on port 3001. Do not attempt to start npm run dev without permission.
+
+**CRITICAL**: User runs ALL servers themselves (npm run dev, npm run storybook, etc.) because they need to see server output. Never run server commands - always ask user to run them.
 
 ### Core Development
 
@@ -26,6 +39,39 @@ if you try to rin the server and theres already something using ask me about it 
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run test:e2e` - Run end-to-end tests with Playwright
 - `npm run test:performance` - Run performance tests
+
+## Mobile Development Setup
+
+### Accessing from Phone/Mobile Device
+
+**Configuration Complete**: Both frontend and backend are now configured for mobile access on the same WiFi network.
+
+**How to Connect:**
+1. **Find your computer's IP address:**
+   - macOS/Linux: `ifconfig | grep "inet " | grep -v 127.0.0.1`
+   - Windows: `ipconfig | findstr "IPv4"`
+   - Example IP: `192.168.1.100`
+
+2. **Access from mobile device:**
+   - URL: `http://YOUR-IP:3001` (e.g., `http://192.168.1.100:3001`)
+   - Both frontend and backend will work automatically
+
+**Technical Details:**
+- **Frontend (Vite)**: Configured with `host: '0.0.0.0'` in vite.config.ts
+- **Backend (Phoenix)**: Configured with `ip: {0, 0, 0, 0}` in dev.exs  
+- **API Configuration**: Dynamic host detection automatically uses your IP when accessed from mobile
+- **Ports**: Frontend (3001), Backend (4001) - both accept network connections
+
+**Auto-Detection Features:**
+- Frontend automatically detects if accessed via IP address
+- API calls dynamically switch to use your computer's IP address
+- OAuth flow works correctly from mobile devices
+- No manual configuration needed once servers are running
+
+**Troubleshooting:**
+- Ensure both devices are on same WiFi network
+- Check firewall settings if connection fails
+- Restart Phoenix backend after IP configuration changes
 
 ## Recent Updates - August 7, 2025 - Session 21
 

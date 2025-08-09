@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@/store';
 import Home from "@/pages/home";
+import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import DashboardTest from "@/pages/dashboard-test";
 import RouteResults from "@/pages/route-results";
@@ -50,6 +51,7 @@ function AuthenticatedRouter() {
     <Switch>
       {/* Authenticated users go to dashboard, non-authenticated to landing page */}
       <Route path="/" component={isAuthenticated ? Dashboard : Home} />
+      <Route path="/login" component={isAuthenticated ? Dashboard : LoginPage} />
       <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
       <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
       <Route path="/plan" component={Home} />
