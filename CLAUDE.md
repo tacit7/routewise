@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## OAuth Authentication Reference
 
+
 **🚨 CRITICAL**: For any OAuth-related issues, always check the comprehensive solution at:
 `/Users/urielmaldonado/projects/route-wise/frontend/OAUTH_SOLUTION.md`
 
@@ -13,13 +14,25 @@ This file contains the complete, tested solution for Google OAuth authentication
 
 ## special instructions
 
-You are Pragmatic straightforward, no bullshit. Match my tone. Tell it like it is. No sugar-coding.No pseudo-questions.Full sentences, real clarity. Sound smart, grounded, direct like you're actually helping. If you think Im making bad design decssions you should tell me.
-whenever you wanna start or stop the server, please ask to user first to do it themselves.
-Same goes for small Commands
-and file edits
-if you try to rin the server and theres already something using ask me about it before proceding
+Pragmatic straightforward, no bullshit. Match my tone. Tell it like it is. No sugar-coating.No pseudo-questions.Full sentences, real clarity. Sound smart, grounded, direct like you're actually helping. If you think Im making bad design decssions you should tell me. Let me know when Im not using industry standard terms and correct me with the correct termenology or rephrase what i say if im not being technical enough.
 
-**IMPORTANT**: When user says "good night" to end current session, at the START of the NEXT session automatically provide a quick summary of where we left off and what we accomplished in the previous session (brief overview to jog memory, not full details). User will start new session, and you should immediately give this summary by checking STATUS.md for latest session info.
+**CRITICAL FEEDBACK PROTOCOL**: When I ask for feedback on my terminology or approach, give constructive criticism and suggestions for improvement using the `say` command. Focus only on areas where I can improve - skip positive/encouraging feedback. Be direct about:
+- Vague or imprecise communication during technical work
+- Non-standard terminology usage
+- Poor problem-solving approaches
+- Inefficient debugging strategies
+- Missing context or unclear directions
+
+whenever you wanna start or stop the server, please ask to user first to do it themselves.
+Same goes for small Commands and file edits
+if you try to run the server and theres already something using ask me about it before proceding
+You must use shadcn wherever possible, the index.css colors, use as little custom css as possible.
+
+you need to take it to consideration mobile and responsive design. You must use shad QA
+**IMPORTANT**: When user says "good night" to end current session, at the START of the NEXT session
+automatically provide a quick summary of where we left off and what we accomplished in the previous
+session (brief overview to jog memory, not full details). User will start new session, and you
+jshould immediately give this summary by checking STATUS.md for latest session info.
 
 **IMPORTANT**: User is currently running their own development server on port 3001. Do not attempt to start npm run dev without permission.
 
@@ -40,6 +53,22 @@ if you try to rin the server and theres already something using ask me about it 
 - `npm run test:e2e` - Run end-to-end tests with Playwright
 - `npm run test:performance` - Run performance tests
 
+### Voice Notifications & Utilities
+
+**Say Command Usage**: Use `say` with premium voices for important notifications and summaries:
+
+- `say -v "Ava" "message" &` - Premium voice with background execution (preferred)
+- `say -v "Samantha" "message" &` - Alternative premium voice
+- `say -v "Alex" "message" &` - Standard premium voice
+
+**Available Premium Voices**: Ava, Samantha, Alex, Victoria, Karen, Veena, Fiona, Moira, Tessa, Serena
+
+**Usage Guidelines**:
+- Always use background execution (`&`) to avoid blocking
+- Use for session summaries, completion notifications, and important updates  
+- Prefer "Ava" voice for consistency
+- Keep messages concise and clear
+
 ## Mobile Development Setup
 
 ### Accessing from Phone/Mobile Device
@@ -58,7 +87,7 @@ if you try to rin the server and theres already something using ask me about it 
 
 **Technical Details:**
 - **Frontend (Vite)**: Configured with `host: '0.0.0.0'` in vite.config.ts
-- **Backend (Phoenix)**: Configured with `ip: {0, 0, 0, 0}` in dev.exs  
+- **Backend (Phoenix)**: Configured with `ip: {0, 0, 0, 0}` in dev.exs
 - **API Configuration**: Dynamic host detection automatically uses your IP when accessed from mobile
 - **Ports**: Frontend (3001), Backend (4001) - both accept network connections
 
