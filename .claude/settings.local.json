@@ -17,7 +17,9 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(git checkout:*)",
-      "Bash(say \"All 6 broken imports fixed. Route Wise naming preserved. Ready to commit and create PR.\")"
+      "Bash(say \"All 6 broken imports fixed. Route Wise naming preserved. Ready to commit and create PR.\")",
+      "Bash(say \"Got it. Say command for short responses and task completion announcements.\")",
+      "Bash(say:*)"
     ],
     "deny": []
   }

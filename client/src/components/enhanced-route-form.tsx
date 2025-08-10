@@ -108,8 +108,8 @@ export default function EnhancedRouteForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="startCity" className="flex items-center text-sm font-medium text-slate-700">
-            <MapPin className="h-4 w-4 text-secondary mr-2" />
+          <Label htmlFor="startCity" className="flex items-center text-sm font-medium text-fg">
+            <MapPin className="h-4 w-4 text-muted-fg mr-2" />
             From
           </Label>
           <PlaceAutocomplete
@@ -119,13 +119,13 @@ export default function EnhancedRouteForm() {
             className="w-full"
           />
           {form.formState.errors.startCity && (
-            <p className="text-sm text-red-600">{form.formState.errors.startCity.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.startCity.message}</p>
           )}
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="endCity" className="flex items-center text-sm font-medium text-slate-700">
-            <Flag className="h-4 w-4 text-accent mr-2" />
+          <Label htmlFor="endCity" className="flex items-center text-sm font-medium text-fg">
+            <Flag className="h-4 w-4 text-muted-fg mr-2" />
             To
           </Label>
           <PlaceAutocomplete
@@ -135,7 +135,7 @@ export default function EnhancedRouteForm() {
             className="w-full"
           />
           {form.formState.errors.endCity && (
-            <p className="text-sm text-red-600">{form.formState.errors.endCity.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.endCity.message}</p>
           )}
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function EnhancedRouteForm() {
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-4 px-6 h-auto transition-all transform hover:scale-105 focus:ring-4 focus:ring-blue-300"
+        className="w-full bg-primary hover:bg-primary/90 text-primary-fg font-semibold py-4 px-6 h-auto transition-all transform hover:scale-105 focus:ring-4 focus:ring-ring"
       >
         {isLoading ? (
           <>

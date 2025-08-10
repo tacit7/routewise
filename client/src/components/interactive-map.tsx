@@ -19,16 +19,16 @@ interface InteractiveMapProps {
   apiKey?: string; // Optional API key to avoid fetching separately
 }
 
-// POI category to marker color mapping using design system colors
+// POI category to marker color mapping using CSS variables
 const getCategoryColor = (category: string): string => {
   const colors = {
-    restaurant: "hsl(0 100% 60%)", // Red
-    attraction: "hsl(160 84% 36%)", // Brand green
-    park: "hsl(142 71% 45%)", // Nature green
-    scenic: "hsl(197 92% 61%)", // Sky blue
-    market: "hsl(42 95% 45%)", // Warning/rating yellow
-    historic: "hsl(271 85% 71%)", // Purple
-    default: "hsl(217 92% 60%)", // Focus blue
+    restaurant: "rgb(239 68 68)", // Red-500
+    attraction: "rgb(34 197 94)", // Green-500 (brand)
+    park: "rgb(22 163 74)", // Green-600
+    scenic: "rgb(59 130 246)", // Blue-500
+    market: "rgb(245 158 11)", // Amber-500
+    historic: "rgb(168 85 247)", // Purple-500
+    default: "rgb(99 102 241)", // Indigo-500
   };
   return colors[category as keyof typeof colors] || colors.default;
 };
@@ -41,7 +41,7 @@ const createOwlMarkerSVG = (
 ): string => {
   const size = isSelected || isHovered ? 32 : 28;
   const shadowIntensity = isHovered ? 0.4 : 0.3;
-  const primaryColor = isSelected ? "hsl(160 84% 36%)" : baseColor; // Use design system primary
+  const primaryColor = isSelected ? "rgb(34 197 94)" : baseColor; // Use design system primary
   const glowEffect = isSelected ? `filter="drop-shadow(0 0 8px ${primaryColor})"` : '';
 
   return `
@@ -171,16 +171,16 @@ const PoiInfoWindow: React.FC<{
           />
         )}
         <h3 className="font-semibold text-base mb-1">{poi.name}</h3>
-        <p className="text-xs text-muted-foreground capitalize mb-2">{poi.category}</p>
+        <p className="text-xs text-muted-fg capitalize mb-2">{poi.category}</p>
         {poi.description && (
-          <p className="text-sm text-foreground mb-2">{poi.description}</p>
+          <p className="text-sm text-fg mb-2">{poi.description}</p>
         )}
         <div className="flex items-center text-xs mb-1">
           <span className="text-yellow-500">⭐</span>
-          <span className="ml-1 text-muted-foreground">{poi.rating} ({poi.reviewCount || 0} reviews)</span>
+          <span className="ml-1 text-muted-fg">{poi.rating} ({poi.reviewCount || 0} reviews)</span>
         </div>
         {poi.address && (
-          <p className="text-xs text-muted-foreground mb-3">{poi.address}</p>
+          <p className="text-xs text-muted-fg mb-3">{poi.address}</p>
         )}
 
         <div className="flex justify-center">
@@ -190,7 +190,7 @@ const PoiInfoWindow: React.FC<{
             className={`py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
               isAddedToTrip
                 ? 'bg-primary/10 text-primary border border-primary/20 cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md'
+                : 'bg-primary hover:bg-primary/90 text-primary-fg shadow-sm hover:shadow-md'
             }`}
           >
             {isAddedToTrip 
@@ -230,7 +230,7 @@ const MapControls: React.FC = () => {
         size="sm"
         variant="secondary"
         onClick={zoomIn}
-        className="bg-card/90 backdrop-blur-sm hover:bg-card shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
+        className="bg-surface/90 backdrop-blur-sm hover:bg-surface shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
         aria-label="Zoom in"
       >
         <span className="text-lg font-bold">+</span>
@@ -239,7 +239,7 @@ const MapControls: React.FC = () => {
         size="sm"
         variant="secondary"
         onClick={zoomOut}
-        className="bg-card/90 backdrop-blur-sm hover:bg-card shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
+        className="bg-surface/90 backdrop-blur-sm hover:bg-surface shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
         aria-label="Zoom out"
       >
         <span className="text-lg font-bold">−</span>
@@ -250,19 +250,19 @@ const MapControls: React.FC = () => {
 
 // Map legend component
 const MapLegend: React.FC = () => (
-  <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded-lg p-3 shadow-lg z-20 border border-border/50">
-    <div className="text-xs font-semibold text-foreground mb-2">
+  <div className="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm rounded-lg p-3 shadow-lg z-20 border border-border/50">
+    <div className="text-xs font-semibold text-fg mb-2">
       Map Legend
     </div>
-    <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+    <div className="flex flex-col gap-1 text-xs text-muted-fg">
       <div className="flex items-center gap-2">
-        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(217 92% 60%)" }}>
+        <div className="w-4 h-4 rounded-full flex items-center justify-center bg-indigo-500">
           <div className="w-2 h-2 rounded-full bg-white"></div>
         </div>
         <span>Points of Interest</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(160 84% 36%)" }}>
+        <div className="w-4 h-4 rounded-full flex items-center justify-center bg-green-500">
           <div className="w-2 h-2 rounded-full bg-white"></div>
         </div>
         <span>Selected POI</span>
@@ -441,12 +441,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   if (isLoading || !googleMapsKey) {
     return (
       <div
-        className={`relative overflow-hidden border border-border ${className}`}
+        className={`relative overflow-hidden rounded-lg border border-border ${className}`}
         style={{ height }}
       >
-        <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+        <div className="absolute inset-0 bg-bg/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-          <p className="text-sm text-muted-foreground">Loading interactive map...</p>
+          <p className="text-sm text-muted-fg">Loading interactive map...</p>
         </div>
       </div>
     );
@@ -454,7 +454,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   return (
     <div
-      className={`relative overflow-hidden border border-border ${className}`}
+      className={`relative overflow-hidden rounded-lg border border-border ${className}`}
       style={{ height }}
     >
       <APIProvider apiKey={googleMapsKey}>

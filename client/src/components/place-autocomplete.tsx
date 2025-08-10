@@ -116,17 +116,14 @@ export function PlaceAutocomplete({
             disabled && "cursor-not-allowed opacity-50"
           )}
           style={{ 
-            borderColor: 'var(--primary)',
-            backgroundColor: 'var(--muted)',
-            color: 'var(--foreground)',
-            '--tw-ring-color': 'var(--primary-hover)'
+            '--tw-ring-color': 'hsl(var(--ring))'
           } as React.CSSProperties}
           disabled={disabled}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
           <div className="flex items-center w-full">
-            <MapPin className="h-4 w-4 text-slate-400 mr-2" />
+            <MapPin className="h-4 w-4 text-muted-fg mr-2" />
             <input
               {...getInputProps()}
               placeholder={placeholder}
@@ -142,22 +139,22 @@ export function PlaceAutocomplete({
       <ul
         {...getMenuProps()}
         className={cn(
-          "card-elevated absolute z-50 w-full mt-1 border border-slate-200 rounded-md max-h-60 overflow-y-auto",
+          "absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto",
           !isOpen && "hidden"
         )}
       >
         {isOpen && (
           <>
             {isLoading ? (
-              <li className="p-4 text-sm text-center text-slate-500">
+              <li className="p-4 text-sm text-center text-muted-fg">
                 Searching...
               </li>
             ) : error ? (
-              <li className="p-4 text-sm text-center text-red-500">
+              <li className="p-4 text-sm text-center text-destructive">
                 {error}
               </li>
             ) : items.length === 0 ? (
-              <li className="p-4 text-sm text-center text-slate-500">
+              <li className="p-4 text-sm text-center text-muted-fg">
                 No cities found
               </li>
             ) : (
@@ -170,17 +167,17 @@ export function PlaceAutocomplete({
                     className={cn(
                       "px-4 py-2 cursor-pointer transition-colors",
                       highlightedIndex === index
-                        ? "bg-green-200 text-green-950"
-                        : "hover:bg-green-100",
-                      isManualEntry && "bg-green-200 border-t border-green-400"
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent/50",
+                      isManualEntry && "bg-accent border-t border-accent/50"
                     )}
                   >
                     <div className="flex flex-col">
                       <span 
                         className={cn(
                           "font-medium",
-                          isManualEntry ? "text-green-900" : "text-slate-900",
-                          highlightedIndex === index && "text-green-950"
+                          isManualEntry ? "text-primary" : "text-fg",
+                          highlightedIndex === index && "text-accent-foreground"
                         )}
                       >
                         {isManualEntry ? `Use "${item.main_text}" as entered` : item.main_text}
@@ -188,8 +185,8 @@ export function PlaceAutocomplete({
                       <span 
                         className={cn(
                           "text-sm",
-                          isManualEntry ? "text-green-800" : "text-slate-500",
-                          highlightedIndex === index && "text-green-900"
+                          isManualEntry ? "text-primary/80" : "text-muted-fg",
+                          highlightedIndex === index && "text-accent-foreground/80"
                         )}
                       >
                         {isManualEntry ? "Proceed with manual entry" : item.secondary_text}
