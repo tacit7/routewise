@@ -2,13 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Safe area utilities for mobile */
+.safe-area-padding {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 :root {
   /* UX Spec Design Tokens */
   --bg: hsl(156 30% 96); /* App background */
   --surface: hsl(0 0% 100%); /* Cards, tab active background */
   --surface-alt: hsl(210 25% 97%); /* Pills, subtle panels */
   --text: hsl(215 18% 18%); /* Primary text */
-  --text-muted: hsl(215 12% 42%); /* Secondary text */
+  --text-muted: hsl(215 16% 35%); /* Secondary text - improved contrast */
   --border: hsl(214 28% 88%); /* Dividers, card borders */
   --primary: hsl(160 84% 36%); /* Brand green (actions, active tab) */
   --primary-50: hsl(160 60% 96%); /* Tint backgrounds */
@@ -16,6 +21,7 @@
   --primary-200: hsl(160 46% 86%); /* Drop slot border */
   --warning: hsl(42 95% 45%); /* Rating star color */
   --focus: hsl(217 92% 60%); /* Focus ring */
+  --dropdown: hsl(0 0% 100%); /* Dropdown/popover background */
 
   /* Legacy support - map to UX spec tokens */
   --background: var(--bg);
@@ -28,8 +34,8 @@
   --ring: var(--focus);
   --secondary: var(--text-muted);
   --secondary-foreground: #ffffff;
-  --accent: #60a5fa;
-  --accent-hover: #3b82f6;
+  --accent: var(--primary-hover);
+  --accent-hover: var(--primary);
   --accent-foreground: #ffffff;
   --muted: var(--surface-alt);
   --muted-hover: var(--primary-50);
