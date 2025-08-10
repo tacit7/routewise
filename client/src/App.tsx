@@ -19,8 +19,10 @@ import ExploreResults from "@/pages/explore-results";
 import PlaceResults from "@/pages/place-results";
 import ItineraryPage from "@/pages/itinerary";
 import TripWizardPage from "@/pages/trip-wizard";
+import PlacesExplorer from "@/pages/places-explorer";
 import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
+import KitchenSinkDemo from "@/pages/kitchen-sink";
 import NotFound from "@/pages/not-found";
 import TripIndicator from "@/components/trip-indicator";
 import AuthSuccess from "@/pages/auth-success";
@@ -62,12 +64,14 @@ function AuthenticatedRouter() {
         <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
         <Route path="/plan" component={Home} />
         <Route path="/trip-wizard" component={TripWizardPage} />
+        <Route path="/places-explorer" component={PlacesExplorer} />
         <Route path="/route" component={RouteResults} />
         <Route path="/route-results" component={RouteResults} />
         <Route path="/explore-results" component={ExploreResults} />
         <Route path="/place-results" component={PlaceResults} />
         <Route path="/itinerary" component={ItineraryPage} />
         <Route path="/interests-demo" component={InterestsDemo} />
+        <Route path="/kitchen-sink" component={KitchenSinkDemo} />
         <Route path="/dashboard-test" component={DashboardTest} />
         <Route path="/auth/success" component={AuthSuccess} />
         <Route path="/auth/error" component={AuthError} />

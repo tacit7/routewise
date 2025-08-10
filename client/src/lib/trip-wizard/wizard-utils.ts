@@ -17,21 +17,21 @@ export const TRIP_TYPE_OPTIONS = [
     value: 'road-trip' as TripType,
     title: 'Road Trip',
     description: 'Drive to your destination with stops along the way',
-    icon: '🚗',
+    icon: 'car',
     benefits: ['Flexible schedule', 'Scenic routes', 'Multiple stops']
   },
   {
     value: 'flight-based' as TripType,
     title: 'Flight Based',
     description: 'Fly to your destination and explore locally',
-    icon: '✈️',
+    icon: 'plane',
     benefits: ['Faster travel', 'Long distances', 'More time at destination']
   },
   {
     value: 'combo' as TripType,
     title: 'Combo Trip',
     description: 'Combine air travel with driving for the best of both',
-    icon: '🚗✈️',
+    icon: 'combo',
     benefits: []
   }
 ];
@@ -41,31 +41,31 @@ export const TRANSPORTATION_OPTIONS = [
     value: 'my-car' as TransportationOption,
     title: 'My Car',
     description: 'Use your own vehicle',
-    icon: '🚗'
+    icon: 'car'
   },
   {
     value: 'rental-car' as TransportationOption,
     title: 'Rental Car',
     description: 'Rent a vehicle for your trip',
-    icon: '🚙'
+    icon: 'car'
   },
   {
     value: 'flights' as TransportationOption,
     title: 'Flights',
     description: 'Air travel between destinations',
-    icon: '✈️'
+    icon: 'plane'
   },
   {
     value: 'public-transport' as TransportationOption,
     title: 'Public Transport',
     description: 'Buses, trains, and local transit',
-    icon: '🚌'
+    icon: 'bus'
   },
   {
     value: 'other' as TransportationOption,
     title: 'Other',
     description: 'Bike, walking, or other methods',
-    icon: '🚲'
+    icon: 'bike'
   }
 ];
 
@@ -74,37 +74,37 @@ export const LODGING_OPTIONS = [
     value: 'hotels' as LodgingOption,
     title: 'Hotels',
     description: 'Traditional hotel accommodations',
-    icon: '🏨'
+    icon: 'hotel'
   },
   {
     value: 'airbnb' as LodgingOption,
     title: 'Airbnb / Rentals',
     description: 'Private homes and rental properties',
-    icon: '🏠'
+    icon: 'home'
   },
   {
     value: 'campgrounds' as LodgingOption,
     title: 'Campgrounds',
     description: 'Established camping facilities',
-    icon: '🏕️'
+    icon: 'tent'
   },
   {
     value: 'free-camping' as LodgingOption,
     title: 'Free Camping',
     description: 'BLM land and free camping spots',
-    icon: '⛺'
+    icon: 'tent'
   },
   {
     value: 'friends' as LodgingOption,
     title: 'Staying with Friends',
     description: 'Friends, family, or personal connections',
-    icon: '👥'
+    icon: 'users'
   },
   {
     value: 'no-lodging' as LodgingOption,
     title: "Don't Need Lodging",
     description: 'Day trip or other arrangements',
-    icon: '🚗'
+    icon: 'car'
   }
 ];
 
@@ -159,18 +159,23 @@ export const getStepTitle = (stepNumber: number): string => {
   return STEP_TITLES[stepNumber - 1] || 'Unknown Step';
 };
 
-export const isStepComplete = (stepNumber: number, data: TripWizardData): boolean => {
+export const isStepComplete = (stepNumber: number, data: TripWizardData, tripMode?: 'route' | 'explore'): boolean => {
   switch (stepNumber) {
     case 1:
       return !!data.tripType;
     case 2:
       // Always require at least a starting location
       if (!data.startLocation) return false;
+      // For explore mode, only starting location is required
+      if (tripMode === 'explore') return true;
       // If flexible locations, only starting location is required
       if (data.flexibleLocations) return true;
       // If not flexible, require both start and end locations
       return !!(data.startLocation && data.endLocation);
     case 3:
+      // For explore mode, dates are optional - can have start, end, both, or be flexible
+      if (tripMode === 'explore') return true;
+      // For route planning, require both dates unless flexible
       return data.flexibleDates || !!(data.startDate && data.endDate);
     case 4:
       return data.transportation.length > 0;

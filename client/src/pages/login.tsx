@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { LoginForm } from '@/components/login-form';
-import { RegisterForm } from '@/components/register-form';
 import { useAuth } from '@/components/auth-context';
+import { GoogleSignInButton } from '@/components/google-signin-button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
@@ -24,23 +21,6 @@ export default function LoginPage() {
   if (isAuthenticated) {
     return null;
   }
-
-  const handleLoginSuccess = () => {
-    // LoginForm handles navigation internally
-  };
-
-  const handleRegisterSuccess = () => {
-    // Switch to login tab after successful registration
-    setActiveTab('login');
-  };
-
-  const handleSwitchToRegister = () => {
-    setActiveTab('register');
-  };
-
-  const handleSwitchToLogin = () => {
-    setActiveTab('login');
-  };
 
   const handleBackToHome = () => {
     setLocation('/');
@@ -77,47 +57,33 @@ export default function LoginPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              Welcome back
+              Welcome to RouteWise
             </h1>
             <p className="mt-2 text-sm text-gray-600">
-              Sign in to your account or create a new one
+              Sign in with your Google account to get started
             </p>
           </div>
 
           <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
             <CardHeader className="space-y-1 pb-4">
               <div className="text-center">
-                <CardTitle className="text-xl">Get Started</CardTitle>
+                <CardTitle className="text-xl">Sign In</CardTitle>
                 <CardDescription>
-                  Choose your preferred sign-in method
+                  Connect with Google to access your personalized route planning
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login" className="text-sm">
-                    Sign In
-                  </TabsTrigger>
-                  <TabsTrigger value="register" className="text-sm">
-                    Create Account
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="login" className="mt-6 space-y-4">
-                  <LoginForm
-                    onSwitchToRegister={handleSwitchToRegister}
-                    onSuccess={handleLoginSuccess}
-                  />
-                </TabsContent>
-
-                <TabsContent value="register" className="mt-6 space-y-4">
-                  <RegisterForm
-                    onSwitchToLogin={handleSwitchToLogin}
-                    onSuccess={handleRegisterSuccess}
-                  />
-                </TabsContent>
-              </Tabs>
+            <CardContent className="space-y-6">
+              <GoogleSignInButton 
+                text="Continue with Google"
+                className="text-base h-12"
+              />
+              
+              <div className="text-center">
+                <p className="text-sm text-gray-500">
+                  Your Google account will be used to save your preferences and routes
+                </p>
+              </div>
             </CardContent>
           </Card>
 

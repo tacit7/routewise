@@ -26,11 +26,16 @@ interface PlaceSuggestion {
   };
 }
 
-interface CityAutocompleteResponse {
+interface UnifiedAutocompleteResponse {
   status: 'success' | 'error';
   data?: {
-    cities: City[];
-    count: number;
+    input: string;
+    types_requested: string[];
+    suggestions: {
+      [key: string]: PlaceSuggestion[];
+    };
+    total_count: number;
+    breakdown: { [key: string]: number };
   };
   message?: string;
 }
@@ -79,24 +84,63 @@ export function useCityAutocomplete(
         input: normalizedQuery,
       });
 
+      console.log('🔍 API Request:', `/api/places/autocomplete?${params.toString()}`);
+
       const response = await fetch(
         `/api/places/autocomplete?${params.toString()}`
       );
 
+      console.log('📊 API Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        let errorText;
+        try {
+          errorText = await response.text();
+        } catch (e) {
+          errorText = response.statusText;
+        }
+        console.error('❌ API Error:', response.status, errorText);
+        throw new Error(`API Error ${response.status}: ${errorText}`);
       }
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+        console.log('✅ API Response data:', data);
+      } catch (e) {
+        console.error('❌ Failed to parse JSON response:', e);
+        throw new Error('Invalid response from server');
+      }
       
       if (data.status === 'success' && data.data?.suggestions) {
-        // Phoenix returns suggestions directly from Google Places API
-        return data.data.suggestions.map((suggestion: any) => ({
-          place_id: suggestion.place_id,
-          description: suggestion.description,
-          main_text: suggestion.structured_formatting.main_text,
-          secondary_text: suggestion.structured_formatting.secondary_text,
-        }));
+        // Handle both old and new Phoenix backend response formats
+        return data.data.suggestions.map((suggestion: any) => {
+          // New format: Google Places API format with structured_formatting
+          if (suggestion.structured_formatting) {
+            return {
+              place_id: suggestion.place_id,
+              description: suggestion.description,
+              main_text: suggestion.structured_formatting.main_text,
+              secondary_text: suggestion.structured_formatting.secondary_text,
+              geometry: suggestion.geometry,
+            };
+          }
+          // Old format: Custom Phoenix format
+          else {
+            return {
+              place_id: suggestion.id || suggestion.place_id,
+              description: `${suggestion.name}, ${suggestion.state}`,
+              main_text: suggestion.name,
+              secondary_text: suggestion.state,
+              geometry: {
+                location: {
+                  lat: suggestion.lat,
+                  lng: suggestion.lng || suggestion.lon,
+                },
+              },
+            };
+          }
+        });
       } else {
         throw new Error(data.message || 'No suggestions available');
       }

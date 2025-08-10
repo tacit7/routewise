@@ -121,61 +121,6 @@ export function LodgingStep({
         </AccessibleFormField>
       </div>
 
-      {/* Selection summary */}
-      {lodging.length > 0 && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
-          <h4 className="font-medium text-blue-900 mb-2">
-            Your Accommodation Preferences:
-          </h4>
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {lodging.map((lodgingOption) => {
-                const option = LODGING_OPTIONS.find(opt => opt.value === lodgingOption);
-                return option ? (
-                  <span
-                    key={lodgingOption}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                  >
-                    <span className="mr-2">{option.icon}</span>
-                    {option.title}
-                  </span>
-                ) : null;
-              })}
-            </div>
-            <div className="text-sm text-blue-800">
-              Budget: {formatCurrency(budgetRange.min)} - {formatCurrency(budgetRange.max)} per night ({budgetCategory.category})
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Budget tips */}
-      <div className="space-y-3">
-        {budgetRange.max <= 100 && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-800">
-              💰 <strong>Budget tip:</strong> Consider hostels, camping, or staying outside city centers for great savings.
-            </p>
-          </div>
-        )}
-        
-        {budgetRange.min >= 200 && (
-          <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
-            <p className="text-sm text-purple-800">
-              ✨ <strong>Premium tip:</strong> Look for hotels with loyalty programs and consider booking directly for perks.
-            </p>
-          </div>
-        )}
-        
-        {lodging.includes('campgrounds') || lodging.includes('free-camping') && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <p className="text-sm text-emerald-800">
-              🏕️ <strong>Camping tip:</strong> We'll help you find campgrounds with amenities and free camping spots along your route.
-            </p>
-          </div>
-        )}
-      </div>
-
       <ValidationMessage error={error} />
     </div>
   );

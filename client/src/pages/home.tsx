@@ -105,7 +105,7 @@ export default function Home() {
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => setLocation("/register")}
+                  onClick={() => window.location.href = '/auth/google'}
                   className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
                   style={{ backgroundColor: 'var(--primary)', color: 'white' }}
                 >

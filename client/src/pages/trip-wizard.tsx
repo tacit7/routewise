@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch } from "@/store/store";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/components/auth-context";
+import { createDraftTrip, updateTrip, selectCurrentTripId } from "@/store/slices/tripSlice";
 import Header from "@/components/header";
 import { TripPlannerWizard } from "@/components/trip-wizard/TripPlannerWizard";
 import { TripWizardData } from "@/types/trip-wizard";
@@ -16,11 +20,34 @@ import {
 export default function TripWizardPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { isAuthenticated, user } = useAuth();
+  
+  // Debug auth state
+  console.log('Trip Wizard Auth State:', { isAuthenticated, user });
+  console.log('JWT Token:', localStorage.getItem('auth_token'));
+  const dispatch = useDispatch<AppDispatch>();
+  const currentTripId = useSelector(selectCurrentTripId);
   const [isCalculating, setIsCalculating] = useState(false);
   const [loadingStage, setLoadingStage] = useState<string>("");
   
   // Get trip type from localStorage (set by dashboard buttons)
   const tripType = localStorage.getItem("tripType") || "route";
+
+  // Create draft trip when wizard starts (only if authenticated)
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(createDraftTrip(tripType))
+        .unwrap()
+        .then((trip: any) => {
+          console.log('Draft trip created successfully:', trip);
+        })
+        .catch((error: any) => {
+          console.error('Failed to create draft trip:', error);
+        });
+    } else {
+      console.log('User not authenticated - skipping draft trip creation');
+    }
+  }, [dispatch, isAuthenticated, tripType]);
 
   const handleWizardComplete = async (wizardData: TripWizardData) => {
     // Handle explore mode - just show places around start location, no routing
@@ -183,6 +210,24 @@ export default function TripWizardPage() {
 
       // Store immediate data for optimistic UI
       localStorage.setItem("routeData", JSON.stringify(immediateRouteData));
+
+      // Update the draft trip with wizard data
+      if (currentTripId) {
+        const startLocationName = wizardData.startLocation?.main_text || "";
+        const endLocationName = wizardData.endLocation?.main_text || "";
+        
+        const tripUpdateData = {
+          route_data: {
+            status: 'in_progress',
+            wizard_data: wizardData,
+            route_data: immediateRouteData,
+            updated_at: new Date().toISOString()
+          },
+          start_city: startLocationName,
+          end_city: endLocationName
+        };
+        dispatch(updateTrip({ tripId: currentTripId, updates: tripUpdateData }));
+      }
 
       // Navigate immediately to show the basic route while data loads
       setLocation("/route-results");

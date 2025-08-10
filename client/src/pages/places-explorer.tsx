@@ -5,25 +5,27 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import Header from "@/components/header";
-import { TripPlannerWizardProps, TripWizardData } from "@/types/trip-wizard";
-import { WizardStep } from "./WizardStep";
-import { StepTransition } from "./components/progress/StepTransition";
-import { DraftRecoveryModal } from "./components/modals/DraftRecoveryModal";
-import { ExitConfirmationModal } from "./components/modals/ExitConfirmationModal";
+import { useAuth } from "@/components/auth-context";
+import UserMenu from "@/components/UserMenu";
+import MobileMenu from "@/components/MobileMenu";
+import { TripWizardData, PlaceSuggestion, TransportationOption, LodgingOption, TripType } from "@/types/trip-wizard";
+import { WizardStep } from "@/components/trip-wizard/WizardStep";
+import { StepTransition } from "@/components/trip-wizard/components/progress/StepTransition";
+import { ExitConfirmationModal } from "@/components/trip-wizard/components/modals/ExitConfirmationModal";
 
 // Step components
-import { TripTypeStep } from "./components/steps/TripTypeStep";
-import { LocationStep } from "./components/steps/LocationStep";
-import { DatesStep } from "./components/steps/DatesStep";
-import { TransportationStep } from "./components/steps/TransportationStep";
-import { LodgingStep } from "./components/steps/LodgingStep";
-import { IntentionsStep } from "./components/steps/IntentionsStep";
-import { SpecialNeedsStep } from "./components/steps/SpecialNeedsStep";
+import { LocationStep } from "@/components/trip-wizard/components/steps/LocationStep";
+import { DatesStep } from "@/components/trip-wizard/components/steps/DatesStep";
+import { TransportationStep } from "@/components/trip-wizard/components/steps/TransportationStep";
+import { LodgingStep } from "@/components/trip-wizard/components/steps/LodgingStep";
+import { IntentionsStep } from "@/components/trip-wizard/components/steps/IntentionsStep";
+import { SpecialNeedsStep } from "@/components/trip-wizard/components/steps/SpecialNeedsStep";
+import { OptionCard } from "@/components/trip-wizard/components/shared/OptionCard";
+import { ValidationMessage } from "@/components/trip-wizard/components/shared/ValidationMessage";
 
 // Hooks
 import { useWizardForm } from "@/hooks/trip-wizard/useWizardForm";
 import { useAutoSave } from "@/hooks/trip-wizard/useAutoSave";
-import { useDraftRecovery } from "@/hooks/trip-wizard/useDraftRecovery";
 import { useKeyboardNavigation } from "@/hooks/trip-wizard/useKeyboardNavigation";
 import { useFocusManagement } from "@/hooks/trip-wizard/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/trip-wizard/useScreenReaderAnnouncements";
@@ -38,42 +40,71 @@ import {
 } from "@/lib/trip-wizard/wizard-utils";
 import { clearDraft } from "@/lib/trip-wizard/storage";
 
-export function TripPlannerWizard({
-  onComplete,
-  onCancel,
-  initialData
-}: TripPlannerWizardProps) {
+// Custom trip type options for exploration (no road trip)
+const EXPLORATION_TRIP_TYPE_OPTIONS = [
+  {
+    value: 'flight-based' as TripType,
+    title: 'Flight Based',
+    description: 'Fly to your destination and explore locally',
+    icon: 'plane',
+    benefits: ['Faster travel', 'Long distances', 'More time at destination']
+  },
+  {
+    value: 'combo' as TripType,
+    title: 'Combo Trip',
+    description: 'Combine air travel with driving for the best of both',
+    icon: 'combo',
+    benefits: ['Flexible options', 'Best of both worlds', 'Optimized travel']
+  },
+  {
+    value: 'not-sure' as TripType,
+    title: "I'm not sure",
+    description: "I'll decide based on what works best for my exploration",
+    icon: 'help-circle',
+    benefits: ['Keep options open', 'Flexible planning', 'Decide later']
+  }
+];
+
+// Custom transportation options for exploration (no car/road trip)
+const EXPLORATION_TRANSPORTATION_OPTIONS = [
+  {
+    value: 'flights' as TransportationOption,
+    title: 'Flights',
+    description: 'Air travel between destinations',
+    icon: 'plane'
+  },
+  {
+    value: 'public-transport' as TransportationOption,
+    title: 'Public Transport',
+    description: 'Buses, trains, and local transit',
+    icon: 'bus'
+  },
+  {
+    value: 'other' as TransportationOption,
+    title: 'Walking/Other',
+    description: 'Walking, bike, rideshare, or other methods',
+    icon: 'bike'
+  },
+  {
+    value: 'not-sure' as TransportationOption,
+    title: 'Not sure yet',
+    description: "I'll decide based on what I find",
+    icon: 'help-circle'
+  }
+];
+
+export default function PlacesExplorer() {
   const [currentStep, setCurrentStep] = useState(1);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
 
-  // Get trip type from localStorage to determine the mode
-  const [tripMode, setTripMode] = useState<'route' | 'explore'>('route');
-  
-  useEffect(() => {
-    const storedTripType = localStorage.getItem('tripType');
-    if (storedTripType === 'explore') {
-      setTripMode('explore');
-    } else {
-      setTripMode('route');
-    }
-  }, []);
-
-  // Draft recovery
-  const {
-    showRecoveryPrompt,
-    recoveredDraft,
-    isLoading: isDraftLoading,
-    acceptDraft,
-    rejectDraft,
-    dismissPrompt,
-  } = useDraftRecovery();
 
   // Form management
   const { form, validateStep, formData } = useWizardForm({
-    initialData: initialData,
+    initialData: undefined,
     onDataChange: (data) => {
       // Auto-save will handle this
     },
@@ -99,34 +130,13 @@ export function TripPlannerWizard({
     onNext: handleNext,
     onPrevious: handlePrevious,
     onExit: handleExit,
-    canProceed: isStepComplete(currentStep, formData),
+    canProceed: isStepComplete(currentStep, formData, 'explore'),
   });
 
-  // Handle draft recovery
-  const handleAcceptDraft = () => {
-    const draft = acceptDraft();
-    if (draft) {
-      setDraftId(draft.id);
-      setCurrentStep(draft.currentStep);
-      form.reset(draft.data);
-      toast({
-        title: "Draft recovered",
-        description: `Continuing from step ${draft.currentStep}`,
-      });
-    }
-  };
-
-  const handleRejectDraft = () => {
-    rejectDraft();
-    toast({
-      title: "Starting fresh",
-      description: "Previous draft has been cleared",
-    });
-  };
 
   // Navigation handlers
   function handleNext() {
-    if (!isStepComplete(currentStep, formData)) {
+    if (!isStepComplete(currentStep, formData, 'explore')) {
       validateStep(currentStep);
       return;
     }
@@ -159,18 +169,27 @@ export function TripPlannerWizard({
       // Clear the draft since we're completing
       clearDraft();
 
+      // Navigate to explore results with state
+      const params = new URLSearchParams({
+        location: formData.startLocation?.main_text || '',
+        interests: formData.intentions.join(','),
+        transportation: formData.transportation.join(','),
+        startDate: formData.startDate?.toISOString() || '',
+        endDate: formData.endDate?.toISOString() || ''
+      });
+      setLocation(`/explore-results?${params}`);
+
       announceFormSubmission('success');
-      onComplete(formData);
 
       toast({
-        title: "Trip plan complete!",
-        description: "Your personalized trip is ready to explore.",
+        title: "Places exploration ready!",
+        description: "Let's discover amazing places in your area.",
       });
     } catch (error) {
       announceFormSubmission('error');
       toast({
         title: "Error",
-        description: "Failed to complete trip plan. Please try again.",
+        description: "Failed to start exploration. Please try again.",
         variant: "destructive",
       });
     }
@@ -181,8 +200,7 @@ export function TripPlannerWizard({
     if (hasProgress) {
       setShowExitConfirmation(true);
     } else {
-      // Navigate back to home page instead of calling onCancel
-      setLocation('/');
+      setLocation('/dashboard');
     }
   }
 
@@ -191,26 +209,98 @@ export function TripPlannerWizard({
       forceSave();
       toast({
         title: "Progress saved",
-        description: "You can continue your trip planning later.",
+        description: "You can continue your exploration planning later.",
       });
     } else {
       clearDraft();
     }
 
     setShowExitConfirmation(false);
-    // Navigate back to home page instead of calling onCancel
-    setLocation('/');
+    setLocation('/dashboard');
   }
+
+  // Custom Trip Type Step with exploration options (no road trip, no header text)
+  const ExplorationTripTypeStep = ({ value, onChange, error }: {
+    value: TripType;
+    onChange: (value: TripType) => void;
+    error?: string;
+  }) => {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {EXPLORATION_TRIP_TYPE_OPTIONS.map((option) => (
+            <OptionCard
+              key={option.value}
+              title={option.title}
+              description={option.description}
+              icon={option.icon}
+              selected={value === option.value}
+              onClick={() => onChange(option.value)}
+              className="h-full"
+            />
+          ))}
+        </div>
+
+        <ValidationMessage error={error} />
+      </div>
+    );
+  };
+
+  // Custom Transportation Step with exploration options
+  const ExplorationTransportationStep = ({ value, onChange, error }: {
+    value: TransportationOption[];
+    onChange: (value: TransportationOption[]) => void;
+    error?: string;
+  }) => {
+    const handleToggle = (option: TransportationOption) => {
+      const newValue = value.includes(option)
+        ? value.filter(v => v !== option)
+        : [...value, option];
+      onChange(newValue);
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <p className="text-slate-600">
+            Select all transportation methods you'd like to use during your exploration
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {EXPLORATION_TRANSPORTATION_OPTIONS.map((option) => (
+            <OptionCard
+              key={option.value}
+              title={option.title}
+              description={option.description}
+              icon={option.icon}
+              selected={value.includes(option.value)}
+              onClick={() => handleToggle(option.value)}
+              className="h-full"
+            />
+          ))}
+        </div>
+
+
+        {error && (
+          <div className="text-sm text-red-600 mt-2">
+            {error}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Render step content
   const renderStepContent = () => {
     const stepData = form.getValues();
     const errors = form.formState.errors;
+    
 
     switch (currentStep) {
       case 1:
         return (
-          <TripTypeStep
+          <ExplorationTripTypeStep
             value={stepData.tripType}
             onChange={(value) => form.setValue('tripType', value)}
             error={errors.tripType?.message}
@@ -224,7 +314,7 @@ export function TripPlannerWizard({
             endLocation={stepData.endLocation}
             stops={stepData.stops}
             flexibleLocations={stepData.flexibleLocations}
-            tripMode={tripMode}
+            tripMode="explore"
             onStartLocationChange={(location) => form.setValue('startLocation', location)}
             onEndLocationChange={(location) => form.setValue('endLocation', location)}
             onStopsChange={(stops) => form.setValue('stops', stops)}
@@ -255,7 +345,7 @@ export function TripPlannerWizard({
 
       case 4:
         return (
-          <TransportationStep
+          <ExplorationTransportationStep
             value={stepData.transportation}
             onChange={(value) => form.setValue('transportation', value)}
             error={errors.transportation?.message}
@@ -301,24 +391,12 @@ export function TripPlannerWizard({
     }
   };
 
-  if (isDraftLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-slate-600">Loading your trip planner...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
-      {/* Page Layout */}
+      {/* Page Layout - Matching Trip Wizard */}
       <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-        {/* Header */}
+        {/* Header - Clean app bar pattern */}
         <Header
           leftContent={
             <Button
@@ -336,62 +414,31 @@ export function TripPlannerWizard({
             <div className="flex items-center justify-center">
               <div className="text-center">
                 <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
-                  Plan Your Trip
+                  Explorer Wizard
                 </h1>
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Step {currentStep} of {TOTAL_STEPS}: {STEP_TITLES[currentStep]}
+                  Step {currentStep} of {TOTAL_STEPS}: {STEP_TITLES[currentStep - 1]}
                 </p>
               </div>
             </div>
           }
           rightContent={
-            <div className="flex items-center gap-3">
-              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                Progress: {Math.round((currentStep / TOTAL_STEPS) * 100)}%
+            user && (
+              <div className="flex items-center gap-2">
+                <UserMenu className="hidden md:block" />
+                <MobileMenu />
               </div>
-              <div
-                className="w-16 h-2 rounded-full border"
-                style={{ backgroundColor: 'var(--surface-alt)', borderColor: 'var(--border)' }}
-              >
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{
-                    backgroundColor: 'var(--primary)',
-                    width: `${(currentStep / TOTAL_STEPS) * 100}%`
-                  }}
-                />
-              </div>
-            </div>
+            )
           }
         />
 
-        {/* Page Content */}
+        {/* Page Content - Matching Trip Wizard */}
         <div className="pt-4 pb-8">
-          {/* Breadcrumb and Back Navigation */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleExit}
-                  className="text-slate-600 hover:text-slate-900"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Home
-                </Button>
-                <div className="text-sm text-slate-500">
-                  Home → Trip Planner
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Main Content Area */}
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Unified Card */}
+            {/* Unified Card - Matching Trip Wizard */}
             <div className="card-elevated rounded-lg border border-slate-200">
-              {/* Progress Status Header */}
+              {/* Progress Status Header - Inside Card */}
               <div className="p-4 border-b border-slate-100">
                 <div className="text-center mb-2">
                   <h2 className="text-lg font-semibold text-slate-800">
@@ -401,7 +448,7 @@ export function TripPlannerWizard({
                 <Progress
                   value={(currentStep / TOTAL_STEPS) * 100}
                   className="h-2 bg-slate-200"
-                  aria-label={`Trip planner progress: Step ${currentStep} of ${TOTAL_STEPS}`}
+                  aria-label={`Places explorer progress: Step ${currentStep} of ${TOTAL_STEPS}`}
                 />
               </div>
 
@@ -414,10 +461,10 @@ export function TripPlannerWizard({
                     stepNumber={currentStep}
                     totalSteps={TOTAL_STEPS}
                     isActive={true}
-                    isComplete={isStepComplete(currentStep, formData)}
+                    isComplete={isStepComplete(currentStep, formData, 'explore')}
                     onNext={handleNext}
                     onPrevious={handlePrevious}
-                    canProceed={isStepComplete(currentStep, formData)}
+                    canProceed={isStepComplete(currentStep, formData, 'explore')}
                     showSkip={currentStep === 7} // Only special needs step is skippable
                   >
                     {renderStepContent()}
@@ -429,14 +476,6 @@ export function TripPlannerWizard({
         </div>
       </div>
 
-      {/* Draft recovery modal */}
-      <DraftRecoveryModal
-        isOpen={showRecoveryPrompt}
-        draft={recoveredDraft}
-        onAccept={handleAcceptDraft}
-        onReject={handleRejectDraft}
-        onCancel={dismissPrompt}
-      />
 
       {/* Exit confirmation modal */}
       <ExitConfirmationModal

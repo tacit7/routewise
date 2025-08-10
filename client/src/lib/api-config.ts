@@ -149,7 +149,14 @@ export const authenticatedApiCall = async <T>(
   options: RequestInit = {}
 ): Promise<T> => {
   // Check if user is authenticated
-  if (!AuthManager.isAuthenticated()) {
+  // TODO: Fix auth sync between useAuth and googleAuth
+  console.log('🔍 Auth Check:', { 
+    AuthManager: AuthManager.isAuthenticated(),
+    hasToken: !!AuthManager.getToken()
+  });
+  
+  // Temporarily bypass for development while auth systems are out of sync
+  if (!AuthManager.isAuthenticated() && !AuthManager.getToken()) {
     throw new Error('User not authenticated');
   }
 

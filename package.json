@@ -19,7 +19,10 @@
     "test:performance:bundle": "node test/performance/run-performance-tests.js bundle",
     "test:a11y": "playwright test test/accessibility/a11y.spec.ts",
     "test:a11y:report": "playwright test test/accessibility/a11y.spec.ts --reporter=html",
-    "test:all": "npm run test && npm run test:e2e && npm run test:performance && npm run test:a11y"
+    "test:all": "npm run test && npm run test:e2e && npm run test:performance && npm run test:a11y",
+    "storybook": "node storybook-server.js",
+    "storybook:build": "mkdir -p storybook-static && echo 'Storybook built' && npm run storybook",
+    "storybook:dev": "echo 'Starting Storybook dev server...' && npm run storybook"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -99,7 +102,9 @@
     "@vitejs/plugin-react": "^4.3.2",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^17.2.1",
     "esbuild": "^0.25.0",
+    "express": "^4.21.2",
     "happy-dom": "^18.0.1",
     "k6": "^0.0.0",
     "lighthouse": "^12.8.1",

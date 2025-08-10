@@ -183,6 +183,9 @@ const Dashboard = () => {
   // Simple first-time user logic based on dashboard data
   const hasInterestsConfigured = enabledInterestNames.length > 0;
   const shouldShowFirstTimeExperience = !hasInterestsConfigured && !isLoading;
+  
+  // Check if there's Explorer Wizard progress
+  const hasExplorerProgress = getExplorerWizardData() !== null;
 
   const handlePlanRoadTrip = () => {
     // Store trip type in localStorage before navigating
@@ -209,17 +212,30 @@ const Dashboard = () => {
   };
 
   const handleStartTrip = (trip: any) => {
-    // Store route data and navigate to planning
-    localStorage.setItem(
-      "routeRequest",
-      JSON.stringify({
-        startLocation: trip.start_city,
-        endLocation: trip.end_city,
-        timestamp: Date.now(),
-      })
-    );
-
-    setLocation("/");
+    if (trip.start_city && trip.end_city) {
+      // Route-based trip: Store route data and navigate to planning
+      localStorage.setItem(
+        "routeRequest",
+        JSON.stringify({
+          startLocation: trip.start_city,
+          endLocation: trip.end_city,
+          timestamp: Date.now(),
+        })
+      );
+      setLocation("/");
+    } else {
+      // Suggestion-based trip: Navigate to places explorer with suggestion context
+      localStorage.setItem(
+        "suggestionContext",
+        JSON.stringify({
+          tripId: trip.id,
+          title: trip.title,
+          description: trip.description,
+          timestamp: Date.now(),
+        })
+      );
+      setLocation("/places-explorer");
+    }
   };
 
   // Show loading while checking data
@@ -259,13 +275,23 @@ const Dashboard = () => {
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
           {/* Empty State Hero Section */}
           <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
-            {/* Heading */}
-            <h1 className="text-4xl font-bold text-fg mb-8">Let's get your next adventure started!</h1>
+            {/* Heading - Different if Explorer in progress */}
+            {hasExplorerProgress ? (
+              <h1 className="text-4xl font-bold text-fg mb-8">Welcome back!</h1>
+            ) : (
+              <h1 className="text-4xl font-bold text-fg mb-8">Let's get your next adventure started!</h1>
+            )}
 
-            {/* Subtext */}
-            <p className="text-xl text-gray-600 mb-12">
-              You haven't planned any trips yet. Start your first adventure below.
-            </p>
+            {/* Subtext - Different if Explorer in progress */}
+            {hasExplorerProgress ? (
+              <p className="text-xl text-gray-600 mb-12">
+                Continue your exploration planning or start a new route.
+              </p>
+            ) : (
+              <p className="text-xl text-gray-600 mb-12">
+                You haven't planned any trips yet. Start your first adventure below.
+              </p>
+            )}
 
             {/* Action Buttons - Clear hierarchy */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -288,53 +314,58 @@ const Dashboard = () => {
               </Button>
             </div>
 
-            {/* Explorer Wizard Progress Card */}
+            {/* Explorer Wizard Progress Card - Always show when data exists */}
             <div className="mt-8">
               <ExplorerWizardCard onContinue={handleContinueExplorer} />
             </div>
 
-            {/* Trip Planning Icon */}
-            <div className="w-64 flex justify-center mx-auto relative">
-              <div className="overflow-hidden h-48 relative">
-                <img
-                  src="/planning.png"
-                  alt="Route planning illustration with road sign and map"
-                  className="w-sm h-auto drop-shadow-lg object-cover"
-                />
-              </div>
-              {/* Scroll cue */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
-                <div className="text-gray-400 text-xs">Scroll for more ↓</div>
-              </div>
-            </div>
-
-            {/* Personalize Section - Only show for first-time users or users without interests */}
-            {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
-              <section className="mt-16">
-                <div className="flex items-center justify-center mb-4">
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
-                    <CheckCircle className="w-5 h-5 text-white" />
+            {/* Only show additional content if NO Explorer progress */}
+            {!hasExplorerProgress && (
+              <>
+                {/* Trip Planning Icon */}
+                <div className="w-64 flex justify-center mx-auto relative">
+                  <div className="overflow-hidden h-48 relative">
+                    <img
+                      src="/planning.png"
+                      alt="Route planning illustration with road sign and map"
+                      className="w-sm h-auto drop-shadow-lg object-cover"
+                    />
                   </div>
-                  <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
+                  {/* Scroll cue */}
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="text-gray-400 text-xs">Scroll for more ↓</div>
+                  </div>
                 </div>
-                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                  Tell us what you're into to get tailored recommendations.
-                </p>
 
-                <Button
-                  onClick={handleCustomizeInterests}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
-                >
-                  Customize Interests
-                </Button>
-              </section>
+                {/* Personalize Section - Only show for first-time users or users without interests */}
+                {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
+                  <section className="mt-16">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
+                        <CheckCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
+                    </div>
+                    <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                      Tell us what you're into to get tailored recommendations.
+                    </p>
+
+                    <Button
+                      onClick={handleCustomizeInterests}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                    >
+                      Customize Interests
+                    </Button>
+                  </section>
+                )}
+              </>
             )}
           </div>
 
           {/* Spacer to push Suggested Trips to bottom */}
           <div className="flex-grow"></div>
 
-          {/* Suggested Trips Section */}
+          {/* Suggested Trips Section - Always show */}
           <section className="text-center flex-shrink-0">
             <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
 
@@ -349,10 +380,12 @@ const Dashboard = () => {
                   <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                     Try Again
                   </Button>
-                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Update Interests
-                  </Button>
+                  {!hasExplorerProgress && (
+                    <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Update Interests
+                    </Button>
+                  )}
                 </div>
               </div>
             ) : isLoadingSuggested ? (
@@ -377,9 +410,16 @@ const Dashboard = () => {
                     </div>
                     <CardContent className="p-4 flex flex-col flex-grow">
                       <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {trip.start_city} to {trip.end_city}
-                      </p>
+                      {/* Render route info for route-based trips, duration/distance for suggestions */}
+                      {trip.start_city && trip.end_city ? (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {trip.start_city} to {trip.end_city}
+                        </p>
+                      ) : (trip.duration || trip.distance) ? (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
+                        </p>
+                      ) : null}
                       <p
                         className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"
                         style={{
@@ -406,10 +446,12 @@ const Dashboard = () => {
                   <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
                   <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
-                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Set Your Interests
-                  </Button>
+                  {!hasExplorerProgress && (
+                    <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Set Your Interests
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
@@ -418,6 +460,7 @@ const Dashboard = () => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
@@ -464,14 +507,16 @@ const Dashboard = () => {
               <Search className="w-5 h-5 mr-2" />
               Explore Places
             </Button>
-            <Button
-              onClick={handleHelpMePlan}
-              variant="outline"
-              className="bg-primary hover:bg-primary/90 text-primary-fg border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
-            >
-              <MapPin className="w-5 h-5 mr-2" />
-              Help Me Plan a Trip
-            </Button>
+            {!hasExplorerProgress && (
+              <Button
+                onClick={handleHelpMePlan}
+                variant="outline"
+                className="bg-primary hover:bg-primary/90 text-primary-fg border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              >
+                <MapPin className="w-5 h-5 mr-2" />
+                Help Me Plan a Trip
+              </Button>
+            )}
           </div>
 
           {/* Explorer Wizard Progress Card */}
@@ -479,8 +524,8 @@ const Dashboard = () => {
             <ExplorerWizardCard onContinue={handleContinueExplorer} />
           </div>
 
-          {/* Personalize Section - Only show for first-time users or users without interests */}
-          {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
+          {/* Only show personalize section if NO Explorer progress */}
+          {!hasExplorerProgress && (shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
             <section className="mb-12">
               <div className="flex items-center justify-center mb-4">
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
@@ -505,7 +550,7 @@ const Dashboard = () => {
         {/* Spacer to push Suggested Trips to bottom */}
         <div className="flex-grow"></div>
 
-        {/* Suggested Trips Section */}
+        {/* Suggested Trips Section - Always show */}
         <section className="text-center flex-shrink-0">
           <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
 
@@ -520,10 +565,12 @@ const Dashboard = () => {
                 <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                   Try Again
                 </Button>
-                <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Update Interests
-                </Button>
+                {!hasExplorerProgress && (
+                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Update Interests
+                  </Button>
+                )}
               </div>
             </div>
           ) : isLoadingSuggested ? (
@@ -548,9 +595,16 @@ const Dashboard = () => {
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {trip.start_city} to {trip.end_city}
-                    </p>
+                    {/* Render route info for route-based trips, duration/distance for suggestions */}
+                    {trip.start_city && trip.end_city ? (
+                      <p className="text-sm text-gray-600 mb-2">
+                        {trip.start_city} to {trip.end_city}
+                      </p>
+                    ) : (trip.duration || trip.distance) ? (
+                      <p className="text-sm text-gray-600 mb-2">
+                        {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
+                      </p>
+                    ) : null}
                     <p
                       className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"
                       style={{
@@ -577,10 +631,12 @@ const Dashboard = () => {
                 <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
                 <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
-                <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Set Your Interests
-                </Button>
+                {!hasExplorerProgress && (
+                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Set Your Interests
+                  </Button>
+                )}
               </div>
             </div>
           )}

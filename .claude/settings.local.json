@@ -13,7 +13,11 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(grep:*)",
       "Bash(mkdir:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm search:*)",
+      "Bash(say:*)",
+      "mcp__faq-expert__search_faqs",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

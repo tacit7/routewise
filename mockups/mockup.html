@@ -1,0 +1,423 @@
+import * as React from "react";
+import { useState } from "react";
+import {
+  ArrowRight,
+  Bell,
+  ChevronDown,
+  Download,
+  Filter,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  User,
+} from "lucide-react";
+
+// shadcn/ui components
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink, PaginationEllipsis } from "@/components/ui/pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+export default function KitchenSinkDemo() {
+  const [emailOptIn, setEmailOptIn] = useState(true);
+  const [progress, setProgress] = useState(36);
+
+  return (
+    <TooltipProvider>
+      <div className="min-h-screen bg-[var(--bg,_hsl(210_20%_98%))] text-foreground">
+        {/* Top App Bar */}
+        <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Kitchen Sink</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 rounded-xl border px-2 py-1.5">
+                <Search className="h-4 w-4" />
+                <input className="w-48 bg-transparent text-sm outline-none" placeholder="Search components…" />
+              </div>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Notifications">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Notifications</TooltipContent>
+              </Tooltip>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
+                      <AvatarFallback>UM</AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline">Uriel</span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" /> Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" /> Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" /> Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
+                    <Filter className="h-4 w-4" /> Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                    <SheetDescription>Refine the preview content.</SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-4 space-y-6">
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select>
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ui">UI</SelectItem>
+                          <SelectItem value="content">Content</SelectItem>
+                          <SelectItem value="forms">Forms</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="email-optin">Email updates</Label>
+                      <Switch id="email-optin" checked={emailOptIn} onCheckedChange={setEmailOptIn} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Complexity</Label>
+                      <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-2">
+                        <div className="flex items-center gap-2 rounded-md border p-2">
+                          <RadioGroupItem id="r1" value="low" />
+                          <Label htmlFor="r1" className="text-sm">Low</Label>
+                        </div>
+                        <div className="flex items-center gap-2 rounded-md border p-2">
+                          <RadioGroupItem id="r2" value="medium" />
+                          <Label htmlFor="r2" className="text-sm">Medium</Label>
+                        </div>
+                        <div className="flex items-center gap-2 rounded-md border p-2">
+                          <RadioGroupItem id="r3" value="high" />
+                          <Label htmlFor="r3" className="text-sm">High</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Range</Label>
+                      <Slider defaultValue={[40]} step={1} max={100} className="w-full" />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Body */}
+        <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-3">
+          {/* Left column */}
+          <section className="lg:col-span-2 space-y-6">
+            {/* Hero / Callout */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Preview: Components in Context
+                  <Badge variant="secondary" className="ml-2">alpha</Badge>
+                </CardTitle>
+                <CardDescription>Use this page to see shadcn/ui pieces together with Tailwind spacing and tokens.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Button className="justify-between"><span>Create New</span><Plus className="h-4 w-4" /></Button>
+                  <Button variant="outline" className="justify-between"><span>Export</span><Download className="h-4 w-4" /></Button>
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="you@example.com" />
+                    <p className="text-sm text-muted-foreground">We'll never share your email.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Role</Label>
+                    <Select>
+                      <SelectTrigger id="role"><SelectValue placeholder="Select a role" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dev">Developer</SelectItem>
+                        <SelectItem value="designer">Designer</SelectItem>
+                        <SelectItem value="pm">Product Manager</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-1 sm:col-span-2 space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea id="bio" rows={4} placeholder="Tell us about yourself…" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="terms" />
+                    <Label htmlFor="terms" className="text-sm">I agree to the terms</Label>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="w-2/3">
+                    <Progress value={progress} />
+                  </div>
+                  <div className="text-sm text-muted-foreground">{progress}% complete</div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={() => setProgress((p) => Math.min(100, p + 8))}>
+                    Increase <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">Open Dialog</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Example Dialog</DialogTitle>
+                        <DialogDescription>Dialogs are great for confirmations and forms.</DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-3 py-2">
+                        <div className="space-y-2">
+                          <Label>Name</Label>
+                          <Input placeholder="Enter your name" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Notify me</Label>
+                          <Switch defaultChecked />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="ghost">Cancel</Button>
+                        <Button>Save</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+              <CardFooter className="justify-between">
+                <div className="text-sm text-muted-foreground">Hint: All spacing uses an 8px scale.</div>
+                <Button variant="ghost" className="gap-2">
+                  Learn more <ArrowRight className="h-4 w-4" />
+                </Button>
+              </CardFooter>
+            </Card>
+
+            {/* Tabs + Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Data Views</CardTitle>
+                <CardDescription>Tabs toggling a simple table and an accordion.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="table" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="table">Table</TabsTrigger>
+                    <TabsTrigger value="faqs">FAQs</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="table" className="mt-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {[
+                          { name: "Ada Lovelace", role: "Developer" },
+                          { name: "Don Norman", role: "Designer" },
+                          { name: "Grace Hopper", role: "Engineer" },
+                        ].map((row) => (
+                          <TableRow key={row.name}>
+                            <TableCell className="font-medium">{row.name}</TableCell>
+                            <TableCell>{row.role}</TableCell>
+                            <TableCell className="text-right">
+                              <Button size="sm" variant="outline" className="mr-2">Edit</Button>
+                              <Button size="sm">Share</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TabsContent>
+                  <TabsContent value="faqs" className="mt-4">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="item-1">
+                        <AccordionTrigger>What is shadcn/ui?</AccordionTrigger>
+                        <AccordionContent>A collection of reusable components built with Radix UI and Tailwind.</AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="item-2">
+                        <AccordionTrigger>Can I customize components?</AccordionTrigger>
+                        <AccordionContent>Yes. Components are unstyled primitives with Tailwind — fully themeable.</AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Right column */}
+          <aside className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src="https://i.pravatar.cc/72" />
+                    <AvatarFallback>UM</AvatarFallback>
+                  </Avatar>
+                  Quick Profile
+                </CardTitle>
+                <CardDescription>Compact user card
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <Badge>Pro</Badge>
+                  <Badge variant="secondary">Active</Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Signed in as <span className="font-medium">uriel@example.com</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline">Manage</Button>
+                  <Button size="sm">Upgrade</Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Alerts</CardTitle>
+                <CardDescription>Status and messaging patterns</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Alert>
+                  <AlertTitle>Heads up</AlertTitle>
+                  <AlertDescription>This is a neutral alert with supporting text.</AlertDescription>
+                </Alert>
+                <Alert className="border-destructive/50 text-destructive">
+                  <AlertTitle>Action required</AlertTitle>
+                  <AlertDescription>Something needs your attention right now.</AlertDescription>
+                </Alert>
+              </CardContent>
+              <CardFooter>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="link" className="gap-1 p-0">Learn about alerts <ArrowRight className="h-4 w-4" /></Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Opens docs (placeholder)</TooltipContent>
+                </Tooltip>
+              </CardFooter>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Pagination</CardTitle>
+                <CardDescription>Standard list controls</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious href="#" />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink href="#">1</PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink href="#" isActive>
+                        2
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink href="#">3</PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext href="#" />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </CardContent>
+            </Card>
+          </aside>
+        </main>
+
+        {/* Footer actions */}
+        <footer className="sticky bottom-0 z-40 border-t bg-background/90 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+            <Button variant="outline">Back</Button>
+            <div className="text-sm text-muted-foreground">Demo footer · 2 of 7</div>
+            <Button>
+              Continue
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </footer>
+      </div>
+    </TooltipProvider>
+  );
+}

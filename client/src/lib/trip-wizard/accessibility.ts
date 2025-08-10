@@ -11,7 +11,7 @@ export const stepAriaLabels = {
   },
   3: {
     title: "Choose your travel dates",
-    description: "Select when you want to start and end your trip, or mark as flexible",
+    description: "",
     instructions: "Use date picker or type dates directly, check flexible option if dates are not fixed"
   },
   4: {

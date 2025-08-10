@@ -1,4 +1,4 @@
-import { Menu, UserCircle, Settings, LogOut, Home } from "lucide-react";
+import { Menu, UserCircle, Settings, LogOut, Home, Palette } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -23,6 +23,7 @@ interface MobileMenuProps {
 const ROUTES = {
   DASHBOARD: "/dashboard",
   INTERESTS: "/interests",
+  KITCHEN_SINK: "/kitchen-sink",
   PROFILE: "/profile",
 } as const;
 
@@ -86,6 +87,7 @@ export default function MobileMenu({ className }: MobileMenuProps) {
   const NAV_ITEMS = [
     { label: "Dashboard", icon: Home, to: ROUTES.DASHBOARD },
     { label: "Interests", icon: Settings, to: ROUTES.INTERESTS },
+    { label: "UI Demo", icon: Palette, to: ROUTES.KITCHEN_SINK },
   ] as const;
 
   const menuButton = "w-full justify-start h-14 text-base font-medium mx-2 rounded-xl";

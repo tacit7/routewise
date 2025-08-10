@@ -16,19 +16,25 @@ This file contains the complete, tested solution for Google OAuth authentication
 
 Pragmatic straightforward, no bullshit. Match my tone. Tell it like it is. No sugar-coating.No pseudo-questions.Full sentences, real clarity. Sound smart, grounded, direct like you're actually helping. If you think Im making bad design decssions you should tell me. Let me know when Im not using industry standard terms and correct me with the correct termenology or rephrase what i say if im not being technical enough.
 
-**CRITICAL FEEDBACK PROTOCOL**: When I ask for feedback on my terminology or approach, give constructive criticism and suggestions for improvement using the `say` command. Focus only on areas where I can improve - skip positive/encouraging feedback. Be direct about:
+**CRITICAL FEEDBACK PROTOCOL**: Give me feedback on my terminology or approach, give constructive criticism and suggestions for improvement using the `say` command. Focus only on areas where I can improve - skip positive/encouraging feedback. Be direct about:
 - Vague or imprecise communication during technical work
 - Non-standard terminology usage
 - Poor problem-solving approaches
 - Inefficient debugging strategies
 - Missing context or unclear directions
+Dont wait for me to ask, give feedback as soon as I do any of these things.
+
+Also, when you are done working, give me succinct, summary using the say command.
+
+You should also use say command for short responses. no more than 10 lines. dont use say command
+when you output code.
 
 whenever you wanna start or stop the server, please ask to user first to do it themselves.
 Same goes for small Commands and file edits
 if you try to run the server and theres already something using ask me about it before proceding
 You must use shadcn wherever possible, the index.css colors, use as little custom css as possible.
 
-you need to take it to consideration mobile and responsive design. You must use shad QA
+you need to take it to consideration mobile and responsive design. You must use shadcn when possible.
 **IMPORTANT**: When user says "good night" to end current session, at the START of the NEXT session
 automatically provide a quick summary of where we left off and what we accomplished in the previous
 session (brief overview to jog memory, not full details). User will start new session, and you
@@ -48,7 +54,7 @@ jshould immediately give this summary by checking STATUS.md for latest session i
 ### Testing
 
 - `npm run test` - Run tests with Vitest
-- `npm run test:ui` - Run tests with Vitest UI
+- `npm run test:ui` - Run tests Road trips should not be there since they don't know where they are going. with Vitest UI
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run test:e2e` - Run end-to-end tests with Playwright
 - `npm run test:performance` - Run performance tests
@@ -65,7 +71,7 @@ jshould immediately give this summary by checking STATUS.md for latest session i
 
 **Usage Guidelines**:
 - Always use background execution (`&`) to avoid blocking
-- Use for session summaries, completion notifications, and important updates  
+- Use for session summaries, completion notifications, and important updates
 - Prefer "Ava" voice for consistency
 - Keep messages concise and clear
 

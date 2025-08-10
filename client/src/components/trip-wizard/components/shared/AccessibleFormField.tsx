@@ -31,7 +31,7 @@ export function AccessibleFormField({
       {description && (
         <p 
           id={descriptionId}
-          className="text-sm text-slate-700"
+          className="text-base text-slate-600 font-medium"
         >
           {description}
         </p>

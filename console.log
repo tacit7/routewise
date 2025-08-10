@@ -1,0 +1,64 @@
+debug-env.ts:2 
+🔧 ENVIRONMENT VARIABLES LOADED:
+debug-env.ts:3 VITE_GOOGLE_CLIENT_ID: Present ✅
+debug-env.ts:4 VITE_API_URL: Not set (using default)
+debug-env.ts:5 VITE_MSW_DISABLED: true
+debug-env.ts:9 Google Client ID Preview: 835274027919...rcontent.com
+debug-env.ts:13 🔧 Environment check complete
+
+auth-context.tsx:99 🔐 Development JWT token obtained: {message: 'Development token generated', user: {…}, success: true, token: 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwa…b3YpidNCAv3ZdbhExkq2Rh-C-QoaPVySePbMSX9ueouScQgBw'}
+auth-context.tsx:112 🎭 Using development user with JWT token
+use-dashboard-data.ts:66 🔍 Dashboard Hook Called: {user: '2', isAuthenticated: true, enabled: true, queryWillRun: true}
+use-dashboard-data.ts:96 📊 TanStack Query State: {status: 'pending', isLoading: true, isError: false, isSuccess: false, isFetching: true, …}
+dashboard.tsx:20 getExplorerWizardData: Raw localStorage: {"id":"trip-wizard-1754805820272-gthpssurk","currentStep":2,"completedSteps":[1,7],"lastUpdated":1754805899620,"data":{"tripType":"flight-based","startLocation":null,"endLocation":null,"stops":[],"flexibleLocations":false,"startDate":null,"endDate":null,"flexibleDates":false,"transportation":[],"lodging":[],"budgetRange":{"min":100,"max":500},"intentions":[],"specialNeeds":{"pets":false,"accessibility":false,"kids":false,"notes":""},"accessibility":{"screenReader":false,"motorImpairment":false,"visualImpairment":false,"cognitiveSupport":false,"other":""}},"expiresAt":1754892299620}
+dashboard.tsx:24 getExplorerWizardData: Parsed draft: {id: 'trip-wizard-1754805820272-gthpssurk', currentStep: 2, completedSteps: Array(2), lastUpdated: 1754805899620, data: {…}, …}
+dashboard.tsx:32 getExplorerWizardData: Returning data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}
+use-dashboard-data.ts:76 📡 DASHBOARD API CALL STARTING - NETWORK REQUEST WILL BE MADE
+use-dashboard-data.ts:83 🚀 Calling authenticatedApiCall...
+use-dashboard-data.ts:66 🔍 Dashboard Hook Called: {user: '2', isAuthenticated: true, enabled: true, queryWillRun: true}
+use-dashboard-data.ts:96 📊 TanStack Query State: {status: 'pending', isLoading: true, isError: false, isSuccess: false, isFetching: true, …}
+dashboard.tsx:20 getExplorerWizardData: Raw localStorage: {"id":"trip-wizard-1754805820272-gthpssurk","currentStep":2,"completedSteps":[1,7],"lastUpdated":1754805899620,"data":{"tripType":"flight-based","startLocation":null,"endLocation":null,"stops":[],"flexibleLocations":false,"startDate":null,"endDate":null,"flexibleDates":false,"transportation":[],"lodging":[],"budgetRange":{"min":100,"max":500},"intentions":[],"specialNeeds":{"pets":false,"accessibility":false,"kids":false,"notes":""},"accessibility":{"screenReader":false,"motorImpairment":false,"visualImpairment":false,"cognitiveSupport":false,"other":""}},"expiresAt":1754892299620}
+dashboard.tsx:24 getExplorerWizardData: Parsed draft: {id: 'trip-wizard-1754805820272-gthpssurk', currentStep: 2, completedSteps: Array(2), lastUpdated: 1754805899620, data: {…}, …}
+dashboard.tsx:32 getExplorerWizardData: Returning data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}
+use-dashboard-data.ts:76 📡 DASHBOARD API CALL STARTING - NETWORK REQUEST WILL BE MADE
+use-dashboard-data.ts:83 🚀 Calling authenticatedApiCall...
+use-dashboard-data.ts:66 🔍 Dashboard Hook Called: {user: '2', isAuthenticated: true, enabled: true, queryWillRun: true}
+use-dashboard-data.ts:96 📊 TanStack Query State: {status: 'pending', isLoading: true, isError: false, isSuccess: false, isFetching: true, …}
+dashboard.tsx:20 getExplorerWizardData: Raw localStorage: {"id":"trip-wizard-1754805820272-gthpssurk","currentStep":2,"completedSteps":[1,7],"lastUpdated":1754805899620,"data":{"tripType":"flight-based","startLocation":null,"endLocation":null,"stops":[],"flexibleLocations":false,"startDate":null,"endDate":null,"flexibleDates":false,"transportation":[],"lodging":[],"budgetRange":{"min":100,"max":500},"intentions":[],"specialNeeds":{"pets":false,"accessibility":false,"kids":false,"notes":""},"accessibility":{"screenReader":false,"motorImpairment":false,"visualImpairment":false,"cognitiveSupport":false,"other":""}},"expiresAt":1754892299620}
+dashboard.tsx:24 getExplorerWizardData: Parsed draft: {id: 'trip-wizard-1754805820272-gthpssurk', currentStep: 2, completedSteps: Array(2), lastUpdated: 1754805899620, data: {…}, …}
+dashboard.tsx:32 getExplorerWizardData: Returning data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}
+use-city-autocomplete.ts:179  GET http://localhost:3001/api/places/autocomplete?input=gua 500 (Internal Server Error)
+queryFn @ use-city-autocomplete.ts:179
+fetchFn @ @tanstack_react-query.js?v=4effa252:881
+run @ @tanstack_react-query.js?v=4effa252:513
+start @ @tanstack_react-query.js?v=4effa252:555
+fetch @ @tanstack_react-query.js?v=4effa252:969
+fetchQuery @ @tanstack_react-query.js?v=4effa252:1828
+prefetchQuery @ @tanstack_react-query.js?v=4effa252:1831
+prefetchPopularCities @ use-city-autocomplete.ts:171
+(anonymous) @ App.tsx:39
+setTimeout
+(anonymous) @ App.tsx:38
+commitHookEffectListMount @ chunk-SXRIVT2P.js?v=4effa252:16963
+commitPassiveMountOnFiber @ chunk-SXRIVT2P.js?v=4effa252:18206
+commitPassiveMountEffects_complete @ chunk-SXRIVT2P.js?v=4effa252:18179
+commitPassiveMountEffects_begin @ chunk-SXRIVT2P.js?v=4effa252:18169
+commitPassiveMountEffects @ chunk-SXRIVT2P.js?v=4effa252:18159
+flushPassiveEffectsImpl @ chunk-SXRIVT2P.js?v=4effa252:19543
+flushPassiveEffects @ chunk-SXRIVT2P.js?v=4effa252:19500
+(anonymous) @ chunk-SXRIVT2P.js?v=4effa252:19381
+workLoop @ chunk-SXRIVT2P.js?v=4effa252:197
+flushWork @ chunk-SXRIVT2P.js?v=4effa252:176
+performWorkUntilDeadline @ chunk-SXRIVT2P.js?v=4effa252:384
+use-dashboard-data.ts:76 📡 DASHBOARD API CALL STARTING - NETWORK REQUEST WILL BE MADE
+use-dashboard-data.ts:83 🚀 Calling authenticatedApiCall...
+use-dashboard-data.ts:66 🔍 Dashboard Hook Called: {user: '2', isAuthenticated: true, enabled: true, queryWillRun: true}
+use-dashboard-data.ts:96 📊 TanStack Query State: {status: 'error', isLoading: false, isError: true, isSuccess: false, isFetching: false, …}
+dashboard.tsx:20 getExplorerWizardData: Raw localStorage: {"id":"trip-wizard-1754805820272-gthpssurk","currentStep":2,"completedSteps":[1,7],"lastUpdated":1754805899620,"data":{"tripType":"flight-based","startLocation":null,"endLocation":null,"stops":[],"flexibleLocations":false,"startDate":null,"endDate":null,"flexibleDates":false,"transportation":[],"lodging":[],"budgetRange":{"min":100,"max":500},"intentions":[],"specialNeeds":{"pets":false,"accessibility":false,"kids":false,"notes":""},"accessibility":{"screenReader":false,"motorImpairment":false,"visualImpairment":false,"cognitiveSupport":false,"other":""}},"expiresAt":1754892299620}
+dashboard.tsx:24 getExplorerWizardData: Parsed draft: {id: 'trip-wizard-1754805820272-gthpssurk', currentStep: 2, completedSteps: Array(2), lastUpdated: 1754805899620, data: {…}, …}
+dashboard.tsx:32 getExplorerWizardData: Returning data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}
+dashboard.tsx:67 ExplorerWizardCard: No savedData, not rendering
+dashboard.tsx:20 getExplorerWizardData: Raw localStorage: {"id":"trip-wizard-1754805820272-gthpssurk","currentStep":2,"completedSteps":[1,7],"lastUpdated":1754805899620,"data":{"tripType":"flight-based","startLocation":null,"endLocation":null,"stops":[],"flexibleLocations":false,"startDate":null,"endDate":null,"flexibleDates":false,"transportation":[],"lodging":[],"budgetRange":{"min":100,"max":500},"intentions":[],"specialNeeds":{"pets":false,"accessibility":false,"kids":false,"notes":""},"accessibility":{"screenReader":false,"motorImpairment":false,"visualImpairment":false,"cognitiveSupport":false,"other":""}},"expiresAt":1754892299620}
+dashboard.tsx:24 getExplorerWizardData: Parsed draft: {id: 'trip-wizard-1754805820272-gthpssurk', currentStep: 2, completedSteps: Array(2), lastUpdated: 1754805899620, data: {…}, …}
+dashboard.tsx:32 getExplorerWizardData: Returning data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}
+dashboard.tsx:50 ExplorerWizardCard: Retrieved data: {tripType: 'flight-based', startLocation: null, endLocation: null, stops: Array(0), flexibleLocations: false, …}

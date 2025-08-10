@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteWise Component Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* RouteWise color scheme */
+            --bg: hsl(156 30% 96%);
+            --surface: hsl(0 0% 100%);
+            --surface-alt: hsl(210 25% 97%);
+            --text: hsl(215 18% 18%);
+            --text-muted: hsl(215 12% 42%);
+            --border: hsl(214 28% 88%);
+            --primary: hsl(160 84% 36%);
+            --primary-50: hsl(160 60% 96%);
+            --primary-100: hsl(160 55% 92%);
+            --warning: hsl(42 95% 45%);
+            --focus: hsl(217 92% 60%);
+            --radius: 1rem;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin: 2rem;
+            border: 1px solid var(--border);
+        }
+        
+        .code-block { 
+            background: var(--text); 
+            color: var(--surface);
+            border-radius: calc(var(--radius) * 0.75); 
+            padding: 1.5rem; 
+            overflow-x: auto; 
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .step-card { 
+            transition: all 120ms ease-out; 
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+        
+        .step-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .step-number {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
+        }
+        
+        .config-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .api-endpoint {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: calc(var(--radius) * 0.75);
+            transition: all 120ms ease-out;
+        }
+        
+        .api-endpoint:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--primary-50);
+        }
+        
+        .method-get {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .header-gradient {
+            color: var(--text);
+        }
+        
+        .section-title {
+            color: var(--text);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .architecture-card {
+            background: var(--surface-alt);
+            border: 1px solid var(--primary-100);
+            border-radius: var(--radius);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="flex items-center justify-center mb-6">
+                <img src="../client/public/logo.svg" alt="RouteWise Logo" class="h-16 w-auto mr-4" />
+                <h1 class="header-gradient text-4xl font-bold">RouteWise</h1>
+            </div>
+            <h2 class="text-2xl font-semibold mb-4" style="color: var(--text-muted)">Component Documentation</h2>
+            <p class="text-lg max-w-3xl mx-auto" style="color: var(--text-muted)">
+                Complete technical documentation of Google OAuth authentication flow implementation in RouteWise.
+            </p>
+        </div>
+
+        <!-- Architecture Overview -->
+        <div class="architecture-card p-6 mb-8">
+            <h2 class="section-title text-2xl font-bold mb-4">Architecture Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Frontend (React + Vite)</h3>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        <li>• Port 3001 (development)</li>
+                        <li>• Vite proxy configuration</li>
+                        <li>• AuthContext for state management</li>
+                        <li>• JWT token handling</li>
+                        <li>• Responsive UI components</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Backend (Phoenix/Elixir)</h3>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        <li>• Port 4001 (API server)</li>
+                        <li>• Ueberauth + Google Strategy</li>
+                        <li>• JWT token generation</li>
+                        <li>• Session management</li>
+                        <li>• Database user storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- OAuth Flow Steps -->
+        <div class="mb-8">
+            <h2 class="section-title text-3xl font-bold mb-6">Authentication Flow Steps</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Step 1 -->
+                <div class="step-card p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="step-number w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                        <h3 class="font-semibold text-gray-900">User Clicks Sign Up</h3>
+                    </div>
+                    <p class="text-gray-600 mb-3">User clicks the Sign Up button on the home page, triggering OAuth initiation.</p>
+                    <div class="code-block">
+                        <code class="text-sm">window.location.href = '/auth/google'</code>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                        <h3 class="font-semibold text-gray-900">Vite Proxy Forward</h3>
+                    </div>
+                    <p class="text-gray-600 mb-3">Vite development server proxies the auth request to Phoenix backend.</p>
+                    <div class="code-block">
+                        <code class="text-sm">localhost:3001/auth/google → localhost:4001/auth/google</code>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                        <h3 class="font-semibold text-gray-900">Phoenix Router Match</h3>
+                    </div>
+                    <p class="text-gray-600 mb-3">Phoenix router matches the OAuth route and applies browser pipeline with Ueberauth.</p>
+                    <div class="code-block">
+                        <code class="text-sm">GET /auth/google → AuthController.request</code>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                        <h3 class="font-semibold text-gray-900">Google OAuth Redirect</h3>
+                    </div>
+                    <p class="text-gray-600 mb-3">Ueberauth redirects user to Google OAuth consent screen.</p>
+                    <div class="code-block">
+                        <code class="text-sm">→ accounts.google.com/oauth/authorize</code>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="step-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">5</div>
+                        <h3 class="font-semibold text-gray-900">User Authorization</h3>
+                    </div>
+                    <p class="text-gray-600">User authorizes the application on Google's consent screen.</p>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="step-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">6</div>
+                        <h3 class="font-semibold text-gray-900">Google Callback</h3>
+                    </div>
+                    <p class="text-gray-600 mb-3">Google redirects back to Phoenix with authorization code.</p>
+                    <div class="code-block">
+                        <code class="text-sm">GET /auth/google/callback</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Vite Config -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="font-semibold text-gray-900 mb-3">Vite Proxy Configuration</h3>
+                <div class="code-block">
+                    <pre class="text-sm"><code>// vite.config.ts
+server: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:4001',
+      changeOrigin: true,
+    },
+    '/auth': {
+      target: 'http://localhost:4001',
+      changeOrigin: true,
+    },
+  },
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Phoenix Config -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="font-semibold text-gray-900 mb-3">Phoenix Router Configuration</h3>
+                <div class="code-block">
+                    <pre class="text-sm"><code># router.ex
+pipeline :auth_browser do
+  plug :accepts, ["html"]
+  plug :fetch_session
+  plug Ueberauth
+end
+
+scope "/auth" do
+  pipe_through :auth_browser
+  get "/:provider", AuthController, :request
+  get "/:provider/callback", AuthController, :google_callback
+end</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Reference -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">API Endpoints</h2>
+            <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-mono">GET</span>
+                        <code class="font-mono">/auth/google</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Initiates Google OAuth flow</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-mono">GET</span>
+                        <code class="font-mono">/auth/google/callback</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Handles Google OAuth callback</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-mono">GET</span>
+                        <code class="font-mono">/api/auth/me</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Gets current user (requires authentication)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

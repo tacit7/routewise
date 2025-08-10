@@ -39,6 +39,7 @@ export function WizardStep({
 
   const stepDescription = description || getStepDescription(stepNumber);
   const stepInstructions = getStepInstructions(stepNumber);
+  
 
   return (
     <div
@@ -89,7 +90,7 @@ export function WizardStep({
             {/* Previous button */}
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={onPrevious}
               disabled={stepNumber === 1}
               className={cn(
@@ -97,7 +98,6 @@ export function WizardStep({
                 stepNumber === 1 && "invisible"
               )}
             >
-              <ChevronLeft className="w-4 h-4 mr-2" />
               Previous
             </Button>
 
@@ -122,14 +122,10 @@ export function WizardStep({
                 <TooltipTrigger asChild>
                   <Button
                     type="button"
+                    variant={canProceed ? "default" : "secondary"}
                     onClick={onNext}
                     disabled={!canProceed}
-                    className={cn(
-                      "w-full sm:w-auto",
-                      canProceed 
-                        ? "bg-primary hover:bg-primary/90 text-white" 
-                        : "bg-slate-200 text-slate-500"
-                    )}
+                    className="w-full sm:w-auto"
                   >
                     {stepNumber === totalSteps ? (
                       <>
@@ -137,10 +133,7 @@ export function WizardStep({
                         <ChevronRight className="w-4 h-4 ml-2" />
                       </>
                     ) : (
-                      <>
-                        Next
-                        <ChevronRight className="w-4 h-4 ml-2" />
-                      </>
+                      "Next"
                     )}
                   </Button>
                 </TooltipTrigger>

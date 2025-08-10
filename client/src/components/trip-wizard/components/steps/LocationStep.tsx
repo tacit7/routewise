@@ -12,6 +12,7 @@ interface LocationStepProps {
   endLocation: PlaceSuggestion | null;
   stops: PlaceSuggestion[];
   flexibleLocations: boolean;
+  tripMode?: 'route' | 'explore';
   onStartLocationChange: (location: PlaceSuggestion) => void;
   onEndLocationChange: (location: PlaceSuggestion) => void;
   onStopsChange: (stops: PlaceSuggestion[]) => void;
@@ -28,6 +29,7 @@ export function LocationStep({
   endLocation,
   stops,
   flexibleLocations,
+  tripMode = 'route',
   onStartLocationChange,
   onEndLocationChange,
   onStopsChange,
@@ -60,6 +62,39 @@ export function LocationStep({
   const canAddStop =
     stops.length < 5 && startLocation && endLocation && !flexibleLocations;
 
+  // For explore mode, show simplified single-location UI
+  if (tripMode === 'explore') {
+    return (
+      <div className="space-y-6">
+        {/* Welcome message for explore mode */}
+        <div className="text-center mb-6">
+          <p className="text-slate-600 text-lg">
+            Where would you like to explore places and discover local attractions?
+          </p>
+        </div>
+
+        {/* Single location input for exploration - Enhanced width and affordance */}
+        <div className="w-full max-w-none">
+          <AccessibleFormField
+            label="Location to Explore"
+            description="Enter a city, neighborhood, address, or general area you want to explore"
+            error={errors?.startLocation}
+            required
+          >
+            <PlaceAutocomplete
+              value={startLocation?.main_text || ""}
+              onSelect={onStartLocationChange}
+              placeholder="Search for city, address, or area to explore..."
+              className="w-full text-base"
+            />
+          </AccessibleFormField>
+        </div>
+
+      </div>
+    );
+  }
+
+  // Default route planning mode
   return (
     <div className="space-y-6">
       {/* Warm welcome message */}
@@ -143,28 +178,17 @@ export function LocationStep({
 
       {/* Stops section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="font-medium text-slate-800">Optional Stops</h4>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-500">
-              {stops.length}/5 stops added
-            </span>
-            {/* Mobile toggle button */}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowStopsOnMobile(!showStopsOnMobile)}
-              className="md:hidden p-1"
-            >
-              {showStopsOnMobile ? (
-                <span className="text-xs">Hide</span>
-              ) : (
-                <span className="text-xs">Show</span>
-              )}
-            </Button>
-          </div>
-        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setShowStopsOnMobile(!showStopsOnMobile)}
+          className="flex items-center justify-between w-full p-3 h-auto font-medium text-slate-800 hover:bg-slate-50 rounded-lg border border-slate-200"
+        >
+          <span>Optional stops ({stops.length}/5)</span>
+          <span className={`transform transition-transform text-slate-400 ${showStopsOnMobile ? 'rotate-90' : ''}`}>
+            ▸
+          </span>
+        </Button>
 
         {/* Stops content - collapsible on mobile */}
         <div className={`space-y-4 md:block ${showStopsOnMobile ? 'block' : 'hidden md:block'}`}>
@@ -255,39 +279,6 @@ export function LocationStep({
         </div>
       </div>
 
-      {/* Route preview */}
-      {startLocation && (flexibleLocations || endLocation) && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-          <h4 className="font-medium text-green-900 mb-2">
-            {flexibleLocations ? "Starting Area:" : "Your Route:"}
-          </h4>
-          <div className="flex items-center justify-center space-x-2 text-sm text-green-800">
-            <MapPin className="w-4 h-4 text-green-600" />
-            <span>{startLocation.main_text}</span>
-            {!flexibleLocations && (
-              <>
-                {stops.map((stop, index) => (
-                  <span key={index} className="flex items-center space-x-2">
-                    <span>→</span>
-                    <span>{stop.main_text}</span>
-                  </span>
-                ))}
-                <span>→</span>
-                <Flag className="w-4 h-4 text-green-600" />
-                <span>{endLocation.main_text}</span>
-              </>
-            )}
-            {flexibleLocations && (
-              <>
-                <span>→</span>
-                <span className="italic text-green-700">
-                  Flexible destinations from here
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       <ValidationMessage error={errors?.stops} />
     </div>

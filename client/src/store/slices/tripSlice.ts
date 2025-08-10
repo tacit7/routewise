@@ -46,6 +46,7 @@ interface TripState {
   // Current trip planning
   currentRoute: RouteRequest | null
   routeResults: any | null
+  currentTripId: string | null
   
   // Trip stats
   stats: TripStats | null
@@ -72,6 +73,7 @@ const initialState: TripState = {
   suggestedTrips: [],
   currentRoute: null,
   routeResults: null,
+  currentTripId: null,
   stats: null,
   isLoadingTrips: false,
   isLoadingSuggestions: false,
@@ -116,6 +118,27 @@ export const fetchTripStats = createAsyncThunk(
       return data.stats
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch trip stats')
+    }
+  }
+)
+
+export const createDraftTrip = createAsyncThunk(
+  'trips/createDraftTrip',
+  async (tripType: string, { rejectWithValue }) => {
+    try {
+      const draftData = {
+        trip: {
+          title: 'Draft Trip',
+          trip_type: tripType
+        }
+      }
+      const data = await authenticatedApiCall<{ trip: Trip }>('/api/trips', {
+        method: 'POST',
+        body: JSON.stringify(draftData),
+      })
+      return data.trip
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to create draft trip')
     }
   }
 )
@@ -180,6 +203,15 @@ const tripSlice = createSlice({
     clearCurrentRoute: (state) => {
       state.currentRoute = null
       state.routeResults = null
+    },
+
+    // Current trip management
+    setCurrentTrip: (state, action: PayloadAction<string | null>) => {
+      state.currentTripId = action.payload
+    },
+
+    clearCurrentTrip: (state) => {
+      state.currentTripId = null
     },
 
     // Trip comparison
@@ -294,6 +326,15 @@ const tripSlice = createSlice({
         state.statsError = action.payload as string
       })
       
+      // Create Draft Trip
+      .addCase(createDraftTrip.fulfilled, (state, action) => {
+        state.currentTripId = action.payload.id
+        // Add to user trips if not already exists
+        if (!state.userTrips.find(t => t.id === action.payload.id)) {
+          state.userTrips.unshift(action.payload)
+        }
+      })
+      
       // Save Trip
       .addCase(saveTrip.fulfilled, (state, action) => {
         // Add to user trips if not already exists
@@ -323,6 +364,8 @@ export const {
   setCurrentRoute,
   setRouteResults,
   clearCurrentRoute,
+  setCurrentTrip,
+  clearCurrentTrip,
   addToCompare,
   removeFromCompare,
   clearCompareTrips,
@@ -343,6 +386,7 @@ export const selectUserTrips = (state: { trips: TripState }) => state.trips.user
 export const selectSuggestedTrips = (state: { trips: TripState }) => state.trips.suggestedTrips
 export const selectCurrentRoute = (state: { trips: TripState }) => state.trips.currentRoute
 export const selectRouteResults = (state: { trips: TripState }) => state.trips.routeResults
+export const selectCurrentTripId = (state: { trips: TripState }) => state.trips.currentTripId
 export const selectTripStats = (state: { trips: TripState }) => state.trips.stats
 export const selectCompareTrips = (state: { trips: TripState }) => state.trips.compareTrips
 export const selectRecentlyViewed = (state: { trips: TripState }) => state.trips.recentlyViewed

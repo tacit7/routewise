@@ -42,7 +42,12 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-    // Removed proxy - using frontend-only authentication
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4001',
+        changeOrigin: true
+      }
+    }
   },
   define: {
     // Pass MSW_DISABLED environment variable to client
