@@ -1,15 +1,163 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/components/auth-context";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Settings, Search } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike } from "lucide-react";
+import UserMenu from "@/components/UserMenu";
+import MobileMenu from "@/components/MobileMenu";
+
+// Function to get saved Explorer Wizard data
+const getExplorerWizardData = () => {
+  try {
+    const saved = localStorage.getItem('routewise-trip-wizard-draft');
+    console.log('getExplorerWizardData: Raw localStorage:', saved);
+    
+    if (saved) {
+      const draft = JSON.parse(saved);
+      console.log('getExplorerWizardData: Parsed draft:', draft);
+      
+      // Check if draft is expired
+      if (Date.now() > draft.expiresAt) {
+        console.log('getExplorerWizardData: Draft expired');
+        return null;
+      }
+      
+      console.log('getExplorerWizardData: Returning data:', draft?.data);
+      return draft?.data || null;
+    }
+    console.log('getExplorerWizardData: No saved data found');
+    return null;
+  } catch (error) {
+    console.error('getExplorerWizardData: Error:', error);
+    return null;
+  }
+};
+
+// Component to display Explorer Wizard progress card
+const ExplorerWizardCard = ({ onContinue }: { onContinue: () => void }) => {
+  const [savedData, setSavedData] = useState<any>(null);
+
+  useEffect(() => {
+    const checkForData = () => {
+      const data = getExplorerWizardData();
+      console.log('ExplorerWizardCard: Retrieved data:', data);
+      setSavedData(data);
+    };
+
+    // Check immediately
+    checkForData();
+
+    // Also check when window regains focus (in case user navigated back)
+    const handleFocus = () => checkForData();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
+  if (!savedData) {
+    console.log('ExplorerWizardCard: No savedData, not rendering');
+    return null;
+  }
+
+  const getTransportationIcon = (transport: string) => {
+    switch (transport) {
+      case 'flights': return <Plane className="w-4 h-4" />;
+      case 'public-transport': return <Bus className="w-4 h-4" />;
+      case 'other': return <Bike className="w-4 h-4" />;
+      default: return <Car className="w-4 h-4" />;
+    }
+  };
+
+  return (
+    <Card className="mb-6 border-blue-200 bg-blue-50/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Search className="w-5 h-5 text-blue-600" />
+            <span>Explorer Wizard in Progress</span>
+          </div>
+          <Button onClick={onContinue} size="sm">
+            <Play className="w-4 h-4 mr-1" />
+            Continue
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* Location */}
+        {savedData.startLocation && (
+          <div className="flex items-center space-x-2 text-sm">
+            <MapPin className="w-4 h-4 text-slate-600" />
+            <span className="font-medium">Exploring:</span>
+            <span>{savedData.startLocation.main_text}</span>
+          </div>
+        )}
+
+        {/* Dates */}
+        {(savedData.startDate || savedData.flexibleDates) && (
+          <div className="flex items-center space-x-2 text-sm">
+            <Calendar className="w-4 h-4 text-slate-600" />
+            <span className="font-medium">Dates:</span>
+            <span>
+              {savedData.flexibleDates ? 
+                'Flexible dates' : 
+                savedData.startDate && savedData.endDate ? 
+                  `${new Date(savedData.startDate).toLocaleDateString()} - ${new Date(savedData.endDate).toLocaleDateString()}` :
+                  savedData.startDate ? 
+                    `From ${new Date(savedData.startDate).toLocaleDateString()}` :
+                    'Not set'
+              }
+            </span>
+          </div>
+        )}
+
+        {/* Transportation */}
+        {savedData.transportation && savedData.transportation.length > 0 && (
+          <div className="flex items-center space-x-2 text-sm">
+            <div className="flex items-center space-x-1">
+              {savedData.transportation.map((transport: string, index: number) => (
+                <span key={transport} className="flex items-center">
+                  {index > 0 && <span className="mx-1 text-slate-400">•</span>}
+                  {getTransportationIcon(transport)}
+                </span>
+              ))}
+            </div>
+            <span className="font-medium">Transportation:</span>
+            <span>{savedData.transportation.join(', ')}</span>
+          </div>
+        )}
+
+        {/* Interests */}
+        {savedData.intentions && savedData.intentions.length > 0 && (
+          <div className="flex items-start space-x-2 text-sm">
+            <Settings className="w-4 h-4 text-slate-600 mt-0.5" />
+            <span className="font-medium">Interests:</span>
+            <div className="flex flex-wrap gap-1">
+              {savedData.intentions.slice(0, 3).map((interest: string) => (
+                <Badge key={interest} variant="secondary" className="text-xs">
+                  {interest}
+                </Badge>
+              ))}
+              {savedData.intentions.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{savedData.intentions.length - 3} more
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -43,9 +191,13 @@ const Dashboard = () => {
   };
 
   const handleExplore = () => {
-    // Store trip type in localStorage before navigating
-    localStorage.setItem("tripType", "explore");
-    setLocation("/trip-wizard");
+    // Navigate directly to the Places Explorer wizard
+    setLocation("/places-explorer");
+  };
+
+  const handleContinueExplorer = () => {
+    // Navigate back to the Explorer Wizard to continue
+    setLocation("/places-explorer");
   };
 
   const handleHelpMePlan = () => {
@@ -86,27 +238,19 @@ const Dashboard = () => {
         <Header
           centerContent={
             <div className="flex items-center justify-center">
-              <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                 Dashboard
               </h1>
             </div>
           }
           rightContent={
             user && (
-              <div className="flex items-center gap-3">
-                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Welcome, {user.name || user.email}
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="hidden sm:inline-block text-sm text-muted-foreground">
+                  Welcome, {user.full_name || user.username || user.email}
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm" 
-                  onClick={() => setLocation("/interests")}
-                  className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Button>
+                <UserMenu className="hidden md:block" />
+                <MobileMenu />
               </div>
             )
           }
@@ -123,31 +267,45 @@ const Dashboard = () => {
               You haven't planned any trips yet. Start your first adventure below.
             </p>
 
-            {/* Action Buttons */}
+            {/* Action Buttons - Clear hierarchy */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={handlePlanRoadTrip}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+                size="lg"
+                className="px-12 py-4 text-xl"
               >
                 <Route className="w-6 h-6 mr-3" />
                 Plan Route
               </Button>
               <Button
                 onClick={handleExplore}
-                className="bg-primary hover:bg-primary/90 text-primary-fg px-12 py-4 rounded-lg font-medium text-xl flex items-center justify-center"
+                variant="outline"
+                size="lg"
+                className="px-12 py-4 text-xl"
               >
                 <Search className="w-6 h-6 mr-3" />
                 Explore Places
               </Button>
             </div>
 
+            {/* Explorer Wizard Progress Card */}
+            <div className="mt-8">
+              <ExplorerWizardCard onContinue={handleContinueExplorer} />
+            </div>
+
             {/* Trip Planning Icon */}
-            <div className="w-64 flex justify-center mx-auto">
-              <img
-                src="/planning.png"
-                alt="Route planning illustration with road sign and map"
-                className="w-sm h-auto drop-shadow-lg"
-              />
+            <div className="w-64 flex justify-center mx-auto relative">
+              <div className="overflow-hidden h-48 relative">
+                <img
+                  src="/planning.png"
+                  alt="Route planning illustration with road sign and map"
+                  className="w-sm h-auto drop-shadow-lg object-cover"
+                />
+              </div>
+              {/* Scroll cue */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <div className="text-gray-400 text-xs">Scroll for more ↓</div>
+              </div>
             </div>
 
             {/* Personalize Section - Only show for first-time users or users without interests */}
@@ -266,27 +424,19 @@ const Dashboard = () => {
       <Header
         centerContent={
           <div className="flex items-center justify-center">
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
               Dashboard
             </h1>
           </div>
         }
         rightContent={
           user && (
-            <div className="flex items-center gap-3">
-              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                Welcome, {user.name || user.email}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="hidden sm:inline-block text-sm text-muted-foreground">
+                Welcome, {user.full_name || user.username || user.email}
               </span>
-              <Button
-                variant="outline"
-                size="sm" 
-                onClick={() => setLocation("/interests")}
-                className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+              <UserMenu className="hidden md:block" />
+              <MobileMenu />
             </div>
           )
         }
@@ -295,18 +445,21 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
         <div className="text-center flex-shrink-0">
-          {/* Top Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
+          {/* Top Action Buttons - Clear hierarchy */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
             <Button
               onClick={handlePlanRoadTrip}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              size="lg"
+              className="px-8 py-3"
             >
               <Route className="w-5 h-5 mr-2" />
               Plan a Road Trip
             </Button>
             <Button
               onClick={handleExplore}
-              className="bg-primary hover:bg-primary/90 text-primary-fg px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+              variant="outline"
+              size="lg"
+              className="px-8 py-3"
             >
               <Search className="w-5 h-5 mr-2" />
               Explore Places
@@ -319,6 +472,11 @@ const Dashboard = () => {
               <MapPin className="w-5 h-5 mr-2" />
               Help Me Plan a Trip
             </Button>
+          </div>
+
+          {/* Explorer Wizard Progress Card */}
+          <div className="mb-12">
+            <ExplorerWizardCard onContinue={handleContinueExplorer} />
           </div>
 
           {/* Personalize Section - Only show for first-time users or users without interests */}

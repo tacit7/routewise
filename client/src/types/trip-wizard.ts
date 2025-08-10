@@ -25,8 +25,8 @@ export interface AccessibilityNeeds {
   other: string;
 }
 
-export type TripType = 'road-trip' | 'flight-based' | 'combo';
-export type TransportationOption = 'my-car' | 'rental-car' | 'flights' | 'public-transport' | 'other';
+export type TripType = 'road-trip' | 'flight-based' | 'combo' | 'not-sure';
+export type TransportationOption = 'my-car' | 'rental-car' | 'flights' | 'public-transport' | 'other' | 'not-sure';
 export type LodgingOption = 'hotels' | 'airbnb' | 'campgrounds' | 'free-camping' | 'friends' | 'no-lodging';
 
 export interface TripWizardData {
