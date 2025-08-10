@@ -109,18 +109,18 @@ export const LODGING_OPTIONS = [
 ];
 
 export const INTENTION_OPTIONS = [
-  { value: 'nature', label: 'Nature & Outdoors', icon: '🌲' },
-  { value: 'scenic-drives', label: 'Scenic Drives', icon: '🛣️' },
-  { value: 'foodie', label: 'Food & Dining', icon: '🍽️' },
-  { value: 'hiking', label: 'Hiking & Trails', icon: '🥾' },
-  { value: 'history', label: 'History & Culture', icon: '🏛️' },
-  { value: 'relaxing', label: 'Relaxing & Wellness', icon: '🧘' },
-  { value: 'urban-exploring', label: 'Urban Exploring', icon: '🏙️' },
-  { value: 'adventure', label: 'Adventure Sports', icon: '🏔️' },
-  { value: 'photography', label: 'Photography', icon: '📸' },
-  { value: 'nightlife', label: 'Nightlife & Entertainment', icon: '🎭' },
-  { value: 'shopping', label: 'Shopping', icon: '🛍️' },
-  { value: 'beaches', label: 'Beaches & Coast', icon: '🏖️' }
+  { value: 'nature', label: 'Nature & Outdoors', icon: 'trees' },
+  { value: 'scenic-drives', label: 'Scenic Drives', icon: 'car' },
+  { value: 'foodie', label: 'Food & Dining', icon: 'utensils' },
+  { value: 'hiking', label: 'Hiking & Trails', icon: 'footprints' },
+  { value: 'history', label: 'History & Culture', icon: 'landmark' },
+  { value: 'relaxing', label: 'Relaxing & Wellness', icon: 'heart' },
+  { value: 'urban-exploring', label: 'Urban Exploring', icon: 'buildings' },
+  { value: 'adventure', label: 'Adventure Sports', icon: 'mountain' },
+  { value: 'photography', label: 'Photography', icon: 'camera' },
+  { value: 'nightlife', label: 'Nightlife & Entertainment', icon: 'music' },
+  { value: 'shopping', label: 'Shopping', icon: 'shopping-bag' },
+  { value: 'beaches', label: 'Beaches & Coast', icon: 'waves' }
 ];
 
 export const getInitialWizardData = (): TripWizardData => ({

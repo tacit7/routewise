@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Loader2, Map as MapIcon, Calendar, List, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Loader2, Map as MapIcon, Calendar, List, Eye, EyeOff, MapPin, Star, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import type { POI } from "@/types/api";
@@ -280,24 +280,24 @@ export default function PlacesView({
   });
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: "var(--bg)" }}>
+    <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="bg-surface shadow-sm border-b border-border flex-shrink-0">
+      <header className="bg-card shadow-sm border-b border-border flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-3">
             <Button
               variant="ghost"
               onClick={() => setLocation(backUrl)}
-              className="flex items-center text-slate-600 hover:text-primary"
+              className="flex items-center text-muted-foreground hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
             <div className="flex items-center gap-2 sm:gap-4">
-              <div className="text-sm text-slate-600 hidden sm:block">
+              <div className="text-sm text-muted-foreground hidden sm:block">
                 {displayHeaderTitle} • {uniquePois.length} places
               </div>
-              <div className="text-xs text-slate-600 sm:hidden">{uniquePois.length} places</div>
+              <div className="text-xs text-muted-foreground sm:hidden">{uniquePois.length} places</div>
 
               {/* Mobile-optimized toggle button */}
               <button
@@ -310,8 +310,8 @@ export default function PlacesView({
                   ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
                   ${
                     isMapVisible
-                      ? "bg-slate-600 hover:bg-slate-700 text-white"
-                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                      ? "bg-muted hover:bg-muted/80 text-muted-foreground"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
                   }
                 `}
                 aria-label={isMapVisible ? "Hide map, show POI list" : "Show map"}
@@ -344,10 +344,10 @@ export default function PlacesView({
           // Mobile map view (full screen)
           <div className="flex-1">
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center bg-surface-alt">
+              <div className="w-full h-full flex items-center justify-center bg-muted">
                 <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
-                  <p className="text-sm text-slate-600">Loading map and places...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">Loading map and places...</p>
                 </div>
               </div>
             ) : (
@@ -369,28 +369,28 @@ export default function PlacesView({
           // Mobile POI list view (full screen)
           <div className="flex-1 flex flex-col">
             {/* Category Filter for POI-only view */}
-            <div className="bg-surface border-b border-border flex-shrink-0">
+            <div className="bg-card border-b border-border flex-shrink-0">
               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
             </div>
 
             {/* POI Grid with Mobile Optimization */}
-            <div className="flex-1 overflow-y-auto" style={{ backgroundColor: "var(--bg)" }}>
-              <div className="p-3 bg-slate-50">
+            <div className="flex-1 overflow-y-auto bg-background">
+              <div className="p-3 bg-muted/30">
                 <div className="max-w-7xl mx-auto">
                   {/* Loading State */}
                   {isLoading && (
                     <div className="p-8 text-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
-                      <p className="text-sm text-slate-600">Loading places...</p>
+                      <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">Loading places...</p>
                     </div>
                   )}
 
                   {/* Empty State */}
                   {!isLoading && filteredPois.length === 0 && (
                     <div className="p-8 text-center">
-                      <div className="text-4xl mb-3">🗺️</div>
-                      <h3 className="text-lg font-semibold text-slate-700 mb-2">No places found</h3>
-                      <p className="text-sm text-slate-600">
+                      <MapPin className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No places found</h3>
+                      <p className="text-sm text-muted-foreground">
                         Try adjusting your filters or explore a different location.
                       </p>
                     </div>
@@ -425,7 +425,7 @@ export default function PlacesView({
               <div className="p-3 border-t border-border bg-surface flex-shrink-0">
                 <Button
                   onClick={() => setLocation("/itinerary")}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white min-h-[48px] touch-manipulation"
+                  className="w-full bg-primary hover:bg-primary/90 text-white min-h-[48px] touch-manipulation"
                   size="lg"
                 >
                   <Calendar className="h-5 w-5 mr-2" />
@@ -444,7 +444,6 @@ export default function PlacesView({
             minSize={20}
             maxSize={50}
             className="bg-card"
-            style={{ backgroundColor: "var(--card)" }}
             onResize={handlePanelResize}
           >
             <div className="flex flex-col h-full">
@@ -453,42 +452,19 @@ export default function PlacesView({
 
               {/* Sidebar Header */}
               <div
-                className="p-3 border-b"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--surface-alt)",
-                }}
+                className="p-3 border-b border-border bg-muted"
               >
-                <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+                <h2 className="text-lg font-semibold text-foreground">
                   {displaySidebarTitle}
                 </h2>
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => setSelectedCity("all")}
-                    className="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer"
-                    style={
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
                       selectedCity === "all"
-                        ? {
-                            backgroundColor: "var(--primary)",
-                            color: "var(--primary-foreground)",
-                          }
-                        : {
-                            backgroundColor: "var(--muted)",
-                            color: "var(--text-muted)",
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (selectedCity !== "all") {
-                        e.currentTarget.style.backgroundColor = "var(--primary-50)";
-                        e.currentTarget.style.color = "var(--primary)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedCity !== "all") {
-                        e.currentTarget.style.backgroundColor = "var(--muted)";
-                        e.currentTarget.style.color = "var(--text-muted)";
-                      }
-                    }}
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                    }`}
                   >
                     All ({uniquePois.length})
                   </button>
@@ -499,8 +475,8 @@ export default function PlacesView({
               <div className="flex-1 overflow-y-auto">
                 {isLoading && (
                   <div className="p-4 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" style={{ color: "var(--primary)" }} />
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
+                    <p className="text-xs text-muted-foreground">
                       Loading places...
                     </p>
                   </div>
@@ -508,11 +484,11 @@ export default function PlacesView({
 
                 {!isLoading && uniquePois.length === 0 && (
                   <div className="p-4 text-center">
-                    <div className="text-2xl mb-2">🗺️</div>
-                    <h3 className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>
+                    <MapPin className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold mb-1 text-foreground">
                       No places found
                     </h3>
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    <p className="text-xs text-muted-foreground">
                       Try a different {showRouting ? "route" : "location"}.
                     </p>
                   </div>
@@ -521,11 +497,7 @@ export default function PlacesView({
                 {uniquePois.length > 0 && (
                   <div
                     key={`poi-container-${panelKey}`}
-                    className={`p-2 ${isFlexLayout ? "flex flex-wrap gap-2" : "space-y-2"}`}
-                    style={{
-                      maxWidth: '100%',
-                      overflow: 'hidden'
-                    }}
+                    className={`p-2 max-w-full overflow-hidden ${isFlexLayout ? "flex flex-wrap gap-2" : "space-y-2"}`}
                   >
                     {filteredPois.map((poi, index) => (
                       cardFlexBasis === '100%' ? (
@@ -534,7 +506,7 @@ export default function PlacesView({
                           key={poi.placeId || poi.id || `poi-list-${index}`}
                           onMouseEnter={() => onPoiHover(poi)}
                           onMouseLeave={() => onPoiHover(null)}
-                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border bg-surface hover:border-border hover:shadow-sm transition-all cursor-pointer"
+                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer"
                         >
                           {/* Thumbnail - 64px */}
                           <img
@@ -546,18 +518,21 @@ export default function PlacesView({
                           {/* Main content - 1fr */}
                           <div className="min-w-0">
                             <h4 className="truncate font-medium text-sm">{poi.name}</h4>
-                            <p className="text-xs text-gray-500 truncate">{poi.description || poi.address}</p>
+                            <p className="text-xs text-muted-foreground truncate">{poi.description || poi.address}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-yellow-500">⭐ {poi.rating}</span>
+                              <div className="flex items-center gap-1 text-xs text-yellow-500">
+                                <Star className="h-3 w-3 fill-current" />
+                                {poi.rating}
+                              </div>
                               {poi.timeFromStart && (
-                                <span className="text-xs text-gray-500">{poi.timeFromStart}</span>
+                                <span className="text-xs text-muted-foreground">{poi.timeFromStart}</span>
                               )}
                             </div>
                           </div>
 
                           {/* Action/Tag - auto */}
                           <div className="flex flex-col items-end gap-1">
-                            <div className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
+                            <div className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
                               {poi.category}
                             </div>
                             <button
@@ -569,13 +544,18 @@ export default function PlacesView({
                               disabled={isInTrip(poi) || isAddingToTrip}
                               className={`text-[10px] px-2 py-1 rounded transition-colors ${
                                 isInTrip(poi)
-                                  ? "bg-purple-100 text-purple-700 cursor-not-allowed"
+                                  ? "bg-primary/10 text-primary cursor-not-allowed"
                                   : isAddingToTrip
-                                  ? "bg-purple-400 text-white cursor-not-allowed"
-                                  : "bg-purple-600 hover:bg-purple-700 text-white"
+                                  ? "bg-primary/60 text-white cursor-not-allowed"
+                                  : "bg-primary hover:bg-primary/90 text-white"
                               }`}
                             >
-                              {isInTrip(poi) ? "✓ In Trip" : isAddingToTrip ? "Adding..." : "+ Trip"}
+                              {isInTrip(poi) ? (
+                                <div className="flex items-center gap-1">
+                                  <Check className="h-3 w-3" />
+                                  In Trip
+                                </div>
+                              ) : isAddingToTrip ? "Adding..." : "+ Trip"}
                             </button>
                           </div>
                         </div>
@@ -585,12 +565,8 @@ export default function PlacesView({
                           key={poi.placeId || poi.id || `poi-card-${index}`}
                           onMouseEnter={() => onPoiHover(poi)}
                           onMouseLeave={() => onPoiHover(null)}
-                          className="transition-all"
-                          style={{
-                            flexBasis: cardFlexBasis,
-                            minWidth: '200px',
-                            maxWidth: '100%'
-                          }}
+                          className="transition-all min-w-[200px] max-w-full"
+                          style={{ flexBasis: cardFlexBasis }}
                         >
                           <PoiCard
                             poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
@@ -608,26 +584,12 @@ export default function PlacesView({
               {/* Itinerary Button */}
               {tripPlaces.length > 0 && (
                 <div
-                  className="p-3 border-t"
-                  style={{
-                    borderColor: "var(--border)",
-                    backgroundColor: "var(--surface-alt)",
-                  }}
+                  className="p-3 border-t border-border bg-muted"
                 >
                   <Button
                     onClick={() => setLocation("/itinerary")}
-                    className="w-full transition-all"
+                    className="w-full transition-all bg-primary text-primary-foreground hover:bg-primary/90"
                     size="sm"
-                    style={{
-                      backgroundColor: "var(--primary)",
-                      color: "var(--primary-foreground)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "var(--primary-hover)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "var(--primary)";
-                    }}
                   >
                     <Calendar className="h-4 w-4 mr-2" />
                     Start Itinerary ({tripPlaces.length} places)
@@ -637,15 +599,15 @@ export default function PlacesView({
             </div>
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="transition-colors" style={{ backgroundColor: "var(--border)" }} />
+          <ResizableHandle withHandle className="transition-colors bg-border" />
 
           {/* Map Panel */}
           <ResizablePanel defaultSize={70}>
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center bg-surface-alt">
+              <div className="w-full h-full flex items-center justify-center bg-muted">
                 <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
-                  <p className="text-sm text-slate-600">Loading map and places...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">Loading map and places...</p>
                 </div>
               </div>
             ) : (

@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ leftContent, centerContent, rightContent }: HeaderProps) {
   return (
-    <div style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }} className="border-b">
+    <div className="bg-card text-card-foreground border-b border-border">
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Left section */}
         <div className="flex items-center gap-4">

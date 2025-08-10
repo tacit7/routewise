@@ -88,15 +88,15 @@ export default function LoginPage() {
           </Card>
 
           <div className="text-center">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               By signing in, you agree to our{' '}
-              <button className="underline hover:text-gray-700 transition-colors">
+              <Button variant="link" size="sm" className="h-auto p-0 text-xs underline">
                 Terms of Service
-              </button>{' '}
+              </Button>{' '}
               and{' '}
-              <button className="underline hover:text-gray-700 transition-colors">
+              <Button variant="link" size="sm" className="h-auto p-0 text-xs underline">
                 Privacy Policy
-              </button>
+              </Button>
             </p>
           </div>
         </div>

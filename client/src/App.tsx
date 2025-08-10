@@ -71,7 +71,8 @@ function AuthenticatedRouter() {
         <Route path="/place-results" component={PlaceResults} />
         <Route path="/itinerary" component={ItineraryPage} />
         <Route path="/interests-demo" component={InterestsDemo} />
-        <Route path="/kitchen-sink" component={KitchenSinkDemo} />
+        {/* Kitchen Sink - Development Only */}
+        {import.meta.env.DEV && <Route path="/kitchen-sink" component={KitchenSinkDemo} />}
         <Route path="/dashboard-test" component={DashboardTest} />
         <Route path="/auth/success" component={AuthSuccess} />
         <Route path="/auth/error" component={AuthError} />

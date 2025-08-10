@@ -250,7 +250,7 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="min-h-screen bg-background">
         <Header
           centerContent={
             <div className="flex items-center justify-center">
@@ -277,18 +277,18 @@ const Dashboard = () => {
           <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
             {/* Heading - Different if Explorer in progress */}
             {hasExplorerProgress ? (
-              <h1 className="text-4xl font-bold text-fg mb-8">Welcome back!</h1>
+              <h1 className="text-4xl font-bold text-foreground mb-8">Welcome back!</h1>
             ) : (
-              <h1 className="text-4xl font-bold text-fg mb-8">Let's get your next adventure started!</h1>
+              <h1 className="text-4xl font-bold text-foreground mb-8">Let's get your next adventure started!</h1>
             )}
 
             {/* Subtext - Different if Explorer in progress */}
             {hasExplorerProgress ? (
-              <p className="text-xl text-gray-600 mb-12">
+              <p className="text-xl text-muted-foreground mb-12">
                 Continue your exploration planning or start a new route.
               </p>
             ) : (
-              <p className="text-xl text-gray-600 mb-12">
+              <p className="text-xl text-muted-foreground mb-12">
                 You haven't planned any trips yet. Start your first adventure below.
               </p>
             )}
@@ -341,18 +341,18 @@ const Dashboard = () => {
                 {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
                   <section className="mt-16">
                     <div className="flex items-center justify-center mb-4">
-                      <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
+                      <div className="w-8 h-8 bg-destructive rounded-full flex items-center justify-center mr-3">
                         <CheckCircle className="w-5 h-5 text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
+                      <h2 className="text-2xl font-bold text-foreground">Personalize Your Trip Suggestions</h2>
                     </div>
-                    <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                    <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                       Tell us what you're into to get tailored recommendations.
                     </p>
 
                     <Button
                       onClick={handleCustomizeInterests}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                      className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium"
                     >
                       Customize Interests
                     </Button>
@@ -367,21 +367,21 @@ const Dashboard = () => {
 
           {/* Suggested Trips Section - Always show */}
           <section className="text-center flex-shrink-0">
-            <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-8">Suggested Trips</h2>
 
             {hasTripsError ? (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-fg mb-2">Failed to load suggestions</h3>
-                  <p className="text-gray-600 mb-6">
+                  <h3 className="text-lg font-medium text-foreground mb-2">Failed to load suggestions</h3>
+                  <p className="text-muted-foreground mb-6">
                     We couldn't load your personalized trip suggestions. Please try again later.
                   </p>
                   <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                     Try Again
                   </Button>
                   {!hasExplorerProgress && (
-                    <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
                       <Settings className="w-4 h-4 mr-2" />
                       Update Interests
                     </Button>
@@ -412,16 +412,16 @@ const Dashboard = () => {
                       <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
                       {/* Render route info for route-based trips, duration/distance for suggestions */}
                       {trip.start_city && trip.end_city ? (
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           {trip.start_city} to {trip.end_city}
                         </p>
                       ) : (trip.duration || trip.distance) ? (
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
                         </p>
                       ) : null}
                       <p
-                        className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"
+                        className="text-sm text-foreground mb-4 overflow-hidden flex-grow"
                         style={{
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
@@ -432,7 +432,7 @@ const Dashboard = () => {
                       </p>
                       <Button
                         onClick={() => handleStartTrip(trip)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
+                        className="w-full bg-primary hover:bg-primary/90 text-white mt-auto"
                       >
                         Start This Trip
                       </Button>
@@ -444,10 +444,10 @@ const Dashboard = () => {
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
-                  <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">No trips available</h3>
+                  <p className="text-muted-foreground mb-6">Customize your interests to get personalized trip suggestions.</p>
                   {!hasExplorerProgress && (
-                    <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
                       <Settings className="w-4 h-4 mr-2" />
                       Set Your Interests
                     </Button>
@@ -462,7 +462,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <Header
         centerContent={
@@ -528,18 +528,18 @@ const Dashboard = () => {
           {!hasExplorerProgress && (shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
             <section className="mb-12">
               <div className="flex items-center justify-center mb-4">
-                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-destructive rounded-full flex items-center justify-center mr-3">
                   <CheckCircle className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-fg">Personalize Your Trip Suggestions</h2>
+                <h2 className="text-2xl font-bold text-foreground">Personalize Your Trip Suggestions</h2>
               </div>
-              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 Tell us what you're into to get tailored recommendations.
               </p>
 
               <Button
                 onClick={handleCustomizeInterests}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium"
               >
                 Customize Interests
               </Button>
@@ -552,21 +552,21 @@ const Dashboard = () => {
 
         {/* Suggested Trips Section - Always show */}
         <section className="text-center flex-shrink-0">
-          <h2 className="text-2xl font-bold text-fg mb-8">Suggested Trips</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-8">Suggested Trips</h2>
 
           {hasTripsError ? (
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-fg mb-2">Failed to load suggestions</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-lg font-medium text-foreground mb-2">Failed to load suggestions</h3>
+                <p className="text-muted-foreground mb-6">
                   We couldn't load your personalized trip suggestions. Please try again later.
                 </p>
                 <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
                   Try Again
                 </Button>
                 {!hasExplorerProgress && (
-                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
                     <Settings className="w-4 h-4 mr-2" />
                     Update Interests
                   </Button>
@@ -597,16 +597,16 @@ const Dashboard = () => {
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
                     {/* Render route info for route-based trips, duration/distance for suggestions */}
                     {trip.start_city && trip.end_city ? (
-                      <p className="text-sm text-gray-600 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {trip.start_city} to {trip.end_city}
                       </p>
                     ) : (trip.duration || trip.distance) ? (
-                      <p className="text-sm text-gray-600 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
                       </p>
                     ) : null}
                     <p
-                      className="text-sm text-gray-700 mb-4 overflow-hidden flex-grow"
+                      className="text-sm text-foreground mb-4 overflow-hidden flex-grow"
                       style={{
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
@@ -617,7 +617,7 @@ const Dashboard = () => {
                     </p>
                     <Button
                       onClick={() => handleStartTrip(trip)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
+                      className="w-full bg-primary hover:bg-primary/90 text-white mt-auto"
                     >
                       Start This Trip
                     </Button>
@@ -629,10 +629,10 @@ const Dashboard = () => {
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-fg mb-2">No trips available</h3>
-                <p className="text-gray-600 mb-6">Customize your interests to get personalized trip suggestions.</p>
+                <h3 className="text-lg font-medium text-foreground mb-2">No trips available</h3>
+                <p className="text-muted-foreground mb-6">Customize your interests to get personalized trip suggestions.</p>
                 {!hasExplorerProgress && (
-                  <Button onClick={handleCustomizeInterests} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
                     <Settings className="w-4 h-4 mr-2" />
                     Set Your Interests
                   </Button>
