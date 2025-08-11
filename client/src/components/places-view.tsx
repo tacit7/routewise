@@ -225,17 +225,26 @@ export default function PlacesView({
     return categoryMatch && cityMatch && tripMatch;
   });
 
-  // Always use vertical card layout - force 100% width
-  const cardFlexBasis = '100%';
-  const isFlexLayout = false;
+  // Dynamic grid calculation based on panel width
+  const calculateGridColumns = () => {
+    const panelWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40; // Account for padding
+    
+    if (panelWidth < 300) return 1;      // Narrow: 1 column
+    if (panelWidth < 500) return 2;      // Medium: 2 columns  
+    if (panelWidth < 700) return 3;      // Wide: 3 columns
+    return Math.min(4, Math.floor(panelWidth / 200)); // Very wide: 4+ columns, but cap at reasonable size
+  };
+  
+  const gridColumns = calculateGridColumns();
+  const isMultiColumn = gridColumns > 1;
 
   // Debug panel sizing
   console.log('Panel Debug:', {
     sidebarSizePercent,
     windowWidth: window.innerWidth,
     calculatedWidth: (window.innerWidth * (sidebarSizePercent / 100)) - 40,
-    cardFlexBasis,
-    isFlexLayout
+    gridColumns,
+    isMultiColumn
   });
 
   const handlePanelResize = (size: number) => {
@@ -514,10 +523,17 @@ export default function PlacesView({
                 {uniquePois.length > 0 && (
                   <div
                     key={`poi-container-${panelKey}`}
-                    className={`p-2 max-w-full overflow-hidden ${isFlexLayout ? "flex flex-wrap gap-2" : "space-y-2"}`}
+                    className={`p-2 max-w-full overflow-hidden transition-all duration-300 ${
+                      isMultiColumn 
+                        ? "grid gap-2" 
+                        : "space-y-2"
+                    }`}
+                    style={isMultiColumn ? { 
+                      gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` 
+                    } : {}}
                   >
                     {filteredPois.map((poi, index) => (
-                      cardFlexBasis === '100%' ? (
+                      !isMultiColumn ? (
                         // Vertical card layout - image on top
                         <div
                           key={poi.placeId || poi.id || `poi-list-${index}`}
@@ -605,20 +621,77 @@ export default function PlacesView({
                           </div>
                         </div>
                       ) : (
-                        // Multi-column card layout for wider panels
+                        // Multi-column compact card layout
                         <div
                           key={poi.placeId || poi.id || `poi-card-${index}`}
                           onMouseEnter={() => onPoiHover(poi)}
                           onMouseLeave={() => onPoiHover(null)}
-                          className="transition-all min-w-[200px] max-w-full"
-                          style={{ flexBasis: cardFlexBasis }}
+                          className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-2"
                         >
-                          <PoiCard
-                            poi={{ ...poi, scheduledTime: scheduledTimes.get(poi.id) }}
-                            variant="grid"
-                            showTimeScheduler={true}
-                            onTimeChange={handleTimeChange}
-                          />
+                          {/* Compact image */}
+                          <div className="relative">
+                            <img
+                              src={poi.imageUrl || '/placeholder-poi.jpg'}
+                              alt={poi.name}
+                              className={`w-full object-cover rounded ${
+                                gridColumns >= 3 ? 'h-20' : 'h-24'
+                              }`}
+                            />
+                            {/* Category badge */}
+                            <div className="absolute top-1 left-1">
+                              <div className="text-xs px-1.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
+                                {poi.category.charAt(0).toUpperCase() + poi.category.slice(1).replace('_', ' ')}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Compact content */}
+                          <div className="mt-2">
+                            {/* Name - shorter for grid */}
+                            <h4 className={`font-medium line-clamp-1 ${
+                              gridColumns >= 3 ? 'text-xs' : 'text-sm'
+                            }`}>
+                              {poi.name}
+                            </h4>
+
+                            {/* Rating and trip button row */}
+                            <div className="flex items-center justify-between mt-1.5">
+                              <div className="flex items-center gap-1 text-warning text-xs">
+                                <Star className="h-3 w-3 fill-current" />
+                                <span className="font-medium">{poi.rating}</span>
+                              </div>
+
+                              {/* Compact trip button */}
+                              <button
+                                onClick={() => {
+                                  if (isInTrip(poi)) {
+                                    removeFromTrip(poi.id);
+                                  } else {
+                                    addToTrip(poi);
+                                  }
+                                }}
+                                disabled={isAddingToTrip || isRemovingFromTrip}
+                                className={`text-xs px-2 py-1 rounded transition-colors focus-ring ${
+                                  isInTrip(poi)
+                                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                                    : isAddingToTrip || isRemovingFromTrip
+                                    ? "bg-primary/60 text-primary-foreground cursor-not-allowed"
+                                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                                }`}
+                                aria-label={
+                                  isInTrip(poi) 
+                                    ? `Remove ${poi.name} from trip` 
+                                    : isAddingToTrip || isRemovingFromTrip
+                                    ? "Processing request..."
+                                    : `Add ${poi.name} to trip`
+                                }
+                              >
+                                {isInTrip(poi) ? (
+                                  <Check className="h-3 w-3" aria-hidden="true" />
+                                ) : isAddingToTrip || isRemovingFromTrip ? "..." : "+"}
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       )
                     ))}

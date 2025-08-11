@@ -18,8 +18,18 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
       throw new Error(`Fetch failed: ${response.status} ${errorText}`);
     }
 
-    const { success, data } = await response.json();
+    const responseData = await response.json();
+    console.log('🔍 Explore Results API Response:', responseData);
+    
+    const { success, data } = responseData;
     if (!success || !data) throw new Error("Invalid response format");
+
+    console.log('📊 Explore POI Data:', {
+      poisCount: data.pois?.length || 0,
+      firstPoi: data.pois?.[0] || 'none',
+      hasApiKey: !!data.maps_api_key,
+      meta: data.meta
+    });
 
     return {
       pois: data.pois || [],
