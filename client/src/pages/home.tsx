@@ -1,5 +1,6 @@
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section";
+import HiddenGems from "@/components/hidden-gems";
 import PoiSection from "@/components/poi-section";
 import FeaturesSection from "@/components/features-section";
 import Footer from "@/components/footer";
@@ -115,6 +116,9 @@ export default function Home() {
         }
       />
       <HeroSection />
+      
+      {/* Hidden Gems Section */}
+      <HiddenGems />
       
       {/* Saved Routes/Trips Section */}
       {(trips.length > 0 || legacyRoutes.length > 0) && (

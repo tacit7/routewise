@@ -23,6 +23,7 @@ import PlacesExplorer from "@/pages/places-explorer";
 import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
 import KitchenSinkDemo from "@/pages/kitchen-sink";
+import SuggestedTrip from "@/pages/suggested-trip";
 import NotFound from "@/pages/not-found";
 import TripIndicator from "@/components/trip-indicator";
 import AuthSuccess from "@/pages/auth-success";
@@ -71,6 +72,9 @@ function AuthenticatedRouter() {
         <Route path="/place-results" component={PlaceResults} />
         <Route path="/itinerary" component={ItineraryPage} />
         <Route path="/interests-demo" component={InterestsDemo} />
+        {/* Suggested Trip Pages */}
+        <Route path="/suggested-trip/:tripSlug" component={SuggestedTrip} />
+        <Route path="/suggested-trip" component={SuggestedTrip} />
         {/* Kitchen Sink - Development Only */}
         {import.meta.env.DEV && <Route path="/kitchen-sink" component={KitchenSinkDemo} />}
         <Route path="/dashboard-test" component={DashboardTest} />

@@ -9,9 +9,16 @@ import Header from "@/components/header";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
+import TripOfTheWeek from "@/components/trip-of-the-week";
+import SeasonalTravel from "@/components/seasonal-travel";
+import DashboardHero from "@/components/dashboard-hero";
+import FeaturedSeasonalTrips from "@/components/featured-seasonal-trips";
+import NearbyTrendingPOIs from "@/components/nearby-trending-pois";
+import PersonalRecommendations from "@/components/personal-recommendations";
+import QuickTools from "@/components/quick-tools";
 
 // Function to get saved Explorer Wizard data
 const getExplorerWizardData = () => {
@@ -41,7 +48,7 @@ const getExplorerWizardData = () => {
 };
 
 // Component to display Explorer Wizard progress card
-const ExplorerWizardCard = ({ onContinue }: { onContinue: () => void }) => {
+const ExplorerWizardCard = ({ onContinue, onDelete }: { onContinue: () => void; onDelete?: () => void }) => {
   const [savedData, setSavedData] = useState<any>(null);
 
   useEffect(() => {
@@ -78,28 +85,63 @@ const ExplorerWizardCard = ({ onContinue }: { onContinue: () => void }) => {
   };
 
   return (
-    <Card className="mb-6 border-blue-200 bg-blue-50/30">
+    <Card className="mb-6 border-primary/20 bg-primary/5 overflow-hidden max-w-2xl mx-auto">
+      {/* Location image header - Always show when there's saved data */}
+      <div className="h-24 relative overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=200&fit=crop&crop=center"
+          alt={savedData.startLocation ? `${savedData.startLocation.main_text} landscape` : 'Trip exploration'}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute bottom-2 left-4 text-white">
+          <div className="text-xs opacity-90">Exploring</div>
+          <div className="font-semibold">
+            {savedData.startLocation ? savedData.startLocation.main_text : 'Your Adventure'}
+          </div>
+        </div>
+        {/* Delete button */}
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+            aria-label="Delete exploration progress"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+      
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Search className="w-5 h-5 text-blue-600" />
-            <span>Explorer Wizard in Progress</span>
+            <Search className="w-4 h-4 text-primary" />
+            <span className="text-sm">Places Explorer in Progress</span>
           </div>
-          <Button onClick={onContinue} size="sm">
-            <Play className="w-4 h-4 mr-1" />
-            Continue
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Trip type badge */}
+            <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+              Exploration
+            </Badge>
+            <Button onClick={onContinue} size="sm" className="text-xs px-3 py-1">
+              <Play className="w-3 h-3 mr-1" />
+              Continue
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Location */}
-        {savedData.startLocation && (
-          <div className="flex items-center space-x-2 text-sm">
-            <MapPin className="w-4 h-4 text-slate-600" />
-            <span className="font-medium">Exploring:</span>
-            <span>{savedData.startLocation.main_text}</span>
+        {/* Progress and completion info */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4" />
+            <span>Last edited: Recently</span>
           </div>
-        )}
+          <div className="text-xs text-muted-foreground">
+            Step 3 of 7 • 43% complete
+          </div>
+        </div>
+
 
         {/* Dates */}
         {(savedData.startDate || savedData.flexibleDates) && (
@@ -203,6 +245,17 @@ const Dashboard = () => {
     setLocation("/places-explorer");
   };
 
+  const handleDeleteExplorer = () => {
+    // Clear the exploration progress
+    localStorage.removeItem('routewise-trip-wizard-draft');
+    toast({
+      title: "Exploration cleared",
+      description: "Your exploration progress has been deleted.",
+    });
+    // Force a page refresh to update the UI
+    window.location.reload();
+  };
+
   const handleHelpMePlan = () => {
     setLocation("/interests");
   };
@@ -224,17 +277,29 @@ const Dashboard = () => {
       );
       setLocation("/");
     } else {
-      // Suggestion-based trip: Navigate to places explorer with suggestion context
-      localStorage.setItem(
-        "suggestionContext",
-        JSON.stringify({
-          tripId: trip.id,
-          title: trip.title,
-          description: trip.description,
-          timestamp: Date.now(),
-        })
-      );
-      setLocation("/places-explorer");
+      // Check if this is one of our predefined suggested trips
+      const predefinedTripSlugs = ['pacific-coast-highway', 'great-lakes', 'san-francisco', 'yellowstone', 'grand-canyon'];
+      const tripSlug = trip.title?.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-');
+        
+      if (predefinedTripSlugs.includes(tripSlug)) {
+        // Navigate to the specific suggested trip page
+        setLocation(`/suggested-trip/${tripSlug}`);
+      } else {
+        // Fallback: Navigate to places explorer with suggestion context
+        localStorage.setItem(
+          "suggestionContext",
+          JSON.stringify({
+            tripId: trip.id,
+            title: trip.title,
+            description: trip.description,
+            timestamp: Date.now(),
+          })
+        );
+        setLocation("/places-explorer");
+      }
     }
   };
 
@@ -252,19 +317,10 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header
-          centerContent={
-            <div className="flex items-center justify-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                Dashboard
-              </h1>
-            </div>
-          }
+          centerContent={null}
           rightContent={
             user && (
-              <div className="flex items-center gap-2 sm:gap-4">
-                <span className="hidden sm:inline-block text-sm text-muted-foreground">
-                  Welcome, {user.full_name || user.username || user.email}
-                </span>
+              <div className="flex items-center gap-2">
                 <UserMenu className="hidden md:block" />
                 <MobileMenu />
               </div>
@@ -272,7 +328,15 @@ const Dashboard = () => {
           }
         />
 
+        {/* Dashboard Hero Section - Full Width */}
+        <DashboardHero />
+
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
+          {/* Explorer Wizard Progress Card - Always show FIRST when data exists */}
+          <div className="mb-8">
+            <ExplorerWizardCard onContinue={handleContinueExplorer} onDelete={handleDeleteExplorer} />
+          </div>
+
           {/* Empty State Hero Section */}
           <div className="text-center max-w-2xl mx-auto mb-16 flex-shrink-0">
             {/* Heading - Different if Explorer in progress */}
@@ -312,11 +376,6 @@ const Dashboard = () => {
                 <Search className="w-6 h-6 mr-3" />
                 Explore Places
               </Button>
-            </div>
-
-            {/* Explorer Wizard Progress Card - Always show when data exists */}
-            <div className="mt-8">
-              <ExplorerWizardCard onContinue={handleContinueExplorer} />
             </div>
 
             {/* Only show additional content if NO Explorer progress */}
@@ -362,6 +421,24 @@ const Dashboard = () => {
             )}
           </div>
 
+          {/* Featured Seasonal Trips Section */}
+          <FeaturedSeasonalTrips />
+          
+          {/* Nearby/Trending POIs Section */}
+          <NearbyTrendingPOIs />
+          
+          {/* Personal Recommendations Section */}
+          <PersonalRecommendations />
+          
+          {/* Interactive Quick Tools */}
+          <QuickTools />
+          
+          {/* Trip of the Week Section */}
+          <TripOfTheWeek />
+          
+          {/* Seasonal Travel Section */}
+          <SeasonalTravel />
+
           {/* Spacer to push Suggested Trips to bottom */}
           <div className="flex-grow"></div>
 
@@ -406,7 +483,13 @@ const Dashboard = () => {
                 {suggestedTrips.map((trip) => (
                   <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                     <div className="relative h-48">
-                      <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover" />
+                      <img 
+                        src={trip.image_url && !trip.image_url.includes('logo.svg') 
+                          ? trip.image_url 
+                          : `https://images.unsplash.com/photo-${Math.abs(trip.id) % 2 === 0 ? '1469474968133-88c9c0ceadeb' : '1539635278303-dd5c92632f4d'}?w=400&h=300&fit=crop&crop=center`}
+                        alt={trip.title} 
+                        className="w-full h-full object-cover" 
+                      />
                     </div>
                     <CardContent className="p-4 flex flex-col flex-grow">
                       <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
@@ -430,12 +513,33 @@ const Dashboard = () => {
                       >
                         {trip.description}
                       </p>
-                      <Button
-                        onClick={() => handleStartTrip(trip)}
-                        className="w-full bg-primary hover:bg-primary/90 text-white mt-auto"
-                      >
-                        Start This Trip
-                      </Button>
+                      <div className="flex gap-2 mt-auto">
+                        <Button
+                          onClick={() => {
+                            const predefinedTripSlugs = ['pacific-coast-highway', 'great-lakes', 'san-francisco', 'yellowstone', 'grand-canyon'];
+                            const tripSlug = trip.title?.toLowerCase()
+                              .replace(/\s+/g, '-')
+                              .replace(/[^a-z0-9-]/g, '')
+                              .replace(/-+/g, '-');
+                            
+                            if (predefinedTripSlugs.includes(tripSlug)) {
+                              setLocation(`/suggested-trip/${tripSlug}`);
+                            } else {
+                              handleStartTrip(trip);
+                            }
+                          }}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => handleStartTrip(trip)}
+                          className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                        >
+                          Start Trip
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -465,19 +569,10 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <Header
-        centerContent={
-          <div className="flex items-center justify-center">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-              Dashboard
-            </h1>
-          </div>
-        }
+        centerContent={null}
         rightContent={
           user && (
-            <div className="flex items-center gap-2 sm:gap-4">
-              <span className="hidden sm:inline-block text-sm text-muted-foreground">
-                Welcome, {user.full_name || user.username || user.email}
-              </span>
+            <div className="flex items-center gap-2">
               <UserMenu className="hidden md:block" />
               <MobileMenu />
             </div>
@@ -485,8 +580,16 @@ const Dashboard = () => {
         }
       />
 
+      {/* Dashboard Hero Section - Full Width */}
+      <DashboardHero />
+
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-120px)] flex flex-col">
+        {/* Explorer Wizard Progress Card - Always show FIRST when data exists */}
+        <div className="mb-8">
+          <ExplorerWizardCard onContinue={handleContinueExplorer} />
+        </div>
+
         <div className="text-center flex-shrink-0">
           {/* Top Action Buttons - Clear hierarchy */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
@@ -519,11 +622,6 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Explorer Wizard Progress Card */}
-          <div className="mb-12">
-            <ExplorerWizardCard onContinue={handleContinueExplorer} />
-          </div>
-
           {/* Only show personalize section if NO Explorer progress */}
           {!hasExplorerProgress && (shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
             <section className="mb-12">
@@ -546,6 +644,24 @@ const Dashboard = () => {
             </section>
           )}
         </div>
+
+        {/* Featured Seasonal Trips Section */}
+        <FeaturedSeasonalTrips />
+        
+        {/* Nearby/Trending POIs Section */}
+        <NearbyTrendingPOIs />
+        
+        {/* Personal Recommendations Section */}
+        <PersonalRecommendations />
+        
+        {/* Interactive Quick Tools */}
+        <QuickTools />
+        
+        {/* Trip of the Week Section */}
+        <TripOfTheWeek />
+        
+        {/* Seasonal Travel Section */}
+        <SeasonalTravel />
 
         {/* Spacer to push Suggested Trips to bottom */}
         <div className="flex-grow"></div>
@@ -591,7 +707,13 @@ const Dashboard = () => {
               {suggestedTrips.map((trip) => (
                 <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <div className="relative h-48">
-                    <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover" />
+                    <img 
+                      src={trip.image_url && !trip.image_url.includes('logo.svg') 
+                        ? trip.image_url 
+                        : `https://images.unsplash.com/photo-${Math.abs(trip.id) % 2 === 0 ? '1469474968133-88c9c0ceadeb' : '1539635278303-dd5c92632f4d'}?w=400&h=300&fit=crop&crop=center`}
+                      alt={trip.title} 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
@@ -615,12 +737,33 @@ const Dashboard = () => {
                     >
                       {trip.description}
                     </p>
-                    <Button
-                      onClick={() => handleStartTrip(trip)}
-                      className="w-full bg-primary hover:bg-primary/90 text-white mt-auto"
-                    >
-                      Start This Trip
-                    </Button>
+                    <div className="flex gap-2 mt-auto">
+                      <Button
+                        onClick={() => {
+                          const predefinedTripSlugs = ['pacific-coast-highway', 'great-lakes', 'san-francisco', 'yellowstone', 'grand-canyon'];
+                          const tripSlug = trip.title?.toLowerCase()
+                            .replace(/\s+/g, '-')
+                            .replace(/[^a-z0-9-]/g, '')
+                            .replace(/-+/g, '-');
+                          
+                          if (predefinedTripSlugs.includes(tripSlug)) {
+                            setLocation(`/suggested-trip/${tripSlug}`);
+                          } else {
+                            handleStartTrip(trip);
+                          }
+                        }}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        View Details
+                      </Button>
+                      <Button
+                        onClick={() => handleStartTrip(trip)}
+                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                      >
+                        Start Trip
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
