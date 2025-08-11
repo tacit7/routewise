@@ -393,11 +393,6 @@ export function TripPlannerWizard({
             <div className="card-elevated rounded-lg border border-slate-200">
               {/* Progress Status Header */}
               <div className="p-4 border-b border-slate-100">
-                <div className="text-center mb-2">
-                  <h2 className="text-lg font-semibold text-slate-800">
-                    Step {currentStep} of {TOTAL_STEPS}
-                  </h2>
-                </div>
                 <Progress
                   value={(currentStep / TOTAL_STEPS) * 100}
                   className="h-2 bg-slate-200"

@@ -111,15 +111,14 @@ export function PlaceAutocomplete({
           variant="outline"
           {...getToggleButtonProps()}
           className={cn(
-            "w-full justify-between font-normal px-4 py-3 focus:ring-2 focus:border-transparent",
+            "w-full justify-between font-normal px-4 py-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             !inputValue && "text-muted-foreground",
             disabled && "cursor-not-allowed opacity-50"
           )}
           style={{ 
             borderColor: 'var(--primary)',
             backgroundColor: 'var(--muted)',
-            color: 'var(--foreground)',
-            '--tw-ring-color': 'var(--primary-hover)'
+            color: 'var(--foreground)'
           } as React.CSSProperties}
           disabled={disabled}
           aria-expanded={isOpen}

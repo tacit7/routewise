@@ -33,7 +33,9 @@ export default function RouteResults() {
           _t: Date.now().toString() // Cache bust in URL params, not query key
         });
 
-        console.log('🔍 Fetching route results with params:', params.toString());
+        const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+        
+        devLog('🔍 Fetching route results with params:', params.toString());
         const response = await fetch(`/api/route-results?${params}`, {
           cache: 'no-store', // Force no caching
           headers: {
@@ -42,22 +44,23 @@ export default function RouteResults() {
             'Expires': '0'
           }
         });
-        console.log('📊 Route Results API response status:', response.status);
+        devLog('📊 Route Results API response status:', response.status);
 
         if (!response.ok) {
+
           const errorText = await response.text();
-          console.error('❌ Route Results API error:', response.status, errorText);
+          devLog('❌ Route Results API error:', response.status, errorText);
           throw new Error(`Failed to fetch route results: ${response.status} ${errorText}`);
         }
 
         const routeResponse = await response.json();
-        console.log('✅ Route Results data received:', routeResponse);
+        devLog('✅ Route Results data received:', routeResponse);
         
         const { success, data, _cache } = routeResponse;
         if (!success || !data) throw new Error("Invalid response format");
 
         // AGGRESSIVE DEBUGGING - Check what cities the backend thinks we requested
-        console.log('🎯 Backend processed cities:', {
+        devLog('🎯 Backend processed cities:', {
           requested_start: routeData.startCity,
           requested_end: routeData.endCity,
           backend_meta: data.meta,
@@ -75,7 +78,8 @@ export default function RouteResults() {
           _cache: _cache || { status: 'unknown', backend: 'unknown', environment: 'unknown', timestamp: null },
         };
       } catch (error) {
-        console.error('Error fetching POIs:', error);
+        const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+        devLog('Error fetching POIs:', error);
         return {
           pois: [],
           route: null,
@@ -97,7 +101,8 @@ export default function RouteResults() {
   // Event handlers for the PlacesView component
 
   const handlePoiClick = (poi: POI | Poi) => {
-    console.log("POI clicked:", poi.name);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog("POI clicked:", poi.name);
   };
 
   const handlePoiSelect = (poiId: number, selected: boolean) => {
@@ -172,7 +177,8 @@ export default function RouteResults() {
   }, [routeResults?._cache, poisLoading, poisError, pois.length]);
 
   if (poisError) {
-    console.error('❌ Route Results Error:', poisError);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog('❌ Route Results Error:', poisError);
   }
 
   return (

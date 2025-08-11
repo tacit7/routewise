@@ -225,21 +225,11 @@ export default function PlaceResults() {
             <div className="flex flex-wrap gap-1 mt-2">
               <button
                 onClick={() => setSelectedCategory("all")}
-                className="px-2 py-1 rounded text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={selectedCategory === "all" 
-                  ? { backgroundColor: 'var(--primary)', color: 'white' }
-                  : { backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }
-                }
-                onMouseEnter={(e) => {
-                  if (selectedCategory !== "all") {
-                    e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedCategory !== "all") {
-                    e.currentTarget.style.backgroundColor = 'var(--surface-alt)';
-                  }
-                }}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  selectedCategory === "all" 
+                    ? "bg-primary text-white" 
+                    : "bg-muted text-muted-foreground hover:bg-primary/10"
+                }`}
               >
                 All ({uniquePois.length})
               </button>
@@ -249,21 +239,11 @@ export default function PlaceResults() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className="px-2 py-1 rounded text-xs font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                    style={selectedCategory === category
-                      ? { backgroundColor: 'var(--primary)', color: 'white' }
-                      : { backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }
-                    }
-                    onMouseEnter={(e) => {
-                      if (selectedCategory !== category) {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedCategory !== category) {
-                        e.currentTarget.style.backgroundColor = 'var(--surface-alt)';
-                      }
-                    }}
+                    className={`px-2 py-1 rounded text-xs font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                      selectedCategory === category
+                        ? "bg-primary text-white"
+                        : "bg-muted text-muted-foreground hover:bg-primary/10"
+                    }`}
                   >
                     {category} ({count})
                   </button>

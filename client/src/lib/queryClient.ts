@@ -104,8 +104,8 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: true, // FORCE enable refetch (fallback)
-      staleTime: 0, // FORCE disable cache (fallback)
+      refetchOnWindowFocus: import.meta.env.DEV ? true : false,
+      staleTime: import.meta.env.DEV ? 0 : Infinity,
       retry: (failureCount, error) => {
         // Enhanced retry logic with APIError support
         if (error instanceof APIError) {

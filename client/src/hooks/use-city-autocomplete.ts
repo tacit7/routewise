@@ -146,7 +146,7 @@ export function useCityAutocomplete(
       }
     },
     enabled: normalizedQuery.length >= 2, // Only fetch for queries 2+ chars
-    staleTime: 1000 * 60 * 30, // 30 minutes - cities don't change often
+    staleTime: 1000 * 60 * 30, // 30 minutes - cities don't change often  
     gcTime: 1000 * 60 * 60 * 2, // 2 hours garbage collection
     refetchOnWindowFocus: false, // Prevent unnecessary refetch
     refetchOnReconnect: true, // Refetch on network reconnect

@@ -1,5 +1,6 @@
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section";
+import HiddenGems from "@/components/hidden-gems";
 import PoiSection from "@/components/poi-section";
 import FeaturesSection from "@/components/features-section";
 import Footer from "@/components/footer";
@@ -93,28 +94,21 @@ export default function Home() {
                 Dashboard
               </Button>
             ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setLocation("/login")}
-                  className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-foreground"
-                >
-                  Login
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => window.location.href = '/auth/google'}
-                  className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground"
-                >
-                  Sign Up
-                </Button>
-              </>
+              <Button
+                size="sm"
+                onClick={() => window.location.href = '/auth/google'}
+                className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground"
+              >
+                Sign Up
+              </Button>
             )}
           </div>
         }
       />
       <HeroSection />
+      
+      {/* Hidden Gems Section */}
+      <HiddenGems />
       
       {/* Saved Routes/Trips Section */}
       {(trips.length > 0 || legacyRoutes.length > 0) && (

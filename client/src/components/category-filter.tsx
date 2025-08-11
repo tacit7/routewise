@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   UtensilsCrossed, 
-  TreePine, 
   Bed, 
   Building, 
   Gamepad2,
-  MapPin,
-  ShoppingBag,
-  Car,
-  Heart,
-  MoreHorizontal 
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

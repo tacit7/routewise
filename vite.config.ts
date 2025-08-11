@@ -6,20 +6,22 @@ import dotenv from "dotenv";
 // Load environment variables from .env file
 dotenv.config();
 
-// Log environment variables to terminal on startup
-console.log('\n🔧 ENVIRONMENT VARIABLES CHECK:');
-console.log('VITE_GOOGLE_CLIENT_ID:', process.env.VITE_GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
-console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
-console.log('VITE_API_URL:', process.env.VITE_API_URL || 'Not set (using default)');
-console.log('MSW_DISABLED:', process.env.MSW_DISABLED);
+// Environment checks are only shown in development
+if (process.env.NODE_ENV !== 'production') {
+  console.log('\n🔧 ENVIRONMENT VARIABLES CHECK:');
+  console.log('VITE_GOOGLE_CLIENT_ID:', process.env.VITE_GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
+  console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌');
+  console.log('VITE_API_URL:', process.env.VITE_API_URL || 'Not set (using default)');
+  console.log('MSW_DISABLED:', process.env.MSW_DISABLED);
 
-if (process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID) {
-  const clientId = process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
-  console.log('Google Client ID Preview:', `${clientId?.substring(0, 12)}...${clientId?.substring(clientId.length - 12)}`);
-} else {
-  console.log('❌ Google OAuth will fail - no client ID found');
+  if (process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID) {
+    const clientId = process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+    console.log('Google Client ID Preview:', `${clientId?.substring(0, 12)}...${clientId?.substring(clientId.length - 12)}`);
+  } else {
+    console.log('❌ Google OAuth will fail - no client ID found');
+  }
+  console.log('🔧 Environment check complete\n');
 }
-console.log('🔧 Environment check complete\n');
 
 export default defineConfig({
   plugins: [react()],
@@ -47,14 +49,16 @@ export default defineConfig({
         target: 'http://localhost:4001',
         changeOrigin: true,
         configure: (proxy, _options) => {
+          const devLog = (...args: any[]) => process.env.NODE_ENV !== 'production' && console.log(...args);
+          
           proxy.on('error', (err, _req, _res) => {
-            console.log('🔴 Proxy error:', err);
+            devLog('🔴 Proxy error:', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('🔄 Proxying request:', req.method, req.url, '→', proxyReq.path);
+            devLog('🔄 Proxying request:', req.method, req.url, '→', proxyReq.path);
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
+            devLog('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
           });
         },
       }

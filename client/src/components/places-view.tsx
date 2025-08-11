@@ -238,8 +238,10 @@ export default function PlacesView({
   const gridColumns = calculateGridColumns();
   const isMultiColumn = gridColumns > 1;
 
+  const devLog = (...a:any[]) => import.meta.env.DEV && console.log(...a);
+  
   // Debug panel sizing
-  console.log('Panel Debug:', {
+  devLog('Panel Debug:', {
     sidebarSizePercent,
     windowWidth: window.innerWidth,
     calculatedWidth: (window.innerWidth * (sidebarSizePercent / 100)) - 40,
@@ -248,7 +250,7 @@ export default function PlacesView({
   });
 
   const handlePanelResize = (size: number) => {
-    console.log('Panel resized to:', size, '%');
+    devLog('Panel resized to:', size, '%');
     setSidebarSizePercent(size);
     // Force re-render of grid layout
     setPanelKey(prev => prev + 1);
@@ -269,7 +271,7 @@ export default function PlacesView({
   const displaySidebarTitle = sidebarTitle || (showRouting ? "Places Along Route" : "Places to Explore");
 
   // Debug logging
-  console.log("PlacesView render:", {
+  devLog("PlacesView render:", {
     isMapVisible,
     showRouting,
     isMobile,
@@ -314,7 +316,7 @@ export default function PlacesView({
         rightContent={
           <button
             onClick={() => {
-              console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
+              devLog("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
               setIsMapVisible(!isMapVisible);
             }}
             className={`
@@ -346,7 +348,7 @@ export default function PlacesView({
 
       {/* Main Content */}
       {(() => {
-        console.log("Rendering decision:", { isMapVisible, showingPanel: isMapVisible, showingGrid: !isMapVisible });
+        devLog("Rendering decision:", { isMapVisible, showingPanel: isMapVisible, showingGrid: !isMapVisible });
         return null;
       })()}
       {isMobile ? (

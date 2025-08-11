@@ -36,7 +36,8 @@ export default function Header({
       await logout();
       setLocation('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+      devLog('Sign out error:', error);
     }
   };
 
@@ -50,22 +51,17 @@ export default function Header({
   };
 
   return (
-    <header className="bg-card text-card-foreground border-b border-border shadow-sm" role="banner">
-      <div className="px-4 sm:px-6 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-border bg-primary text-white" role="banner">
+      <div className="container flex h-16 items-center justify-between px-4 lg:px-6">
         {/* Left section - Logo and leftContent */}
         <div className="flex items-center gap-4">
           {showLogo && (
             <button
               onClick={() => setLocation('/')}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-ring"
+              className="hover:opacity-80 transition-opacity focus-ring text-white"
               aria-label="Go to home page"
             >
-              <img 
-                src="/logo.svg" 
-                alt="RouteWise" 
-                className="h-8 w-auto"
-              />
-              <span className="font-semibold text-lg text-primary hidden sm:inline">
+              <span className="font-semibold text-lg text-white">
                 RouteWise
               </span>
             </button>
@@ -76,26 +72,17 @@ export default function Header({
               {leftContent}
             </div>
           )}
-          
-          {/* Center content when no explicit left content */}
-          {!leftContent && centerContent && (
-            <div className="flex-1 ml-4">
-              {centerContent}
-            </div>
-          )}
         </div>
 
-        {/* Center section (when there is left content) */}
-        {leftContent && centerContent && (
-          <div className="flex-1 px-4">
-            <div className="flex justify-center">
-              {centerContent}
-            </div>
+        {/* Center section */}
+        {centerContent && (
+          <div className="flex justify-center px-2 min-w-0">
+            {centerContent}
           </div>
         )}
 
         {/* Right section - rightContent and user menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           {rightContent && (
             <div className="flex items-center gap-3">
               {rightContent}
@@ -109,7 +96,7 @@ export default function Header({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full p-0 hover:bg-muted focus-ring"
+                      className="relative h-10 w-10 rounded-full p-0 hover:bg-white/10 focus-ring text-white"
                       aria-label={`User menu for ${user?.name || 'User'}`}
                     >
                       <Avatar className="h-9 w-9">
@@ -125,74 +112,36 @@ export default function Header({
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="end" 
-                    className="w-56"
-                    style={{ 
-                      backgroundColor: 'var(--card)', 
-                      borderColor: 'var(--border)',
-                      color: 'var(--card-foreground)'
-                    }}
-                  >
-                    <DropdownMenuLabel 
-                      className="font-normal"
-                      style={{ color: 'var(--text)' }}
-                    >
+                  <DropdownMenuContent align="end" className="w-56 shadow-lg border-2 bg-white border-border">
+                    <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
                           {user?.name || 'User'}
                         </p>
-                        <p className="text-xs leading-none" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-xs leading-none text-muted-foreground">
                           {user?.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={() => setLocation('/profile')}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--text)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                        e.currentTarget.style.color = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--text)';
-                      }}
+                      className="cursor-pointer focus:bg-[var(--primary-hover)] focus:text-white"
                     >
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => setLocation('/settings')}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--text)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                        e.currentTarget.style.color = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--text)';
-                      }}
+                      className="cursor-pointer focus:bg-[var(--primary-hover)] focus:text-white"
                     >
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleSignOut}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--destructive)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--destructive-50)';
-                        e.currentTarget.style.color = 'var(--destructive)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--destructive)';
-                      }}
+                      className="cursor-pointer text-destructive focus:bg-[var(--primary-hover)] focus:text-white"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>

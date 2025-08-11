@@ -8,6 +8,7 @@ import Header from "@/components/header";
 import { useAuth } from "@/components/auth-context";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { TripWizardData, PlaceSuggestion, TransportationOption, LodgingOption, TripType } from "@/types/trip-wizard";
 import { WizardStep } from "@/components/trip-wizard/WizardStep";
 import { StepTransition } from "@/components/trip-wizard/components/progress/StepTransition";
@@ -58,10 +59,10 @@ const EXPLORATION_TRIP_TYPE_OPTIONS = [
   },
   {
     value: 'not-sure' as TripType,
-    title: "I'm not sure",
-    description: "I'll decide based on what works best for my exploration",
+    title: "I'm just exploring",
+    description: "I want to discover what's possible for my trip",
     icon: 'help-circle',
-    benefits: ['Keep options open', 'Flexible planning', 'Decide later']
+    benefits: ['Keep options open', 'Flexible planning', 'Discover possibilities']
   }
 ];
 
@@ -87,8 +88,8 @@ const EXPLORATION_TRANSPORTATION_OPTIONS = [
   },
   {
     value: 'not-sure' as TransportationOption,
-    title: 'Not sure yet',
-    description: "I'll decide based on what I find",
+    title: 'I\'m exploring options',
+    description: "I want to see what transportation works best",
     icon: 'help-circle'
   }
 ];
@@ -196,12 +197,9 @@ export default function PlacesExplorer() {
   }
 
   function handleExit() {
-    const hasProgress = currentStep > 1 || completedSteps.length > 0;
-    if (hasProgress) {
-      setShowExitConfirmation(true);
-    } else {
-      setLocation('/dashboard');
-    }
+    // Clear any existing draft and go directly to dashboard without saving
+    clearDraft();
+    setLocation('/dashboard');
   }
 
   function handleConfirmExit(saveProgress: boolean) {
@@ -336,6 +334,7 @@ export default function PlacesExplorer() {
             onStartDateChange={(date) => form.setValue('startDate', date)}
             onEndDateChange={(date) => form.setValue('endDate', date)}
             onFlexibleDatesChange={(flexible) => form.setValue('flexibleDates', flexible)}
+            tripMode="explore"
             errors={{
               startDate: errors.startDate?.message,
               endDate: errors.endDate?.message,
@@ -399,29 +398,32 @@ export default function PlacesExplorer() {
         {/* Header - Clean app bar pattern */}
         <Header
           leftContent={
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExit}
-              className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              style={{ color: 'var(--text)' }}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
+            <Breadcrumb className="flex-1 min-w-0">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    href="/dashboard" 
+                    className="text-white/80 hover:text-white"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleExit();
+                    }}
+                  >
+                    <span className="hidden sm:inline">Home</span>
+                    <span className="sm:hidden">H</span>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="text-white/60" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-white truncate">
+                    <span className="hidden sm:inline">Places Explorer</span>
+                    <span className="sm:hidden">Explorer</span>
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           }
-          centerContent={
-            <div className="flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
-                  Explorer Wizard
-                </h1>
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Step {currentStep} of {TOTAL_STEPS}: {STEP_TITLES[currentStep - 1]}
-                </p>
-              </div>
-            </div>
-          }
+          centerContent={null}
           rightContent={
             user && (
               <div className="flex items-center gap-2">
@@ -440,16 +442,16 @@ export default function PlacesExplorer() {
             <div className="card-elevated rounded-lg border border-slate-200">
               {/* Progress Status Header - Inside Card */}
               <div className="p-4 border-b border-slate-100">
-                <div className="text-center mb-2">
-                  <h2 className="text-lg font-semibold text-slate-800">
-                    Step {currentStep} of {TOTAL_STEPS}
-                  </h2>
-                </div>
                 <Progress
                   value={(currentStep / TOTAL_STEPS) * 100}
                   className="h-2 bg-slate-200"
                   aria-label={`Places explorer progress: Step ${currentStep} of ${TOTAL_STEPS}`}
                 />
+                <div className="mt-2 text-center">
+                  <span className="text-sm text-slate-500">
+                    Step {currentStep} of {TOTAL_STEPS}
+                  </span>
+                </div>
               </div>
 
               {/* Main content */}

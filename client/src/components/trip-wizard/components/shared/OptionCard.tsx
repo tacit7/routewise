@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { OptionCardProps } from "@/types/trip-wizard";
-import { Check, Car, Plane, Bus, Bike, Hotel, Home, Tent, Users, HelpCircle } from "lucide-react";
+import { Car, Plane, Bus, Bike, Hotel, Home, Tent, Users, HelpCircle } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   car: Car,
@@ -13,7 +13,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   tent: Tent,
   users: Users,
   'help-circle': HelpCircle,
-  combo: () => <div className="flex items-center space-x-1"><Car className="w-3 h-3" /><Plane className="w-3 h-3" /></div>
+  combo: () => <div className="flex items-center space-x-1"><Car className="w-6 h-6" /><Plane className="w-6 h-6" /></div>
 };
 
 export function OptionCard({
@@ -43,12 +43,6 @@ export function OptionCard({
       aria-pressed={selected}
       aria-describedby={description ? `${title}-description` : undefined}
     >
-      {/* Selection indicator */}
-      {selected && (
-        <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-          <Check className="w-3 h-3 text-white" />
-        </div>
-      )}
       
       {/* Content */}
       <div className="flex flex-col items-center text-center space-y-2">
@@ -58,7 +52,7 @@ export function OptionCard({
             {typeof icon === 'string' ? (
               // Check if it's an icon identifier we can map to Lucide
               iconMap[icon] ? (
-                React.createElement(iconMap[icon], { className: 'w-6 h-6' })
+                React.createElement(iconMap[icon], { className: 'w-8 h-8' })
               ) : (
                 // Fallback to emoji/string
                 <span role="img" aria-hidden="true">{icon}</span>
