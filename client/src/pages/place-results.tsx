@@ -319,7 +319,7 @@ export default function PlaceResults() {
                 size="sm"
               >
                 <Calendar className="h-4 w-4 mr-2" />
-                Start Itinerary ({tripPlaces.length} places)
+                Start Planning Itinerary
               </Button>
             </div>
           )}

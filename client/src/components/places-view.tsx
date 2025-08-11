@@ -442,7 +442,7 @@ export default function PlacesView({
                   aria-label={`Start planning itinerary with ${tripPlaces.length} places`}
                 >
                   <Calendar className="h-5 w-5 mr-2" aria-hidden="true" />
-                  Start Itinerary ({tripPlaces.length} places)
+                  Start Planning Itinerary
                 </Button>
               </div>
             )}
@@ -743,7 +743,7 @@ export default function PlacesView({
                     size="sm"
                   >
                     <Calendar className="h-4 w-4 mr-2" />
-                    Start Itinerary ({tripPlaces.length} places)
+                    Start Planning Itinerary
                   </Button>
                 </div>
               )}
