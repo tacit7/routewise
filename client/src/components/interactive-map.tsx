@@ -14,6 +14,7 @@ interface InteractiveMapProps {
   hoveredPoi?: Poi | null;
   onPoiClick?: (poi: Poi) => void;
   onPoiSelect?: (poiId: number, selected: boolean) => void;
+  onPoiHover?: (poi: Poi | null) => void;
   className?: string;
   height?: string;
   apiKey?: string; // Optional API key to avoid fetching separately
@@ -85,8 +86,10 @@ const PoiMarker: React.FC<{
   isSelected: boolean;
   isHovered: boolean;
   onClick: (poi: Poi) => void;
+  onMouseEnter?: (poi: Poi) => void;
+  onMouseLeave?: () => void;
   index?: number;
-}> = ({ poi, isSelected, isHovered, onClick, index }) => {
+}> = ({ poi, isSelected, isHovered, onClick, onMouseEnter, onMouseLeave, index }) => {
   const coords = getPoiCoordinates(poi);
   console.log('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
 
@@ -104,12 +107,24 @@ const PoiMarker: React.FC<{
         onClick(poi);
       }}
     >
-      <Pin
-        background={color}
-        glyphColor="white"
-        borderColor="white"
-        scale={isSelected || isHovered ? 1.2 : 1.0}
-      />
+      <div
+        onMouseEnter={() => {
+          console.log('🖱️ Marker hovered:', poi.name);
+          onMouseEnter?.(poi);
+        }}
+        onMouseLeave={() => {
+          console.log('🖱️ Marker unhovered:', poi.name);
+          onMouseLeave?.();
+        }}
+        style={{ cursor: 'pointer' }}
+      >
+        <Pin
+          background={color}
+          glyphColor="white"
+          borderColor="white"
+          scale={isSelected || isHovered ? 1.2 : 1.0}
+        />
+      </div>
     </AdvancedMarker>
   );
 };
@@ -152,8 +167,15 @@ const PoiInfoWindow: React.FC<{
         )}
         <h3 className="font-semibold text-base mb-1">{poi.name}</h3>
         <p className="text-xs text-muted-foreground capitalize mb-2">{poi.category}</p>
+        {console.log('🗺️ Map Popup POI Description Debug:', { 
+          name: poi.name, 
+          description: poi.description, 
+          hasDescription: !!poi.description,
+          descriptionLength: poi.description?.length || 0,
+          descriptionType: typeof poi.description
+        })}
         {poi.description && (
-          <p className="text-sm text-foreground mb-2">{poi.description}</p>
+          <p className="text-sm text-foreground mb-2 bg-blue-100 border border-blue-300">{poi.description}</p>
         )}
         <div className="flex items-center text-xs mb-1">
           <span className="text-yellow-500">⭐</span>
@@ -257,7 +279,8 @@ const MapContent: React.FC<{
   selectedPoiIds: number[];
   hoveredPoi: Poi | null;
   onPoiClick?: (poi: Poi) => void;
-}> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick }) => {
+  onPoiHover?: (poi: Poi | null) => void;
+}> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick, onPoiHover }) => {
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>(null);
 
@@ -334,6 +357,8 @@ const MapContent: React.FC<{
               isSelected={isSelected}
               isHovered={isHovered}
               onClick={handlePoiClick}
+              onMouseEnter={(poi) => onPoiHover?.(poi)}
+              onMouseLeave={() => onPoiHover?.(null)}
               index={index}
             />
           );
@@ -365,6 +390,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   hoveredPoi,
   onPoiClick,
   onPoiSelect,
+  onPoiHover,
   className = "",
   height = "400px",
   apiKey,
@@ -446,8 +472,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         <MapContent
           pois={pois}
           selectedPoiIds={selectedPoiIds}
-          hoveredPoi={hoveredPoi}
+          hoveredPoi={hoveredPoi || null}
           onPoiClick={onPoiClick}
+          onPoiHover={onPoiHover}
         />
       </APIProvider>
     </div>

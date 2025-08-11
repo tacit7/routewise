@@ -370,6 +370,7 @@ export default function PlacesView({
                 hoveredPoi={hoveredPoi}
                 onPoiClick={onPoiClick}
                 onPoiSelect={onPoiSelect}
+                onPoiHover={onPoiHover}
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
@@ -564,9 +565,20 @@ export default function PlacesView({
                             </h4>
 
                             {/* Description - show all descriptions to debug backend data */}
-                            {poi.description && (
-                              <p className="text-muted-foreground text-sm mt-2 line-clamp-1">
+                            {console.log('🏷️ Left Panel POI Description Debug:', { 
+                              name: poi.name, 
+                              description: poi.description, 
+                              hasDescription: !!poi.description,
+                              descriptionLength: poi.description?.length || 0,
+                              descriptionType: typeof poi.description
+                            })}
+                            {poi.description ? (
+                              <p className="text-muted-foreground text-sm mt-2 line-clamp-1 bg-yellow-100 border border-yellow-300">
                                 {poi.description}
+                              </p>
+                            ) : (
+                              <p className="text-red-500 text-xs mt-2 bg-red-100 border border-red-300">
+                                [DEBUG: No description - poi.description is: {String(poi.description)}]
                               </p>
                             )}
 
@@ -654,6 +666,27 @@ export default function PlacesView({
                               {poi.name}
                             </h4>
 
+                            {/* Description - compact version for grid */}
+                            {console.log('🏷️ Multi-Column POI Description Debug:', { 
+                              name: poi.name, 
+                              description: poi.description, 
+                              hasDescription: !!poi.description,
+                              descriptionLength: poi.description?.length || 0,
+                              descriptionType: typeof poi.description,
+                              gridColumns
+                            })}
+                            {poi.description ? (
+                              <p className={`text-muted-foreground mt-1 line-clamp-1 bg-green-100 border border-green-300 ${
+                                gridColumns >= 3 ? 'text-xs' : 'text-sm'
+                              }`}>
+                                {poi.description}
+                              </p>
+                            ) : (
+                              <p className="text-red-500 text-xs mt-1 bg-red-100 border border-red-300">
+                                [DEBUG: No description in grid]
+                              </p>
+                            )}
+
                             {/* Rating and trip button row */}
                             <div className="flex items-center justify-between mt-1.5">
                               <div className="flex items-center gap-1 text-warning text-xs">
@@ -737,6 +770,7 @@ export default function PlacesView({
                 hoveredPoi={hoveredPoi}
                 onPoiClick={onPoiClick}
                 onPoiSelect={onPoiSelect}
+                onPoiHover={onPoiHover}
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
