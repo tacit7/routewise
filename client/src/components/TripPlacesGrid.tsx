@@ -97,18 +97,30 @@ export default function TripPlacesGrid({
               }}
               onDragEnd={() => setDraggedItem(null)}
             >
-              {(place as any).imageUrl && (
-                <div className="aspect-video relative overflow-hidden">
-                  <img src={(place as any).imageUrl} alt={place.name} className="w-full h-full object-cover" />
+              <div className="aspect-video relative overflow-hidden">
+                <img 
+                  src={(place as any).imageUrl || '/placeholder-poi.jpg'} 
+                  alt={place.name} 
+                  className="w-full h-full object-cover" 
+                />
+                {/* Category badge on image */}
+                <div className="absolute top-2 left-2">
+                  <Badge variant="secondary" className="text-xs bg-black/60 text-white backdrop-blur-sm border-0">
+                    {place.category.charAt(0).toUpperCase() + place.category.slice(1).replace('_', ' ')}
+                  </Badge>
                 </div>
-              )}
+              </div>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">{place.name}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">{place.category}</Badge>
+                {(place as any).description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                    {(place as any).description}
+                  </p>
+                )}
+                <div className="flex items-center gap-2 mt-2">
                   {place.rating && (
                     <div className="flex items-center text-xs text-muted-foreground">
-                      <Star className="h-3 w-3 mr-1" />
+                      <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
                       <span>{place.rating}</span>
                     </div>
                   )}

@@ -102,9 +102,30 @@ export default function DailyItinerarySidebar({
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
+                      {/* POI Image */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={(place as any).imageUrl || '/placeholder-poi.jpg'}
+                          alt={place.name}
+                          className="w-12 h-12 rounded object-cover"
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm mb-1">{place.name}</div>
-                        <Badge variant="outline" className="text-xs mb-2">{place.category}</Badge>
+                        {(place as any).description && (
+                          <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
+                            {(place as any).description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline" className="text-xs">{place.category}</Badge>
+                          {place.rating && (
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
+                              <span>{place.rating}</span>
+                            </div>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 mt-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <Input
