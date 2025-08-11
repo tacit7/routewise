@@ -147,7 +147,18 @@
 
 .focus-ring:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--focus) with 2px offset;
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+/* Ensure focus is visible for all interactive elements */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 /* UX Spec Styling */

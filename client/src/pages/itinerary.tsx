@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { Check, LogIn, Plus, Save } from "lucide-react";
+import { ArrowLeft, Check, LogIn, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/header/BackButton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -68,6 +68,32 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     setActiveDay(days.length);
   };
 
+  const handleDeleteDay = (dayIndex: number) => {
+    if (days.length <= 1) return; // Don't delete if it's the only day
+    
+    // Remove places from that day from assignedPlaceIds
+    const dayToDelete = days[dayIndex];
+    dayToDelete.places.forEach((place) => {
+      const id = getIdentifier(place);
+      setAssignedPlaceIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    });
+
+    // Remove the day
+    const newDays = days.filter((_, index) => index !== dayIndex);
+    setDays(newDays);
+    
+    // Adjust active day if necessary
+    if (activeDay >= newDays.length) {
+      setActiveDay(newDays.length - 1);
+    } else if (activeDay >= dayIndex) {
+      setActiveDay(Math.max(0, activeDay - 1));
+    }
+  };
+
   const handlePlaceAssignment = (place: ItineraryPlace, dayIndex: number) => {
     const id = getIdentifier(place);
     if (assignedPlaceIds.has(id)) return;
@@ -120,6 +146,11 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     return `${list[0]} to ${list[list.length - 1]} (+${list.length - 2} more)`;
   };
 
+  const unassigned = useMemo(
+    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
+    [itineraryPlaces, assignedPlaceIds]
+  );
+
   if (itineraryPlaces.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
@@ -142,11 +173,6 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
       </div>
     );
   }
-
-  const unassigned = useMemo(
-    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
-    [itineraryPlaces, assignedPlaceIds]
-  );
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
@@ -180,29 +206,20 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 Saved {lastSavedAt.toLocaleTimeString()}
               </div>
             )}
-            <Button
+            <button
               onClick={isAuthenticated ? () => {} : () => setLocation("/")}
               disabled={isSaving || days.every((d) => d.places.length === 0)}
-              className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              style={isAuthenticated ? { backgroundColor: 'var(--primary)', color: 'white' } : { backgroundColor: 'var(--surface-alt)', color: 'var(--text)' }}
+              className="p-2 rounded-full hover:bg-gray-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
             >
               {isSaving ? (
-                <>
-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: 'var(--surface)', borderTopColor: 'transparent' }}></div>
-                  Saving...
-                </>
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
               ) : isAuthenticated ? (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Trip
-                </>
+                <Save className="h-5 w-5 text-gray-600" />
               ) : (
-                <>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In to Save
-                </>
+                <LogIn className="h-5 w-5 text-gray-600" />
               )}
-            </Button>
+            </button>
           </>
         }
       />
@@ -211,18 +228,36 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
         <div className="border-b px-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
           <TabsList className="h-auto p-0 bg-transparent">
             {days.map((day, index) => (
-              <TabsTrigger 
-                key={index} 
-                value={`day-${index}`} 
-                className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={{ 
-                  backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
-                  color: activeDay === index ? 'white' : 'var(--text)',
-                  borderColor: 'var(--border)'
-                }}
-              >
-                Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
-              </TabsTrigger>
+              <div key={index} className="relative group">
+                <TabsTrigger 
+                  value={`day-${index}`} 
+                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
+                  style={{ 
+                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
+                    color: activeDay === index ? 'white' : 'var(--text)',
+                    borderColor: 'var(--border)'
+                  }}
+                >
+                  Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
+                </TabsTrigger>
+                {days.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDay(index);
+                    }}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-all focus-ring hover:bg-gray-100"
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      color: '#5f6368'
+                    }}
+                    title={`Delete Day ${index + 1}`}
+                    aria-label={`Delete Day ${index + 1}`}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             ))}
 
             <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>

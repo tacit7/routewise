@@ -10,6 +10,7 @@ import { useTripPlaces } from "@/hooks/use-trip-places";
 import CategoryFilter from "@/components/category-filter";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
+import Header from "@/components/header";
 
 interface PlacesViewProps {
   // Core data
@@ -118,6 +119,7 @@ export default function PlacesView({
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedPoiId, setSelectedPoiId] = useState<number | null>(null);
+  const [showTripOnly, setShowTripOnly] = useState<boolean>(false);
 
   // POI scheduling state
   const [scheduledTimes, setScheduledTimes] = useState<Map<number, string>>(new Map());
@@ -171,7 +173,7 @@ export default function PlacesView({
 
   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
   const [panelKey, setPanelKey] = useState(0); // Force re-render on panel resize
-  const { tripPlaces, addToTrip, isInTrip, isAddingToTrip } = useTripPlaces();
+  const { tripPlaces, addToTrip, removeFromTrip, isInTrip, isAddingToTrip, isRemovingFromTrip } = useTripPlaces();
 
   // Filter and dedupe POIs
   const uniquePois = pois.filter((poi, index, self) => {
@@ -218,28 +220,14 @@ export default function PlacesView({
       }
     }
 
-    return categoryMatch && cityMatch;
+    const tripMatch = showTripOnly ? isInTrip(poi) : true;
+
+    return categoryMatch && cityMatch && tripMatch;
   });
 
-  // Calculate optimal card width based on panel size
-  const getCardFlexBasis = () => {
-    // Force full width for mobile or explore mode
-    if (!showRouting || isMobile) return '100%';
-
-    // Calculate actual sidebar width for desktop
-    const containerWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40;
-
-    // Force single-column list until panel is quite wide
-    // Default 30% (~360px equivalent) should show single column
-    if (containerWidth < 500) return '100%';      // Single column list (default behavior)
-    if (containerWidth < 700) return 'calc(50% - 8px)';  // 2 per row only when wider
-    if (containerWidth < 900) return 'calc(33.333% - 8px)'; // 3 per row when very wide
-    if (containerWidth < 1100) return 'calc(25% - 8px)';     // 4 per row when extra wide
-    return 'calc(20% - 8px)'; // 5 per row for ultrawide panels
-  };
-
-  const cardFlexBasis = getCardFlexBasis();
-  const isFlexLayout = cardFlexBasis !== '100%';
+  // Always use vertical card layout - force 100% width
+  const cardFlexBasis = '100%';
+  const isFlexLayout = false;
 
   // Debug panel sizing
   console.log('Panel Debug:', {
@@ -281,57 +269,72 @@ export default function PlacesView({
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="bg-card shadow-sm border-b border-border flex-shrink-0">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation(backUrl)}
-              className="flex items-center text-muted-foreground hover:text-primary"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className="text-sm text-muted-foreground hidden sm:block">
-                {displayHeaderTitle} • {uniquePois.length} places
-              </div>
-              <div className="text-xs text-muted-foreground sm:hidden">{uniquePois.length} places</div>
-
-              {/* Mobile-optimized toggle button */}
-              <button
-                onClick={() => {
-                  console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
-                  setIsMapVisible(!isMapVisible);
-                }}
-                className={`
-                  flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation
-                  ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
-                  ${
-                    isMapVisible
-                      ? "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                  }
-                `}
-                aria-label={isMapVisible ? "Hide map, show POI list" : "Show map"}
-              >
-                {isMapVisible ? (
-                  <>
-                    <List className="h-4 w-4" />
-                    <span className="text-sm hidden sm:inline">List</span>
-                  </>
-                ) : (
-                  <>
-                    <MapIcon className="h-4 w-4" />
-                    <span className="text-sm hidden sm:inline">Map</span>
-                  </>
-                )}
-              </button>
-            </div>
+      {/* Screen reader announcements for filter changes */}
+      <div 
+        aria-live="polite" 
+        aria-atomic="true" 
+        className="sr-only"
+      >
+        Showing {filteredPois.length} places
+        {selectedCategory !== "all" && ` filtered by ${selectedCategory}`}
+        {showTripOnly && ` from your trip`}
+      </div>
+      
+      <Header
+        leftContent={
+          <Button
+            variant="ghost"
+            onClick={() => setLocation(backUrl)}
+            className="flex items-center text-muted-foreground hover:text-primary focus-ring"
+            aria-label="Go back to previous page"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+        }
+        centerContent={
+          <div className="text-center">
+            <h1 className="text-lg font-semibold text-foreground">
+              {displayHeaderTitle}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {uniquePois.length} places found
+            </p>
           </div>
-        </div>
-      </header>
+        }
+        rightContent={
+          <button
+            onClick={() => {
+              console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
+              setIsMapVisible(!isMapVisible);
+            }}
+            className={`
+              flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation focus-ring
+              ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
+              ${
+                isMapVisible
+                  ? "bg-muted hover:bg-muted/80 text-muted-foreground"
+                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
+              }
+            `}
+            aria-label={isMapVisible ? "Hide map and show places list view" : "Show map view"}
+            aria-pressed={isMapVisible}
+            role="button"
+          >
+            {isMapVisible ? (
+              <>
+                <List className="h-4 w-4" />
+                <span className="text-sm hidden sm:inline">List</span>
+              </>
+            ) : (
+              <>
+                <MapIcon className="h-4 w-4" />
+                <span className="text-sm hidden sm:inline">Map</span>
+              </>
+            )}
+          </button>
+        }
+      />
 
       {/* Main Content */}
       {(() => {
@@ -367,7 +370,7 @@ export default function PlacesView({
           </div>
         ) : (
           // Mobile POI list view (full screen)
-          <div className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col" role="main" aria-label="Places list view">
             {/* Category Filter for POI-only view */}
             <div className="bg-card border-b border-border flex-shrink-0">
               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
@@ -427,13 +430,14 @@ export default function PlacesView({
                   onClick={() => setLocation("/itinerary")}
                   className="w-full bg-primary hover:bg-primary/90 text-white min-h-[48px] touch-manipulation"
                   size="lg"
+                  aria-label={`Start planning itinerary with ${tripPlaces.length} places`}
                 >
-                  <Calendar className="h-5 w-5 mr-2" />
+                  <Calendar className="h-5 w-5 mr-2" aria-hidden="true" />
                   Start Itinerary ({tripPlaces.length} places)
                 </Button>
               </div>
             )}
-          </div>
+          </main>
         )
       ) : (
         // Desktop: Original ResizablePanelGroup layout
@@ -443,31 +447,47 @@ export default function PlacesView({
             defaultSize={30}
             minSize={20}
             maxSize={50}
-            className="bg-card"
+            className="bg-surface shadow-lg border-r-2 border-primary/20"
             onResize={handlePanelResize}
           >
-            <div className="flex flex-col h-full">
+            <aside className="flex flex-col h-full" role="complementary" aria-label="Places filter and list">
               {/* Category Filter */}
               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
 
               {/* Sidebar Header */}
-              <div
-                className="p-3 border-b border-border bg-muted"
-              >
-                <h2 className="text-lg font-semibold text-foreground">
+              <div className="p-3 border-b border-border bg-muted">
+                <h2 className="text-lg font-semibold text-foreground" id="places-sidebar-heading">
                   {displaySidebarTitle}
                 </h2>
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 mt-2 flex-wrap">
                   <button
                     onClick={() => setSelectedCity("all")}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
                       selectedCity === "all"
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                     }`}
+                    aria-label={`Show all places. ${uniquePois.length} places total. ${selectedCity === "all" ? "Currently selected" : "Click to select"}`}
+                    aria-pressed={selectedCity === "all"}
+                    role="button"
                   >
                     All ({uniquePois.length})
                   </button>
+                  {tripPlaces.length > 0 && (
+                    <button
+                      onClick={() => setShowTripOnly(!showTripOnly)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
+                        showTripOnly
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                      }`}
+                      aria-label={`Show only places in trip. ${tripPlaces.length} places in your trip. ${showTripOnly ? "Currently showing trip places only" : "Click to filter to trip places only"}`}
+                      aria-pressed={showTripOnly}
+                      role="button"
+                    >
+                      Trip Only ({tripPlaces.length})
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -501,62 +521,90 @@ export default function PlacesView({
                   >
                     {filteredPois.map((poi, index) => (
                       cardFlexBasis === '100%' ? (
-                        // Single-column list layout using your grid spec
+                        // Vertical card layout - image on top
                         <div
                           key={poi.placeId || poi.id || `poi-list-${index}`}
                           onMouseEnter={() => onPoiHover(poi)}
                           onMouseLeave={() => onPoiHover(null)}
-                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer"
+                          className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-3"
                         >
-                          {/* Thumbnail - 64px */}
-                          <img
-                            src={poi.imageUrl || '/placeholder-poi.jpg'}
-                            alt={poi.name}
-                            className="h-16 w-16 rounded object-cover"
-                          />
-
-                          {/* Main content - 1fr */}
-                          <div className="min-w-0">
-                            <h4 className="truncate font-medium text-sm">{poi.name}</h4>
-                            <p className="text-xs text-muted-foreground truncate">{poi.description || poi.address}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="flex items-center gap-1 text-xs text-yellow-500">
-                                <Star className="h-3 w-3 fill-current" />
-                                {poi.rating}
+                          {/* Image on top */}
+                          <div className="relative">
+                            <img
+                              src={poi.imageUrl || '/placeholder-poi.jpg'}
+                              alt={poi.name}
+                              className="w-full h-32 object-cover rounded"
+                            />
+                            {/* Category badge on image */}
+                            <div className="absolute top-2 left-2">
+                              <div className="text-xs px-2 py-1 rounded-full bg-black/60 text-white backdrop-blur-sm">
+                                {poi.category.charAt(0).toUpperCase() + poi.category.slice(1).replace('_', ' ')}
                               </div>
-                              {poi.timeFromStart && (
-                                <span className="text-xs text-muted-foreground">{poi.timeFromStart}</span>
-                              )}
                             </div>
                           </div>
 
-                          {/* Action/Tag - auto */}
-                          <div className="flex flex-col items-end gap-1">
-                            <div className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                              {poi.category}
-                            </div>
-                            <button
-                              onClick={() => {
-                                if (!isInTrip(poi)) {
-                                  addToTrip(poi);
+                          {/* Content below image */}
+                          <div className="mt-3">
+                            {/* Name */}
+                            <h4 className="font-medium text-base line-clamp-2">
+                              {poi.name}
+                            </h4>
+
+                            {/* Description (now with smart backend-generated content) */}
+                            {poi.description && poi.description !== "Point of interest" && (
+                              <p className="text-muted-foreground text-sm mt-2 line-clamp-1">
+                                {poi.description}
+                              </p>
+                            )}
+
+                            {/* Rating */}
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center gap-1 text-warning text-base">
+                                <Star className="h-4 w-4 fill-current" />
+                                <span className="font-medium">{poi.rating}</span>
+                                {poi.timeFromStart && (
+                                  <span className="text-muted-foreground text-xs ml-2">{poi.timeFromStart}</span>
+                                )}
+                              </div>
+
+                              {/* Add/Remove Trip button */}
+                              <button
+                                onClick={() => {
+                                  if (isInTrip(poi)) {
+                                    removeFromTrip(poi.id);
+                                  } else {
+                                    addToTrip(poi);
+                                  }
+                                }}
+                                disabled={isAddingToTrip || isRemovingFromTrip}
+                                className={`text-xs px-3 py-1 rounded transition-colors focus-ring ${
+                                  isInTrip(poi)
+                                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                                    : isAddingToTrip || isRemovingFromTrip
+                                    ? "bg-primary/60 text-primary-foreground cursor-not-allowed"
+                                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                                }`}
+                                aria-label={
+                                  isInTrip(poi) 
+                                    ? `Remove ${poi.name} from trip` 
+                                    : isAddingToTrip || isRemovingFromTrip
+                                    ? "Processing request..."
+                                    : `Add ${poi.name} to trip`
                                 }
-                              }}
-                              disabled={isInTrip(poi) || isAddingToTrip}
-                              className={`text-[10px] px-2 py-1 rounded transition-colors ${
-                                isInTrip(poi)
-                                  ? "bg-primary/10 text-primary cursor-not-allowed"
-                                  : isAddingToTrip
-                                  ? "bg-primary/60 text-white cursor-not-allowed"
-                                  : "bg-primary hover:bg-primary/90 text-white"
-                              }`}
-                            >
-                              {isInTrip(poi) ? (
-                                <div className="flex items-center gap-1">
-                                  <Check className="h-3 w-3" />
-                                  In Trip
-                                </div>
-                              ) : isAddingToTrip ? "Adding..." : "+ Trip"}
-                            </button>
+                                aria-describedby={`poi-${poi.id}-status`}
+                              >
+                                {isInTrip(poi) ? (
+                                  <div className="flex items-center gap-1">
+                                    <Check className="h-3 w-3" aria-hidden="true" />
+                                    Remove
+                                  </div>
+                                ) : isAddingToTrip || isRemovingFromTrip ? "..." : "+ Trip"}
+                              </button>
+                              {/* Hidden status text for screen readers */}
+                              <span id={`poi-${poi.id}-status`} className="sr-only">
+                                {isInTrip(poi) ? "This place is in your trip" : "This place is not in your trip"}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       ) : (
@@ -596,7 +644,7 @@ export default function PlacesView({
                   </Button>
                 </div>
               )}
-            </div>
+            </aside>
           </ResizablePanel>
 
           <ResizableHandle withHandle className="transition-colors bg-border" />
