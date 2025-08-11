@@ -90,30 +90,32 @@ const PoiMarker: React.FC<{
   onMouseLeave?: () => void;
   index?: number;
 }> = ({ poi, isSelected, isHovered, onClick, onMouseEnter, onMouseLeave, index }) => {
+  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+  
   const coords = getPoiCoordinates(poi);
-  console.log('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
+  devLog('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
 
   const color = getCategoryColor(poi.category, index); // Use array index for consistent color cycling
-  console.log('🎨 Google Pin Color:', { category: poi.category, color, poiId: poi.id });
+  devLog('🎨 Google Pin Color:', { category: poi.category, color, poiId: poi.id });
   
-  console.log('🗺️ Rendering AdvancedMarker with Pin:', { position: coords, title: poi.name });
+  devLog('🗺️ Rendering AdvancedMarker with Pin:', { position: coords, title: poi.name });
   
   return (
     <AdvancedMarker
       position={coords}
       title={poi.name}
       onClick={() => {
-        console.log('📍 Marker clicked:', poi.name);
+        devLog('📍 Marker clicked:', poi.name);
         onClick(poi);
       }}
     >
       <div
         onMouseEnter={() => {
-          console.log('🖱️ Marker hovered:', poi.name);
+          devLog('🖱️ Marker hovered:', poi.name);
           onMouseEnter?.(poi);
         }}
         onMouseLeave={() => {
-          console.log('🖱️ Marker unhovered:', poi.name);
+          devLog('🖱️ Marker unhovered:', poi.name);
           onMouseLeave?.();
         }}
         style={{ cursor: 'pointer' }}
@@ -167,15 +169,8 @@ const PoiInfoWindow: React.FC<{
         )}
         <h3 className="font-semibold text-base mb-1">{poi.name}</h3>
         <p className="text-xs text-muted-foreground capitalize mb-2">{poi.category}</p>
-        {console.log('🗺️ Map Popup POI Description Debug:', { 
-          name: poi.name, 
-          description: poi.description, 
-          hasDescription: !!poi.description,
-          descriptionLength: poi.description?.length || 0,
-          descriptionType: typeof poi.description
-        })}
         {poi.description && (
-          <p className="text-sm text-foreground mb-2 bg-blue-100 border border-blue-300">{poi.description}</p>
+          <p className="text-sm text-foreground mb-2">{poi.description}</p>
         )}
         <div className="flex items-center text-xs mb-1">
           <span className="text-yellow-500">⭐</span>
@@ -338,10 +333,11 @@ const MapContent: React.FC<{
         style={{ width: '100%', height: '100%' }}
       >
         {pois.map((poi, index) => {
+          const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
           const isSelected = selectedPoiIds.includes(Number(poi.id));
           const isHovered = hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id) : false;
           
-          console.log(`🔢 Rendering POI ${index + 1}/${pois.length}:`, { 
+          devLog(`🔢 Rendering POI ${index + 1}/${pois.length}:`, { 
             name: poi.name, 
             id: poi.id, 
             placeId: poi.placeId,

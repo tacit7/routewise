@@ -255,13 +255,13 @@ export default function PlacesView({
     // Force re-render of grid layout
     setPanelKey(prev => prev + 1);
 
-    // Trigger map resize with debouncing
+    // Enhanced map resize with debouncing
     setTimeout(() => {
       window.dispatchEvent(new Event("resize"));
       if (window.google && window.google.maps) {
         window.dispatchEvent(new CustomEvent("mapResize"));
       }
-    }, 100);
+    }, 150);
   };
 
   // Compute display values
@@ -451,8 +451,11 @@ export default function PlacesView({
           </main>
         )
       ) : (
-        // Desktop: Original ResizablePanelGroup layout
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
+        // Desktop: Enhanced ResizablePanelGroup with smooth dragging
+        <ResizablePanelGroup 
+          direction="horizontal" 
+          className="flex-1"
+        >
           {/* Left Sidebar */}
           <ResizablePanel
             defaultSize={30}
@@ -566,21 +569,10 @@ export default function PlacesView({
                               {poi.name}
                             </h4>
 
-                            {/* Description - show all descriptions to debug backend data */}
-                            {console.log('🏷️ Left Panel POI Description Debug:', { 
-                              name: poi.name, 
-                              description: poi.description, 
-                              hasDescription: !!poi.description,
-                              descriptionLength: poi.description?.length || 0,
-                              descriptionType: typeof poi.description
-                            })}
-                            {poi.description ? (
-                              <p className="text-muted-foreground text-sm mt-2 line-clamp-1 bg-yellow-100 border border-yellow-300">
+                            {/* Description - full text display */}
+                            {poi.description && (
+                              <p className="text-muted-foreground text-sm mt-2">
                                 {poi.description}
-                              </p>
-                            ) : (
-                              <p className="text-red-500 text-xs mt-2 bg-red-100 border border-red-300">
-                                [DEBUG: No description - poi.description is: {String(poi.description)}]
                               </p>
                             )}
 
@@ -669,23 +661,11 @@ export default function PlacesView({
                             </h4>
 
                             {/* Description - compact version for grid */}
-                            {console.log('🏷️ Multi-Column POI Description Debug:', { 
-                              name: poi.name, 
-                              description: poi.description, 
-                              hasDescription: !!poi.description,
-                              descriptionLength: poi.description?.length || 0,
-                              descriptionType: typeof poi.description,
-                              gridColumns
-                            })}
-                            {poi.description ? (
-                              <p className={`text-muted-foreground mt-1 line-clamp-1 bg-green-100 border border-green-300 ${
-                                gridColumns >= 3 ? 'text-xs' : 'text-sm'
+                            {poi.description && (
+                              <p className={`text-muted-foreground mt-1 ${
+                                gridColumns >= 3 ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3'
                               }`}>
                                 {poi.description}
-                              </p>
-                            ) : (
-                              <p className="text-red-500 text-xs mt-1 bg-red-100 border border-red-300">
-                                [DEBUG: No description in grid]
                               </p>
                             )}
 
@@ -752,7 +732,10 @@ export default function PlacesView({
             </aside>
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="transition-colors bg-border" />
+          <ResizableHandle 
+            withHandle 
+            className="transition-all duration-200 bg-border hover:bg-primary/20 active:bg-primary/30 w-2 group relative" 
+          />
 
           {/* Map Panel */}
           <ResizablePanel defaultSize={70}>

@@ -79,9 +79,11 @@ export default function PoiCard({
             <h4 className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>
               {poi.name}
             </h4>
-            <p className="text-xs line-clamp-1 mb-1" style={{ color: 'var(--text-muted)' }}>
-              {poi.description}
-            </p>
+            {poi.description && (
+              <p className="text-xs mb-1 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                {poi.description}
+              </p>
+            )}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center text-xs" style={{ color: 'var(--text-muted)' }}>
                 <Star className="h-3 w-3 mr-1" style={{ color: 'var(--warning)' }} />
