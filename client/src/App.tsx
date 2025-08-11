@@ -51,8 +51,8 @@ function AuthenticatedRouter() {
     );
   }
 
-  // Only show TripIndicator on route-results and explore-results pages
-  const showTripIndicator = location === '/route-results' || location === '/explore-results';
+  // Only show TripIndicator on other pages (disabled for route-results and explore-results)
+  const showTripIndicator = location !== '/route-results' && location !== '/explore-results';
 
   return (
     <>

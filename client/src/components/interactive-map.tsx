@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
-import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap, Pin } from "@vis.gl/react-google-maps";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Poi } from "@/types/schema";
@@ -19,81 +19,44 @@ interface InteractiveMapProps {
   apiKey?: string; // Optional API key to avoid fetching separately
 }
 
-// POI category to marker color mapping using design system colors
+// POI category to color mapping using design system colors
 const getCategoryColor = (category: string): string => {
   const colors = {
-    restaurant: "hsl(0 100% 60%)", // Red
-    attraction: "hsl(160 84% 36%)", // Brand green
-    park: "hsl(142 71% 45%)", // Nature green
-    scenic: "hsl(197 92% 61%)", // Sky blue
-    market: "hsl(42 95% 45%)", // Warning/rating yellow
-    historic: "hsl(271 85% 71%)", // Purple
-    default: "hsl(217 92% 60%)", // Focus blue
+    restaurant: "#EA4335", // Google Red
+    attraction: "#34A853", // Google Green
+    park: "#137333", // Darker green for parks
+    scenic: "#4285F4", // Google Blue
+    shopping: "#9C27B0", // Purple
+    market: "#FF9800", // Orange
+    historic: "#795548", // Brown
+    default: "#4285F4", // Google Blue
   };
   return colors[category as keyof typeof colors] || colors.default;
 };
 
-// Create custom owl-themed SVG marker using design system colors
-const createOwlMarkerSVG = (
-  baseColor: string,
-  isSelected = false,
-  isHovered = false
-): string => {
-  const size = isSelected || isHovered ? 32 : 28;
-  const shadowIntensity = isHovered ? 0.4 : 0.3;
-  const primaryColor = isSelected ? "hsl(160 84% 36%)" : baseColor; // Use design system primary
-  const glowEffect = isSelected ? `filter="drop-shadow(0 0 8px ${primaryColor})"` : '';
 
-  return `
-    <svg width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" ${glowEffect}>
-      <!-- Pin Drop Shadow -->
-      <ellipse cx="50" cy="115" rx="15" ry="3" fill="rgba(0,0,0,${shadowIntensity})" />
+// Helper function to get POI coordinates with fallback support
+const getPoiCoordinates = (poi: Poi): { lat: number; lng: number } => {
+  // Primary coordinates (lat/lng) are preferred, fallback to alternative format
+  const lat = poi.lat ?? poi.latitude ?? 0;
+  const lng = poi.lng ?? poi.longitude ?? 0;
 
-      <!-- Pin Body -->
-      <path d="M50 10 C30 10, 15 25, 15 45 C15 65, 50 100, 50 100 C50 100, 85 65, 85 45 C85 25, 70 10, 50 10 Z"
-            fill="${primaryColor}" stroke="white" stroke-width="2"/>
-
-      <!-- Owl Face Background -->
-      <circle cx="50" cy="40" r="22" fill="rgba(255,255,255,0.9)"/>
-
-      <!-- Owl Eyes -->
-      <circle cx="42" cy="35" r="8" fill="white"/>
-      <circle cx="58" cy="35" r="8" fill="white"/>
-
-      <!-- Owl Eye Details -->
-      <circle cx="42" cy="35" r="5" fill="${primaryColor}"/>
-      <circle cx="58" cy="35" r="5" fill="${primaryColor}"/>
-      <circle cx="42" cy="35" r="2" fill="white"/>
-      <circle cx="58" cy="35" r="2" fill="white"/>
-
-      <!-- Owl Beak -->
-      <path d="M47 42 L50 48 L53 42 Z" fill="${primaryColor}"/>
-
-      <!-- Owl Eyebrows -->
-      <path d="M35 28 C38 25, 46 25, 48 28" stroke="${primaryColor}" stroke-width="2" fill="none"/>
-      <path d="M52 28 C54 25, 62 25, 65 28" stroke="${primaryColor}" stroke-width="2" fill="none"/>
-
-      <!-- Decorative Elements -->
-      <circle cx="65" cy="25" r="3" fill="rgba(255,255,255,0.6)"/>
-      <path d="M30 50 C25 45, 25 55, 30 50" fill="rgba(255,255,255,0.4)"/>
-      <path d="M70 50 C75 45, 75 55, 70 50" fill="rgba(255,255,255,0.4)"/>
-    </svg>
-  `;
-};
-
-// Helper function to normalize POI coordinates
-const getPoiCoordinates = (poi: any): { lat: number; lng: number } | null => {
-  const lat = poi.lat ?? poi.latitude;
-  const lng = poi.lng ?? poi.longitude;
-
-  if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
-    return { lat, lng };
+  // Validate coordinates are valid numbers
+  if (!isFinite(lat) || !isFinite(lng) || lat === 0 || lng === 0) {
+    console.error('❌ Invalid POI coordinates:', { 
+      id: poi.id, 
+      name: poi.name, 
+      primary: { lat: poi.lat, lng: poi.lng },
+      fallback: { latitude: poi.latitude, longitude: poi.longitude }
+    });
+    // Return a safe default (center of US) rather than null to prevent crashes
+    return { lat: 39.8283, lng: -98.5795 };
   }
 
-  return null;
+  return { lat, lng };
 };
 
-// Custom marker component
+// Custom marker component using Google's default Pin
 const PoiMarker: React.FC<{
   poi: Poi;
   isSelected: boolean;
@@ -101,34 +64,29 @@ const PoiMarker: React.FC<{
   onClick: (poi: Poi) => void;
 }> = ({ poi, isSelected, isHovered, onClick }) => {
   const coords = getPoiCoordinates(poi);
-  
-  if (!coords) return null;
+  console.log('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
 
   const color = getCategoryColor(poi.category);
-  const markerSVG = createOwlMarkerSVG(color, isSelected, isHovered);
+  console.log('🎨 Google Pin Color:', { category: poi.category, color });
   
-  // Create marker element
-  const markerElement = useMemo(() => {
-    const div = document.createElement('div');
-    div.style.cssText = `
-      cursor: pointer;
-      opacity: ${isHovered ? "1.0" : "0.85"};
-      transition: all 0.3s ease;
-      transform: ${isHovered ? "scale(1.1)" : "scale(1)"};
-      z-index: ${isSelected ? "1000" : isHovered ? "999" : "1"};
-      position: relative;
-    `;
-    div.innerHTML = markerSVG;
-    return div;
-  }, [markerSVG, isHovered, isSelected]);
-
+  console.log('🗺️ Rendering AdvancedMarker with Pin:', { position: coords, title: poi.name });
+  
   return (
     <AdvancedMarker
       position={coords}
       title={poi.name}
-      onClick={() => onClick(poi)}
-      content={markerElement}
-    />
+      onClick={() => {
+        console.log('📍 Marker clicked:', poi.name);
+        onClick(poi);
+      }}
+    >
+      <Pin
+        background={color}
+        glyphColor="white"
+        borderColor="white"
+        scale={isSelected || isHovered ? 1.2 : 1.0}
+      />
+    </AdvancedMarker>
   );
 };
 
@@ -142,8 +100,6 @@ const PoiInfoWindow: React.FC<{
 }> = ({ poi, onClose, isInTrip, addToTrip, isAddingToTrip }) => {
   const coords = getPoiCoordinates(poi);
   const [isAdding, setIsAdding] = useState(false);
-  
-  if (!coords) return null;
 
   const isAddedToTrip = isInTrip(poi);
   
@@ -296,12 +252,7 @@ const MapContent: React.FC<{
       return { center: { lat: 39.8283, lng: -98.5795 }, bounds: null };
     }
 
-    const validPois = pois.filter(poi => getPoiCoordinates(poi) !== null);
-    if (validPois.length === 0) {
-      return { center: { lat: 39.8283, lng: -98.5795 }, bounds: null };
-    }
-
-    const coords = validPois.map(poi => getPoiCoordinates(poi)!);
+    const coords = pois.map(poi => getPoiCoordinates(poi));
     
     const bounds = coords.reduce((acc, coord) => ({
       minLat: Math.min(acc.minLat, coord.lat),
@@ -339,9 +290,17 @@ const MapContent: React.FC<{
         fullscreenControl={true}
         style={{ width: '100%', height: '100%' }}
       >
-        {pois.map(poi => {
+        {pois.map((poi, index) => {
           const isSelected = selectedPoiIds.includes(Number(poi.id));
           const isHovered = hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id) : false;
+          
+          console.log(`🔢 Rendering POI ${index + 1}/${pois.length}:`, { 
+            name: poi.name, 
+            id: poi.id, 
+            placeId: poi.placeId,
+            isSelected, 
+            isHovered 
+          });
           
           return (
             <PoiMarker

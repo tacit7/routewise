@@ -24,26 +24,27 @@ export default function RouteResults() {
     queryKey: ["/api/route-results", routeData?.startCity, routeData?.endCity],
     queryFn: async () => {
       if (!routeData) return { pois: [], route: null, maps_api_key: null, meta: null };
-      
+
       try {
         const params = new URLSearchParams({
           start: routeData.startCity,
           end: routeData.endCity
         });
-        
+
         console.log('🔍 Fetching route results with params:', params.toString());
         const response = await fetch(`/api/route-results?${params}`);
         console.log('📊 Route Results API response status:', response.status);
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('❌ Route Results API error:', response.status, errorText);
           throw new Error(`Failed to fetch route results: ${response.status} ${errorText}`);
         }
-        
+
         const routeResponse = await response.json();
         console.log('✅ Route Results data received:', routeResponse);
-        
+
+        debugger;
         if (routeResponse.success && routeResponse.data) {
           return {
             pois: routeResponse.data.pois || [],
@@ -123,7 +124,7 @@ export default function RouteResults() {
 
   // Extract POIs from route results
   const pois = routeResults?.pois || [];
-  
+
   if (poisError) {
     console.error('❌ Route Results Error:', poisError);
   }
