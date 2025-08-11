@@ -211,6 +211,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               disabled={isSaving || days.every((d) => d.places.length === 0)}
               className="p-2 rounded-full hover:bg-gray-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
               title={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
+              aria-label={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
             >
               {isSaving ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>

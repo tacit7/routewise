@@ -319,7 +319,6 @@ export default function PlacesView({
             `}
             aria-label={isMapVisible ? "Hide map and show places list view" : "Show map view"}
             aria-pressed={isMapVisible}
-            role="button"
           >
             {isMapVisible ? (
               <>
@@ -469,7 +468,6 @@ export default function PlacesView({
                     }`}
                     aria-label={`Show all places. ${uniquePois.length} places total. ${selectedCity === "all" ? "Currently selected" : "Click to select"}`}
                     aria-pressed={selectedCity === "all"}
-                    role="button"
                   >
                     All ({uniquePois.length})
                   </button>
@@ -483,7 +481,6 @@ export default function PlacesView({
                       }`}
                       aria-label={`Show only places in trip. ${tripPlaces.length} places in your trip. ${showTripOnly ? "Currently showing trip places only" : "Click to filter to trip places only"}`}
                       aria-pressed={showTripOnly}
-                      role="button"
                     >
                       Trip Only ({tripPlaces.length})
                     </button>
