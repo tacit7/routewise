@@ -61,17 +61,30 @@ const getCategoryColor = (category: string, index?: number): string => {
 
 // Helper function to get POI coordinates with fallback support
 const getPoiCoordinates = (poi: Poi): { lat: number; lng: number } => {
+  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+  
   // Primary coordinates (lat/lng) are preferred, fallback to alternative format
   const lat = poi.lat ?? poi.latitude ?? 0;
   const lng = poi.lng ?? poi.longitude ?? 0;
 
-  // Validate coordinates are valid numbers
-  if (!isFinite(lat) || !isFinite(lng) || lat === 0 || lng === 0) {
-    console.error('❌ Invalid POI coordinates:', { 
+  devLog('🗺️ Processing POI coordinates:', { 
+    name: poi.name,
+    raw_lat: poi.lat,
+    raw_lng: poi.lng,
+    fallback_lat: poi.latitude,
+    fallback_lng: poi.longitude,
+    final_lat: lat,
+    final_lng: lng
+  });
+
+  // Validate coordinates are valid numbers (allow negative values, just not exactly 0,0)
+  if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) {
+    devLog('❌ Invalid POI coordinates:', { 
       id: poi.id, 
       name: poi.name, 
       primary: { lat: poi.lat, lng: poi.lng },
-      fallback: { latitude: poi.latitude, longitude: poi.longitude }
+      fallback: { latitude: poi.latitude, longitude: poi.longitude },
+      reason: !isFinite(lat) ? 'lat not finite' : !isFinite(lng) ? 'lng not finite' : 'both coords are 0,0'
     });
     // Return a safe default (center of US) rather than null to prevent crashes
     return { lat: 39.8283, lng: -98.5795 };
@@ -276,8 +289,22 @@ const MapContent: React.FC<{
   onPoiClick?: (poi: Poi) => void;
   onPoiHover?: (poi: Poi | null) => void;
 }> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick, onPoiHover }) => {
+  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>(null);
+
+  // Debug POI data
+  devLog('🗺️ MapContent received POIs:', { 
+    count: pois.length,
+    sample: pois.slice(0, 3).map(poi => ({
+      name: poi.name,
+      lat: poi.lat,
+      lng: poi.lng,
+      latitude: poi.latitude,
+      longitude: poi.longitude,
+      id: poi.id
+    }))
+  });
 
   const handlePoiClick = (poi: Poi) => {
     setSelectedPoi(poi);
@@ -332,15 +359,17 @@ const MapContent: React.FC<{
         fullscreenControl={true}
         style={{ width: '100%', height: '100%' }}
       >
-        {pois.map((poi, index) => {
+        {pois.length > 0 ? pois.map((poi, index) => {
           const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
           const isSelected = selectedPoiIds.includes(Number(poi.id));
           const isHovered = hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id) : false;
+          const coords = getPoiCoordinates(poi);
           
           devLog(`🔢 Rendering POI ${index + 1}/${pois.length}:`, { 
             name: poi.name, 
             id: poi.id, 
             placeId: poi.placeId,
+            coords,
             isSelected, 
             isHovered,
             colorIndex: index // Show which color index this POI will use
@@ -358,7 +387,10 @@ const MapContent: React.FC<{
               index={index}
             />
           );
-        })}
+        }) : (
+          // Show a message in dev mode when no POIs
+          import.meta.env.DEV && devLog('⚠️ No POIs to render on map')
+        )}
 
         {selectedPoi && (
           <PoiInfoWindow
@@ -391,9 +423,20 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   height = "400px",
   apiKey,
 }) => {
+  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Debug map props
+  devLog('🗺️ InteractiveMap props:', {
+    startCity,
+    endCity, 
+    poisCount: pois.length,
+    hasApiKey: !!apiKey,
+    selectedCount: selectedPoiIds.length,
+    hoveredPoiName: hoveredPoi?.name
+  });
 
   // Set Google Maps API key
   useEffect(() => {
