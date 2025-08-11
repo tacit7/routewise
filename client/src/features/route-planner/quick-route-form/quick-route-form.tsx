@@ -120,7 +120,7 @@ export function QuickRouteForm({
         {/* From City */}
         <div>
           <Label htmlFor="startCity" className={`block ${textClass} font-medium text-slate-900 mb-2`}>
-            <MapPin className="inline w-4 h-4 mr-2 text-blue-600" />
+            <MapPin className="inline w-4 h-4 mr-2 text-primary" />
             From
           </Label>
           <Controller
@@ -132,7 +132,7 @@ export function QuickRouteForm({
                   value={field.value}
                   onSelect={(city) => field.onChange(city)}
                   placeholder="Enter starting city"
-                  className={`${inputPadding} border-2 focus:border-blue-500 ${
+                  className={`${inputPadding} border-2 focus:border-primary ${
                     fieldState.error ? 'border-red-300' : 'border-gray-200'
                   }`}
                 />
@@ -147,7 +147,7 @@ export function QuickRouteForm({
         {/* To City */}
         <div>
           <Label htmlFor="endCity" className={`block ${textClass} font-medium text-slate-900 mb-2`}>
-            <Flag className="inline w-4 h-4 mr-2 text-green-600" />
+            <Flag className="inline w-4 h-4 mr-2 text-primary" />
             To
           </Label>
           <Controller
@@ -159,7 +159,7 @@ export function QuickRouteForm({
                   value={field.value}
                   onSelect={(city) => field.onChange(city)}
                   placeholder="Enter destination city"
-                  className={`${inputPadding} border-2 focus:border-blue-500 ${
+                  className={`${inputPadding} border-2 focus:border-primary ${
                     fieldState.error ? 'border-red-300' : 'border-gray-200'
                   }`}
                 />
@@ -175,7 +175,7 @@ export function QuickRouteForm({
         <Button
           type="submit"
           disabled={isLoading}
-          className={`w-full ${buttonPadding} bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all`}
+          className={`w-full ${buttonPadding} bg-primary hover:bg-primary-hover text-white font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all`}
         >
           {isLoading ? (
             <>

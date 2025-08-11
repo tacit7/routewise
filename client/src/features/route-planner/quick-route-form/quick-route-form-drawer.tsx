@@ -30,7 +30,7 @@ export function QuickRouteFormDrawer({
         <Button 
           variant={triggerVariant}
           size="lg"
-          className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all bg-blue-600 hover:bg-blue-700 text-white border-0"
+          className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all bg-primary hover:bg-primary-hover text-white border-0"
         >
           <MapPin className="mr-2 h-5 w-5" />
           {triggerText}
@@ -38,7 +38,7 @@ export function QuickRouteFormDrawer({
         </Button>
       </SheetTrigger>
       
-      <SheetContent side="bottom" className="bg-white rounded-t-xl border-t-2 border-blue-100">
+      <SheetContent side="bottom" className="bg-white rounded-t-xl border-t-2 border-primary-100">
         <SheetHeader className="text-center pb-6">
           <SheetTitle className="text-xl font-bold text-slate-900">Plan Your Route</SheetTitle>
           <p className="text-muted-foreground">Where would you like to go?</p>

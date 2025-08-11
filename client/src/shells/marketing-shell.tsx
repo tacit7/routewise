@@ -13,7 +13,7 @@ export function MarketingShell({
   showLogo = true 
 }: MarketingShellProps) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <TopNav authButtons={navAuthButtons} showLogo={showLogo} />
       
       <main className="flex-1">

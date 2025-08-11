@@ -42,7 +42,7 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                 onClick={() => setLocation('/')}
                 className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
               >
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-teal-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
                   <i className="fas fa-route text-white text-lg md:text-xl"></i>
                 </div>
                 <span className="text-xl md:text-2xl font-bold text-slate-900">RouteWise</span>
@@ -62,7 +62,7 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                   <Button onClick={handleSignIn} variant="ghost" className="text-slate-600 hover:text-slate-900">
                     Sign In
                   </Button>
-                  <Button onClick={handleSignUp} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button onClick={handleSignUp} className="bg-primary hover:bg-primary-hover text-white">
                     Sign Up
                   </Button>
                 </>
@@ -108,7 +108,7 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                         </Button>
                         <Button
                           onClick={handleSignUp}
-                          className="justify-start w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                          className="justify-start w-full h-12 bg-primary hover:bg-primary-hover text-white"
                         >
                           <UserPlus className="mr-3 h-5 w-5" />
                           Sign Up
@@ -160,7 +160,7 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                         </Button>
                         <Button
                           onClick={handleSignUp}
-                          className="justify-start w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                          className="justify-start w-full h-12 bg-primary hover:bg-primary-hover text-white"
                         >
                           <UserPlus className="mr-3 h-5 w-5" />
                           Sign Up

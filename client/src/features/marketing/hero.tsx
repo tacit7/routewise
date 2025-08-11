@@ -136,7 +136,7 @@ export function Hero({
             <span className="inline-block px-2 py-1 rounded-lg bg-black/30 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0">
               Plan Your Perfect{" "}
             </span>
-            <span className="inline-block px-2 py-1 rounded-lg bg-teal-600/80 backdrop-blur-sm text-white md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:text-teal-300">
+            <span className="inline-block px-2 py-1 rounded-lg bg-primary/80 backdrop-blur-sm text-white md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:text-accent">
               Getaway
             </span>
           </h1>
