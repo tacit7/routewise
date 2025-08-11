@@ -75,6 +75,7 @@ export default function KitchenSinkDemo() {
   const [date, setDate] = useState<Date>();
   const [open, setOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [profileSheetOpen, setProfileSheetOpen] = useState(false);
 
   const handleLoadingDemo = () => {
     setIsLoading(true);
@@ -110,7 +111,7 @@ export default function KitchenSinkDemo() {
               <Button
                 variant="ghost" 
                 size="icon"
-                className="lg:hidden h-10 w-10 text-white hover:bg-white/10"
+                className="lg:hidden h-12 w-12 min-h-[48px] text-white hover:bg-white/10"
                 onClick={() => setCommandOpen(true)}
               >
                 <Search className="h-4 w-4" />
@@ -118,7 +119,7 @@ export default function KitchenSinkDemo() {
               
               <Button
                 variant="outline"
-                className="hidden lg:flex justify-between w-64 h-10 border-white/20 bg-white/10 text-white hover:bg-white/20"
+                className="hidden lg:flex justify-between w-64 h-12 min-h-[48px] border-white/20 bg-white/10 text-white hover:bg-white/20"
                 onClick={() => setCommandOpen(true)}
               >
                 <span className="text-white/80">Search components...</span>
@@ -129,60 +130,76 @@ export default function KitchenSinkDemo() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="h-12 w-12 min-h-[48px] text-white hover:bg-white/10">
                     <Bell className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Notifications</TooltipContent>
               </Tooltip>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="gap-2 h-10 px-2 sm:px-3 text-white hover:bg-white/10">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
-                      <AvatarFallback>UM</AvatarFallback>
-                    </Avatar>
-                    <span className="hidden lg:inline">Uriel</span>
-                    <ChevronDown className="h-4 w-4 hidden sm:block" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 shadow-lg border-2 bg-white border-border">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-white">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Mobile: Bottom Sheet */}
+              <div className="md:hidden">
+                <Button 
+                  variant="ghost" 
+                  className="gap-2 h-12 min-h-[48px] px-3 text-white hover:bg-white/10"
+                  onClick={() => setProfileSheetOpen(true)}
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
+                    <AvatarFallback>UM</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </div>
+
+              {/* Desktop: Dropdown Menu */}
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-2 h-12 min-h-[48px] px-3 sm:px-4 text-white hover:bg-white/10">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
+                        <AvatarFallback>UM</AvatarFallback>
+                      </Avatar>
+                      <span className="hidden lg:inline">Uriel</span>
+                      <ChevronDown className="h-4 w-4 hidden lg:block" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 shadow-lg border-2 bg-white border-border">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-white">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Main content with responsive layout */}
-        <main className="container px-4 py-4 sm:py-6 lg:px-6">
-          <div className="mx-auto max-w-7xl">
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-            {/* Left column - Typography and Forms */}
-            <div className="space-y-4 sm:space-y-6">
+        <main className="w-full px-3 sm:px-4 py-4 sm:py-6 lg:px-6">
+          <div className="flex justify-center w-full">
+            <div className="w-full max-w-3xl mx-auto">
+              <div className="space-y-4 sm:space-y-6">
               
               {/* Typography Section */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Typography</CardTitle>
                   <CardDescription>Headings, text, links, and content hierarchy</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Headings */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Headings</h4>
@@ -221,7 +238,7 @@ export default function KitchenSinkDemo() {
                   {/* Lists */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Lists</h4>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                       <div>
                         <h5 className="text-sm font-medium mb-2">Unordered List</h5>
                         <ul className="space-y-1 list-disc list-inside">
@@ -259,19 +276,19 @@ export default function KitchenSinkDemo() {
 
               {/* Forms Section */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Form Components</CardTitle>
                   <CardDescription>Input fields, validation states, and form controls</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="text-input">Text Input</Label>
                       <Input 
                         id="text-input" 
                         type="text" 
                         placeholder="Enter text"
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                       />
                     </div>
 
@@ -281,7 +298,7 @@ export default function KitchenSinkDemo() {
                         id="email" 
                         type="email" 
                         placeholder="Enter your email"
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                       />
                     </div>
 
@@ -291,7 +308,7 @@ export default function KitchenSinkDemo() {
                         id="password" 
                         type="password" 
                         placeholder="Enter password"
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                       />
                     </div>
 
@@ -301,7 +318,7 @@ export default function KitchenSinkDemo() {
                         id="search" 
                         type="search" 
                         placeholder="Search..."
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                       />
                     </div>
 
@@ -311,7 +328,7 @@ export default function KitchenSinkDemo() {
                         id="number" 
                         type="number" 
                         placeholder="Enter number"
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         min="0"
                         max="100"
                       />
@@ -322,7 +339,7 @@ export default function KitchenSinkDemo() {
                       <Input 
                         id="file" 
                         type="file" 
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         accept=".pdf,.doc,.docx,.jpg,.png"
                       />
                     </div>
@@ -345,7 +362,7 @@ export default function KitchenSinkDemo() {
                         id="disabled-input" 
                         type="text" 
                         placeholder="Disabled input"
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         disabled
                         defaultValue="Cannot edit this"
                       />
@@ -497,11 +514,11 @@ export default function KitchenSinkDemo() {
 
               {/* Button States and Actions */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Buttons</CardTitle>
                   <CardDescription>All button variants, sizes, and interactive states</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Variants */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Variants</h4>
@@ -595,7 +612,7 @@ export default function KitchenSinkDemo() {
                     <div className="flex gap-2">
                       <Button 
                         onClick={() => setProgress(p => Math.min(100, p + 10))}
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         size="sm"
                       >
                         +10
@@ -603,7 +620,7 @@ export default function KitchenSinkDemo() {
                       <Button 
                         variant="outline" 
                         onClick={() => setProgress(p => Math.max(0, p - 10))}
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         size="sm"
                       >
                         -10
@@ -611,7 +628,7 @@ export default function KitchenSinkDemo() {
                       <Button 
                         variant="ghost" 
                         onClick={() => setProgress(0)}
-                        className="h-11"
+                        className="h-12 min-h-[48px]"
                         size="sm"
                       >
                         Reset
@@ -620,18 +637,14 @@ export default function KitchenSinkDemo() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
-
-            {/* Right column - Navigation and Feedback */}
-            <div className="space-y-4 sm:space-y-6">
               
               {/* Navigation Components */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Navigation Components</CardTitle>
                   <CardDescription>Navigation bars, breadcrumbs, tabs, and menu controls</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Top Navigation Bar */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Top Navigation Bar</h4>
@@ -668,7 +681,7 @@ export default function KitchenSinkDemo() {
                   {/* Side Navigation */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Side Navigation</h4>
-                    <div className="border rounded-lg bg-white p-4 w-64">
+                    <div className="border rounded-lg bg-white p-4 w-full max-w-sm">
                       <nav className="space-y-1">
                         <a href="#" className="flex items-center space-x-3 bg-primary/10 text-primary rounded-md px-3 py-2 text-sm font-medium">
                           <Home className="h-4 w-4" />
@@ -897,11 +910,11 @@ export default function KitchenSinkDemo() {
 
               {/* Feedback & Alerts */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Feedback & Alerts</CardTitle>
                   <CardDescription>Alerts, progress indicators, and user feedback components</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Inline Alerts */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Inline Alerts</h4>
@@ -1098,15 +1111,15 @@ export default function KitchenSinkDemo() {
 
               {/* Complex Layout & Content */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Complex Layout & Content</CardTitle>
                   <CardDescription>Cards, tables, accordions, and advanced layout components</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Cards Variants */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Card Variants</h4>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                       {/* Basic Card */}
                       <Card>
                         <CardHeader>
@@ -1350,15 +1363,15 @@ export default function KitchenSinkDemo() {
 
               {/* Date & Time Pickers */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Date & Time Pickers</CardTitle>
                   <CardDescription>Calendar, date range, and time selection components</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Single Date Picker */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Single Date</h4>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label>Pick a date</Label>
                         <Popover>
@@ -1430,13 +1443,13 @@ export default function KitchenSinkDemo() {
                   {/* Time Picker */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Time Picker</h4>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="time">Select time</Label>
                         <Input 
                           id="time"
                           type="time" 
-                          className="h-11"
+                          className="h-12 min-h-[48px]"
                           defaultValue="09:00"
                         />
                       </div>
@@ -1446,7 +1459,7 @@ export default function KitchenSinkDemo() {
                         <Input 
                           id="datetime"
                           type="datetime-local" 
-                          className="h-11"
+                          className="h-12 min-h-[48px]"
                         />
                       </div>
                     </div>
@@ -1471,7 +1484,7 @@ export default function KitchenSinkDemo() {
 
               {/* Overlay Components */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Overlays</CardTitle>
                   <CardDescription>Modals, sheets, and dropdown menus</CardDescription>
                 </CardHeader>
@@ -1556,11 +1569,11 @@ export default function KitchenSinkDemo() {
 
               {/* Avatar & Identity */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Avatar & Identity</CardTitle>
                   <CardDescription>User avatars, badges, and identity components</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
                       <AvatarImage src="https://i.pravatar.cc/80" />
@@ -1623,11 +1636,11 @@ export default function KitchenSinkDemo() {
 
               {/* Loading States */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Loading States</CardTitle>
                   <CardDescription>Skeleton placeholders and loading indicators</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Text Skeletons</h4>
                     <div className="space-y-3">
@@ -1654,11 +1667,11 @@ export default function KitchenSinkDemo() {
 
               {/* Theme & Utility Checks */}
               <Card>
-                <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
                   <CardTitle>Theme & Utility Checks</CardTitle>
                   <CardDescription>Color swatches, spacing examples, and responsive breakpoint tests</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
                   {/* Color Swatches */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Color Swatches</h4>
@@ -1857,8 +1870,8 @@ export default function KitchenSinkDemo() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </div>
-          </div>
           </div>
         </main>
 
@@ -1873,6 +1886,57 @@ export default function KitchenSinkDemo() {
             </Button>
           </div>
         </footer>
+
+        {/* Mobile Profile Sheet */}
+        <Sheet open={profileSheetOpen} onOpenChange={setProfileSheetOpen}>
+          <SheetContent side="bottom" className="bg-white">
+            <SheetHeader className="text-left pb-4">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
+                  <AvatarFallback>UM</AvatarFallback>
+                </Avatar>
+                <div>
+                  <SheetTitle className="text-lg">Uriel Maldonado</SheetTitle>
+                  <SheetDescription className="text-sm text-muted-foreground">
+                    uriel@example.com
+                  </SheetDescription>
+                </div>
+              </div>
+            </SheetHeader>
+            
+            <div className="space-y-1 py-4">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start h-12 text-base font-normal"
+                onClick={() => setProfileSheetOpen(false)}
+              >
+                <User className="mr-3 h-5 w-5" />
+                Profile
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start h-12 text-base font-normal"
+                onClick={() => setProfileSheetOpen(false)}
+              >
+                <Settings className="mr-3 h-5 w-5" />
+                Settings
+              </Button>
+              
+              <div className="border-t border-border my-2"></div>
+              
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start h-12 text-base font-normal text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => setProfileSheetOpen(false)}
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Log out
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
 
         {/* Command Palette */}
         <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>

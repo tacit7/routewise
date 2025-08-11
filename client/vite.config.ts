@@ -11,12 +11,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3001,
+    port: 3001, // Default port - can be overridden with --port flag
     host: '0.0.0.0',
-    hmr: {
-      port: 3001,
-      host: 'localhost',
-    },
     proxy: {
       '/api': {
         target: 'http://localhost:4001',
