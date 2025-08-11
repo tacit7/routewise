@@ -124,7 +124,8 @@ export default function PoiCardShadcn({
           />
           {showRelevanceScore && isPersonalized && relevanceScore > 0.6 && (
             <Badge 
-              className="absolute top-2 right-2 bg-amber-100 text-amber-700"
+              className="absolute top-2 right-2 bg-warning/20 text-warning-foreground border-warning"
+              variant="outline"
             >
               {Math.round(relevanceScore * 100)}% match
             </Badge>
@@ -178,7 +179,7 @@ export default function PoiCardShadcn({
             <HoverCard>
               <HoverCardTrigger asChild>
                 <div className="flex items-center space-x-1 cursor-help">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <Star className="h-4 w-4 text-warning fill-current" />
                   <span className="font-medium">{poi.rating}</span>
                   <span className="text-sm text-muted-foreground">
                     • {poi.reviewCount} reviews
@@ -236,7 +237,7 @@ export default function PoiCardShadcn({
                     )}
 
                     <div className="flex items-center">
-                      <Star className="h-5 w-5 mr-2 text-yellow-400 fill-current" />
+                      <Star className="h-5 w-5 mr-2 text-warning fill-current" />
                       <span className="font-medium">{poi.rating}</span>
                       <span className="text-muted-foreground ml-1">
                         ({poi.reviewCount} reviews)

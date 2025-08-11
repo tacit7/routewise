@@ -24,26 +24,29 @@ export default function RouteResults() {
     queryKey: ["/api/route-results", routeData?.startCity, routeData?.endCity],
     queryFn: async () => {
       if (!routeData) return { pois: [], route: null, maps_api_key: null, meta: null };
-      
+
       try {
         const params = new URLSearchParams({
           start: routeData.startCity,
           end: routeData.endCity
         });
+
+        const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
         
-        console.log('🔍 Fetching route results with params:', params.toString());
+        devLog('🔍 Fetching route results with params:', params.toString());
         const response = await fetch(`/api/route-results?${params}`);
-        console.log('📊 Route Results API response status:', response.status);
-        
+        devLog('📊 Route Results API response status:', response.status);
+
         if (!response.ok) {
+
           const errorText = await response.text();
-          console.error('❌ Route Results API error:', response.status, errorText);
+          devLog('❌ Route Results API error:', response.status, errorText);
           throw new Error(`Failed to fetch route results: ${response.status} ${errorText}`);
         }
-        
+
         const routeResponse = await response.json();
-        console.log('✅ Route Results data received:', routeResponse);
-        
+        devLog('✅ Route Results data received:', routeResponse);
+
         if (routeResponse.success && routeResponse.data) {
           return {
             pois: routeResponse.data.pois || [],
@@ -56,7 +59,8 @@ export default function RouteResults() {
           throw new Error('Invalid response format from route results API');
         }
       } catch (error) {
-        console.error('Error fetching POIs:', error);
+        const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+        devLog('Error fetching POIs:', error);
         return {
           pois: [],
           route: null,
@@ -77,7 +81,8 @@ export default function RouteResults() {
   // Event handlers for the PlacesView component
 
   const handlePoiClick = (poi: POI | Poi) => {
-    console.log("POI clicked:", poi.name);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog("POI clicked:", poi.name);
   };
 
   const handlePoiSelect = (poiId: number, selected: boolean) => {
@@ -123,9 +128,10 @@ export default function RouteResults() {
 
   // Extract POIs from route results
   const pois = routeResults?.pois || [];
-  
+
   if (poisError) {
-    console.error('❌ Route Results Error:', poisError);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog('❌ Route Results Error:', poisError);
   }
 
   return (

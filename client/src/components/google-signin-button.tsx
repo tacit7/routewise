@@ -38,7 +38,8 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
           setUseNativeButton(true);
         }
       } catch (error) {
-        console.warn('Failed to render Google button, using fallback:', error);
+        const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+        devLog('Failed to render Google button, using fallback:', error);
         setUseNativeButton(false);
       }
     };
@@ -62,7 +63,8 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
     try {
       await signInWithGoogle();
     } catch (error) {
-      console.error('Google sign-in failed:', error);
+      const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+      devLog('Google sign-in failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -73,8 +75,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
     return (
       <div 
         ref={buttonRef} 
-        className={`w-full ${className}`} 
-        style={{ opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }}
+        className={`w-full ${className} ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
       />
     );
   }
@@ -86,12 +87,12 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       variant="outline"
       onClick={handleGoogleSignIn}
       disabled={disabled || isLoading}
-      className={`w-full flex items-center justify-center gap-3 border-gray-300 hover:bg-gray-50 ${className}`}
+      className={`w-full flex items-center justify-center gap-3 border-input hover:bg-accent hover:text-accent-foreground ${className}`}
     >
       {isLoading ? (
         <>
-          <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-          <span className="text-gray-700 font-medium">Signing in...</span>
+          <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
+          <span className="text-foreground font-medium">Signing in...</span>
         </>
       ) : (
         <>
@@ -113,7 +114,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          <span className="text-gray-700 font-medium">{text}</span>
+          <span className="text-foreground font-medium">{text}</span>
         </>
       )}
     </Button>

@@ -1,4 +1,59 @@
 
+## Session: August 11, 2025 - TanStack Query Caching Debug & Vite Proxy Issue
+
+### TanStack Query Hiding Network Requests Due to Caching
+**Question:** Why are API requests not appearing in browser Network tab, and requests going to wrong port (3002 instead of 4001)?
+**Error/Issue:** API requests for `/api/places/autocomplete` not visible in Network tab, appearing to hit frontend port 3002 instead of backend port 4001 via Vite proxy
+**Context:** TanStack Query aggressive caching (30-minute staleTime) masking actual network requests, making proxy debugging impossible
+**Solution:** Temporarily disable TanStack Query caching to force fresh network requests and verify Vite proxy configuration
+**Code:**
+```typescript
+// Before: Aggressive caching hiding network requests
+return useQuery({
+  queryKey: ['cities', normalizedQuery, limit, countries],
+  queryFn: async () => { /* API call */ },
+  staleTime: 1000 * 60 * 30, // 30 minutes - prevents network requests
+  gcTime: 1000 * 60 * 60 * 2, // 2 hours garbage collection
+});
+
+// After: Debugging mode with disabled caching
+return useQuery({
+  queryKey: ['cities', normalizedQuery, limit, countries], 
+  queryFn: async () => { /* API call */ },
+  staleTime: 0, // DEBUGGING: Always fetch fresh (disable cache)
+  gcTime: 0, // DEBUGGING: Don't cache responses
+});
+```
+**Additional Debugging Steps:**
+1. **Install TanStack Query DevTools** for cache inspection:
+   ```bash
+   npm install @tanstack/react-query-devtools
+   ```
+2. **Enhanced Vite Proxy Logging** for request tracing:
+   ```typescript
+   proxy: {
+     '/api': {
+       target: 'http://localhost:4001',
+       changeOrigin: true,
+       configure: (proxy, _options) => {
+         proxy.on('proxyReq', (proxyReq, req, _res) => {
+           console.log('🔄 Proxying request:', req.method, req.url, '→', proxyReq.path);
+         });
+         proxy.on('proxyRes', (proxyRes, req, _res) => {
+           console.log('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
+         });
+       },
+     }
+   }
+   ```
+**Date:** August 11, 2025
+**Project:** [[Route-Wise Frontend]]
+**Status:** Solved
+
+#tanstack-query #vite #proxy #caching #debugging #network-requests
+**Related:** [[TanStack Query Optimization]] [[Vite Configuration]]
+---
+
 ## Session: August 6, 2025 - Dashboard API Consolidation Implementation
 
 ### Dashboard API Consolidation Implementation

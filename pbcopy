@@ -1,0 +1,1298 @@
+diff --git a/.env.example b/.env.example
+index 7370ddf..6e5702f 100644
+--- a/.env.example
++++ b/.env.example
+@@ -8,7 +8,7 @@ DATABASE_URL=postgresql://postgres:password@postgres:5432/routewise
+ # Override: Set to specific backend URL (e.g., http://192.168.1.100:4001)
+ VITE_API_URL=
+ 
+-# MSW (Mock Service Worker) Configuration  
++# MSW (Mock Service Worker) Configuration
+ # Set to "true" to disable MSW and use real Phoenix backend
+ MSW_DISABLED=false
+ 
+diff --git a/FAQ.md b/FAQ.md
+index 796c708..419ff64 100644
+--- a/FAQ.md
++++ b/FAQ.md
+@@ -1,4 +1,59 @@
+ 
++## Session: August 11, 2025 - TanStack Query Caching Debug & Vite Proxy Issue
++
++### TanStack Query Hiding Network Requests Due to Caching
++**Question:** Why are API requests not appearing in browser Network tab, and requests going to wrong port (3002 instead of 4001)?
++**Error/Issue:** API requests for `/api/places/autocomplete` not visible in Network tab, appearing to hit frontend port 3002 instead of backend port 4001 via Vite proxy
++**Context:** TanStack Query aggressive caching (30-minute staleTime) masking actual network requests, making proxy debugging impossible
++**Solution:** Temporarily disable TanStack Query caching to force fresh network requests and verify Vite proxy configuration
++**Code:**
++```typescript
++// Before: Aggressive caching hiding network requests
++return useQuery({
++  queryKey: ['cities', normalizedQuery, limit, countries],
++  queryFn: async () => { /* API call */ },
++  staleTime: 1000 * 60 * 30, // 30 minutes - prevents network requests
++  gcTime: 1000 * 60 * 60 * 2, // 2 hours garbage collection
++});
++
++// After: Debugging mode with disabled caching
++return useQuery({
++  queryKey: ['cities', normalizedQuery, limit, countries], 
++  queryFn: async () => { /* API call */ },
++  staleTime: 0, // DEBUGGING: Always fetch fresh (disable cache)
++  gcTime: 0, // DEBUGGING: Don't cache responses
++});
++```
++**Additional Debugging Steps:**
++1. **Install TanStack Query DevTools** for cache inspection:
++   ```bash
++   npm install @tanstack/react-query-devtools
++   ```
++2. **Enhanced Vite Proxy Logging** for request tracing:
++   ```typescript
++   proxy: {
++     '/api': {
++       target: 'http://localhost:4001',
++       changeOrigin: true,
++       configure: (proxy, _options) => {
++         proxy.on('proxyReq', (proxyReq, req, _res) => {
++           console.log('🔄 Proxying request:', req.method, req.url, '→', proxyReq.path);
++         });
++         proxy.on('proxyRes', (proxyRes, req, _res) => {
++           console.log('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
++         });
++       },
++     }
++   }
++   ```
++**Date:** August 11, 2025
++**Project:** [[Route-Wise Frontend]]
++**Status:** Solved
++
++#tanstack-query #vite #proxy #caching #debugging #network-requests
++**Related:** [[TanStack Query Optimization]] [[Vite Configuration]]
++---
++
+ ## Session: August 6, 2025 - Dashboard API Consolidation Implementation
+ 
+ ### Dashboard API Consolidation Implementation
+diff --git a/client/src/components/category-filter.tsx b/client/src/components/category-filter.tsx
+index 7bb812f..b8b4a62 100644
+--- a/client/src/components/category-filter.tsx
++++ b/client/src/components/category-filter.tsx
+@@ -1,10 +1,14 @@
+ import React, { useState } from "react";
+ import { 
+   UtensilsCrossed, 
+-  Trees, 
++  TreePine, 
+   Bed, 
+-  Theater, 
+-  Calendar,
++  Building, 
++  Gamepad2,
++  MapPin,
++  ShoppingBag,
++  Car,
++  Heart,
+   MoreHorizontal 
+ } from "lucide-react";
+ import { Button } from "@/components/ui/button";
+@@ -17,11 +21,36 @@ interface CategoryFilterProps {
+ }
+ 
+ const categories = [
+-  { id: "restaurant", label: "Food", icon: UtensilsCrossed },
+-  { id: "tourist_attraction", label: "Nature", icon: Trees },
+-  { id: "lodging", label: "Lodging", icon: Bed },
+-  { id: "museum", label: "Culture", icon: Theater },
+-  { id: "amusement_park", label: "Events", icon: Calendar },
++  { 
++    id: "restaurant", 
++    label: "Food", 
++    description: "Restaurants, cafes, and dining experiences",
++    icon: UtensilsCrossed 
++  },
++  { 
++    id: "tourist_attraction", 
++    label: "Attractions", 
++    description: "Tourist attractions, landmarks, and points of interest",
++    icon: MapPin 
++  },
++  { 
++    id: "lodging", 
++    label: "Lodging", 
++    description: "Hotels, motels, and accommodation options",
++    icon: Bed 
++  },
++  { 
++    id: "museum", 
++    label: "Culture", 
++    description: "Museums, galleries, and cultural sites",
++    icon: Building 
++  },
++  { 
++    id: "amusement_park", 
++    label: "Entertainment", 
++    description: "Amusement parks, entertainment venues, and attractions",
++    icon: Gamepad2 
++  },
+ ];
+ 
+ export default function CategoryFilter({ 
+@@ -51,7 +80,7 @@ export default function CategoryFilter({
+         
+         {/* Category Icons */}
+         <div className="flex items-center gap-1">
+-          {categories.map(({ id, label, icon: Icon }) => (
++          {categories.map(({ id, label, description, icon: Icon }) => (
+             <Button
+               key={id}
+               variant="ghost"
+@@ -84,7 +113,9 @@ export default function CategoryFilter({
+                   e.currentTarget.style.color = 'var(--text-muted)';
+                 }
+               }}
+-              title={label}
++              title={`${label}: ${description}`}
++              aria-label={`Filter by ${label}. ${description}. ${selectedCategory === id ? 'Currently selected' : 'Click to select'}`}
++              aria-pressed={selectedCategory === id}
+             >
+               <Icon className="h-4 w-4" />
+             </Button>
+@@ -105,6 +136,8 @@ export default function CategoryFilter({
+               e.currentTarget.style.backgroundColor = 'transparent';
+               e.currentTarget.style.color = 'var(--text-muted)';
+             }}
++            aria-label="Open category filter modal for more options"
++            aria-expanded={isModalOpen}
+           >
+             More
+           </Button>
+diff --git a/client/src/components/enhanced-route-form.tsx b/client/src/components/enhanced-route-form.tsx
+index d496f3c..3f8606e 100644
+--- a/client/src/components/enhanced-route-form.tsx
++++ b/client/src/components/enhanced-route-form.tsx
+@@ -108,8 +108,8 @@ export default function EnhancedRouteForm() {
+     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+       <div className="grid md:grid-cols-2 gap-4">
+         <div className="space-y-2">
+-          <Label htmlFor="startCity" className="flex items-center text-sm font-medium text-slate-700">
+-            <MapPin className="h-4 w-4 text-secondary mr-2" />
++          <Label htmlFor="startCity" className="flex items-center text-sm font-medium text-foreground">
++            <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+             From
+           </Label>
+           <PlaceAutocomplete
+@@ -119,13 +119,13 @@ export default function EnhancedRouteForm() {
+             className="w-full"
+           />
+           {form.formState.errors.startCity && (
+-            <p className="text-sm text-red-600">{form.formState.errors.startCity.message}</p>
++            <p className="text-sm text-destructive">{form.formState.errors.startCity.message}</p>
+           )}
+         </div>
+         
+         <div className="space-y-2">
+-          <Label htmlFor="endCity" className="flex items-center text-sm font-medium text-slate-700">
+-            <Flag className="h-4 w-4 text-accent mr-2" />
++          <Label htmlFor="endCity" className="flex items-center text-sm font-medium text-foreground">
++            <Flag className="h-4 w-4 text-muted-foreground mr-2" />
+             To
+           </Label>
+           <PlaceAutocomplete
+@@ -135,7 +135,7 @@ export default function EnhancedRouteForm() {
+             className="w-full"
+           />
+           {form.formState.errors.endCity && (
+-            <p className="text-sm text-red-600">{form.formState.errors.endCity.message}</p>
++            <p className="text-sm text-destructive">{form.formState.errors.endCity.message}</p>
+           )}
+         </div>
+       </div>
+@@ -144,7 +144,7 @@ export default function EnhancedRouteForm() {
+       <Button 
+         type="submit" 
+         disabled={isLoading}
+-        className="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-4 px-6 h-auto transition-all transform hover:scale-105 focus:ring-4 focus:ring-blue-300"
++        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 h-auto transition-all transform hover:scale-105 focus:ring-2 focus:ring-ring focus:ring-offset-2"
+       >
+         {isLoading ? (
+           <>
+diff --git a/client/src/components/google-signin-button.tsx b/client/src/components/google-signin-button.tsx
+index e5c368d..0a38392 100644
+--- a/client/src/components/google-signin-button.tsx
++++ b/client/src/components/google-signin-button.tsx
+@@ -86,12 +86,12 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
+       variant="outline"
+       onClick={handleGoogleSignIn}
+       disabled={disabled || isLoading}
+-      className={`w-full flex items-center justify-center gap-3 border-gray-300 hover:bg-gray-50 ${className}`}
++      className={`w-full flex items-center justify-center gap-3 border-input hover:bg-accent hover:text-accent-foreground ${className}`}
+     >
+       {isLoading ? (
+         <>
+-          <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+-          <span className="text-gray-700 font-medium">Signing in...</span>
++          <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
++          <span className="text-foreground font-medium">Signing in...</span>
+         </>
+       ) : (
+         <>
+@@ -113,7 +113,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
+               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+             />
+           </svg>
+-          <span className="text-gray-700 font-medium">{text}</span>
++          <span className="text-foreground font-medium">{text}</span>
+         </>
+       )}
+     </Button>
+diff --git a/client/src/components/header.tsx b/client/src/components/header.tsx
+index 5f6956a..c9cfe3f 100644
+--- a/client/src/components/header.tsx
++++ b/client/src/components/header.tsx
+@@ -1,21 +1,85 @@
+ import React from "react";
++import { useLocation } from "wouter";
++import { LogOut, Settings, User } from "lucide-react";
++import { Button } from "@/components/ui/button";
++import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
++import {
++  DropdownMenu,
++  DropdownMenuContent,
++  DropdownMenuItem,
++  DropdownMenuLabel,
++  DropdownMenuSeparator,
++  DropdownMenuTrigger,
++} from "@/components/ui/dropdown-menu";
++import { useAuth } from "@/components/auth-context";
+ 
+ interface HeaderProps {
+   leftContent?: React.ReactNode; // Back button, etc.
+   centerContent?: React.ReactNode; // Title, trip info, etc.
+   rightContent?: React.ReactNode; // Actions, save button, etc.
++  showLogo?: boolean; // Whether to show logo in left section
++  showUserMenu?: boolean; // Whether to show user menu in right section
+ }
+ 
+-export default function Header({ leftContent, centerContent, rightContent }: HeaderProps) {
++export default function Header({ 
++  leftContent, 
++  centerContent, 
++  rightContent, 
++  showLogo = true, 
++  showUserMenu = true 
++}: HeaderProps) {
++  const [, setLocation] = useLocation();
++  const { user, isAuthenticated, logout } = useAuth();
++
++  const handleSignOut = async () => {
++    try {
++      await logout();
++      setLocation('/');
++    } catch (error) {
++      console.error('Sign out error:', error);
++    }
++  };
++
++  const getUserInitials = (name: string) => {
++    return name
++      .split(' ')
++      .map(n => n[0])
++      .join('')
++      .toUpperCase()
++      .slice(0, 2);
++  };
++
+   return (
+-    <div className="bg-card text-card-foreground border-b border-border">
+-      <div className="px-6 py-4 flex items-center justify-between">
+-        {/* Left section */}
++    <header className="bg-card text-card-foreground border-b border-border shadow-sm" role="banner">
++      <div className="px-4 sm:px-6 py-3 flex items-center justify-between">
++        {/* Left section - Logo and leftContent */}
+         <div className="flex items-center gap-4">
+-          {leftContent}
++          {showLogo && (
++            <button
++              onClick={() => setLocation('/')}
++              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-ring"
++              aria-label="Go to home page"
++            >
++              <img 
++                src="/logo.svg" 
++                alt="RouteWise" 
++                className="h-8 w-auto"
++              />
++              <span className="font-semibold text-lg text-primary hidden sm:inline">
++                RouteWise
++              </span>
++            </button>
++          )}
++          
++          {leftContent && (
++            <div className="flex items-center gap-2">
++              {leftContent}
++            </div>
++          )}
++          
+           {/* Center content when no explicit left content */}
+           {!leftContent && centerContent && (
+-            <div className="flex-1">
++            <div className="flex-1 ml-4">
+               {centerContent}
+             </div>
+           )}
+@@ -23,18 +87,132 @@ export default function Header({ leftContent, centerContent, rightContent }: Hea
+ 
+         {/* Center section (when there is left content) */}
+         {leftContent && centerContent && (
+-          <div className="flex-1">
+-            {centerContent}
++          <div className="flex-1 px-4">
++            <div className="flex justify-center">
++              {centerContent}
++            </div>
+           </div>
+         )}
+ 
+-        {/* Right section */}
+-        {rightContent && (
+-          <div className="flex items-center gap-3">
+-            {rightContent}
+-          </div>
+-        )}
++        {/* Right section - rightContent and user menu */}
++        <div className="flex items-center gap-3">
++          {rightContent && (
++            <div className="flex items-center gap-3">
++              {rightContent}
++            </div>
++          )}
++          
++          {showUserMenu && (
++            <div className="flex items-center gap-2">
++              {isAuthenticated ? (
++                <DropdownMenu>
++                  <DropdownMenuTrigger asChild>
++                    <Button
++                      variant="ghost"
++                      className="relative h-10 w-10 rounded-full p-0 hover:bg-muted focus-ring"
++                      aria-label={`User menu for ${user?.name || 'User'}`}
++                    >
++                      <Avatar className="h-9 w-9">
++                        {user?.picture && (
++                          <AvatarImage 
++                            src={user.picture} 
++                            alt={user.name || 'User avatar'} 
++                          />
++                        )}
++                        <AvatarFallback className="bg-primary text-primary-foreground font-medium">
++                          {user?.name ? getUserInitials(user.name) : 'U'}
++                        </AvatarFallback>
++                      </Avatar>
++                    </Button>
++                  </DropdownMenuTrigger>
++                  <DropdownMenuContent 
++                    align="end" 
++                    className="w-56"
++                    style={{ 
++                      backgroundColor: 'var(--card)', 
++                      borderColor: 'var(--border)',
++                      color: 'var(--card-foreground)'
++                    }}
++                  >
++                    <DropdownMenuLabel 
++                      className="font-normal"
++                      style={{ color: 'var(--text)' }}
++                    >
++                      <div className="flex flex-col space-y-1">
++                        <p className="text-sm font-medium leading-none">
++                          {user?.name || 'User'}
++                        </p>
++                        <p className="text-xs leading-none" style={{ color: 'var(--text-muted)' }}>
++                          {user?.email}
++                        </p>
++                      </div>
++                    </DropdownMenuLabel>
++                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
++                    <DropdownMenuItem 
++                      onClick={() => setLocation('/profile')}
++                      className="cursor-pointer focus-ring"
++                      style={{ color: 'var(--text)' }}
++                      onMouseEnter={(e) => {
++                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
++                        e.currentTarget.style.color = 'var(--primary)';
++                      }}
++                      onMouseLeave={(e) => {
++                        e.currentTarget.style.backgroundColor = 'transparent';
++                        e.currentTarget.style.color = 'var(--text)';
++                      }}
++                    >
++                      <User className="mr-2 h-4 w-4" />
++                      <span>Profile</span>
++                    </DropdownMenuItem>
++                    <DropdownMenuItem 
++                      onClick={() => setLocation('/settings')}
++                      className="cursor-pointer focus-ring"
++                      style={{ color: 'var(--text)' }}
++                      onMouseEnter={(e) => {
++                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
++                        e.currentTarget.style.color = 'var(--primary)';
++                      }}
++                      onMouseLeave={(e) => {
++                        e.currentTarget.style.backgroundColor = 'transparent';
++                        e.currentTarget.style.color = 'var(--text)';
++                      }}
++                    >
++                      <Settings className="mr-2 h-4 w-4" />
++                      <span>Settings</span>
++                    </DropdownMenuItem>
++                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
++                    <DropdownMenuItem 
++                      onClick={handleSignOut}
++                      className="cursor-pointer focus-ring"
++                      style={{ color: 'var(--destructive)' }}
++                      onMouseEnter={(e) => {
++                        e.currentTarget.style.backgroundColor = 'var(--destructive-50)';
++                        e.currentTarget.style.color = 'var(--destructive)';
++                      }}
++                      onMouseLeave={(e) => {
++                        e.currentTarget.style.backgroundColor = 'transparent';
++                        e.currentTarget.style.color = 'var(--destructive)';
++                      }}
++                    >
++                      <LogOut className="mr-2 h-4 w-4" />
++                      <span>Sign out</span>
++                    </DropdownMenuItem>
++                  </DropdownMenuContent>
++                </DropdownMenu>
++              ) : (
++                <Button
++                  onClick={() => setLocation('/auth')}
++                  variant="default"
++                  size="sm"
++                  className="focus-ring"
++                >
++                  Sign In
++                </Button>
++              )}
++            </div>
++          )}
++        </div>
+       </div>
+-    </div>
++    </header>
+   );
+ }
+diff --git a/client/src/components/hero-section.tsx b/client/src/components/hero-section.tsx
+index b3cd0e2..fe833e1 100644
+--- a/client/src/components/hero-section.tsx
++++ b/client/src/components/hero-section.tsx
+@@ -14,13 +14,13 @@ export default function HeroSection() {
+           backgroundImage: `url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080')`
+         }}
+       />
+-      <div className="absolute inset-0 bg-slate-900 bg-opacity-40" />
++      <div className="absolute inset-0 bg-background/60" />
+       
+       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+         <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+           Plan Your Perfect <span className="text-accent">Road Trip</span>
+         </h2>
+-        <p className="text-xl text-slate-200 mb-12 max-w-2xl mx-auto">
++        <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+           Discover amazing stops along your route or explore places around any destination. Let's make every mile memorable.
+         </p>
+         
+@@ -33,8 +33,8 @@ export default function HeroSection() {
+                 onClick={() => setActiveTab('route')}
+                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+                   activeTab === 'route'
+-                    ? 'bg-surface text-blue-600 shadow-sm'
+-                    : 'text-muted-fg hover:text-fg'
++                    ? 'bg-surface text-primary shadow-sm'
++                    : 'text-muted-foreground hover:text-foreground'
+                 }`}
+               >
+                 <i className="fas fa-route mr-2" />
+@@ -44,8 +44,8 @@ export default function HeroSection() {
+                 onClick={() => setActiveTab('place')}
+                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
+                   activeTab === 'place'
+-                    ? 'bg-surface text-purple-600 shadow-sm'
+-                    : 'text-muted-fg hover:text-fg'
++                    ? 'bg-surface text-primary shadow-sm'
++                    : 'text-muted-foreground hover:text-foreground'
+                 }`}
+               >
+                 <i className="fas fa-compass mr-2" />
+@@ -57,8 +57,8 @@ export default function HeroSection() {
+             {activeTab === 'route' && (
+               <div>
+                 <div className="mb-4 text-center">
+-                  <h3 className="text-lg font-semibold text-fg mb-2">Quick Route</h3>
+-                  <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
++                  <h3 className="text-lg font-semibold text-foreground mb-2">Quick Route</h3>
++                  <p className="text-sm text-muted-foreground">Get started fast with basic route planning</p>
+                 </div>
+                 <RouteForm />
+               </div>
+@@ -67,8 +67,8 @@ export default function HeroSection() {
+             {activeTab === 'place' && (
+               <div>
+                 <div className="mb-4 text-center">
+-                  <h3 className="text-lg font-semibold text-fg mb-2">Explore Places</h3>
+-                  <p className="text-sm text-slate-600">Discover attractions around any city or destination</p>
++                  <h3 className="text-lg font-semibold text-foreground mb-2">Explore Places</h3>
++                  <p className="text-sm text-muted-foreground">Discover attractions around any city or destination</p>
+                 </div>
+                 <PlaceForm />
+               </div>
+diff --git a/client/src/components/places-view.tsx b/client/src/components/places-view.tsx
+index c5d87bb..79ca645 100644
+--- a/client/src/components/places-view.tsx
++++ b/client/src/components/places-view.tsx
+@@ -10,6 +10,7 @@ import { useTripPlaces } from "@/hooks/use-trip-places";
+ import CategoryFilter from "@/components/category-filter";
+ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+ import { Badge } from "@/components/ui/badge";
++import Header from "@/components/header";
+ 
+ interface PlacesViewProps {
+   // Core data
+@@ -118,6 +119,7 @@ export default function PlacesView({
+   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+   const [selectedCity, setSelectedCity] = useState<string>("all");
+   const [selectedPoiId, setSelectedPoiId] = useState<number | null>(null);
++  const [showTripOnly, setShowTripOnly] = useState<boolean>(false);
+ 
+   // POI scheduling state
+   const [scheduledTimes, setScheduledTimes] = useState<Map<number, string>>(new Map());
+@@ -171,7 +173,7 @@ export default function PlacesView({
+ 
+   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
+   const [panelKey, setPanelKey] = useState(0); // Force re-render on panel resize
+-  const { tripPlaces, addToTrip, isInTrip, isAddingToTrip } = useTripPlaces();
++  const { tripPlaces, addToTrip, removeFromTrip, isInTrip, isAddingToTrip, isRemovingFromTrip } = useTripPlaces();
+ 
+   // Filter and dedupe POIs
+   const uniquePois = pois.filter((poi, index, self) => {
+@@ -218,28 +220,14 @@ export default function PlacesView({
+       }
+     }
+ 
+-    return categoryMatch && cityMatch;
+-  });
++    const tripMatch = showTripOnly ? isInTrip(poi) : true;
+ 
+-  // Calculate optimal card width based on panel size
+-  const getCardFlexBasis = () => {
+-    // Force full width for mobile or explore mode
+-    if (!showRouting || isMobile) return '100%';
+-
+-    // Calculate actual sidebar width for desktop
+-    const containerWidth = (window.innerWidth * (sidebarSizePercent / 100)) - 40;
+-
+-    // Force single-column list until panel is quite wide
+-    // Default 30% (~360px equivalent) should show single column
+-    if (containerWidth < 500) return '100%';      // Single column list (default behavior)
+-    if (containerWidth < 700) return 'calc(50% - 8px)';  // 2 per row only when wider
+-    if (containerWidth < 900) return 'calc(33.333% - 8px)'; // 3 per row when very wide
+-    if (containerWidth < 1100) return 'calc(25% - 8px)';     // 4 per row when extra wide
+-    return 'calc(20% - 8px)'; // 5 per row for ultrawide panels
+-  };
++    return categoryMatch && cityMatch && tripMatch;
++  });
+ 
+-  const cardFlexBasis = getCardFlexBasis();
+-  const isFlexLayout = cardFlexBasis !== '100%';
++  // Always use vertical card layout - force 100% width
++  const cardFlexBasis = '100%';
++  const isFlexLayout = false;
+ 
+   // Debug panel sizing
+   console.log('Panel Debug:', {
+@@ -281,57 +269,72 @@ export default function PlacesView({
+ 
+   return (
+     <div className="h-screen flex flex-col bg-background">
+-      {/* Header */}
+-      <header className="bg-card shadow-sm border-b border-border flex-shrink-0">
+-        <div className="px-4 sm:px-6 lg:px-8">
+-          <div className="flex items-center justify-between py-3">
+-            <Button
+-              variant="ghost"
+-              onClick={() => setLocation(backUrl)}
+-              className="flex items-center text-muted-foreground hover:text-primary"
+-            >
+-              <ArrowLeft className="h-4 w-4 mr-2" />
+-              Back to Home
+-            </Button>
+-            <div className="flex items-center gap-2 sm:gap-4">
+-              <div className="text-sm text-muted-foreground hidden sm:block">
+-                {displayHeaderTitle} • {uniquePois.length} places
+-              </div>
+-              <div className="text-xs text-muted-foreground sm:hidden">{uniquePois.length} places</div>
+-
+-              {/* Mobile-optimized toggle button */}
+-              <button
+-                onClick={() => {
+-                  console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
+-                  setIsMapVisible(!isMapVisible);
+-                }}
+-                className={`
+-                  flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation
+-                  ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
+-                  ${
+-                    isMapVisible
+-                      ? "bg-muted hover:bg-muted/80 text-muted-foreground"
+-                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+-                  }
+-                `}
+-                aria-label={isMapVisible ? "Hide map, show POI list" : "Show map"}
+-              >
+-                {isMapVisible ? (
+-                  <>
+-                    <List className="h-4 w-4" />
+-                    <span className="text-sm hidden sm:inline">List</span>
+-                  </>
+-                ) : (
+-                  <>
+-                    <MapIcon className="h-4 w-4" />
+-                    <span className="text-sm hidden sm:inline">Map</span>
+-                  </>
+-                )}
+-              </button>
+-            </div>
++      {/* Screen reader announcements for filter changes */}
++      <div 
++        aria-live="polite" 
++        aria-atomic="true" 
++        className="sr-only"
++      >
++        Showing {filteredPois.length} places
++        {selectedCategory !== "all" && ` filtered by ${selectedCategory}`}
++        {showTripOnly && ` from your trip`}
++      </div>
++      
++      <Header
++        leftContent={
++          <Button
++            variant="ghost"
++            onClick={() => setLocation(backUrl)}
++            className="flex items-center text-muted-foreground hover:text-primary focus-ring"
++            aria-label="Go back to previous page"
++          >
++            <ArrowLeft className="h-4 w-4 mr-2" />
++            <span className="hidden sm:inline">Back</span>
++          </Button>
++        }
++        centerContent={
++          <div className="text-center">
++            <h1 className="text-lg font-semibold text-foreground">
++              {displayHeaderTitle}
++            </h1>
++            <p className="text-sm text-muted-foreground">
++              {uniquePois.length} places found
++            </p>
+           </div>
+-        </div>
+-      </header>
++        }
++        rightContent={
++          <button
++            onClick={() => {
++              console.log("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
++              setIsMapVisible(!isMapVisible);
++            }}
++            className={`
++              flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation focus-ring
++              ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
++              ${
++                isMapVisible
++                  ? "bg-muted hover:bg-muted/80 text-muted-foreground"
++                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
++              }
++            `}
++            aria-label={isMapVisible ? "Hide map and show places list view" : "Show map view"}
++            aria-pressed={isMapVisible}
++            role="button"
++          >
++            {isMapVisible ? (
++              <>
++                <List className="h-4 w-4" />
++                <span className="text-sm hidden sm:inline">List</span>
++              </>
++            ) : (
++              <>
++                <MapIcon className="h-4 w-4" />
++                <span className="text-sm hidden sm:inline">Map</span>
++              </>
++            )}
++          </button>
++        }
++      />
+ 
+       {/* Main Content */}
+       {(() => {
+@@ -367,7 +370,7 @@ export default function PlacesView({
+           </div>
+         ) : (
+           // Mobile POI list view (full screen)
+-          <div className="flex-1 flex flex-col">
++          <main className="flex-1 flex flex-col" role="main" aria-label="Places list view">
+             {/* Category Filter for POI-only view */}
+             <div className="bg-card border-b border-border flex-shrink-0">
+               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+@@ -427,13 +430,14 @@ export default function PlacesView({
+                   onClick={() => setLocation("/itinerary")}
+                   className="w-full bg-primary hover:bg-primary/90 text-white min-h-[48px] touch-manipulation"
+                   size="lg"
++                  aria-label={`Start planning itinerary with ${tripPlaces.length} places`}
+                 >
+-                  <Calendar className="h-5 w-5 mr-2" />
++                  <Calendar className="h-5 w-5 mr-2" aria-hidden="true" />
+                   Start Itinerary ({tripPlaces.length} places)
+                 </Button>
+               </div>
+             )}
+-          </div>
++          </main>
+         )
+       ) : (
+         // Desktop: Original ResizablePanelGroup layout
+@@ -443,31 +447,47 @@ export default function PlacesView({
+             defaultSize={30}
+             minSize={20}
+             maxSize={50}
+-            className="bg-card"
++            className="bg-surface shadow-lg border-r-2 border-primary/20"
+             onResize={handlePanelResize}
+           >
+-            <div className="flex flex-col h-full">
++            <aside className="flex flex-col h-full" role="complementary" aria-label="Places filter and list">
+               {/* Category Filter */}
+               <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+ 
+               {/* Sidebar Header */}
+-              <div
+-                className="p-3 border-b border-border bg-muted"
+-              >
+-                <h2 className="text-lg font-semibold text-foreground">
++              <div className="p-3 border-b border-border bg-muted">
++                <h2 className="text-lg font-semibold text-foreground" id="places-sidebar-heading">
+                   {displaySidebarTitle}
+                 </h2>
+-                <div className="flex gap-2 mt-2">
++                <div className="flex gap-2 mt-2 flex-wrap">
+                   <button
+                     onClick={() => setSelectedCity("all")}
+-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
++                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
+                       selectedCity === "all"
+                         ? "bg-primary text-primary-foreground"
+                         : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                     }`}
++                    aria-label={`Show all places. ${uniquePois.length} places total. ${selectedCity === "all" ? "Currently selected" : "Click to select"}`}
++                    aria-pressed={selectedCity === "all"}
++                    role="button"
+                   >
+                     All ({uniquePois.length})
+                   </button>
++                  {tripPlaces.length > 0 && (
++                    <button
++                      onClick={() => setShowTripOnly(!showTripOnly)}
++                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
++                        showTripOnly
++                          ? "bg-primary text-primary-foreground"
++                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
++                      }`}
++                      aria-label={`Show only places in trip. ${tripPlaces.length} places in your trip. ${showTripOnly ? "Currently showing trip places only" : "Click to filter to trip places only"}`}
++                      aria-pressed={showTripOnly}
++                      role="button"
++                    >
++                      Trip Only ({tripPlaces.length})
++                    </button>
++                  )}
+                 </div>
+               </div>
+ 
+@@ -501,62 +521,90 @@ export default function PlacesView({
+                   >
+                     {filteredPois.map((poi, index) => (
+                       cardFlexBasis === '100%' ? (
+-                        // Single-column list layout using your grid spec
++                        // Vertical card layout - image on top
+                         <div
+                           key={poi.placeId || poi.id || `poi-list-${index}`}
+                           onMouseEnter={() => onPoiHover(poi)}
+                           onMouseLeave={() => onPoiHover(null)}
+-                          className="grid grid-cols-[64px_1fr_auto] gap-3 items-center p-2 rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer"
++                          className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-3"
+                         >
+-                          {/* Thumbnail - 64px */}
+-                          <img
+-                            src={poi.imageUrl || '/placeholder-poi.jpg'}
+-                            alt={poi.name}
+-                            className="h-16 w-16 rounded object-cover"
+-                          />
+-
+-                          {/* Main content - 1fr */}
+-                          <div className="min-w-0">
+-                            <h4 className="truncate font-medium text-sm">{poi.name}</h4>
+-                            <p className="text-xs text-muted-foreground truncate">{poi.description || poi.address}</p>
+-                            <div className="flex items-center gap-2 mt-1">
+-                              <div className="flex items-center gap-1 text-xs text-yellow-500">
+-                                <Star className="h-3 w-3 fill-current" />
+-                                {poi.rating}
++                          {/* Image on top */}
++                          <div className="relative">
++                            <img
++                              src={poi.imageUrl || '/placeholder-poi.jpg'}
++                              alt={poi.name}
++                              className="w-full h-32 object-cover rounded"
++                            />
++                            {/* Category badge on image */}
++                            <div className="absolute top-2 left-2">
++                              <div className="text-xs px-2 py-1 rounded-full bg-black/60 text-white backdrop-blur-sm">
++                                {poi.category.charAt(0).toUpperCase() + poi.category.slice(1).replace('_', ' ')}
+                               </div>
+-                              {poi.timeFromStart && (
+-                                <span className="text-xs text-muted-foreground">{poi.timeFromStart}</span>
+-                              )}
+                             </div>
+                           </div>
+ 
+-                          {/* Action/Tag - auto */}
+-                          <div className="flex flex-col items-end gap-1">
+-                            <div className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+-                              {poi.category}
+-                            </div>
+-                            <button
+-                              onClick={() => {
+-                                if (!isInTrip(poi)) {
+-                                  addToTrip(poi);
++                          {/* Content below image */}
++                          <div className="mt-3">
++                            {/* Name */}
++                            <h4 className="font-medium text-base line-clamp-2">
++                              {poi.name}
++                            </h4>
++
++                            {/* Description (now with smart backend-generated content) */}
++                            {poi.description && poi.description !== "Point of interest" && (
++                              <p className="text-muted-foreground text-sm mt-2 line-clamp-1">
++                                {poi.description}
++                              </p>
++                            )}
++
++                            {/* Rating */}
++                            <div className="flex items-center justify-between mt-2">
++                              <div className="flex items-center gap-1 text-warning text-base">
++                                <Star className="h-4 w-4 fill-current" />
++                                <span className="font-medium">{poi.rating}</span>
++                                {poi.timeFromStart && (
++                                  <span className="text-muted-foreground text-xs ml-2">{poi.timeFromStart}</span>
++                                )}
++                              </div>
++
++                              {/* Add/Remove Trip button */}
++                              <button
++                                onClick={() => {
++                                  if (isInTrip(poi)) {
++                                    removeFromTrip(poi.id);
++                                  } else {
++                                    addToTrip(poi);
++                                  }
++                                }}
++                                disabled={isAddingToTrip || isRemovingFromTrip}
++                                className={`text-xs px-3 py-1 rounded transition-colors focus-ring ${
++                                  isInTrip(poi)
++                                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
++                                    : isAddingToTrip || isRemovingFromTrip
++                                    ? "bg-primary/60 text-primary-foreground cursor-not-allowed"
++                                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
++                                }`}
++                                aria-label={
++                                  isInTrip(poi) 
++                                    ? `Remove ${poi.name} from trip` 
++                                    : isAddingToTrip || isRemovingFromTrip
++                                    ? "Processing request..."
++                                    : `Add ${poi.name} to trip`
+                                 }
+-                              }}
+-                              disabled={isInTrip(poi) || isAddingToTrip}
+-                              className={`text-[10px] px-2 py-1 rounded transition-colors ${
+-                                isInTrip(poi)
+-                                  ? "bg-primary/10 text-primary cursor-not-allowed"
+-                                  : isAddingToTrip
+-                                  ? "bg-primary/60 text-white cursor-not-allowed"
+-                                  : "bg-primary hover:bg-primary/90 text-white"
+-                              }`}
+-                            >
+-                              {isInTrip(poi) ? (
+-                                <div className="flex items-center gap-1">
+-                                  <Check className="h-3 w-3" />
+-                                  In Trip
+-                                </div>
+-                              ) : isAddingToTrip ? "Adding..." : "+ Trip"}
+-                            </button>
++                                aria-describedby={`poi-${poi.id}-status`}
++                              >
++                                {isInTrip(poi) ? (
++                                  <div className="flex items-center gap-1">
++                                    <Check className="h-3 w-3" aria-hidden="true" />
++                                    Remove
++                                  </div>
++                                ) : isAddingToTrip || isRemovingFromTrip ? "..." : "+ Trip"}
++                              </button>
++                              {/* Hidden status text for screen readers */}
++                              <span id={`poi-${poi.id}-status`} className="sr-only">
++                                {isInTrip(poi) ? "This place is in your trip" : "This place is not in your trip"}
++                              </span>
++                            </div>
+                           </div>
+                         </div>
+                       ) : (
+@@ -596,7 +644,7 @@ export default function PlacesView({
+                   </Button>
+                 </div>
+               )}
+-            </div>
++            </aside>
+           </ResizablePanel>
+ 
+           <ResizableHandle withHandle className="transition-colors bg-border" />
+diff --git a/client/src/components/poi-card-shadcn.tsx b/client/src/components/poi-card-shadcn.tsx
+index 11ffd4f..89baa4e 100644
+--- a/client/src/components/poi-card-shadcn.tsx
++++ b/client/src/components/poi-card-shadcn.tsx
+@@ -124,7 +124,8 @@ export default function PoiCardShadcn({
+           />
+           {showRelevanceScore && isPersonalized && relevanceScore > 0.6 && (
+             <Badge 
+-              className="absolute top-2 right-2 bg-amber-100 text-amber-700"
++              className="absolute top-2 right-2 bg-warning/20 text-warning-foreground border-warning"
++              variant="outline"
+             >
+               {Math.round(relevanceScore * 100)}% match
+             </Badge>
+@@ -178,7 +179,7 @@ export default function PoiCardShadcn({
+             <HoverCard>
+               <HoverCardTrigger asChild>
+                 <div className="flex items-center space-x-1 cursor-help">
+-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
++                  <Star className="h-4 w-4 text-warning fill-current" />
+                   <span className="font-medium">{poi.rating}</span>
+                   <span className="text-sm text-muted-foreground">
+                     • {poi.reviewCount} reviews
+@@ -236,7 +237,7 @@ export default function PoiCardShadcn({
+                     )}
+ 
+                     <div className="flex items-center">
+-                      <Star className="h-5 w-5 mr-2 text-yellow-400 fill-current" />
++                      <Star className="h-5 w-5 mr-2 text-warning fill-current" />
+                       <span className="font-medium">{poi.rating}</span>
+                       <span className="text-muted-foreground ml-1">
+                         ({poi.reviewCount} reviews)
+diff --git a/client/src/hooks/use-city-autocomplete.ts b/client/src/hooks/use-city-autocomplete.ts
+index 14c3359..b04635b 100644
+--- a/client/src/hooks/use-city-autocomplete.ts
++++ b/client/src/hooks/use-city-autocomplete.ts
+@@ -146,7 +146,7 @@ export function useCityAutocomplete(
+       }
+     },
+     enabled: normalizedQuery.length >= 2, // Only fetch for queries 2+ chars
+-    staleTime: 1000 * 60 * 30, // 30 minutes - cities don't change often
++    staleTime: 1000 * 60 * 30, // 30 minutes - cities don't change often  
+     gcTime: 1000 * 60 * 60 * 2, // 2 hours garbage collection
+     refetchOnWindowFocus: false, // Prevent unnecessary refetch
+     refetchOnReconnect: true, // Refetch on network reconnect
+diff --git a/client/src/hooks/use-explore-results.ts b/client/src/hooks/use-explore-results.ts
+index 235b829..f39429f 100644
+--- a/client/src/hooks/use-explore-results.ts
++++ b/client/src/hooks/use-explore-results.ts
+@@ -13,6 +13,7 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
+ 
+   try {
+     const response = await fetch(`/api/explore-results?${params}`);
++    debugger;
+     if (!response.ok) {
+       const errorText = await response.text();
+       throw new Error(`Fetch failed: ${response.status} ${errorText}`);
+diff --git a/client/src/index.css b/client/src/index.css
+index 8d720fc..851e22c 100644
+--- a/client/src/index.css
++++ b/client/src/index.css
+@@ -147,7 +147,18 @@
+ 
+ .focus-ring:focus {
+   outline: none;
+-  box-shadow: 0 0 0 2px var(--focus) with 2px offset;
++  box-shadow: 0 0 0 2px var(--focus);
++}
++
++/* Ensure focus is visible for all interactive elements */
++button:focus-visible,
++[role="button"]:focus-visible,
++a:focus-visible,
++input:focus-visible,
++select:focus-visible,
++textarea:focus-visible {
++  outline: 2px solid var(--focus);
++  outline-offset: 2px;
+ }
+ 
+ /* UX Spec Styling */
+diff --git a/client/src/lib/queryClient.ts b/client/src/lib/queryClient.ts
+index 3bc21c4..12d87c9 100644
+--- a/client/src/lib/queryClient.ts
++++ b/client/src/lib/queryClient.ts
+@@ -104,8 +104,8 @@ export const queryClient = new QueryClient({
+     queries: {
+       queryFn: getQueryFn({ on401: "throw" }),
+       refetchInterval: false,
+-      refetchOnWindowFocus: false,
+-      staleTime: Infinity,
++      refetchOnWindowFocus: import.meta.env.DEV ? true : false,
++      staleTime: import.meta.env.DEV ? 0 : Infinity,
+       retry: (failureCount, error) => {
+         // Enhanced retry logic with APIError support
+         if (error instanceof APIError) {
+diff --git a/client/src/pages/itinerary.tsx b/client/src/pages/itinerary.tsx
+index 3a9f1d0..616f9d3 100644
+--- a/client/src/pages/itinerary.tsx
++++ b/client/src/pages/itinerary.tsx
+@@ -1,6 +1,6 @@
+ import React, { useEffect, useMemo, useState } from "react";
+ import { useLocation } from "wouter";
+-import { Check, LogIn, Plus, Save } from "lucide-react";
++import { ArrowLeft, Check, LogIn, Plus, Save, X } from "lucide-react";
+ import { Button } from "@/components/ui/button";
+ import BackButton from "@/components/header/BackButton";
+ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+@@ -68,6 +68,32 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
+     setActiveDay(days.length);
+   };
+ 
++  const handleDeleteDay = (dayIndex: number) => {
++    if (days.length <= 1) return; // Don't delete if it's the only day
++    
++    // Remove places from that day from assignedPlaceIds
++    const dayToDelete = days[dayIndex];
++    dayToDelete.places.forEach((place) => {
++      const id = getIdentifier(place);
++      setAssignedPlaceIds((prev) => {
++        const next = new Set(prev);
++        next.delete(id);
++        return next;
++      });
++    });
++
++    // Remove the day
++    const newDays = days.filter((_, index) => index !== dayIndex);
++    setDays(newDays);
++    
++    // Adjust active day if necessary
++    if (activeDay >= newDays.length) {
++      setActiveDay(newDays.length - 1);
++    } else if (activeDay >= dayIndex) {
++      setActiveDay(Math.max(0, activeDay - 1));
++    }
++  };
++
+   const handlePlaceAssignment = (place: ItineraryPlace, dayIndex: number) => {
+     const id = getIdentifier(place);
+     if (assignedPlaceIds.has(id)) return;
+@@ -120,6 +146,11 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
+     return `${list[0]} to ${list[list.length - 1]} (+${list.length - 2} more)`;
+   };
+ 
++  const unassigned = useMemo(
++    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
++    [itineraryPlaces, assignedPlaceIds]
++  );
++
+   if (itineraryPlaces.length === 0) {
+     return (
+       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+@@ -143,11 +174,6 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
+     );
+   }
+ 
+-  const unassigned = useMemo(
+-    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
+-    [itineraryPlaces, assignedPlaceIds]
+-  );
+-
+   return (
+     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+       <Header
+@@ -180,29 +206,20 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
+                 Saved {lastSavedAt.toLocaleTimeString()}
+               </div>
+             )}
+-            <Button
++            <button
+               onClick={isAuthenticated ? () => {} : () => setLocation("/")}
+               disabled={isSaving || days.every((d) => d.places.length === 0)}
+-              className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+-              style={isAuthenticated ? { backgroundColor: 'var(--primary)', color: 'white' } : { backgroundColor: 'var(--surface-alt)', color: 'var(--text)' }}
++              className="p-2 rounded-full hover:bg-gray-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
++              title={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
+             >
+               {isSaving ? (
+-                <>
+-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: 'var(--surface)', borderTopColor: 'transparent' }}></div>
+-                  Saving...
+-                </>
++                <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+               ) : isAuthenticated ? (
+-                <>
+-                  <Save className="h-4 w-4 mr-2" />
+-                  Save Trip
+-                </>
++                <Save className="h-5 w-5 text-gray-600" />
+               ) : (
+-                <>
+-                  <LogIn className="h-4 w-4 mr-2" />
+-                  Sign In to Save
+-                </>
++                <LogIn className="h-5 w-5 text-gray-600" />
+               )}
+-            </Button>
++            </button>
+           </>
+         }
+       />
+@@ -211,18 +228,36 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
+         <div className="border-b px-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+           <TabsList className="h-auto p-0 bg-transparent">
+             {days.map((day, index) => (
+-              <TabsTrigger 
+-                key={index} 
+-                value={`day-${index}`} 
+-                className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+-                style={{ 
+-                  backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
+-                  color: activeDay === index ? 'white' : 'var(--text)',
+-                  borderColor: 'var(--border)'
+-                }}
+-              >
+-                Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
+-              </TabsTrigger>
++              <div key={index} className="relative group">
++                <TabsTrigger 
++                  value={`day-${index}`} 
++                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
++                  style={{ 
++                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
++                    color: activeDay === index ? 'white' : 'var(--text)',
++                    borderColor: 'var(--border)'
++                  }}
++                >
++                  Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
++                </TabsTrigger>
++                {days.length > 1 && (
++                  <button
++                    onClick={(e) => {
++                      e.stopPropagation();
++                      handleDeleteDay(index);
++                    }}
++                    className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-all focus-ring hover:bg-gray-100"
++                    style={{ 
++                      backgroundColor: 'transparent',
++                      color: '#5f6368'
++                    }}
++                    title={`Delete Day ${index + 1}`}
++                    aria-label={`Delete Day ${index + 1}`}
++                  >
++                    <X className="h-4 w-4" />
++                  </button>
++                )}
++              </div>
+             ))}
+ 
+             <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>
+diff --git a/client/src/pages/route-results.tsx b/client/src/pages/route-results.tsx
+index d5e0190..edbe216 100644
+--- a/client/src/pages/route-results.tsx
++++ b/client/src/pages/route-results.tsx
+@@ -24,26 +24,27 @@ export default function RouteResults() {
+     queryKey: ["/api/route-results", routeData?.startCity, routeData?.endCity],
+     queryFn: async () => {
+       if (!routeData) return { pois: [], route: null, maps_api_key: null, meta: null };
+-      
++
+       try {
+         const params = new URLSearchParams({
+           start: routeData.startCity,
+           end: routeData.endCity
+         });
+-        
++
+         console.log('🔍 Fetching route results with params:', params.toString());
+         const response = await fetch(`/api/route-results?${params}`);
+         console.log('📊 Route Results API response status:', response.status);
+-        
++
+         if (!response.ok) {
++
+           const errorText = await response.text();
+           console.error('❌ Route Results API error:', response.status, errorText);
+           throw new Error(`Failed to fetch route results: ${response.status} ${errorText}`);
+         }
+-        
++
+         const routeResponse = await response.json();
+         console.log('✅ Route Results data received:', routeResponse);
+-        
++
+         if (routeResponse.success && routeResponse.data) {
+           return {
+             pois: routeResponse.data.pois || [],
+@@ -123,7 +124,7 @@ export default function RouteResults() {
+ 
+   // Extract POIs from route results
+   const pois = routeResults?.pois || [];
+-  
++
+   if (poisError) {
+     console.error('❌ Route Results Error:', poisError);
+   }
+diff --git a/vite.config.ts b/vite.config.ts
+index 09f4592..401f2c6 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -35,7 +35,7 @@ export default defineConfig({
+     emptyOutDir: true,
+   },
+   server: {
+-    port: 3001,
++    port: 3002,
+     host: '0.0.0.0', // Allow access from mobile devices on same network
+     strictPort: false, // Allow port fallback if 3001 is busy
+     fs: {
+@@ -45,7 +45,20 @@ export default defineConfig({
+     proxy: {
+       '/api': {
+         target: 'http://localhost:4001',
+-        changeOrigin: true
++        changeOrigin: true,
++        configure: (proxy, _options) => {
++          proxy.on('error', (err, _req, _res) => {
++            console.log('🔴 Proxy error:', err);
++          });
++          proxy.on('proxyReq', (proxyReq, req, _res) => {
++            console.log('🔄 Proxying request:', req.method, req.url, '→', proxyReq.path);
++            // Add CORS headers if needed
++            proxyReq.setHeader('Origin', 'http://localhost:3002');
++          });
++          proxy.on('proxyRes', (proxyRes, req, _res) => {
++            console.log('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
++          });
++        },
+       }
+     }
+   },

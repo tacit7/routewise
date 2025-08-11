@@ -36,7 +36,8 @@ export default function Header({
       await logout();
       setLocation('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+      devLog('Sign out error:', error);
     }
   };
 
@@ -125,74 +126,36 @@ export default function Header({
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="end" 
-                    className="w-56"
-                    style={{ 
-                      backgroundColor: 'var(--card)', 
-                      borderColor: 'var(--border)',
-                      color: 'var(--card-foreground)'
-                    }}
-                  >
-                    <DropdownMenuLabel 
-                      className="font-normal"
-                      style={{ color: 'var(--text)' }}
-                    >
+                  <DropdownMenuContent align="end" className="w-56 bg-card border border-border shadow-lg">
+                    <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
                           {user?.name || 'User'}
                         </p>
-                        <p className="text-xs leading-none" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-xs leading-none text-muted-foreground">
                           {user?.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={() => setLocation('/profile')}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--text)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                        e.currentTarget.style.color = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--text)';
-                      }}
+                      className="cursor-pointer"
                     >
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => setLocation('/settings')}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--text)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                        e.currentTarget.style.color = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--text)';
-                      }}
+                      className="cursor-pointer"
                     >
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator style={{ borderColor: 'var(--border)' }} />
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleSignOut}
-                      className="cursor-pointer focus-ring"
-                      style={{ color: 'var(--destructive)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--destructive-50)';
-                        e.currentTarget.style.color = 'var(--destructive)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--destructive)';
-                      }}
+                      className="cursor-pointer text-destructive focus:text-destructive"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>

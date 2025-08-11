@@ -14,13 +14,13 @@ export default function HeroSection() {
           backgroundImage: `url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080')`
         }}
       />
-      <div className="absolute inset-0 bg-slate-900 bg-opacity-40" />
+      <div className="absolute inset-0 bg-background/60" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
           Plan Your Perfect <span className="text-accent">Road Trip</span>
         </h2>
-        <p className="text-xl text-slate-200 mb-12 max-w-2xl mx-auto">
+        <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
           Discover amazing stops along your route or explore places around any destination. Let's make every mile memorable.
         </p>
         
@@ -33,8 +33,8 @@ export default function HeroSection() {
                 onClick={() => setActiveTab('route')}
                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                   activeTab === 'route'
-                    ? 'bg-surface text-blue-600 shadow-sm'
-                    : 'text-muted-fg hover:text-fg'
+                    ? 'bg-surface text-primary shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <i className="fas fa-route mr-2" />
@@ -44,8 +44,8 @@ export default function HeroSection() {
                 onClick={() => setActiveTab('place')}
                 className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
                   activeTab === 'place'
-                    ? 'bg-surface text-purple-600 shadow-sm'
-                    : 'text-muted-fg hover:text-fg'
+                    ? 'bg-surface text-primary shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <i className="fas fa-compass mr-2" />
@@ -57,8 +57,8 @@ export default function HeroSection() {
             {activeTab === 'route' && (
               <div>
                 <div className="mb-4 text-center">
-                  <h3 className="text-lg font-semibold text-fg mb-2">Quick Route</h3>
-                  <p className="text-sm text-slate-600">Get started fast with basic route planning</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Quick Route</h3>
+                  <p className="text-sm text-muted-foreground">Get started fast with basic route planning</p>
                 </div>
                 <RouteForm />
               </div>
@@ -67,8 +67,8 @@ export default function HeroSection() {
             {activeTab === 'place' && (
               <div>
                 <div className="mb-4 text-center">
-                  <h3 className="text-lg font-semibold text-fg mb-2">Explore Places</h3>
-                  <p className="text-sm text-slate-600">Discover attractions around any city or destination</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Explore Places</h3>
+                  <p className="text-sm text-muted-foreground">Discover attractions around any city or destination</p>
                 </div>
                 <PlaceForm />
               </div>

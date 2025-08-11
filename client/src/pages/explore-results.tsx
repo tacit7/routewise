@@ -17,7 +17,10 @@ export default function ExploreResults() {
   } = useExploreResults();
 
   if (!exploreData) return null;
-  if (error) console.error("❌ Explore Results Error:", error);
+  if (error) {
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog("❌ Explore Results Error:", error);
+  }
 
   return (
     <PlacesView
