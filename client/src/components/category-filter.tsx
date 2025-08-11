@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { 
   UtensilsCrossed, 
-  Trees, 
+  TreePine, 
   Bed, 
-  Theater, 
-  Calendar,
+  Building, 
+  Gamepad2,
+  MapPin,
+  ShoppingBag,
+  Car,
+  Heart,
   MoreHorizontal 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,11 +21,36 @@ interface CategoryFilterProps {
 }
 
 const categories = [
-  { id: "restaurant", label: "Food", icon: UtensilsCrossed },
-  { id: "tourist_attraction", label: "Nature", icon: Trees },
-  { id: "lodging", label: "Lodging", icon: Bed },
-  { id: "museum", label: "Culture", icon: Theater },
-  { id: "amusement_park", label: "Events", icon: Calendar },
+  { 
+    id: "restaurant", 
+    label: "Food", 
+    description: "Restaurants, cafes, and dining experiences",
+    icon: UtensilsCrossed 
+  },
+  { 
+    id: "tourist_attraction", 
+    label: "Attractions", 
+    description: "Tourist attractions, landmarks, and points of interest",
+    icon: MapPin 
+  },
+  { 
+    id: "lodging", 
+    label: "Lodging", 
+    description: "Hotels, motels, and accommodation options",
+    icon: Bed 
+  },
+  { 
+    id: "museum", 
+    label: "Culture", 
+    description: "Museums, galleries, and cultural sites",
+    icon: Building 
+  },
+  { 
+    id: "amusement_park", 
+    label: "Entertainment", 
+    description: "Amusement parks, entertainment venues, and attractions",
+    icon: Gamepad2 
+  },
 ];
 
 export default function CategoryFilter({ 
@@ -51,7 +80,7 @@ export default function CategoryFilter({
         
         {/* Category Icons */}
         <div className="flex items-center gap-1">
-          {categories.map(({ id, label, icon: Icon }) => (
+          {categories.map(({ id, label, description, icon: Icon }) => (
             <Button
               key={id}
               variant="ghost"
@@ -84,7 +113,9 @@ export default function CategoryFilter({
                   e.currentTarget.style.color = 'var(--text-muted)';
                 }
               }}
-              title={label}
+              title={`${label}: ${description}`}
+              aria-label={`Filter by ${label}. ${description}. ${selectedCategory === id ? 'Currently selected' : 'Click to select'}`}
+              aria-pressed={selectedCategory === id}
             >
               <Icon className="h-4 w-4" />
             </Button>
@@ -105,6 +136,8 @@ export default function CategoryFilter({
               e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.color = 'var(--text-muted)';
             }}
+            aria-label="Open category filter modal for more options"
+            aria-expanded={isModalOpen}
           >
             More
           </Button>
