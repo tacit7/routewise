@@ -27,7 +27,8 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
       meta: data.meta || null,
     };
   } catch (err) {
-    console.error("❌ Explore Results API Error:", err);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog("❌ Explore Results API Error:", err);
     return { pois: [], maps_api_key: null, meta: null };
   }
 }
@@ -77,7 +78,8 @@ export function useExploreResults() {
   const pois = useMemo(() => query.data?.pois || [], [query.data]);
 
   const handlePoiClick = (poi: POI | Poi) => {
-    console.log("POI clicked:", poi.name);
+    const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+    devLog("POI clicked:", poi.name);
   };
 
   const handlePoiSelect = (poiId: number, selected: boolean) => {

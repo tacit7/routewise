@@ -107,16 +107,7 @@ export default function CategoryFilterModal({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-6 w-6 p-0 transition-all"
-            style={{ color: 'var(--text-muted)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-              e.currentTarget.style.color = 'var(--primary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
+            className="h-6 w-6 p-0 transition-all text-muted-foreground hover:bg-primary/10 hover:text-primary"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -155,14 +146,7 @@ export default function CategoryFilterModal({
                 }}
               >
                 <AccordionTrigger 
-                  className="px-4 py-3 hover:no-underline transition-all"
-                  style={{ color: 'var(--text)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
+                  className="px-4 py-3 hover:no-underline transition-all text-foreground hover:bg-primary/10"
                 >
                   <span className="font-medium">{category.name}</span>
                 </AccordionTrigger>
@@ -199,31 +183,13 @@ export default function CategoryFilterModal({
             <Button
               variant="outline"
               onClick={handleClearAll}
-              className="flex-1 transition-all"
-              style={{ 
-                borderColor: 'var(--border)',
-                color: 'var(--text-muted)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                e.currentTarget.style.borderColor = 'var(--primary)';
-                e.currentTarget.style.color = 'var(--primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.color = 'var(--text-muted)';
-              }}
+              className="flex-1 transition-all border-border text-muted-foreground hover:bg-primary/10 hover:border-primary hover:text-primary"
             >
               Clear All
             </Button>
             <Button
               onClick={handleApplyFilters}
-              className="flex-1"
-              style={{ 
-                backgroundColor: 'var(--primary)', 
-                color: 'var(--primary-foreground)' 
-              }}
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Apply Filters
             </Button>

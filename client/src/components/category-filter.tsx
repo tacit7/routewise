@@ -1,15 +1,10 @@
 import React, { useState } from "react";
 import { 
   UtensilsCrossed, 
-  TreePine, 
   Bed, 
   Building, 
   Gamepad2,
-  MapPin,
-  ShoppingBag,
-  Car,
-  Heart,
-  MoreHorizontal 
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -75,8 +70,8 @@ export default function CategoryFilter({
 
   return (
     <>
-      <div className="flex items-center gap-2 p-3 bg-card border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="text-xs font-medium mr-2" style={{ color: 'var(--text-muted)' }}>RouteWise</div>
+      <div className="flex items-center gap-2 p-3 bg-card border-b border-border">
+        <div className="text-xs font-medium mr-2 text-muted-foreground">RouteWise</div>
         
         {/* Category Icons */}
         <div className="flex items-center gap-1">
@@ -89,30 +84,9 @@ export default function CategoryFilter({
               className={cn(
                 "w-10 h-10 rounded-full p-0 flex items-center justify-center transition-all",
                 selectedCategory === id
-                  ? "text-white"
-                  : ""
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
               )}
-              style={selectedCategory === id 
-                ? { 
-                    backgroundColor: 'var(--primary)', 
-                    color: 'var(--primary-foreground)'
-                  }
-                : { 
-                    color: 'var(--text-muted)'
-                  }
-              }
-              onMouseEnter={(e) => {
-                if (selectedCategory !== id) {
-                  e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-                  e.currentTarget.style.color = 'var(--primary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCategory !== id) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-muted)';
-                }
-              }}
               title={`${label}: ${description}`}
               aria-label={`Filter by ${label}. ${description}. ${selectedCategory === id ? 'Currently selected' : 'Click to select'}`}
               aria-pressed={selectedCategory === id}
@@ -126,16 +100,7 @@ export default function CategoryFilter({
             variant="ghost"
             size="sm"
             onClick={() => setIsModalOpen(true)}
-            className="px-3 py-1 text-xs ml-1 transition-all"
-            style={{ color: 'var(--text-muted)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary-50)';
-              e.currentTarget.style.color = 'var(--primary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
+            className="px-3 py-1 text-xs ml-1 transition-all text-muted-foreground hover:bg-primary/10 hover:text-primary"
             aria-label="Open category filter modal for more options"
             aria-expanded={isModalOpen}
           >

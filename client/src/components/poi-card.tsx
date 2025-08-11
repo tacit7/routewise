@@ -104,23 +104,13 @@ export default function PoiCard({
               <button
                 onClick={handleAddToTrip}
                 disabled={isAddedToTrip || isAddingToTrip}
-                className="py-1 px-3 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={isAddedToTrip
-                  ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
-                  : isAddingToTrip
-                  ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
-                  : { backgroundColor: 'var(--primary)', color: 'white' }
-                }
-                onMouseEnter={(e) => {
-                  if (!isAddedToTrip && !isAddingToTrip) {
-                    e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isAddedToTrip && !isAddingToTrip) {
-                    e.currentTarget.style.backgroundColor = 'var(--primary)';
-                  }
-                }}
+                className={`py-1 px-3 rounded text-xs font-medium transition-all duration-200 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  isAddedToTrip
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : isAddingToTrip
+                    ? "bg-primary/60 text-white cursor-not-allowed"
+                    : "bg-primary text-white hover:bg-primary/90"
+                }`}
               >
                 {isAddingToTrip ? (
                   <>
@@ -215,10 +205,7 @@ export default function PoiCard({
           </div>
           <button
             onClick={() => setShowDetails(true)}
-            className="font-medium flex items-center transition-colors focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded px-2 py-1"
-            style={{ color: 'var(--primary)' }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            className="font-medium flex items-center transition-colors focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded px-2 py-1 text-primary hover:opacity-80"
           >
             View Details <ArrowRight className="h-4 w-4 ml-1" />
           </button>
@@ -229,23 +216,13 @@ export default function PoiCard({
           <button
             onClick={handleAddToTrip}
             disabled={isAddedToTrip || isAddingToTrip}
-            className="py-2 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-            style={isAddedToTrip
-              ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
-              : isAddingToTrip
-              ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
-              : { backgroundColor: 'var(--primary)', color: 'white' }
-            }
-            onMouseEnter={(e) => {
-              if (!isAddedToTrip && !isAddingToTrip) {
-                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isAddedToTrip && !isAddingToTrip) {
-                e.currentTarget.style.backgroundColor = 'var(--primary)';
-              }
-            }}
+            className={`py-2 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+              isAddedToTrip
+                ? "bg-primary/10 text-primary border border-primary/20"
+                : isAddingToTrip
+                ? "bg-primary/60 text-white cursor-not-allowed"
+                : "bg-primary text-white hover:bg-primary/90"
+            }`}
           >
             {isAddingToTrip ? (
               <>
@@ -279,12 +256,9 @@ export default function PoiCard({
               />
               <button
                 onClick={() => setShowDetails(false)}
-                className="absolute top-4 right-4 rounded-full p-2 transition-all focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={{ backgroundColor: 'var(--surface)', opacity: '0.9' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surface)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface)'}
+                className="absolute top-4 right-4 rounded-full p-2 transition-all focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background bg-background/90 hover:bg-background text-foreground"
               >
-                <X className="h-5 w-5" style={{ color: 'var(--text)' }} />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -356,23 +330,13 @@ export default function PoiCard({
                 <button
                   onClick={handleAddToTrip}
                   disabled={isAddedToTrip || isAddingToTrip}
-                  className="py-3 px-8 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                  style={isAddedToTrip
-                    ? { backgroundColor: 'var(--primary-50)', color: 'var(--primary)', border: '1px solid var(--primary-100)' }
-                    : isAddingToTrip
-                    ? { backgroundColor: 'var(--primary)', opacity: '0.6', color: 'white', cursor: 'not-allowed' }
-                    : { backgroundColor: 'var(--primary)', color: 'white' }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!isAddedToTrip && !isAddingToTrip) {
-                      e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isAddedToTrip && !isAddingToTrip) {
-                      e.currentTarget.style.backgroundColor = 'var(--primary)';
-                    }
-                  }}
+                  className={`py-3 px-8 rounded-lg font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                    isAddedToTrip
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : isAddingToTrip
+                      ? "bg-primary/60 text-white cursor-not-allowed"
+                      : "bg-primary text-white hover:bg-primary/90"
+                  }`}
                 >
                   {isAddingToTrip ? (
                     <>
@@ -399,10 +363,7 @@ export default function PoiCard({
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ml-3 focus-visible:ring-2 focus-visible:ring-[var(--primary-200)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                    style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-50)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-alt)'}
+                    className="flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ml-3 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background bg-muted text-muted-foreground hover:bg-primary/10"
                   >
                     <ExternalLink className="h-5 w-5 mr-2" />
                     View on Maps

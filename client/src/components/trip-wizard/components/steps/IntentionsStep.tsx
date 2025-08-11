@@ -63,6 +63,14 @@ export function IntentionsStep({ value, onChange, error }: IntentionsStepProps) 
             type="button"
             variant="outline"
             size="sm"
+            onClick={() => onChange(INTENTION_OPTIONS.map(opt => opt.value))}
+          >
+            Select All
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={selectPopular}
           >
             Select Popular
@@ -82,28 +90,32 @@ export function IntentionsStep({ value, onChange, error }: IntentionsStepProps) 
       {/* Selection counter */}
       <div className="text-center">
         <span className="text-sm text-muted-foreground">
-          {value.length} intentions selected
+          {value.length} interests selected
         </span>
       </div>
 
-      {/* Intention options - Card list with scroll affordance */}
+      {/* Interest options - Card list with scroll affordance */}
       <div className="relative">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-hidden">
           {INTENTION_OPTIONS.map((option, index) => {
             const isSelected = value.includes(option.value);
-            const isDisabled = false; // Allow selecting all intentions
+            const isDisabled = false; // Allow selecting all interests
             
             return (
-              <Button
+              <button
                 key={option.value}
                 type="button"
-                variant={isSelected ? "default" : "outline"}
                 onClick={() => handleToggle(option.value)}
                 disabled={isDisabled}
                 className={cn(
-                  "h-auto py-3 px-4 flex flex-col items-center space-y-2 text-center transition-all min-h-[44px]",
-                  isSelected && "bg-primary text-white",
-                  isDisabled && "opacity-50 cursor-not-allowed",
+                  "relative w-full p-3 rounded-lg border-2 transition-all duration-200 min-h-[80px]",
+                  "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                  "hover:shadow-md transform hover:-translate-y-1",
+                  "flex flex-col items-center space-y-2 text-center",
+                  isSelected
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border bg-white hover:border-border",
+                  isDisabled && "opacity-50 cursor-not-allowed hover:transform-none hover:shadow-none",
                   // Crop the last visible row on mobile to show more options
                   index >= 8 && "sm:block hidden",
                   index >= 9 && "lg:block"
@@ -113,10 +125,13 @@ export function IntentionsStep({ value, onChange, error }: IntentionsStepProps) 
                 <div className="flex items-center justify-center" aria-hidden="true">
                   {getIntentionIcon(option.icon)}
                 </div>
-                <span className="text-xs font-medium leading-tight">
+                <span className={cn(
+                  "text-xs font-medium leading-tight",
+                  isSelected ? "text-primary" : "text-foreground"
+                )}>
                   {option.label}
                 </span>
-              </Button>
+              </button>
             );
           })}
         </div>

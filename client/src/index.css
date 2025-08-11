@@ -28,7 +28,7 @@
   --primary-100: hsl(160 55% 92%); /* Subtle borders */
   --primary-200: hsl(160 46% 86%); /* Drop slot border */
   --warning: hsl(42 95% 45%); /* Rating star color */
-  --focus: hsl(217 92% 60%); /* Focus ring */
+  --focus: var(--primary); /* Focus ring */
   --dropdown: hsl(0 0% 100%); /* Dropdown/popover background */
 
   /* Legacy support - map to UX spec tokens */
@@ -39,7 +39,7 @@
   --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   --primary-hover: hsl(160 84% 32%);
   --primary-foreground: #ffffff;
-  --ring: var(--focus);
+  --ring: var(--primary);
   --secondary: var(--text-muted);
   --secondary-foreground: #ffffff;
   --accent: var(--primary-hover);
@@ -236,3 +236,32 @@ textarea:focus-visible {
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+
+/* Theme Component Classes */
+.hero-card {
+  @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/20;
+  @apply p-6 md:p-8 max-w-2xl mx-auto;
+}
+
+/* Light overlay cards */
+.overlay-card-light {
+  @apply bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/30;
+}
+
+.overlay-card-lighter {
+  @apply bg-white/60 backdrop-blur-sm rounded-xl shadow-md border border-gray-200/20;
+}
+
+/* Dashboard section backgrounds */
+.section-gradient-primary {
+  @apply bg-gradient-to-br from-green-50 via-white to-green-100;
+}
+
+.section-gradient-subtle {
+  @apply bg-gradient-to-r from-slate-50 to-white;
+}
+
+.section-background-alt {
+  @apply bg-slate-50/50;
+}
+
