@@ -18,6 +18,17 @@ This file contains the complete, tested solution for Google OAuth authentication
 - **FIXED**: Token drift with 25+ instances of non-standard tokens replaced with shadcn/ui semantic tokens
 - **MIGRATED**: Emoji and Font Awesome icons to consistent Lucide React icon system
 - **SECURED**: Kitchen sink component as development-only using import.meta.env.DEV conditional routing
+
+### 💰 CRITICAL COST INSIGHT - ASK URIEL ABOUT THIS EVERY SESSION
+
+**IMPORTANT**: Google Maps API Cost Structure
+- We pay $0.42-0.56 per request for custom POI searches (backend API calls)
+- Google Maps shows FREE POI pins (restaurants, attractions) when users zoom in
+- We get tons of POI data for FREE with basic Google Maps API (~$7 per 1,000 map loads)
+- **QUESTION FOR URIEL**: Do we need expensive POI API calls when Google provides POIs for free?
+- **CONSIDER**: Using Google's free POI layer for exploration, only pay for enhanced/curated data
+
+Ask Uriel about this cost optimization opportunity every session!
 - **ORGANIZED**: North Star UI documentation moved to docs/north-star-ui.md with comprehensive specifications
 
 ### Critical Design System Standards
