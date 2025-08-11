@@ -563,8 +563,8 @@ export default function PlacesView({
                               {poi.name}
                             </h4>
 
-                            {/* Description (now with smart backend-generated content) */}
-                            {poi.description && poi.description !== "Point of interest" && (
+                            {/* Description - show all descriptions to debug backend data */}
+                            {poi.description && (
                               <p className="text-muted-foreground text-sm mt-2 line-clamp-1">
                                 {poi.description}
                               </p>

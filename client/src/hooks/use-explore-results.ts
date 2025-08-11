@@ -21,24 +21,31 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
     const responseData = await response.json();
     console.log('🔍 Explore Results API Response:', responseData);
     
-    const { success, data } = responseData;
+    const { success, data, _cache } = responseData;
     if (!success || !data) throw new Error("Invalid response format");
 
     console.log('📊 Explore POI Data:', {
       poisCount: data.pois?.length || 0,
       firstPoi: data.pois?.[0] || 'none',
       hasApiKey: !!data.maps_api_key,
-      meta: data.meta
+      meta: data.meta,
+      cache: _cache
     });
 
     return {
       pois: data.pois || [],
       maps_api_key: data.maps_api_key || null,
       meta: data.meta || null,
+      _cache: _cache || { status: 'unknown', backend: 'unknown', environment: 'unknown', timestamp: null },
     };
   } catch (err) {
     console.error("❌ Explore Results API Error:", err);
-    return { pois: [], maps_api_key: null, meta: null };
+    return { 
+      pois: [], 
+      maps_api_key: null, 
+      meta: null,
+      _cache: { status: 'error', backend: 'unknown', environment: 'unknown', timestamp: null }
+    };
   }
 }
 
@@ -86,6 +93,25 @@ export function useExploreResults() {
 
   const pois = useMemo(() => query.data?.pois || [], [query.data]);
 
+  // Cache info for developer debugging
+  const cacheInfo = useMemo(() => {
+    const cache = query.data?._cache;
+    const localStorageKeys = ['exploreData'];
+    
+    return {
+      backendStatus: cache?.status || 'unknown',
+      backendType: cache?.backend || 'unknown',
+      timestamp: cache?.timestamp,
+      queryStatus: query.isLoading ? 'loading' : query.isError ? 'error' : query.isFetching ? 'stale' : 'fresh',
+      lastFetch: query.dataUpdatedAt ? new Date(query.dataUpdatedAt) : undefined,
+      pageType: 'explore-results' as const,
+      apiEndpoint: '/api/explore-results',
+      dataCount: pois.length,
+      hasLocalData: !!localStorage.getItem('exploreData'),
+      localStorageKeys: localStorageKeys.filter(key => localStorage.getItem(key))
+    };
+  }, [query.data?._cache, query.isLoading, query.isError, query.isFetching, query.dataUpdatedAt, pois.length]);
+
   const handlePoiClick = (poi: POI | Poi) => {
     console.log("POI clicked:", poi.name);
   };
@@ -105,5 +131,6 @@ export function useExploreResults() {
     setHoveredPoi,
     handlePoiClick,
     handlePoiSelect,
+    cacheInfo,
   };
 }

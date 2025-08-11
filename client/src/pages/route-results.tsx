@@ -1,10 +1,11 @@
 import { useLocation } from "wouter";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import type { POI, RouteResultsAPIResponse } from "@/types/api";
 import type { Poi } from "@/types/schema";
 import PlacesView from "@/components/places-view";
+import DeveloperCacheFAB from "@/components/developer-cache-fab";
 
 interface RouteData {
   startCity: string;
@@ -52,28 +53,27 @@ export default function RouteResults() {
         const routeResponse = await response.json();
         console.log('✅ Route Results data received:', routeResponse);
         
-        // AGGRESSIVE DEBUGGING - Check what cities the backend thinks we requested
-        if (routeResponse.data && routeResponse.data.meta) {
-          console.log('🎯 Backend processed cities:', {
-            requested_start: routeData.startCity,
-            requested_end: routeData.endCity,
-            backend_meta: routeResponse.data.meta,
-            poi_count: routeResponse.data.pois?.length || 0,
-            first_poi: routeResponse.data.pois?.[0]?.address || 'none'
-          });
-        }
+        const { success, data, _cache } = routeResponse;
+        if (!success || !data) throw new Error("Invalid response format");
 
-        if (routeResponse.success && routeResponse.data) {
-          return {
-            pois: routeResponse.data.pois || [],
-            route: routeResponse.data.route || null,
-            maps_api_key: routeResponse.data.maps_api_key || null,
-            meta: routeResponse.data.meta || null,
-            trip_places: routeResponse.data.trip_places || []
-          };
-        } else {
-          throw new Error('Invalid response format from route results API');
-        }
+        // AGGRESSIVE DEBUGGING - Check what cities the backend thinks we requested
+        console.log('🎯 Backend processed cities:', {
+          requested_start: routeData.startCity,
+          requested_end: routeData.endCity,
+          backend_meta: data.meta,
+          poi_count: data.pois?.length || 0,
+          first_poi: data.pois?.[0]?.address || 'none',
+          cache: _cache
+        });
+
+        return {
+          pois: data.pois || [],
+          route: data.route || null,
+          maps_api_key: data.maps_api_key || null,
+          meta: data.meta || null,
+          trip_places: data.trip_places || [],
+          _cache: _cache || { status: 'unknown', backend: 'unknown', environment: 'unknown', timestamp: null },
+        };
       } catch (error) {
         console.error('Error fetching POIs:', error);
         return {
@@ -81,7 +81,8 @@ export default function RouteResults() {
           route: null,
           maps_api_key: null,
           meta: null,
-          trip_places: []
+          trip_places: [],
+          _cache: { status: 'error', backend: 'unknown', environment: 'unknown', timestamp: null }
         };
       }
     },
@@ -151,26 +152,48 @@ export default function RouteResults() {
   // Extract POIs from route results
   const pois = routeResults?.pois || [];
 
+  // Cache info for developer debugging
+  const cacheInfo = useMemo(() => {
+    const cache = routeResults?._cache;
+    const localStorageKeys = ['routeData', 'tripPlaces'];
+    
+    return {
+      backendStatus: cache?.status || 'unknown',
+      backendType: cache?.backend || 'unknown',
+      timestamp: cache?.timestamp,
+      queryStatus: poisLoading ? 'loading' : poisError ? 'error' : 'fresh',
+      lastFetch: undefined, // TanStack query doesn't expose this easily for route results
+      pageType: 'route-results' as const,
+      apiEndpoint: '/api/route-results',
+      dataCount: pois.length,
+      hasLocalData: !!localStorage.getItem('routeData') || !!localStorage.getItem('tripPlaces'),
+      localStorageKeys: localStorageKeys.filter(key => localStorage.getItem(key))
+    };
+  }, [routeResults?._cache, poisLoading, poisError, pois.length]);
+
   if (poisError) {
     console.error('❌ Route Results Error:', poisError);
   }
 
   return (
-    <PlacesView
-      startLocation={routeData.startCity}
-      endLocation={routeData.endCity}
-      pois={pois}
-      isLoading={poisLoading}
-      showRouting={true} // Show routing for route results
-      apiKey={routeResults?.maps_api_key}
-      selectedPoiIds={selectedPoiIds}
-      hoveredPoi={hoveredPoi}
-      onPoiClick={handlePoiClick}
-      onPoiSelect={handlePoiSelect}
-      onPoiHover={handlePoiHover}
-      headerTitle={`${routeData.startCity} → ${routeData.endCity}`}
-      sidebarTitle="Places Along Route"
-      backUrl="/"
-    />
+    <>
+      <PlacesView
+        startLocation={routeData.startCity}
+        endLocation={routeData.endCity}
+        pois={pois}
+        isLoading={poisLoading}
+        showRouting={true} // Show routing for route results
+        apiKey={routeResults?.maps_api_key}
+        selectedPoiIds={selectedPoiIds}
+        hoveredPoi={hoveredPoi}
+        onPoiClick={handlePoiClick}
+        onPoiSelect={handlePoiSelect}
+        onPoiHover={handlePoiHover}
+        headerTitle={`${routeData.startCity} → ${routeData.endCity}`}
+        sidebarTitle="Places Along Route"
+        backUrl="/"
+      />
+      <DeveloperCacheFAB cacheInfo={cacheInfo} />
+    </>
   );
 }
