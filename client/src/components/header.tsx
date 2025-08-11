@@ -58,15 +58,10 @@ export default function Header({
           {showLogo && (
             <button
               onClick={() => setLocation('/')}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-ring text-white"
+              className="hover:opacity-80 transition-opacity focus-ring text-white"
               aria-label="Go to home page"
             >
-              <img 
-                src="/logo.svg" 
-                alt="RouteWise" 
-                className="h-8 w-auto"
-              />
-              <span className="font-semibold text-lg text-white hidden sm:inline">
+              <span className="font-semibold text-lg text-white">
                 RouteWise
               </span>
             </button>

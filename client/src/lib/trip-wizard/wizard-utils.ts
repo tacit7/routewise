@@ -8,7 +8,7 @@ export const STEP_TITLES = [
   "Dates",
   "Transportation",
   "Lodging",
-  "Intentions",
+  "Interests",
   "Special Needs"
 ];
 
