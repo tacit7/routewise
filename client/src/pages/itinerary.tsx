@@ -282,8 +282,8 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               <InteractiveMap
                 startCity="My Trip"
                 endCity=""
-                pois={[]}
-                selectedPoiIds={[]}
+                pois={days[activeDay]?.places || []} // Show places scheduled for the active day
+                selectedPoiIds={days[activeDay]?.places.map(p => Number(getIdentifier(p))) || []}
                 hoveredPoi={null}
                 height="100%"
                 className="w-full h-full"

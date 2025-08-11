@@ -19,8 +19,31 @@ interface InteractiveMapProps {
   apiKey?: string; // Optional API key to avoid fetching separately
 }
 
-// POI category to color mapping using design system colors
-const getCategoryColor = (category: string): string => {
+// POI category to color mapping - showing variety of colors for preview
+const getCategoryColor = (category: string, index?: number): string => {
+  // If index provided, cycle through different colors for preview
+  if (typeof index === 'number') {
+    const previewColors = [
+      "#EA4335", // Google Red
+      "#34A853", // Google Green  
+      "#4285F4", // Google Blue
+      "#9C27B0", // Purple
+      "#FF9800", // Orange
+      "#795548", // Brown
+      "#137333", // Dark Green
+      "#E91E63", // Pink
+      "#FF5722", // Deep Orange
+      "#607D8B", // Blue Grey
+      "#8BC34A", // Light Green
+      "#FFC107", // Amber
+      "#673AB7", // Deep Purple
+      "#00BCD4", // Cyan
+      "#CDDC39"  // Lime
+    ];
+    return previewColors[index % previewColors.length];
+  }
+  
+  // Original category-based colors
   const colors = {
     restaurant: "#EA4335", // Google Red
     attraction: "#34A853", // Google Green
@@ -62,12 +85,13 @@ const PoiMarker: React.FC<{
   isSelected: boolean;
   isHovered: boolean;
   onClick: (poi: Poi) => void;
-}> = ({ poi, isSelected, isHovered, onClick }) => {
+  index?: number;
+}> = ({ poi, isSelected, isHovered, onClick, index }) => {
   const coords = getPoiCoordinates(poi);
   console.log('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
 
-  const color = getCategoryColor(poi.category);
-  console.log('🎨 Google Pin Color:', { category: poi.category, color });
+  const color = getCategoryColor(poi.category, index); // Use array index for consistent color cycling
+  console.log('🎨 Google Pin Color:', { category: poi.category, color, poiId: poi.id });
   
   console.log('🗺️ Rendering AdvancedMarker with Pin:', { position: coords, title: poi.name });
   
@@ -299,7 +323,8 @@ const MapContent: React.FC<{
             id: poi.id, 
             placeId: poi.placeId,
             isSelected, 
-            isHovered 
+            isHovered,
+            colorIndex: index // Show which color index this POI will use
           });
           
           return (
@@ -309,6 +334,7 @@ const MapContent: React.FC<{
               isSelected={isSelected}
               isHovered={isHovered}
               onClick={handlePoiClick}
+              index={index}
             />
           );
         })}

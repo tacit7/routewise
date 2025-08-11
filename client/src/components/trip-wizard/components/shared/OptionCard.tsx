@@ -33,7 +33,7 @@ export function OptionCard({
       className={cn(
         "relative w-full p-4 rounded-lg border-2 transition-all duration-200 min-h-[120px]",
         "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-bg",
-        "hover:shadow-md transform hover:-translate-y-1",
+        "hover:shadow-md transform hover:-translate-y-1 hover:scale-110",
         selected
           ? "border-primary bg-primary/5 shadow-sm"
           : "border-border bg-surface hover:border-border",

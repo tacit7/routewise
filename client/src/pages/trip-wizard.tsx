@@ -195,7 +195,7 @@ export default function TripWizardPage() {
           duration: "Calculating...",
           stops: routeParams.stops || [],
         },
-        poisData: [], // Will be populated as data arrives
+        // No poisData - route-results will fetch fresh
         wizardPreferences: {
           tripType: wizardData.tripType,
           transportation: wizardData.transportation,
@@ -237,35 +237,26 @@ export default function TripWizardPage() {
         description: "Route displayed! We're still finding the best places for you.",
       });
 
-      // Start both API calls simultaneously for better performance
-      setLoadingStage("Finding the best route and discovering places...");
+      // Calculate route only - POIs will be fetched fresh by route-results page
+      setLoadingStage("Calculating your route...");
 
-      const [routeResponse, poisResponse] = await Promise.allSettled([
-        // Calculate route using existing API
-        fetch("/api/route", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            startLocation: routeParams.startLocation,
-            endLocation: routeParams.endLocation,
-            stops: routeParams.stops,
-          }),
+      const routeResponse = await fetch("/api/route", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          startLocation: routeParams.startLocation,
+          endLocation: routeParams.endLocation,
+          stops: routeParams.stops,
         }),
-        // Fetch POIs for the route in parallel
-        fetch(
-          `/api/pois?startLocation=${encodeURIComponent(routeParams.startLocation)}&endLocation=${encodeURIComponent(
-            routeParams.endLocation
-          )}`
-        ),
-      ]);
+      });
 
       // Handle route data
       let routeData = null;
-      if (routeResponse.status === "fulfilled" && routeResponse.value.ok) {
-        routeData = await routeResponse.value.json();
-        setLoadingStage("Route found! Loading points of interest...");
+      if (routeResponse.ok) {
+        routeData = await routeResponse.json();
+        setLoadingStage("Route calculated! Preparing your trip...");
       } else {
         console.warn("Route calculation failed, using fallback data");
         // Provide basic route structure as fallback
@@ -279,24 +270,13 @@ export default function TripWizardPage() {
         };
       }
 
-      // Handle POI data with graceful degradation
-      let poisData = [];
-      if (poisResponse.status === "fulfilled" && poisResponse.value.ok) {
-        poisData = await poisResponse.value.json();
-        setLoadingStage(`Found ${poisData.length} amazing places along your route!`);
-      } else {
-        console.warn("POI fetch failed, proceeding with route only");
-        setLoadingStage("Route ready! Places data will load in the background.");
-        // Continue with empty POI data - user can still see the route
-      }
-
-      // Create trip data with route and POI information
+      // Create trip data with route information only - POIs will be fetched by route-results
       const tripData = createTripFromWizard(wizardData, {
         ...routeData,
-        pois: poisData,
+        pois: [], // No POI data stored - route-results will fetch fresh
       });
 
-      // Update stored data with complete information (user is already on route results page)
+      // Store only route configuration - no POI data to avoid stale cache
       const completeRouteData = {
         startCity: wizardData.startLocation?.main_text || "",
         endCity: wizardData.endLocation?.main_text || "",
@@ -304,7 +284,7 @@ export default function TripWizardPage() {
         endLocation: routeParams.endLocation,
         stops: routeParams.stops,
         routeData: routeData,
-        poisData: poisData,
+        // poisData removed - route-results will fetch fresh POI data
         wizardPreferences: {
           tripType: wizardData.tripType,
           transportation: wizardData.transportation,
@@ -315,7 +295,7 @@ export default function TripWizardPage() {
           accessibility: wizardData.accessibility,
         },
         fromWizard: true,
-        loadingComplete: true, // Flag to indicate data is complete
+        loadingComplete: true, // Flag to indicate route data is complete
       };
 
       localStorage.setItem("routeData", JSON.stringify(completeRouteData));
@@ -328,16 +308,11 @@ export default function TripWizardPage() {
         })
       );
 
-      // Show success message based on what data we have
-      if (poisData.length > 0) {
+      // Show success message - POIs will be loaded on route-results page
+      if (routeData) {
         toast({
           title: "Trip Plan Complete!",
-          description: `Found ${poisData.length} amazing places along your route`,
-        });
-      } else if (routeData) {
-        toast({
-          title: "Route Ready!",
-          description: "Your route is ready. Places will continue loading in the background.",
+          description: "Your route is ready. Finding amazing places along the way...",
         });
       } else {
         toast({
@@ -370,7 +345,7 @@ export default function TripWizardPage() {
             duration: "unknown",
             stops: routeParams.stops || [],
           },
-          poisData: [],
+          // No poisData - route-results will fetch fresh
           wizardPreferences: {
             tripType: wizardData.tripType,
             transportation: wizardData.transportation,

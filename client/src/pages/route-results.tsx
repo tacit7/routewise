@@ -28,11 +28,19 @@ export default function RouteResults() {
       try {
         const params = new URLSearchParams({
           start: routeData.startCity,
-          end: routeData.endCity
+          end: routeData.endCity,
+          _t: Date.now().toString() // Cache bust in URL params, not query key
         });
 
         console.log('🔍 Fetching route results with params:', params.toString());
-        const response = await fetch(`/api/route-results?${params}`);
+        const response = await fetch(`/api/route-results?${params}`, {
+          cache: 'no-store', // Force no caching
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
         console.log('📊 Route Results API response status:', response.status);
 
         if (!response.ok) {
@@ -43,8 +51,18 @@ export default function RouteResults() {
 
         const routeResponse = await response.json();
         console.log('✅ Route Results data received:', routeResponse);
+        
+        // AGGRESSIVE DEBUGGING - Check what cities the backend thinks we requested
+        if (routeResponse.data && routeResponse.data.meta) {
+          console.log('🎯 Backend processed cities:', {
+            requested_start: routeData.startCity,
+            requested_end: routeData.endCity,
+            backend_meta: routeResponse.data.meta,
+            poi_count: routeResponse.data.pois?.length || 0,
+            first_poi: routeResponse.data.pois?.[0]?.address || 'none'
+          });
+        }
 
-        debugger;
         if (routeResponse.success && routeResponse.data) {
           return {
             pois: routeResponse.data.pois || [],
@@ -99,18 +117,26 @@ export default function RouteResults() {
     const start = searchParams.get("start");
     const end = searchParams.get("end");
 
+    console.log('🔍 Route Results - URL Params:', { start, end });
+
     if (start && end) {
+      console.log('✅ Using URL params for route data:', { start, end });
       setRouteData({ startCity: start, endCity: end });
     } else {
       const savedData = localStorage.getItem("routeData");
+      console.log('💾 Checking localStorage for routeData:', savedData);
+      
       if (savedData) {
         try {
           const parsed = JSON.parse(savedData);
+          console.log('✅ Using localStorage route data:', parsed);
           setRouteData(parsed);
         } catch {
+          console.error('❌ Failed to parse localStorage routeData, redirecting to home');
           setLocation("/");
         }
       } else {
+        console.warn('❌ No route data found in URL or localStorage, redirecting to home');
         setLocation("/");
       }
     }
