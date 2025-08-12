@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Poi } from "@/types/schema";
 import { useTripPlaces } from "@/hooks/use-trip-places";
+import { useDevLog } from "@/components/developer-fab";
 
 interface InteractiveMapProps {
   startCity: string;
@@ -61,31 +62,12 @@ const getCategoryColor = (category: string, index?: number): string => {
 
 // Helper function to get POI coordinates with fallback support
 const getPoiCoordinates = (poi: Poi): { lat: number; lng: number } => {
-  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
-  
   // Primary coordinates (lat/lng) are preferred, fallback to alternative format
   const lat = poi.lat ?? poi.latitude ?? 0;
   const lng = poi.lng ?? poi.longitude ?? 0;
 
-  devLog('🗺️ Processing POI coordinates:', { 
-    name: poi.name,
-    raw_lat: poi.lat,
-    raw_lng: poi.lng,
-    fallback_lat: poi.latitude,
-    fallback_lng: poi.longitude,
-    final_lat: lat,
-    final_lng: lng
-  });
-
   // Validate coordinates are valid numbers (allow negative values, just not exactly 0,0)
   if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) {
-    devLog('❌ Invalid POI coordinates:', { 
-      id: poi.id, 
-      name: poi.name, 
-      primary: { lat: poi.lat, lng: poi.lng },
-      fallback: { latitude: poi.latitude, longitude: poi.longitude },
-      reason: !isFinite(lat) ? 'lat not finite' : !isFinite(lng) ? 'lng not finite' : 'both coords are 0,0'
-    });
     // Return a safe default (center of US) rather than null to prevent crashes
     return { lat: 39.8283, lng: -98.5795 };
   }
@@ -103,34 +85,18 @@ const PoiMarker: React.FC<{
   onMouseLeave?: () => void;
   index?: number;
 }> = ({ poi, isSelected, isHovered, onClick, onMouseEnter, onMouseLeave, index }) => {
-  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
-  
   const coords = getPoiCoordinates(poi);
-  devLog('🎯 POI Marker Rendering:', { name: poi.name, coords, category: poi.category });
-
-  const color = getCategoryColor(poi.category, index); // Use array index for consistent color cycling
-  devLog('🎨 Google Pin Color:', { category: poi.category, color, poiId: poi.id });
-  
-  devLog('🗺️ Rendering AdvancedMarker with Pin:', { position: coords, title: poi.name });
+  const color = getCategoryColor(poi.category, index);
   
   return (
     <AdvancedMarker
       position={coords}
       title={poi.name}
-      onClick={() => {
-        devLog('📍 Marker clicked:', poi.name);
-        onClick(poi);
-      }}
+      onClick={() => onClick(poi)}
     >
       <div
-        onMouseEnter={() => {
-          devLog('🖱️ Marker hovered:', poi.name);
-          onMouseEnter?.(poi);
-        }}
-        onMouseLeave={() => {
-          devLog('🖱️ Marker unhovered:', poi.name);
-          onMouseLeave?.();
-        }}
+        onMouseEnter={() => onMouseEnter?.(poi)}
+        onMouseLeave={() => onMouseLeave?.()}
         style={{ cursor: 'pointer' }}
       >
         <Pin
@@ -144,7 +110,7 @@ const PoiMarker: React.FC<{
   );
 };
 
-// Info window component
+// Info window component for regular POIs
 const PoiInfoWindow: React.FC<{
   poi: Poi;
   onClose: () => void;
@@ -172,6 +138,99 @@ const PoiInfoWindow: React.FC<{
 
   return (
     <InfoWindow position={coords} onClose={onClose}>
+      <div className="p-3 max-w-sm">
+        {poi.imageUrl && (
+          <img
+            src={poi.imageUrl}
+            alt={poi.name}
+            className="w-full h-32 object-cover rounded mb-2"
+          />
+        )}
+        <h3 className="font-semibold text-base mb-1">{poi.name}</h3>
+        <p className="text-xs text-muted-foreground capitalize mb-2">{poi.category}</p>
+        {poi.description && (
+          <p className="text-sm text-foreground mb-2">{poi.description}</p>
+        )}
+        <div className="flex items-center text-xs mb-1">
+          <span className="text-yellow-500">⭐</span>
+          <span className="ml-1 text-muted-foreground">{poi.rating} ({poi.reviewCount || 0} reviews)</span>
+        </div>
+        {poi.address && (
+          <p className="text-xs text-muted-foreground mb-3">{poi.address}</p>
+        )}
+
+        <div className="flex justify-center">
+          <Button
+            onClick={handleAddToTrip}
+            disabled={isAddedToTrip || isAdding || isAddingToTrip}
+            className={`py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isAddedToTrip
+                ? 'bg-primary/10 text-primary border border-primary/20 cursor-not-allowed'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md'
+            }`}
+          >
+            {isAddedToTrip 
+              ? '✓ In Trip'
+              : isAdding || isAddingToTrip
+                ? '⏳ Adding...'
+                : '+ Add to Trip'
+            }
+          </Button>
+        </div>
+      </div>
+    </InfoWindow>
+  );
+};
+
+// Info window component for Google POIs
+const GooglePlaceInfoWindow: React.FC<{
+  place: any;
+  position: { lat: number; lng: number };
+  onClose: () => void;
+  isInTrip: (poi: Poi) => boolean;
+  addToTrip: (poi: Poi) => void;
+  isAddingToTrip: boolean;
+}> = ({ place, position, onClose, isInTrip, addToTrip, isAddingToTrip }) => {
+  const [isAdding, setIsAdding] = useState(false);
+
+  // Convert Google Place to POI format
+  const convertToPoi = (googlePlace: any): Poi => {
+    return {
+      id: Date.now(), // Temporary ID for new POI
+      placeId: googlePlace.place_id,
+      name: googlePlace.name || 'Unknown Place',
+      address: googlePlace.formatted_address || '',
+      rating: googlePlace.rating ? googlePlace.rating.toString() : '0',
+      category: googlePlace.types?.[0]?.replace(/_/g, ' ') || 'unknown',
+      lat: googlePlace.geometry?.location?.lat() || position.lat,
+      lng: googlePlace.geometry?.location?.lng() || position.lng,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      // Additional fields for UI display
+      imageUrl: googlePlace.photos?.[0]?.getUrl?.({ maxWidth: 400, maxHeight: 300 }),
+      description: googlePlace.types?.slice(0, 3).join(', ').replace(/_/g, ' '),
+      reviewCount: googlePlace.user_ratings_total || 0,
+    };
+  };
+
+  const poi = convertToPoi(place);
+  const isAddedToTrip = isInTrip(poi);
+  
+  const handleAddToTrip = async () => {
+    if (isAddedToTrip || isAdding || isAddingToTrip) return;
+    
+    setIsAdding(true);
+    try {
+      await addToTrip(poi);
+      // Close info window after successful addition
+      setTimeout(onClose, 1000);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  return (
+    <InfoWindow position={position} onClose={onClose}>
       <div className="p-3 max-w-sm">
         {poi.imageUrl && (
           <img
@@ -289,22 +348,56 @@ const MapContent: React.FC<{
   onPoiClick?: (poi: Poi) => void;
   onPoiHover?: (poi: Poi | null) => void;
 }> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick, onPoiHover }) => {
-  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>(null);
+  const [selectedGooglePlace, setSelectedGooglePlace] = useState<{
+    place: any;
+    position: { lat: number; lng: number };
+  } | null>(null);
+  const map = useMap();
+  const devLog = useDevLog();
 
-  // Debug POI data
-  devLog('🗺️ MapContent received POIs:', { 
-    count: pois.length,
-    sample: pois.slice(0, 3).map(poi => ({
-      name: poi.name,
-      lat: poi.lat,
-      lng: poi.lng,
-      latitude: poi.latitude,
-      longitude: poi.longitude,
-      id: poi.id
-    }))
-  });
+  // Add Google POI click listener
+  useEffect(() => {
+    if (map) {
+      devLog('InteractiveMap', 'Map Instance Ready', { hasMap: true, poisCount: pois.length });
+      
+      const listener = map.addListener('click', (event: any) => {
+        devLog('InteractiveMap', 'Map Click', { hasPlaceId: !!event.placeId, placeId: event.placeId });
+        
+        if (event.placeId) {
+          // Load Places library and get details
+          window.google.maps.importLibrary('places').then((places: any) => {
+            const service = new places.PlacesService(map);
+            service.getDetails({
+              placeId: event.placeId,
+              fields: ['place_id', 'name', 'types', 'formatted_address', 'rating', 'geometry', 'photos', 'user_ratings_total']
+            }, (place: any, status: any) => {
+              devLog('InteractiveMap', 'Google Places Response', { status, placeName: place?.name, placeId: place?.place_id });
+              
+              if (status === 'OK' && place) {
+                setSelectedGooglePlace({
+                  place,
+                  position: {
+                    lat: place.geometry?.location?.lat() || 0,
+                    lng: place.geometry?.location?.lng() || 0
+                  }
+                });
+              }
+            });
+          }).catch((error: any) => {
+            devLog('InteractiveMap', 'Places Library Load Error', error.message);
+          });
+        }
+      });
+      
+      return () => {
+        if (listener) {
+          window.google.maps.event.removeListener(listener);
+        }
+      };
+    }
+  }, [map, devLog, pois.length]);
 
   const handlePoiClick = (poi: Poi) => {
     setSelectedPoi(poi);
@@ -359,21 +452,9 @@ const MapContent: React.FC<{
         fullscreenControl={true}
         style={{ width: '100%', height: '100%' }}
       >
-        {pois.length > 0 ? pois.map((poi, index) => {
-          const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
+        {pois.map((poi, index) => {
           const isSelected = selectedPoiIds.includes(Number(poi.id));
           const isHovered = hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id) : false;
-          const coords = getPoiCoordinates(poi);
-          
-          devLog(`🔢 Rendering POI ${index + 1}/${pois.length}:`, { 
-            name: poi.name, 
-            id: poi.id, 
-            placeId: poi.placeId,
-            coords,
-            isSelected, 
-            isHovered,
-            colorIndex: index // Show which color index this POI will use
-          });
           
           return (
             <PoiMarker
@@ -387,15 +468,23 @@ const MapContent: React.FC<{
               index={index}
             />
           );
-        }) : (
-          // Show a message in dev mode when no POIs
-          import.meta.env.DEV && devLog('⚠️ No POIs to render on map')
-        )}
+        })}
 
         {selectedPoi && (
           <PoiInfoWindow
             poi={selectedPoi}
             onClose={handleInfoWindowClose}
+            isInTrip={isInTrip}
+            addToTrip={addToTrip}
+            isAddingToTrip={isAddingToTrip}
+          />
+        )}
+
+        {selectedGooglePlace && (
+          <GooglePlaceInfoWindow
+            place={selectedGooglePlace.place}
+            position={selectedGooglePlace.position}
+            onClose={() => setSelectedGooglePlace(null)}
             isInTrip={isInTrip}
             addToTrip={addToTrip}
             isAddingToTrip={isAddingToTrip}
@@ -423,20 +512,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   height = "400px",
   apiKey,
 }) => {
-  const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Debug map props
-  devLog('🗺️ InteractiveMap props:', {
-    startCity,
-    endCity, 
-    poisCount: pois.length,
-    hasApiKey: !!apiKey,
-    selectedCount: selectedPoiIds.length,
-    hoveredPoiName: hoveredPoi?.name
-  });
 
   // Set Google Maps API key
   useEffect(() => {
@@ -445,6 +523,16 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         setGoogleMapsKey(apiKey);
         setIsLoading(false);
       } else {
+        // Try environment variable first as fallback
+        const envApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        if (envApiKey) {
+          console.log('✅ Using Google Maps API key from environment variable');
+          setGoogleMapsKey(envApiKey);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Fallback to backend API
         try {
           const response = await fetch("/api/maps-key");
           const data = await response.json();

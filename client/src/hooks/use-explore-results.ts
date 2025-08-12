@@ -19,18 +19,8 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
     }
 
     const responseData = await response.json();
-    console.log('🔍 Explore Results API Response:', responseData);
-    
     const { success, data, _cache } = responseData;
     if (!success || !data) throw new Error("Invalid response format");
-
-    console.log('📊 Explore POI Data:', {
-      poisCount: data.pois?.length || 0,
-      firstPoi: data.pois?.[0] || 'none',
-      hasApiKey: !!data.maps_api_key,
-      meta: data.meta,
-      cache: _cache
-    });
 
     return {
       pois: data.pois || [],
@@ -41,9 +31,9 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
   } catch (err) {
     const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
     devLog("❌ Explore Results API Error:", err);
-    return { 
-      pois: [], 
-      maps_api_key: null, 
+    return {
+      pois: [],
+      maps_api_key: null,
       meta: null,
       _cache: { status: 'error', backend: 'unknown', environment: 'unknown', timestamp: null }
     };
@@ -91,17 +81,17 @@ export function useExploreResults() {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
-
   const pois = useMemo(() => query.data?.pois || [], [query.data]);
 
   // Cache info for developer debugging
   const cacheInfo = useMemo(() => {
     const cache = query.data?._cache;
     const localStorageKeys = ['exploreData'];
-    
+
     return {
       backendStatus: cache?.status || 'unknown',
       backendType: cache?.backend || 'unknown',
+      environment: cache?.environment,
       timestamp: cache?.timestamp,
       queryStatus: query.isLoading ? 'loading' : query.isError ? 'error' : query.isFetching ? 'stale' : 'fresh',
       lastFetch: query.dataUpdatedAt ? new Date(query.dataUpdatedAt) : undefined,

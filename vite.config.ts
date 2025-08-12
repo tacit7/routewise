@@ -73,5 +73,9 @@ export default defineConfig({
     "import.meta.env.VITE_GOOGLE_CLIENT_ID": JSON.stringify(
       process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || ""
     ),
+    // Pass Google Maps API Key
+    "import.meta.env.VITE_GOOGLE_MAPS_API_KEY": JSON.stringify(
+      process.env.VITE_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY || ""
+    ),
   },
 });

@@ -11,6 +11,7 @@ import CategoryFilter from "@/components/category-filter";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/header";
+import { useDevLog } from "@/components/developer-fab";
 
 interface PlacesViewProps {
   // Core data
@@ -120,6 +121,7 @@ export default function PlacesView({
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedPoiId, setSelectedPoiId] = useState<number | null>(null);
   const [showTripOnly, setShowTripOnly] = useState<boolean>(false);
+  const devLog = useDevLog();
 
   // POI scheduling state
   const [scheduledTimes, setScheduledTimes] = useState<Map<number, string>>(new Map());
@@ -238,19 +240,15 @@ export default function PlacesView({
   const gridColumns = calculateGridColumns();
   const isMultiColumn = gridColumns > 1;
 
-  const devLog = (...a:any[]) => import.meta.env.DEV && console.log(...a);
-  
-  // Debug panel sizing
-  devLog('Panel Debug:', {
-    sidebarSizePercent,
-    windowWidth: window.innerWidth,
-    calculatedWidth: (window.innerWidth * (sidebarSizePercent / 100)) - 40,
-    gridColumns,
-    isMultiColumn
-  });
 
   const handlePanelResize = (size: number) => {
-    devLog('Panel resized to:', size, '%');
+    devLog('PlacesView', 'Panel Resized', { 
+      newSize: size, 
+      windowWidth: window.innerWidth,
+      calculatedWidth: (window.innerWidth * (size / 100)) - 40,
+      gridColumns
+    });
+    
     setSidebarSizePercent(size);
     // Force re-render of grid layout
     setPanelKey(prev => prev + 1);
@@ -270,13 +268,6 @@ export default function PlacesView({
 
   const displaySidebarTitle = sidebarTitle || (showRouting ? "Places Along Route" : "Places to Explore");
 
-  // Debug logging
-  devLog("PlacesView render:", {
-    isMapVisible,
-    showRouting,
-    isMobile,
-    poisCount: uniquePois.length,
-  });
 
   return (
     <div className="h-screen flex flex-col bg-background">
@@ -315,10 +306,7 @@ export default function PlacesView({
         }
         rightContent={
           <button
-            onClick={() => {
-              devLog("Toggle map clicked:", { before: isMapVisible, after: !isMapVisible });
-              setIsMapVisible(!isMapVisible);
-            }}
+            onClick={() => setIsMapVisible(!isMapVisible)}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation focus-ring
               ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
@@ -347,10 +335,6 @@ export default function PlacesView({
       />
 
       {/* Main Content */}
-      {(() => {
-        devLog("Rendering decision:", { isMapVisible, showingPanel: isMapVisible, showingGrid: !isMapVisible });
-        return null;
-      })()}
       {isMobile ? (
         // Mobile: Simple conditional rendering - either map OR POI list
         isMapVisible ? (

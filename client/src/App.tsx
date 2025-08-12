@@ -25,9 +25,9 @@ import InterestsPage from "@/pages/interests";
 import KitchenSinkDemo from "@/pages/kitchen-sink";
 import SuggestedTrip from "@/pages/suggested-trip";
 import NotFound from "@/pages/not-found";
-import TripIndicator from "@/components/trip-indicator";
 import AuthSuccess from "@/pages/auth-success";
 import AuthError from "@/pages/auth-error";
+import { DeveloperFab } from "@/components/developer-fab";
 
 function AuthenticatedRouter() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -52,8 +52,8 @@ function AuthenticatedRouter() {
     );
   }
 
-  // Only show TripIndicator on other pages (disabled for route-results and explore-results)
-  const showTripIndicator = location !== '/route-results' && location !== '/explore-results';
+  // Show Developer FAB on all pages
+  const showDeveloperFab = true;
 
   return (
     <>
@@ -82,7 +82,7 @@ function AuthenticatedRouter() {
         <Route path="/auth/error" component={AuthError} />
         <Route component={NotFound} />
       </Switch>
-      {showTripIndicator && <TripIndicator />}
+      {/* Developer FAB now handled by individual pages with cache info */}
     </>
   );
 }

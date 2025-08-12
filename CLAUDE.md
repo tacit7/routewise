@@ -4,11 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## OAuth Authentication Reference
 
-
 **🚨 CRITICAL**: For any OAuth-related issues, always check the comprehensive solution at:
 `/Users/urielmaldonado/projects/route-wise/frontend/OAUTH_SOLUTION.md`
 
 This file contains the complete, tested solution for Google OAuth authentication that has been verified multiple times. Reference this file before making any OAuth-related changes.
+
+## Google Maps API Key Issues
+
+**🚨 CRITICAL**: When you see the error "Google Maps API key not configured" in the frontend:
+
+**Root Cause**: The Phoenix backend server was not started with `dotenv` command to load environment variables.
+
+**Solution**: The backend server must be started with:
+```bash
+dotenv mix phx.server
+```
+
+**Note**: This is a backend issue, not a frontend configuration problem. The frontend fetches the API key from `/api/maps-key` endpoint, which fails when the backend doesn't have access to environment variables.
 
 ## Recent Updates - August 11, 2025 - Session 23
 

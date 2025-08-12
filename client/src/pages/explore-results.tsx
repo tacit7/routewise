@@ -17,7 +17,6 @@ export default function ExploreResults() {
     handlePoiSelect,
     cacheInfo,
   } = useExploreResults();
-
   if (!exploreData) return null;
   if (error) {
     const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
