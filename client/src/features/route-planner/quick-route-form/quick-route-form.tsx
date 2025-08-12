@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, Flag, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import CityAutocomplete from "@/components/city-autocomplete";
 
 const routeSchema = z.object({
   startCity: z.string().min(1, "Please enter a starting city"),
@@ -119,21 +118,17 @@ export function QuickRouteForm({
       <div className={spacingClass}>
         {/* From City */}
         <div>
-          <Label htmlFor="startCity" className={`block ${textClass} font-medium text-slate-900 mb-2`}>
-            <MapPin className="inline w-4 h-4 mr-2 text-primary" />
-            From
-          </Label>
           <Controller
             name="startCity"
             control={form.control}
             render={({ field, fieldState }) => (
               <div>
-                <CityAutocomplete
-                  value={field.value}
-                  onSelect={(city) => field.onChange(city)}
+                <Input
+                  {...field}
                   placeholder="Enter starting city"
-                  className={`${inputPadding} border-2 focus:border-primary ${
-                    fieldState.error ? 'border-red-300' : 'border-gray-200'
+                  autoComplete="off"
+                  className={`${inputPadding} border-0 focus:border-0 ring-0 focus:ring-2 focus:ring-primary/60 bg-white/90 backdrop-blur-sm shadow-sm focus:shadow-md transition-all outline-none ${
+                    fieldState.error ? 'focus:ring-red-400' : ''
                   }`}
                 />
                 {fieldState.error && (
@@ -146,21 +141,17 @@ export function QuickRouteForm({
 
         {/* To City */}
         <div>
-          <Label htmlFor="endCity" className={`block ${textClass} font-medium text-slate-900 mb-2`}>
-            <Flag className="inline w-4 h-4 mr-2 text-primary" />
-            To
-          </Label>
           <Controller
             name="endCity"
             control={form.control}
             render={({ field, fieldState }) => (
               <div>
-                <CityAutocomplete
-                  value={field.value}
-                  onSelect={(city) => field.onChange(city)}
+                <Input
+                  {...field}
                   placeholder="Enter destination city"
-                  className={`${inputPadding} border-2 focus:border-primary ${
-                    fieldState.error ? 'border-red-300' : 'border-gray-200'
+                  autoComplete="off"
+                  className={`${inputPadding} border-0 focus:border-0 ring-0 focus:ring-2 focus:ring-primary/60 bg-white/90 backdrop-blur-sm shadow-sm focus:shadow-md transition-all outline-none ${
+                    fieldState.error ? 'focus:ring-red-400' : ''
                   }`}
                 />
                 {fieldState.error && (

@@ -164,15 +164,50 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                     {isAuthenticated ? (
                       <>
                         <div className="px-4 py-2 border-b border-gray-100">
-                          <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                          <p className="text-xs text-slate-500">{user?.email}</p>
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Avatar className="h-10 w-10">
+                              {user?.picture && (
+                                <AvatarImage 
+                                  src={user.picture} 
+                                  alt={user.name || 'User avatar'} 
+                                />
+                              )}
+                              <AvatarFallback className="bg-primary text-primary-foreground font-medium">
+                                {user?.name ? getUserInitials(user.name) : 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-900 truncate">{user?.name}</p>
+                              <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            </div>
+                          </div>
                         </div>
                         <Button
                           onClick={handleDashboard}
                           variant="ghost"
                           className="justify-start w-full h-12"
                         >
+                          <User className="mr-3 h-5 w-5" />
                           Dashboard
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setLocation('/profile');
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="justify-start w-full h-12"
+                        >
+                          <Settings className="mr-3 h-5 w-5" />
+                          Settings
+                        </Button>
+                        <Button
+                          onClick={handleLogout}
+                          variant="ghost"
+                          className="justify-start w-full h-12 text-destructive hover:text-destructive"
+                        >
+                          <LogOut className="mr-3 h-5 w-5" />
+                          Sign Out
                         </Button>
                       </>
                     ) : (

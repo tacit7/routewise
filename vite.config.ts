@@ -61,6 +61,24 @@ export default defineConfig({
             devLog('✅ Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
           });
         },
+      },
+      '/auth': {
+        target: 'http://localhost:4001',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          const devLog = (...args: any[]) => process.env.NODE_ENV !== 'production' && console.log(...args);
+          
+          proxy.on('error', (err, _req, _res) => {
+            devLog('🔴 Auth Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            devLog('🔄 Auth Proxying request:', req.method, req.url, '→', proxyReq.path);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            devLog('✅ Auth Proxy response:', req.method, req.url, '→', proxyRes.statusCode);
+          });
+        },
       }
     }
   },

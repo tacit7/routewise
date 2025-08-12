@@ -17,7 +17,7 @@
 
 /* Hero card styling for landing page */
 .hero-card {
-  @apply bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 p-6 md:p-8 shadow-xl;
+  @apply bg-white/85 backdrop-blur-md rounded-2xl border border-white/50 p-6 md:p-8 shadow-xl;
 }
 
 :root {
@@ -243,10 +243,6 @@ textarea:focus-visible {
 }
 
 /* Theme Component Classes */
-.hero-card {
-  @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/20;
-  @apply p-6 md:p-8 max-w-2xl mx-auto;
-}
 
 /* Light overlay cards */
 .overlay-card-light {

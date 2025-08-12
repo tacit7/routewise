@@ -150,6 +150,7 @@ export default function PlacesView({
     onPoiClick(poi);
   };
 
+
   // Detect mobile and set mobile-first map visibility
   useEffect(() => {
     const checkMobile = () => {
@@ -370,20 +371,6 @@ export default function PlacesView({
               </div>
             </div>
 
-            {/* Mobile Itinerary Button - Fixed at bottom */}
-            {tripPlaces.length > 0 && (
-              <div className="p-3 border-t border-border bg-surface flex-shrink-0">
-                <Button
-                  onClick={() => setLocation("/itinerary")}
-                  className="w-full bg-primary hover:bg-primary/90 text-white min-h-[48px] touch-manipulation"
-                  size="lg"
-                  aria-label={`Start planning itinerary with ${tripPlaces.length} places`}
-                >
-                  <Calendar className="h-5 w-5 mr-2" aria-hidden="true" />
-                  Start Planning Itinerary
-                </Button>
-              </div>
-            )}
           </main>
         )
       ) : (
@@ -406,9 +393,20 @@ export default function PlacesView({
 
               {/* Sidebar Header */}
               <div className="p-3 border-b border-border bg-muted">
-                <h2 className="text-lg font-semibold text-foreground" id="places-sidebar-heading">
-                  {displaySidebarTitle}
-                </h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground" id="places-sidebar-heading">
+                    {displaySidebarTitle}
+                  </h2>
+                  {tripPlaces.length > 0 && (
+                    <Button
+                      onClick={() => setLocation("/itinerary")}
+                      size="sm"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1 text-xs"
+                    >
+                      Start Planning
+                    </Button>
+                  )}
+                </div>
                 <div className="flex gap-2 mt-2 flex-wrap">
                   <button
                     onClick={() => setSelectedCity("all")}
@@ -650,21 +648,6 @@ export default function PlacesView({
                 )}
               </div>
 
-              {/* Itinerary Button */}
-              {tripPlaces.length > 0 && (
-                <div
-                  className="p-3 border-t border-border bg-muted"
-                >
-                  <Button
-                    onClick={() => setLocation("/itinerary")}
-                    className="w-full transition-all bg-primary text-primary-foreground hover:bg-primary/90"
-                    size="sm"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Start Planning Itinerary
-                  </Button>
-                </div>
-              )}
             </aside>
           </ResizablePanel>
 
