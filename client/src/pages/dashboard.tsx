@@ -440,9 +440,9 @@ const Dashboard = () => {
               </div>
 
               {/* Explore Places Card */}
-              <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
-                <form onSubmit={handleExploreFormSubmit}>
-                  <div className="text-center">
+              <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group h-full">
+                <form onSubmit={handleExploreFormSubmit} className="h-full">
+                  <div className="text-center h-full flex flex-col">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                       <Search className="w-8 h-8 text-primary" />
                     </div>
@@ -452,23 +452,36 @@ const Dashboard = () => {
                     </p>
                     
                     {/* Explore Form Input */}
-                    <div className="space-y-3 mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Location to explore (e.g., New York, NY)"
-                        value={exploreLocation}
-                        onChange={(e) => setExploreLocation(e.target.value)}
-                        className="w-full"
-                      />
+                    <div className="space-y-3 mb-6 flex-grow">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                        <Input
+                          type="text"
+                          placeholder="New York, Grand Canyon, France"
+                          value={exploreLocation}
+                          onChange={(e) => setExploreLocation(e.target.value)}
+                          className="w-full pl-10 placeholder:text-muted-foreground/40"
+                        />
+                      </div>
+                      
+                      {/* Invisible inactive button */}
+                      <Button
+                        type="button"
+                        disabled
+                        className="w-full invisible opacity-0 pointer-events-none"
+                      >
+                        Hidden Button
+                      </Button>
                     </div>
                     
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      className="w-full border-border text-foreground hover:bg-muted/80 transition-colors"
-                    >
-                      Start Exploring →
-                    </Button>
+                    <div className="mt-auto">
+                      <Button
+                        type="submit"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                      >
+                        Start Exploring →
+                      </Button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -598,9 +611,9 @@ const Dashboard = () => {
             </div>
 
             {/* Explore Places Card */}
-            <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
-              <form onSubmit={handleExploreFormSubmit}>
-                <div className="text-center">
+            <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group h-full">
+              <form onSubmit={handleExploreFormSubmit} className="h-full">
+                <div className="text-center h-full flex flex-col">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                     <Search className="w-8 h-8 text-primary" />
                   </div>
@@ -610,23 +623,36 @@ const Dashboard = () => {
                   </p>
                   
                   {/* Explore Form Input */}
-                  <div className="space-y-3 mb-4">
-                    <Input
-                      type="text"
-                      placeholder="Location to explore (e.g., New York, NY)"
-                      value={exploreLocation}
-                      onChange={(e) => setExploreLocation(e.target.value)}
-                      className="w-full"
-                    />
+                  <div className="space-y-3 mb-6 flex-grow">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Input
+                        type="text"
+                        placeholder="New York, Grand Canyon, France"
+                        value={exploreLocation}
+                        onChange={(e) => setExploreLocation(e.target.value)}
+                        className="w-full pl-10 placeholder:text-muted-foreground/40"
+                      />
+                    </div>
+                    
+                    {/* Invisible inactive button */}
+                    <Button
+                      type="button"
+                      disabled
+                      className="w-full invisible opacity-0 pointer-events-none"
+                    >
+                      Hidden Button
+                    </Button>
                   </div>
                   
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    className="w-full border-border text-foreground hover:bg-muted/80 transition-colors"
-                  >
-                    Start Exploring →
-                  </Button>
+                  <div className="mt-auto">
+                    <Button
+                      type="submit"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    >
+                      Start Exploring →
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>
