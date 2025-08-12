@@ -6,6 +6,7 @@ import type { POI, RouteResultsAPIResponse } from "@/types/api";
 import type { Poi } from "@/types/schema";
 import PlacesView from "@/components/places-view";
 import DeveloperCacheFAB from "@/components/developer-cache-fab";
+import { TopNav } from "@/features/marketing/top-nav";
 
 interface RouteData {
   startCity: string;
@@ -29,21 +30,13 @@ export default function RouteResults() {
       try {
         const params = new URLSearchParams({
           start: routeData.startCity,
-          end: routeData.endCity,
-          _t: Date.now().toString() // Cache bust in URL params, not query key
+          end: routeData.endCity
         });
 
         const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
         
         devLog('🔍 Fetching route results with params:', params.toString());
-        const response = await fetch(`/api/route-results?${params}`, {
-          cache: 'no-store', // Force no caching
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
+        const response = await fetch(`/api/route-results?${params}`);
         devLog('📊 Route Results API response status:', response.status);
 
         if (!response.ok) {
@@ -91,10 +84,9 @@ export default function RouteResults() {
       }
     },
     enabled: !!routeData,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes - route data is stable
+    gcTime: 30 * 60 * 1000, // 30 minutes in cache
+    refetchOnWindowFocus: false, // Route data doesn't change often
     refetchOnReconnect: true,
   });
 
@@ -183,6 +175,7 @@ export default function RouteResults() {
 
   return (
     <>
+      <TopNav />
       <PlacesView
         startLocation={routeData.startCity}
         endLocation={routeData.endCity}
