@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MapPin, Clock, Route as RouteIcon, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Clock, Route as RouteIcon, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
@@ -123,70 +123,53 @@ export default function DashboardHero() {
       {/* Content overlay */}
       <div className="absolute inset-0 flex items-center z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex justify-between items-center w-full">
-            {/* Left side - Trip info */}
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-5 h-5 text-white/80" />
-                <span className="text-white/80 text-sm font-medium">{currentImage.location}</span>
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                {currentImage.title}
-              </h1>
-              <p className="text-white/90 text-lg mb-6 max-w-md">
-                {currentImage.description}
-              </p>
-              
-              {/* Trip Stats */}
-              <div className="flex flex-wrap gap-3 mb-6">
-                <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
-                  <Clock className="w-4 h-4 mr-1" />
-                  {currentImage.duration}
-                </Badge>
-                <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
-                  <RouteIcon className="w-4 h-4 mr-1" />
-                  {currentImage.distance}
-                </Badge>
-                <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
-                  <Star className="w-4 h-4 mr-1" />
-                  {currentImage.difficulty}
-                </Badge>
-              </div>
-              
-              {/* Highlights */}
-              <div className="mb-6">
-                <p className="text-white/80 text-sm mb-2">Top Highlights:</p>
-                <div className="flex flex-wrap gap-2">
-                  {currentImage.highlights.slice(0, 3).map((highlight, index) => (
-                    <span key={index} className="text-white/90 text-sm bg-black/20 px-2 py-1 rounded">
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-              </div>
+          {/* Card-style container */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 max-w-2xl">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="w-5 h-5 text-white/80" />
+              <span className="text-white/80 text-sm font-medium">{currentImage.location}</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              {currentImage.title}
+            </h1>
+            <p className="text-white/90 text-lg mb-6">
+              {currentImage.description}
+            </p>
+            
+            {/* Trip Stats */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              <button
+                onClick={handleViewTrip}
+                className="bg-green-500/20 hover:bg-green-500/30 text-white border border-green-400/30 px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1"
+              >
+                <Eye className="w-4 h-4" />
+                View Trip
+              </button>
+              <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                <Clock className="w-4 h-4 mr-1" />
+                {currentImage.duration}
+              </Badge>
+              <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                <RouteIcon className="w-4 h-4 mr-1" />
+                {currentImage.distance}
+              </Badge>
+              <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                <Star className="w-4 h-4 mr-1" />
+                {currentImage.difficulty}
+              </Badge>
             </div>
             
-            {/* Right side - View Trip button */}
-            <div className="hidden md:block">
-              <Button 
-                onClick={handleViewTrip}
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg font-semibold shadow-lg"
-              >
-                View This Trip
-              </Button>
+            {/* Highlights */}
+            <div className="mb-6">
+              <p className="text-white/80 text-sm mb-2">Top Highlights:</p>
+              <div className="flex flex-wrap gap-2">
+                {currentImage.highlights.slice(0, 3).map((highlight, index) => (
+                  <span key={index} className="text-white/90 text-sm bg-black/20 px-2 py-1 rounded">
+                    {highlight}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          
-          {/* Mobile View Trip button */}
-          <div className="md:hidden mt-4">
-            <Button 
-              onClick={handleViewTrip}
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-white px-6 py-2 font-semibold shadow-lg"
-            >
-              View This Trip
-            </Button>
           </div>
         </div>
       </div>
