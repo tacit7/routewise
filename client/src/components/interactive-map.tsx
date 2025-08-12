@@ -1,11 +1,12 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap, Pin } from "@vis.gl/react-google-maps";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Poi } from "@/types/schema";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useDevLog } from "@/components/developer-fab";
+import { usePhoenixPOIClusters } from "@/hooks/usePhoenixPOIClusters";
 
 interface InteractiveMapProps {
   startCity: string;
@@ -20,6 +21,7 @@ interface InteractiveMapProps {
   className?: string;
   height?: string;
   apiKey?: string; // Optional API key to avoid fetching separately
+  enableClustering?: boolean; // Enable Phoenix WebSocket clustering
 }
 
 // POI category to color mapping - showing variety of colors for preview
@@ -106,6 +108,76 @@ const PoiMarker: React.FC<{
           borderColor="white"
           scale={isSelected || isHovered ? 1.2 : 1.0}
         />
+      </div>
+    </AdvancedMarker>
+  );
+};
+
+// Cluster marker component for grouped POIs
+const ClusterMarker: React.FC<{
+  cluster: {
+    id: string;
+    lat: number;
+    lng: number;
+    count: number;
+    pois: Poi[];
+    category_breakdown?: Record<string, number>;
+    avg_rating?: number;
+  };
+  isHovered: boolean;
+  onClick: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}> = ({ cluster, isHovered, onClick, onMouseEnter, onMouseLeave }) => {
+  const { lat, lng, count } = cluster;
+  
+  // Determine cluster size for visual scaling
+  const getClusterSize = (count: number) => {
+    if (count < 5) return { size: 40, scale: 1.0, textSize: 'text-sm' };
+    if (count < 10) return { size: 50, scale: 1.1, textSize: 'text-base' };
+    if (count < 25) return { size: 60, scale: 1.2, textSize: 'text-lg' };
+    return { size: 70, scale: 1.3, textSize: 'text-xl' };
+  };
+
+  const { size, scale, textSize } = getClusterSize(count);
+  
+  return (
+    <AdvancedMarker
+      position={{ lat, lng }}
+      title={`${count} POIs`}
+      onClick={onClick}
+    >
+      <div
+        onMouseEnter={() => onMouseEnter?.()}
+        onMouseLeave={() => onMouseLeave?.()}
+        style={{ 
+          cursor: 'pointer',
+          transform: isHovered ? `scale(${scale * 1.1})` : `scale(${scale})`,
+          transition: 'transform 0.2s ease-in-out'
+        }}
+      >
+        <div 
+          className={`rounded-full flex items-center justify-center shadow-lg border-2 border-white ${textSize} font-bold`}
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: 'var(--primary)',
+            color: 'white'
+          }}
+        >
+          {count}
+        </div>
+        {/* Small indicator showing it's a cluster */}
+        <div 
+          className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
+          style={{ 
+            backgroundColor: 'var(--surface)',
+            color: 'var(--primary)',
+            border: '1px solid var(--border)'
+          }}
+        >
+          <Users className="w-2.5 h-2.5" />
+        </div>
       </div>
     </AdvancedMarker>
   );
