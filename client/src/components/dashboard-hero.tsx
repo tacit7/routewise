@@ -103,29 +103,29 @@ export default function DashboardHero() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/40" />
       
-      {/* Navigation arrows */}
-      <button
-        onClick={prevImage}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
-        aria-label="Previous image"
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      
-      <button
-        onClick={nextImage}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
-        aria-label="Next image"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
-      
       {/* Content overlay */}
-      <div className="absolute inset-0 flex items-center z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           {/* Card-style container */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 max-w-2xl">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 max-w-2xl mx-auto text-center relative">
+            {/* Navigation arrows inside the card */}
+            <button
+              onClick={prevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            
+            <button
+              onClick={nextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center justify-center gap-2 mb-3">
               <MapPin className="w-5 h-5 text-white/80" />
               <span className="text-white/80 text-sm font-medium">{currentImage.location}</span>
             </div>
@@ -137,7 +137,7 @@ export default function DashboardHero() {
             </p>
             
             {/* Trip Stats */}
-            <div className="flex flex-wrap gap-3 mb-6">
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
               <button
                 onClick={handleViewTrip}
                 className="bg-green-500/20 hover:bg-green-500/30 text-white border border-green-400/30 px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1"
@@ -162,7 +162,7 @@ export default function DashboardHero() {
             {/* Highlights */}
             <div className="mb-6">
               <p className="text-white/80 text-sm mb-2">Top Highlights:</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 {currentImage.highlights.slice(0, 3).map((highlight, index) => (
                   <span key={index} className="text-white/90 text-sm bg-black/20 px-2 py-1 rounded">
                     {highlight}
@@ -170,22 +170,22 @@ export default function DashboardHero() {
                 ))}
               </div>
             </div>
+            
+            {/* Image indicators inside card */}
+            <div className="flex justify-center gap-2">
+              {DASHBOARD_HERO_IMAGES.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      
-      {/* Image indicators */}
-      <div className="absolute bottom-4 right-4 z-20 flex gap-2">
-        {DASHBOARD_HERO_IMAGES.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentImageIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-            }`}
-            aria-label={`Go to image ${index + 1}`}
-          />
-        ))}
       </div>
 
       {/* Add group class for hover effects */}
