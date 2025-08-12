@@ -2,6 +2,7 @@ import React from "react";
 import PlacesView from "@/components/places-view";
 import { useExploreResults } from "@/hooks/use-explore-results";
 import DeveloperCacheFAB from "@/components/developer-cache-fab";
+import { TopNav } from "@/features/marketing/top-nav";
 
 export default function ExploreResults() {
   const {
@@ -17,6 +18,9 @@ export default function ExploreResults() {
     handlePoiSelect,
     cacheInfo,
   } = useExploreResults();
+
+  // Check if clustering is enabled via debug tools
+  const enableClustering = localStorage.getItem('enableClustering') === 'true';
   if (!exploreData) return null;
   if (error) {
     const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
@@ -25,6 +29,7 @@ export default function ExploreResults() {
 
   return (
     <>
+      <TopNav />
       <PlacesView
         startLocation={exploreData.startLocation}
         pois={pois}
@@ -39,6 +44,7 @@ export default function ExploreResults() {
         headerTitle={`Exploring ${exploreData.startLocation}`}
         sidebarTitle="Places to Explore"
         backUrl="/dashboard"
+        enableClustering={enableClustering}
       />
       <DeveloperCacheFAB cacheInfo={cacheInfo} />
     </>

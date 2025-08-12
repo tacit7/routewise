@@ -7,7 +7,7 @@ import {
   useUserInterests,
   userPreferences
 } from "@/hooks/use-interests";
-import Header from "@/components/header";
+import { TopNav } from "@/features/marketing/top-nav";
 import ReduxTest from "@/components/redux-test";
 import { Route, MapPin, CheckCircle, Settings, AlertTriangle } from "lucide-react";
 
@@ -28,30 +28,28 @@ const DashboardTest = () => {
 
   return (
     <div className="bg-bg min-h-screen">
-      <Header
-        leftContent={
-          <div className="flex items-center">
+      <TopNav />
+      
+      {/* Page Header */}
+      <div className="bg-white border-b px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>
               RouteWise Test
             </h1>
-          </div>
-        }
-        centerContent={
-          <div className="flex items-center justify-center">
             <h2 className="text-lg font-medium" style={{ color: 'var(--text)' }}>
               Dashboard Integration Test
             </h2>
           </div>
-        }
-        rightContent={
+          
           <div className="flex items-center gap-2">
             <Settings className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
             <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
               Test Mode
             </span>
           </div>
-        }
-      />
+        </div>
+      </div>
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">

@@ -15,7 +15,7 @@ import TripPlacesGrid from "@/components/TripPlacesGrid";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { InteractiveMap } from "@/components/interactive-map";
-import Header from "@/components/header";
+import { TopNav } from "@/features/marketing/top-nav";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
@@ -176,30 +176,32 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
-      <Header
-        leftContent={
-          <BackButton onClick={handleGoBack} text="Back to Route Results" />
-        }
-        centerContent={
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Input
-                type="text"
-                placeholder={generateTripTitle()}
-                value={tripTitle}
-                onChange={(e) => setTripTitle(e.target.value)}
-                className="text-lg sm:text-xl lg:text-2xl font-bold h-auto py-1 px-2 border-0 shadow-none w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-0 focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                style={{ backgroundColor: 'var(--surface)', color: 'var(--text)' }}
-              />
+      <TopNav />
+      
+      {/* Page Header */}
+      <div className="bg-white border-b px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <BackButton onClick={handleGoBack} text="Back to Route Results" />
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Input
+                  type="text"
+                  placeholder={generateTripTitle()}
+                  value={tripTitle}
+                  onChange={(e) => setTripTitle(e.target.value)}
+                  className="text-lg sm:text-xl lg:text-2xl font-bold h-auto py-1 px-2 border-0 shadow-none w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-0 focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+                  style={{ backgroundColor: 'var(--surface)', color: 'var(--text)' }}
+                />
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Organize your {itineraryPlaces.length} saved places into daily plans
+                {!isAuthenticated && <Badge variant="secondary" className="ml-2" style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}>Sign in to save</Badge>}
+              </p>
             </div>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              Organize your {itineraryPlaces.length} saved places into daily plans
-              {!isAuthenticated && <Badge variant="secondary" className="ml-2" style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}>Sign in to save</Badge>}
-            </p>
           </div>
-        }
-        rightContent={
-          <>
+          
+          <div className="flex items-center gap-2">
             {lastSavedAt && (
               <div className="text-sm flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
                 <Check className="h-4 w-4" />
@@ -221,9 +223,9 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 <LogIn className="h-5 w-5 text-gray-600" />
               )}
             </button>
-          </>
-        }
-      />
+          </div>
+        </div>
+      </div>
 
       <Tabs value={`day-${activeDay}`} onValueChange={(v) => setActiveDay(parseInt(v.replace("day-", "")))} className="flex-1 flex flex-col">
         <div className="border-b px-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>

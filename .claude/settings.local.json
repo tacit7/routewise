@@ -17,7 +17,9 @@
       "Bash(npm search:*)",
       "Bash(say:*)",
       "mcp__faq-expert__search_faqs",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }

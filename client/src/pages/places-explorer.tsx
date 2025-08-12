@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import Header from "@/components/header";
+import { TopNav } from "@/features/marketing/top-nav";
 import { useAuth } from "@/components/auth-context";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
@@ -395,15 +395,17 @@ export default function PlacesExplorer() {
     <>
       {/* Page Layout - Matching Trip Wizard */}
       <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-        {/* Header - Clean app bar pattern */}
-        <Header
-          leftContent={
+        <TopNav />
+        
+        {/* Page Header */}
+        <div className="bg-white border-b px-6 py-4">
+          <div className="flex items-center justify-between">
             <Breadcrumb className="flex-1 min-w-0">
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink 
                     href="/dashboard" 
-                    className="text-white/80 hover:text-white"
+                    className="text-slate-600 hover:text-slate-900"
                     onClick={(e) => {
                       e.preventDefault();
                       handleExit();
@@ -413,26 +415,24 @@ export default function PlacesExplorer() {
                     <span className="sm:hidden">H</span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="text-white/60" />
+                <BreadcrumbSeparator className="text-slate-400" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-white truncate">
+                  <BreadcrumbPage className="text-slate-900 truncate">
                     <span className="hidden sm:inline">Places Explorer</span>
                     <span className="sm:hidden">Explorer</span>
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          }
-          centerContent={null}
-          rightContent={
-            user && (
+            
+            {user && (
               <div className="flex items-center gap-2">
                 <UserMenu className="hidden md:block" />
                 <MobileMenu />
               </div>
-            )
-          }
-        />
+            )}
+          </div>
+        </div>
 
         {/* Page Content - Matching Trip Wizard */}
         <div className="pt-4 pb-8">

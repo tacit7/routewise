@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import { TopNav } from "@/features/marketing/top-nav";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -19,13 +19,7 @@ export function AppShell({
 }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
-      <Header 
-        leftContent={leftContent}
-        centerContent={centerContent}
-        rightContent={rightContent}
-        showLogo={showLogo}
-        showUserMenu={showUserMenu}
-      />
+      <TopNav />
       
       <main className="flex-1">
         {children}

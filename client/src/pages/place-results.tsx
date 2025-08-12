@@ -20,7 +20,7 @@ import { InteractiveMap } from "@/components/interactive-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useTripPlaces } from "@/hooks/use-trip-places";
-import Header from "@/components/header";
+import { TopNav } from "@/features/marketing/top-nav";
 
 interface PlaceData {
   placeName: string;
@@ -180,26 +180,28 @@ export default function PlaceResults() {
 
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
-      <Header
-        leftContent={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/")}
-            className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-            style={{ color: 'var(--text)' }}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Button>
-        }
-        centerContent={
-          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            <MapPin className="h-4 w-4 inline mr-1" />
-            {placeData.placeName} • {uniquePois.length} nearby places
+      <TopNav />
+      
+      {/* Page Header */}
+      <div className="bg-white border-b px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/")}
+              className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              style={{ color: 'var(--text)' }}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              <MapPin className="h-4 w-4 inline mr-1" />
+              {placeData.placeName} • {uniquePois.length} nearby places
+            </div>
           </div>
-        }
-        rightContent={
+          
           <Button
             onClick={() => setIsMapVisible(!isMapVisible)}
             className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
@@ -208,8 +210,8 @@ export default function PlaceResults() {
             <MapIcon className="h-4 w-4" />
             {isMapVisible ? "Hide Map" : "Show Map"}
           </Button>
-        }
-      />
+        </div>
+      </div>
 
       {/* Full-width layout with no gaps */}
       <div className="flex-1 flex overflow-hidden">

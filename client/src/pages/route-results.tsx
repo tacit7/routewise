@@ -21,6 +21,9 @@ export default function RouteResults() {
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const { toast } = useToast();
 
+  // Check if clustering is enabled via debug tools
+  const enableClustering = localStorage.getItem('enableClustering') === 'true';
+
   // Fetch POIs along the route using the correct Phoenix API endpoint
   const { data: routeResults, isLoading: poisLoading, error: poisError } = useQuery({
     queryKey: ["/api/route-results", routeData?.startCity, routeData?.endCity],
@@ -191,6 +194,7 @@ export default function RouteResults() {
         headerTitle={`${routeData.startCity} → ${routeData.endCity}`}
         sidebarTitle="Places Along Route"
         backUrl="/"
+        enableClustering={enableClustering}
       />
       <DeveloperCacheFAB cacheInfo={cacheInfo} />
     </>

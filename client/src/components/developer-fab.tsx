@@ -508,13 +508,13 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         • No backend dependencies required<br/>
                         <br/>
                         <strong>Performance:</strong><br/>
-                        • Handles 1000+ POIs efficiently<br/>
+                        • Handles 20-1000+ POIs efficiently<br/>
                         • Real-time clustering on zoom/pan<br/>
-                        • 60px grid size for optimal visual density<br/>
+                        • 120px grid optimized for visibility<br/>
                         <br/>
                         <strong>Configuration:</strong><br/>
-                        • Grid Size: 60px<br/>
-                        • Max Zoom: 15 (individual POIs above)<br/>
+                        • Grid Size: 120px (optimized for small datasets)<br/>
+                        • Max Zoom: 13 (individual POIs above)<br/>
                         • Min Cluster Size: 2 POIs
                       </div>
                     </div>

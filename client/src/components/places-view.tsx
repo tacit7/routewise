@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Loader2, Map as MapIcon, Calendar, List, Eye, EyeOff, MapPin, Star, Check } from "lucide-react";
+import { ArrowLeft, Loader2, Map as MapIcon, Calendar, Eye, EyeOff, MapPin, Star, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import type { POI } from "@/types/api";
@@ -10,7 +10,6 @@ import { useTripPlaces } from "@/hooks/use-trip-places";
 import CategoryFilter from "@/components/category-filter";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
-import Header from "@/components/header";
 import { useDevLog } from "@/components/developer-fab";
 
 interface PlacesViewProps {
@@ -23,6 +22,7 @@ interface PlacesViewProps {
   // Map configuration
   showRouting?: boolean; // true for route mode, false for explore mode
   apiKey?: string;
+  enableClustering?: boolean; // Enable Phoenix WebSocket clustering
 
   // Event handlers
   onPoiClick: (poi: POI | Poi) => void;
@@ -107,6 +107,7 @@ export default function PlacesView({
   isLoading,
   showRouting = true,
   apiKey,
+  enableClustering = false,
   onPoiClick,
   onPoiSelect,
   onPoiHover,
@@ -262,6 +263,7 @@ export default function PlacesView({
     }, 150);
   };
 
+
   // Compute display values
   const displayHeaderTitle =
     headerTitle || (showRouting ? `${startLocation} → ${endLocation}` : `Exploring ${startLocation}`);
@@ -282,57 +284,6 @@ export default function PlacesView({
         {showTripOnly && ` from your trip`}
       </div>
       
-      <Header
-        leftContent={
-          <Button
-            variant="ghost"
-            onClick={() => setLocation(backUrl)}
-            className="flex items-center text-muted-foreground hover:text-primary focus-ring"
-            aria-label="Go back to previous page"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Back</span>
-          </Button>
-        }
-        centerContent={
-          <div className="text-center">
-            <h1 className="text-lg font-semibold text-foreground">
-              {displayHeaderTitle}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {uniquePois.length} places found
-            </p>
-          </div>
-        }
-        rightContent={
-          <button
-            onClick={() => setIsMapVisible(!isMapVisible)}
-            className={`
-              flex items-center gap-2 px-3 py-2 rounded-lg transition-all touch-manipulation focus-ring
-              ${isMobile ? "min-w-[44px] min-h-[44px]" : "px-3 py-1.5"}
-              ${
-                isMapVisible
-                  ? "bg-muted hover:bg-muted/80 text-muted-foreground"
-                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
-              }
-            `}
-            aria-label={isMapVisible ? "Hide map and show places list view" : "Show map view"}
-            aria-pressed={isMapVisible}
-          >
-            {isMapVisible ? (
-              <>
-                <List className="h-4 w-4" />
-                <span className="text-sm hidden sm:inline">List</span>
-              </>
-            ) : (
-              <>
-                <MapIcon className="h-4 w-4" />
-                <span className="text-sm hidden sm:inline">Map</span>
-              </>
-            )}
-          </button>
-        }
-      />
 
       {/* Main Content */}
       {isMobile ? (
@@ -360,6 +311,7 @@ export default function PlacesView({
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
+                enableClustering={enableClustering}
               />
             )}
           </div>
@@ -743,6 +695,7 @@ export default function PlacesView({
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
+                enableClustering={enableClustering}
               />
             )}
           </ResizablePanel>
