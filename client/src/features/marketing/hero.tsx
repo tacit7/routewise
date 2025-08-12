@@ -90,48 +90,52 @@ export function Hero({
         <div className={`absolute inset-0 ${overlayClasses[overlay]}`} />
       )}
       
-      {/* Carousel navigation - hidden on mobile to reduce clutter */}
+      {/* Carousel navigation - improved mobile touch targets */}
       <button
         onClick={prevImage}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-1.5 md:p-2 rounded-full transition-all opacity-60 hover:opacity-100"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-3 sm:p-2 md:p-2 rounded-full transition-all opacity-60 hover:opacity-100 touch-manipulation min-h-[44px] min-w-[44px]"
         aria-label="Previous image"
       >
-        <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
+        <ChevronLeft className="w-5 h-5 sm:w-4 sm:h-4 md:w-6 md:h-6" />
       </button>
       
       <button
         onClick={nextImage}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-1.5 md:p-2 rounded-full transition-all opacity-60 hover:opacity-100"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/20 hover:bg-black/40 text-white p-3 sm:p-2 md:p-2 rounded-full transition-all opacity-60 hover:opacity-100 touch-manipulation min-h-[44px] min-w-[44px]"
         aria-label="Next image"
       >
-        <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
+        <ChevronRight className="w-5 h-5 sm:w-4 sm:h-4 md:w-6 md:h-6" />
       </button>
       
-      {/* Image indicators - smaller on mobile */}
-      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 md:gap-2">
+      {/* Image indicators - improved mobile touch targets */}
+      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 md:gap-2">
         {HERO_IMAGES.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentImageIndex(index)}
-            className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all ${
-              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+            className={`relative w-8 h-8 md:w-6 md:h-6 rounded-full transition-all touch-manipulation flex items-center justify-center ${
+              index === currentImageIndex ? 'bg-white/20' : 'bg-black/20'
             }`}
             aria-label={`Go to image ${index + 1}`}
-          />
+          >
+            <div className={`w-2 h-2 md:w-2 md:h-2 rounded-full transition-all ${
+              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+            }`} />
+          </button>
         ))}
       </div>
       
-      {/* Image caption - repositioned for mobile */}
-      <div className="absolute bottom-16 md:bottom-20 left-4 z-20 text-white max-w-sm">
-        <h3 className="text-sm md:text-lg font-semibold mb-1">{currentImage.title}</h3>
-        <p className="text-xs md:text-sm opacity-90 hidden md:block">{currentImage.description}</p>
+      {/* Image caption - better mobile positioning */}
+      <div className="absolute bottom-20 sm:bottom-16 md:bottom-20 left-4 z-20 text-white max-w-xs sm:max-w-sm">
+        <h3 className="text-sm md:text-lg font-semibold mb-1 bg-black/30 px-2 py-1 rounded backdrop-blur-sm md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">{currentImage.title}</h3>
+        <p className="text-xs md:text-sm opacity-90 hidden sm:block bg-black/20 px-2 py-1 rounded backdrop-blur-sm md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">{currentImage.description}</p>
       </div>
       
       {/* Main hero content */}
       <div className={`relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${alignClasses[align]} w-full`}>
         {/* Enhanced text with better mobile contrast */}
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-3 md:mb-6 leading-tight">
+        <div className="mb-8 sm:mb-6 md:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-3 md:mb-6 leading-tight">
             {/* Enhanced text shadow and backdrop for mobile readability */}
             <span className="inline-block px-2 py-1 rounded-lg bg-black/30 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0">
               Plan Your Perfect{" "}

@@ -579,8 +579,18 @@ const MapContent: React.FC<{
   const effectivePois = shouldUseClustering ? clusterSinglePOIs.map(c => c.pois[0]) : pois; // Use single POIs from clustering
   const effectiveClusters = shouldUseClustering ? multiPOIClusters : [];
 
-  // Expose clustering state to debug tools
+  // Expose POI and clustering data to debug tools
   useEffect(() => {
+    // Always expose POI data for debugging
+    (window as any).__routewise_pois = pois;
+    
+    // Update selected POIs count in debug tools
+    const tripPlaces = JSON.parse(localStorage.getItem('tripPlaces') || '[]');
+    const countEl = document.getElementById('selected-pois-count');
+    if (countEl) {
+      countEl.textContent = tripPlaces.length.toString();
+    }
+    
     if (enableClustering) {
       (window as any).__clientClustering = {
         isConnected: clusteringConnected,

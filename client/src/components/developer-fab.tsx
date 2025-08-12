@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle } from 'lucide-react';
+import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
@@ -225,7 +225,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
           <div className="h-[70vh] overflow-hidden">
           <Tabs defaultValue="logs" className="h-full">
-            <TabsList className={`grid w-full h-10 ${cacheInfo ? 'grid-cols-4' : 'grid-cols-3'}`}>
+            <TabsList className={`grid w-full h-10 ${cacheInfo ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="logs" className="text-sm">
                 <Database className="h-4 w-4 mr-2" />
                 Logs
@@ -237,6 +237,10 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
               <TabsTrigger value="maps" className="text-sm">
                 <Map className="h-4 w-4 mr-2" />
                 Maps
+              </TabsTrigger>
+              <TabsTrigger value="gmaps" className="text-sm">
+                <Zap className="h-4 w-4 mr-2" />
+                G-Maps
               </TabsTrigger>
               {cacheInfo && (
                 <TabsTrigger value="cache" className="text-sm">
@@ -520,6 +524,158 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                     </div>
                   </Card>
 
+                  {/* Selected POIs Tracking */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Selected POIs
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">In Trip:</span>
+                        <Badge variant="outline" id="selected-pois-count">
+                          0
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Hovered:</span>
+                        <span className="font-mono text-xs" id="hovered-poi-name">None</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Last Added:</span>
+                        <span className="font-mono text-xs" id="last-added-poi">None</span>
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs"
+                        onClick={() => {
+                          // Get trip places from localStorage or global state
+                          const tripPlaces = JSON.parse(localStorage.getItem('tripPlaces') || '[]');
+                          const selectedPoiIds = JSON.parse(localStorage.getItem('selectedPoiIds') || '[]');
+                          
+                          console.log('🎯 Selected POIs Debug:', {
+                            tripPlacesCount: tripPlaces.length,
+                            selectedPoiIds: selectedPoiIds,
+                            tripPlaces: tripPlaces
+                          });
+                          
+                          if (tripPlaces.length > 0) {
+                            console.log('📍 Trip Places Details:');
+                            tripPlaces.forEach((poi, index) => {
+                              console.log(`${index + 1}. ${poi.name} (${poi.category}) - ${poi.address}`);
+                            });
+                          } else {
+                            console.log('ℹ️ No POIs currently selected for trip');
+                          }
+                          
+                          // Check for hovered POI
+                          if ((window as any).__routewise_hovered_poi) {
+                            console.log('👆 Currently Hovered POI:', (window as any).__routewise_hovered_poi);
+                          }
+                          
+                          if ((window as any).__devLog) {
+                            (window as any).__devLog('Selected POIs', 'Trip Selection State', {
+                              tripCount: tripPlaces.length,
+                              selectedIds: selectedPoiIds,
+                              lastAction: localStorage.getItem('lastPoiAction') || 'none'
+                            });
+                          }
+                        }}
+                      >
+                        Show Selected POIs
+                      </Button>
+                      
+                      <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                        <strong>Selection State:</strong><br/>
+                        • Trip POIs stored in localStorage<br/>
+                        • Real-time selection tracking<br/>
+                        • Hover state monitoring<br/>
+                        • Trip planning persistence
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* POI API Response Data */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <Database className="h-5 w-5" />
+                      POI API Response Sample
+                    </h4>
+                    <div className="space-y-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs"
+                        onClick={() => {
+                          // Get POI data from the map component
+                          const mapElement = document.querySelector('[data-testid="interactive-map"]') || document.querySelector('.map-container');
+                          
+                          // Try to get POI data from various sources
+                          let poisData = null;
+                          
+                          // Check if there's POI data in the global window object
+                          if ((window as any).__routewise_pois) {
+                            poisData = (window as any).__routewise_pois.slice(0, 3); // First 3 POIs
+                          }
+                          
+                          // Fallback: try to extract from current page context
+                          if (!poisData) {
+                            const currentPath = window.location.pathname;
+                            if (currentPath.includes('route-results') || currentPath.includes('explore-results')) {
+                              console.log('ℹ️ POI data not exposed to debug tools yet');
+                              poisData = [{
+                                id: 1,
+                                name: "Example Restaurant",
+                                category: "restaurant", 
+                                lat: 30.2672,
+                                lng: -97.7431,
+                                rating: 4.5,
+                                address: "123 Main St, Austin, TX",
+                                description: "Great local food",
+                                imageUrl: "https://example.com/image.jpg",
+                                placeId: "ChIJ123...",
+                                timeFromStart: "15 min"
+                              }];
+                              console.log('📋 Sample POI structure:', poisData[0]);
+                            }
+                          }
+                          
+                          if (poisData && poisData.length > 0) {
+                            console.log('🗺️ POI API Response Sample (first 3):');
+                            poisData.forEach((poi, index) => {
+                              console.log(`POI ${index + 1}:`, poi);
+                            });
+                            
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('POI API Response', 'Sample POI Data', {
+                                sampleCount: poisData.length,
+                                totalAvailable: (window as any).__routewise_pois?.length || 'unknown',
+                                firstPOI: poisData[0]
+                              });
+                            }
+                          } else {
+                            console.log('ℹ️ No POI data available - navigate to a map page with POIs');
+                          }
+                        }}
+                      >
+                        Show POI Structure
+                      </Button>
+                      
+                      <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                        <strong>POI Data Fields:</strong><br/>
+                        • id, name, category, lat, lng<br/>
+                        • rating, address, description<br/>
+                        • imageUrl, placeId, timeFromStart<br/>
+                        <br/>
+                        <strong>Usage:</strong> Click button to log POI structure to console
+                      </div>
+                    </div>
+                  </Card>
+
                   <Card className="p-4">
                     <h4 className="font-medium text-base mb-3">Debug Actions</h4>
                     <div className="space-y-3">
@@ -553,6 +709,197 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         }}
                       >
                         Log to Console
+                      </Button>
+                    </div>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="gmaps" className="mt-3 h-[calc(100%-50px)]">
+              <ScrollArea className="h-full">
+                <div className="space-y-4">
+                  {/* API Key Status */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      API Key Status
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Status:</span>
+                        <Badge
+                          variant={systemInfo.googleMaps?.available ? "default" : "destructive"}
+                          id="gmaps-key-status"
+                        >
+                          {systemInfo.googleMaps?.available ? "Valid" : "Invalid"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Source:</span>
+                        <span className="font-mono text-sm" id="gmaps-key-source">
+                          /api/maps-key
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs"
+                        onClick={async () => {
+                          try {
+                            console.log('🔑 Testing Google Maps API key...');
+                            const response = await fetch('/api/maps-key');
+                            const data = await response.json();
+                            
+                            console.log('📋 API Key Response:', {
+                              status: response.status,
+                              hasKey: !!data.api_key,
+                              keyPreview: data.api_key ? `${data.api_key.substring(0, 8)}...` : 'none'
+                            });
+                            
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('Google Maps API', 'API Key Test', {
+                                status: response.status,
+                                hasKey: !!data.api_key,
+                                timestamp: Date.now()
+                              });
+                            }
+                            
+                            // Update status indicators
+                            const statusEl = document.getElementById('gmaps-key-status');
+                            if (statusEl) {
+                              statusEl.textContent = data.api_key ? 'Valid' : 'Missing';
+                              statusEl.className = data.api_key ? 
+                                'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/80' :
+                                'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-destructive/50 text-destructive';
+                            }
+                          } catch (error) {
+                            console.error('❌ API Key test failed:', error);
+                          }
+                        }}
+                      >
+                        Test API Key
+                      </Button>
+                    </div>
+                  </Card>
+
+                  {/* Session Usage Tracking */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      Session Usage
+                    </h4>
+                    <div className="space-y-2 text-sm font-mono">
+                      <div className="flex justify-between">
+                        <span>Map Loads:</span>
+                        <span id="gmaps-map-loads">1</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Marker Updates:</span>
+                        <span id="gmaps-marker-updates">0</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Geocoding Calls:</span>
+                        <span id="gmaps-geocoding">0</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Places API:</span>
+                        <span id="gmaps-places">0</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <div className="flex justify-between items-center">
+                        <span class="text-sm font-medium">Est. Cost:</span>
+                        <span id="gmaps-estimated-cost" class="font-mono text-sm">$0.00</span>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* API Pricing Reference */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5" />
+                      💰 API Pricing (2024)
+                    </h4>
+                    <div className="text-xs space-y-1">
+                      <div className="flex justify-between">
+                        <span>Maps JavaScript API:</span>
+                        <span className="font-mono">$7.00/1K loads</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Geocoding API:</span>
+                        <span className="font-mono">$5.00/1K requests</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Places API (Find Place):</span>
+                        <span className="font-mono">$17.00/1K requests</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Places API (Nearby):</span>
+                        <span class="font-mono">$32.00/1K requests</span>
+                      </div>
+                      <div class="flex justify-between font-medium text-red-600 pt-2 border-t border-border">
+                        <span>Custom POI Search:</span>
+                        <span class="font-mono">$0.42-0.56/request</span>
+                      </div>
+                    </div>
+                    
+                    <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                      <strong>💡 Cost Optimization Tip:</strong><br/>
+                      Google Maps shows FREE POI pins when users zoom in. Consider using Google's free POI layer for exploration vs. expensive POI API calls.
+                    </div>
+                  </Card>
+
+                  {/* Usage Analytics */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3">Usage Analytics</h4>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs"
+                        onClick={() => {
+                          // Track map usage analytics
+                          const analytics = {
+                            sessionStart: sessionStorage.getItem('gmaps-session-start') || new Date().toISOString(),
+                            mapLoads: parseInt(sessionStorage.getItem('gmaps-map-loads') || '1'),
+                            apiCalls: parseInt(sessionStorage.getItem('gmaps-api-calls') || '0'),
+                            estimatedCost: parseFloat(sessionStorage.getItem('gmaps-estimated-cost') || '0.007') // Default 1 map load
+                          };
+                          
+                          console.log('📊 Google Maps Usage Analytics:', analytics);
+                          
+                          if ((window as any).__devLog) {
+                            (window as any).__devLog('Google Maps Analytics', 'Session Usage Summary', analytics);
+                          }
+                        }}
+                      >
+                        Export Usage Data
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs border-red-200 text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                          // Reset session counters
+                          sessionStorage.removeItem('gmaps-session-start');
+                          sessionStorage.removeItem('gmaps-map-loads');
+                          sessionStorage.removeItem('gmaps-api-calls');
+                          sessionStorage.removeItem('gmaps-estimated-cost');
+                          
+                          // Reset UI counters
+                          document.getElementById('gmaps-map-loads')!.textContent = '0';
+                          document.getElementById('gmaps-marker-updates')!.textContent = '0';
+                          document.getElementById('gmaps-geocoding')!.textContent = '0';
+                          document.getElementById('gmaps-places')!.textContent = '0';
+                          document.getElementById('gmaps-estimated-cost')!.textContent = '$0.00';
+                          
+                          console.log('🔄 Google Maps usage counters reset');
+                        }}
+                      >
+                        Reset Counters
                       </Button>
                     </div>
                   </Card>

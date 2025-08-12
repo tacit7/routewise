@@ -124,13 +124,13 @@ export default function Home() {
       
       {/* Saved Routes/Trips Section */}
       {(trips.length > 0 || legacyRoutes.length > 0) && (
-        <section className="py-16 bg-background">
+        <section className="py-12 sm:py-16 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-foreground mb-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
                 {isAuthenticated ? "My Saved Trips" : "My Saved Routes"}
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
                 Quick access to your previously planned routes and discovered places
               </p>
               {loading && (
@@ -141,38 +141,38 @@ export default function Home() {
               )}
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Backend Trips (for authenticated users) */}
               {trips.map((trip) => (
-                <div key={`trip-${trip.id}`} className="bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-foreground">{trip.title}</h3>
+                <div key={`trip-${trip.id}`} className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base flex-1 pr-2 line-clamp-2">{trip.title}</h3>
                     <button
                       onClick={() => handleDeleteTrip(trip.id)}
-                      className="text-muted-foreground hover:text-red-500 transition-colors"
+                      className="text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 p-2 sm:p-1 -mt-1 touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-auto sm:min-w-auto flex items-center justify-center"
                       aria-label={`Delete trip ${trip.title}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="mr-2 h-4 w-4 text-primary" />
-                      <span>{trip.startCity}</span>
+                  <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <MapPin className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
+                      <span className="truncate">{trip.startCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Flag className="mr-2 h-4 w-4 text-red-600" />
-                      <span>{trip.endCity}</span>
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <Flag className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 flex-shrink-0" />
+                      <span className="truncate">{trip.endCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Star className="mr-2 h-4 w-4 text-amber-500" />
-                      <span>{trip.poisData ? trip.poisData.length : 0} places discovered</span>
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <Star className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500 flex-shrink-0" />
+                      <span>{trip.poisData ? trip.poisData.length : 0} places</span>
                     </div>
                     {trip.routeData && (
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Clock className="mr-2 h-4 w-4 text-blue-500" />
-                        <span>{trip.routeData.duration} • {trip.routeData.distance}</span>
+                      <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                        <Clock className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500 flex-shrink-0" />
+                        <span className="truncate">{trip.routeData.duration} • {trip.routeData.distance}</span>
                       </div>
                     )}
                   </div>
@@ -183,9 +183,9 @@ export default function Home() {
                   
                   <Button
                     onClick={() => loadTrip(trip)}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base h-12 sm:h-10 touch-manipulation"
                   >
-                    <Route className="mr-2 h-4 w-4" />
+                    <Route className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     View Trip
                   </Button>
                 </div>
@@ -193,34 +193,34 @@ export default function Home() {
 
               {/* Legacy Routes (from localStorage) */}
               {legacyRoutes.map((route) => (
-                <div key={`legacy-${route.id}`} className="bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow relative">
+                <div key={`legacy-${route.id}`} className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6 hover:shadow-md transition-shadow relative">
                   <div className="absolute top-2 right-2">
                     <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Legacy</span>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-foreground">{route.name}</h3>
+                  <div className="flex items-start justify-between mb-4 pt-6 sm:pt-0">
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base flex-1 pr-2 line-clamp-2">{route.name}</h3>
                     <button
                       onClick={() => handleDeleteLegacyRoute(route.id)}
-                      className="text-muted-foreground hover:text-red-500 transition-colors"
+                      className="text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 p-2 sm:p-1 -mt-1 touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-auto sm:min-w-auto flex items-center justify-center"
                       aria-label={`Delete route ${route.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="mr-2 h-4 w-4 text-primary" />
-                      <span>{route.startCity}</span>
+                  <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <MapPin className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
+                      <span className="truncate">{route.startCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Flag className="mr-2 h-4 w-4 text-red-600" />
-                      <span>{route.endCity}</span>
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <Flag className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 flex-shrink-0" />
+                      <span className="truncate">{route.endCity}</span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Star className="mr-2 h-4 w-4 text-amber-500" />
-                      <span>{route.placesCount} places discovered</span>
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                      <Star className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500 flex-shrink-0" />
+                      <span>{route.placesCount} places</span>
                     </div>
                   </div>
                   
@@ -230,7 +230,7 @@ export default function Home() {
                   
                   <Button
                     onClick={() => loadLegacyRoute(route)}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-12 sm:h-10 touch-manipulation"
                   >
                     <Route className="mr-2 h-4 w-4" />
                     View Route
