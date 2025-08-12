@@ -29,6 +29,7 @@ import {
 
 // shadcn/ui components
 import { Button } from "@/components/ui/button";
+import { ButtonGhost } from "@/components/ui/button-ghost";
 import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,14 +109,13 @@ export default function KitchenSinkDemo() {
 
             <div className="flex items-center space-x-1 sm:space-x-2">
               {/* Search icon for mobile, full search for desktop */}
-              <Button
-                variant="ghost" 
+              <ButtonGhost
                 size="icon"
-                className="lg:hidden h-12 w-12 min-h-[48px] text-white hover:bg-white/10"
+                className="lg:hidden"
                 onClick={() => setCommandOpen(true)}
               >
                 <Search className="h-4 w-4" />
-              </Button>
+              </ButtonGhost>
               
               <Button
                 variant="outline"
@@ -130,25 +130,24 @@ export default function KitchenSinkDemo() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-12 w-12 min-h-[48px] text-white hover:bg-white/10">
+                  <ButtonGhost size="icon">
                     <Bell className="h-4 w-4" />
-                  </Button>
+                  </ButtonGhost>
                 </TooltipTrigger>
                 <TooltipContent>Notifications</TooltipContent>
               </Tooltip>
 
               {/* Mobile: Bottom Sheet */}
               <div className="md:hidden">
-                <Button 
-                  variant="ghost" 
-                  className="gap-2 h-12 min-h-[48px] px-3 text-white hover:bg-white/10"
+                <ButtonGhost 
+                  className="gap-2 px-3"
                   onClick={() => setProfileSheetOpen(true)}
                 >
                   <Avatar className="h-6 w-6">
                     <AvatarImage src="https://i.pravatar.cc/64" alt="User" />
                     <AvatarFallback>UM</AvatarFallback>
                   </Avatar>
-                </Button>
+                </ButtonGhost>
               </div>
 
               {/* Desktop: Dropdown Menu */}
