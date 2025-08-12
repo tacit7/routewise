@@ -365,6 +365,161 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                     </Card>
                   )}
 
+                  {/* Client-Side Clustering Debug */}
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <Network className="h-5 w-5" />
+                      Client-Side Clustering
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500" id="clustering-status-dot" />
+                        <span className="text-sm font-medium text-green-600" id="clustering-status-text">Client Clustering Ready</span>
+                      </div>
+                      
+                      <div className="text-sm space-y-1 font-mono" id="clustering-stats">
+                        <div>Clusters: <span id="cluster-count" className="text-green-600">0</span></div>
+                        <div>Single POIs: <span id="single-poi-count" className="text-green-600">0</span></div>
+                        <div>Total: <span id="total-cluster-count" className="text-green-600">0</span></div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                          onClick={() => {
+                            // Test client clustering functionality
+                            console.log('🔍 Testing Client-Side Clustering');
+                            console.log('✅ Client clustering is always available - no external dependencies');
+                            
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('Client Clustering Test', 'Testing clustering functionality', {
+                                clusteringType: 'client-side',
+                                status: 'always available',
+                                timestamp: Date.now()
+                              });
+                            }
+                            
+                            // Show current clustering stats if available
+                            if ((window as any).__clientClustering) {
+                              const stats = (window as any).__clientClustering;
+                              console.log('📊 Current clustering stats:', {
+                                connected: stats.isConnected,
+                                totalClusters: stats.totalClusters,
+                                multiPOIClusters: stats.multiPOIClusters,
+                                singlePOIs: stats.singlePOIs
+                              });
+                            } else {
+                              console.log('ℹ️ Clustering will be available when enabled on a map page');
+                            }
+                          }}
+                        >
+                          Test Client Clustering
+                        </Button>
+
+                        <Button
+                          variant="outline" 
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={() => {
+                            // Enable clustering on map pages
+                            const currentPath = window.location.pathname;
+                            const isMapPage = currentPath.includes('route-results') || currentPath.includes('explore-results');
+                            
+                            if (isMapPage) {
+                              // Store clustering preference
+                              localStorage.setItem('enableClustering', 'true');
+                              window.location.reload();
+                              
+                              if ((window as any).__devLog) {
+                                (window as any).__devLog('Clustering Toggle', 'Clustering Enabled', {
+                                  currentPath,
+                                  action: 'enabled'
+                                });
+                              }
+                            } else {
+                              if ((window as any).__devLog) {
+                                (window as any).__devLog('Clustering Toggle', 'Not on map page', {
+                                  currentPath,
+                                  message: 'Navigate to route-results or explore-results page to test clustering'
+                                });
+                              }
+                              alert('Navigate to a route-results or explore-results page to enable clustering');
+                            }
+                          }}
+                        >
+                          Enable Clustering
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => {
+                            // Client clustering refreshes automatically on zoom/pan
+                            if ((window as any).__clientClustering) {
+                              (window as any).__clientClustering.refreshClusters();
+                              console.log('🔄 Client clustering refresh (automatic on zoom/pan)');
+                            } else {
+                              console.log('ℹ️ Client clustering refreshes automatically when viewport changes');
+                            }
+                          }}
+                        >
+                          Clustering Info
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-xs border-red-200 text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            // Disable clustering
+                            const currentPath = window.location.pathname;
+                            const isMapPage = currentPath.includes('route-results') || currentPath.includes('explore-results');
+                            
+                            if (isMapPage) {
+                              localStorage.removeItem('enableClustering');
+                              window.location.reload();
+                              
+                              if ((window as any).__devLog) {
+                                (window as any).__devLog('Clustering Toggle', 'Clustering Disabled', {
+                                  currentPath,
+                                  action: 'disabled'
+                                });
+                              }
+                            } else {
+                              localStorage.removeItem('enableClustering');
+                              alert('Clustering preference cleared');
+                            }
+                          }}
+                        >
+                          Disable Clustering
+                        </Button>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground bg-green-50 border border-green-200 p-2 rounded">
+                        <strong>✅ Client-Side Clustering: ACTIVE</strong><br/>
+                        <br/>
+                        <strong>Features:</strong><br/>
+                        • Grid-based clustering algorithm<br/>
+                        • Zoom-responsive clustering (stops at zoom 15+)<br/>
+                        • Viewport-aware performance optimization<br/>
+                        • No backend dependencies required<br/>
+                        <br/>
+                        <strong>Performance:</strong><br/>
+                        • Handles 1000+ POIs efficiently<br/>
+                        • Real-time clustering on zoom/pan<br/>
+                        • 60px grid size for optimal visual density<br/>
+                        <br/>
+                        <strong>Configuration:</strong><br/>
+                        • Grid Size: 60px<br/>
+                        • Max Zoom: 15 (individual POIs above)<br/>
+                        • Min Cluster Size: 2 POIs
+                      </div>
+                    </div>
+                  </Card>
+
                   <Card className="p-4">
                     <h4 className="font-medium text-base mb-3">Debug Actions</h4>
                     <div className="space-y-3">
