@@ -15,6 +15,11 @@
   padding-top: max(0.5rem, env(safe-area-inset-top)); 
 }
 
+/* Hero card styling for landing page */
+.hero-card {
+  @apply bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 p-6 md:p-8 shadow-xl;
+}
+
 :root {
   /* UX Spec Design Tokens */
   --bg: hsl(156 30% 96); /* App background */

@@ -11,7 +11,7 @@ import { useTrips, type Trip, type LegacyRoute } from "@/hooks/use-trips";
 import { useAuth } from "@/components/auth-context";
 import { Trash2, MapPin, Flag, Star, Clock, Route } from "lucide-react";
 
-export default function Home() {
+export default function LandingPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
