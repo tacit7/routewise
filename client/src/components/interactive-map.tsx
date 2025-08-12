@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap, Pin } from "@vis.gl/react-google-maps";
-import { Loader2, MapPin, Users } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Poi } from "@/types/schema";
@@ -21,7 +21,6 @@ interface InteractiveMapProps {
   className?: string;
   height?: string;
   apiKey?: string; // Optional API key to avoid fetching separately
-  enableClustering?: boolean; // Enable Phoenix WebSocket clustering
 }
 
 // POI category to color mapping - showing variety of colors for preview
@@ -113,75 +112,6 @@ const PoiMarker: React.FC<{
   );
 };
 
-// Cluster marker component for grouped POIs
-const ClusterMarker: React.FC<{
-  cluster: {
-    id: string;
-    lat: number;
-    lng: number;
-    count: number;
-    pois: Poi[];
-    category_breakdown?: Record<string, number>;
-    avg_rating?: number;
-  };
-  isHovered: boolean;
-  onClick: () => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-}> = ({ cluster, isHovered, onClick, onMouseEnter, onMouseLeave }) => {
-  const { lat, lng, count } = cluster;
-  
-  // Determine cluster size for visual scaling
-  const getClusterSize = (count: number) => {
-    if (count < 5) return { size: 40, scale: 1.0, textSize: 'text-sm' };
-    if (count < 10) return { size: 50, scale: 1.1, textSize: 'text-base' };
-    if (count < 25) return { size: 60, scale: 1.2, textSize: 'text-lg' };
-    return { size: 70, scale: 1.3, textSize: 'text-xl' };
-  };
-
-  const { size, scale, textSize } = getClusterSize(count);
-  
-  return (
-    <AdvancedMarker
-      position={{ lat, lng }}
-      title={`${count} POIs`}
-      onClick={onClick}
-    >
-      <div
-        onMouseEnter={() => onMouseEnter?.()}
-        onMouseLeave={() => onMouseLeave?.()}
-        style={{ 
-          cursor: 'pointer',
-          transform: isHovered ? `scale(${scale * 1.1})` : `scale(${scale})`,
-          transition: 'transform 0.2s ease-in-out'
-        }}
-      >
-        <div 
-          className={`rounded-full flex items-center justify-center shadow-lg border-2 border-white ${textSize} font-bold`}
-          style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            backgroundColor: 'var(--primary)',
-            color: 'white'
-          }}
-        >
-          {count}
-        </div>
-        {/* Small indicator showing it's a cluster */}
-        <div 
-          className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
-          style={{ 
-            backgroundColor: 'var(--surface)',
-            color: 'var(--primary)',
-            border: '1px solid var(--border)'
-          }}
-        >
-          <Users className="w-2.5 h-2.5" />
-        </div>
-      </div>
-    </AdvancedMarker>
-  );
-};
 
 // Info window component for regular POIs
 const PoiInfoWindow: React.FC<{
@@ -490,99 +420,19 @@ const MapContent: React.FC<{
   hoveredPoi: Poi | null;
   onPoiClick?: (poi: Poi) => void;
   onPoiHover?: (poi: Poi | null) => void;
-  enableClustering?: boolean;
-}> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick, onPoiHover, enableClustering = false }) => {
+}> = ({ pois, selectedPoiIds, hoveredPoi, onPoiClick, onPoiHover }) => {
   const { isInTrip, addToTrip, isAddingToTrip } = useTripPlaces();
   const [selectedPoi, setSelectedPoi] = useState<Poi | null>(null);
   const [selectedGooglePlace, setSelectedGooglePlace] = useState<{
     place: any;
     position: { lat: number; lng: number };
   } | null>(null);
-  const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
   const map = useMap();
   const devLog = useDevLog();
 
-  // Real-time viewport tracking for clustering
-  const [viewport, setViewport] = useState<{ north: number; south: number; east: number; west: number } | null>(null);
 
-  // Update viewport on map events (debounced to prevent rapid updates)
-  useEffect(() => {
-    if (!map || !enableClustering) {
-      setViewport(null);
-      return;
-    }
 
-    let timeoutId: NodeJS.Timeout;
-
-    const updateViewport = () => {
-      // Debounce viewport updates to prevent rapid firing
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const bounds = map.getBounds();
-        if (!bounds) return;
-
-        const ne = bounds.getNorthEast();
-        const sw = bounds.getSouthWest();
-
-        const newViewport = {
-          north: ne.lat(),
-          south: sw.lat(),
-          east: ne.lng(),
-          west: sw.lng()
-        };
-        
-        setViewport(newViewport);
-      }, 300); // 300ms debounce
-    };
-
-    // Initial viewport
-    updateViewport();
-
-    // Use 'idle' event which fires when map stops moving/zooming
-    const listeners = [
-      map.addListener('idle', updateViewport)
-    ];
-
-    return () => {
-      clearTimeout(timeoutId);
-      listeners.forEach(listener => {
-        if (listener && typeof listener.remove === 'function') {
-          listener.remove();
-        }
-      });
-    };
-  }, [map, enableClustering]);
-
-  const currentZoom = map?.getZoom() || 10;
-  
-  // Use client-side clustering when enabled and viewport is available
-  const {
-    clusters: clientClusters,
-    singlePOIs: clusterSinglePOIs,
-    multiPOIClusters,
-    totalClusters,
-    clusterCount,
-    singlePOICount,
-    isLoading: clusteringLoading,
-    error: clusteringError,
-    isConnected: clusteringConnected
-  } = useClientPOIClustering(
-    pois,
-    currentZoom,
-    viewport,
-    {
-      gridSize: 120,      // Optimized for small datasets
-      maxZoom: 13,        // Stop clustering at zoom 13 for better UX
-      minimumClusterSize: 2  // At least 2 POIs to form cluster
-    }
-  );
-
-  // Use clustering data when available, fallback to regular POIs
-  const shouldUseClustering = enableClustering && viewport && clusteringConnected && !clusteringError;
-  const effectivePois = shouldUseClustering ? clusterSinglePOIs.map(c => c.pois[0]) : pois; // Use single POIs from clustering
-  const effectiveClusters = shouldUseClustering ? multiPOIClusters : [];
-
-  // Expose POI and clustering data to debug tools
+  // Expose POI data to debug tools
   useEffect(() => {
     // Always expose POI data for debugging
     (window as any).__routewise_pois = pois;
@@ -593,60 +443,11 @@ const MapContent: React.FC<{
     if (countEl) {
       countEl.textContent = tripPlaces.length.toString();
     }
-    
-    if (enableClustering) {
-      (window as any).__clientClustering = {
-        isConnected: clusteringConnected,
-        error: clusteringError,
-        totalClusters,
-        singlePOIs: singlePOICount,
-        multiPOIClusters: clusterCount,
-        clusters: clientClusters,
-        refreshClusters: () => {
-          devLog('InteractiveMap', 'Client clustering refresh (automatic)', {
-            connected: clusteringConnected,
-            totalClusters,
-            zoom: currentZoom
-          });
-        }
-      };
+  }, [pois]);
 
-      // Update debug panel if it exists
-      const statusDot = document.getElementById('clustering-status-dot');
-      const statusText = document.getElementById('clustering-status-text');
-      const clusterCountEl = document.getElementById('cluster-count');
-      const singlePoiCountEl = document.getElementById('single-poi-count');
-      const totalCountEl = document.getElementById('total-cluster-count');
-
-      if (statusDot && statusText) {
-        if (clusteringConnected) {
-          statusDot.className = 'w-2 h-2 rounded-full bg-green-500';
-          statusText.textContent = 'Client Clustering Active';
-          statusText.className = 'text-sm font-medium text-green-600';
-        } else if (clusteringError) {
-          statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
-          statusText.textContent = `Error: ${clusteringError}`;
-          statusText.className = 'text-sm font-medium text-red-600';
-        } else {
-          statusDot.className = 'w-2 h-2 rounded-full bg-yellow-500';
-          statusText.textContent = 'Client Clustering...';
-          statusText.className = 'text-sm font-medium text-yellow-600';
-        }
-      }
-
-      if (clusterCountEl) clusterCountEl.textContent = clusterCount.toString();
-      if (singlePoiCountEl) singlePoiCountEl.textContent = singlePOICount.toString();
-      if (totalCountEl) totalCountEl.textContent = totalClusters.toString();
-    }
-
-    return () => {
-      delete (window as any).__clientClustering;
-    };
-  }, [enableClustering, clusteringConnected, clusteringError, totalClusters, singlePOICount, clusterCount, clientClusters, devLog]);
-
-  // Auto-fit map bounds to show all POIs optimally (but not when clustering is enabled)
+  // Auto-fit map bounds to show all POIs optimally
   useEffect(() => {
-    if (map && pois.length > 0 && !enableClustering) {
+    if (map && pois.length > 0) {
       devLog('InteractiveMap', 'Auto-fitting map bounds', { poisCount: pois.length });
       
       const bounds = new window.google.maps.LatLngBounds();
@@ -681,7 +482,7 @@ const MapContent: React.FC<{
         }
       }
     }
-  }, [map, pois, devLog, enableClustering]);
+  }, [map, pois, devLog]);
 
   // Add Google POI click listener
   useEffect(() => {
@@ -730,25 +531,6 @@ const MapContent: React.FC<{
     onPoiClick?.(poi);
   };
 
-  const handleClusterClick = (cluster: any) => {
-    if (!map) return;
-    
-    devLog('InteractiveMap', 'Cluster clicked', { 
-      clusterId: cluster.id, 
-      count: cluster.count, 
-      currentZoom: map.getZoom() 
-    });
-    
-    // If cluster has only a few POIs, zoom in to show them
-    if (cluster.count <= 10) {
-      map.setZoom(Math.min(map.getZoom() + 2, 18));
-      map.setCenter({ lat: cluster.lat, lng: cluster.lng });
-    } else {
-      // For large clusters, zoom in more gradually
-      map.setZoom(Math.min(map.getZoom() + 1, 16));
-      map.setCenter({ lat: cluster.lat, lng: cluster.lng });
-    }
-  };
 
   const handleInfoWindowClose = () => {
     setSelectedPoi(null);
@@ -798,33 +580,8 @@ const MapContent: React.FC<{
         fullscreenControl={true}
         style={{ width: '100%', height: '100%' }}
       >
-        {/* Render clusters when clustering is enabled */}
-        {effectiveClusters.map((cluster) => (
-          cluster.type === 'cluster' ? (
-            <ClusterMarker
-              key={cluster.id}
-              cluster={cluster}
-              isHovered={hoveredCluster === cluster.id}
-              onClick={() => handleClusterClick(cluster)}
-              onMouseEnter={() => setHoveredCluster(cluster.id)}
-              onMouseLeave={() => setHoveredCluster(null)}
-            />
-          ) : (
-            // Single POI from clustering system
-            <PoiMarker
-              key={cluster.id}
-              poi={cluster.pois[0]} // Single POI clusters have one POI
-              isSelected={selectedPoiIds.includes(Number(cluster.pois[0].id))}
-              isHovered={hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (cluster.pois[0].placeId || cluster.pois[0].id) : false}
-              onClick={handlePoiClick}
-              onMouseEnter={(poi) => onPoiHover?.(poi)}
-              onMouseLeave={() => onPoiHover?.(null)}
-            />
-          )
-        ))}
-
-        {/* Render regular POIs when clustering is disabled or unavailable */}
-        {effectivePois.map((poi, index) => {
+        {/* Render POI markers */}
+        {pois.map((poi, index) => {
           const isSelected = selectedPoiIds.includes(Number(poi.id));
           const isHovered = hoveredPoi ? (hoveredPoi.placeId || hoveredPoi.id) === (poi.placeId || poi.id) : false;
           
@@ -920,7 +677,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   className = "",
   height = "400px",
   apiKey,
-  enableClustering = false,
 }) => {
   const [googleMapsKey, setGoogleMapsKey] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -1002,7 +758,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           hoveredPoi={hoveredPoi || null}
           onPoiClick={onPoiClick}
           onPoiHover={onPoiHover}
-          enableClustering={enableClustering}
         />
       </APIProvider>
     </div>
