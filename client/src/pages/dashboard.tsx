@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/components/auth-context";
 import { useLocation } from "wouter";
@@ -9,7 +10,7 @@ import { AppShell } from "@/shells/app-shell";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
 import TripOfTheWeek from "@/components/trip-of-the-week";
@@ -205,6 +206,11 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Form state for route planning
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
+  const [exploreLocation, setExploreLocation] = useState("");
 
   // Use the consolidated dashboard data hook
   const { data: dashboardData, isLoading, error } = useDashboardData();
@@ -238,6 +244,36 @@ const Dashboard = () => {
   const handleExplore = () => {
     // Navigate directly to the Places Explorer wizard
     setLocation("/places-explorer");
+  };
+
+  const handleRouteFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!startLocation.trim() || !endLocation.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both start and end locations",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Navigate to route results with the locations
+    setLocation(`/route-results?start=${encodeURIComponent(startLocation.trim())}&end=${encodeURIComponent(endLocation.trim())}`);
+  };
+
+  const handleExploreFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!exploreLocation.trim()) {
+      toast({
+        title: "Missing Information", 
+        description: "Please enter a location to explore",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Navigate to explore results with the location
+    setLocation(`/explore-results?location=${encodeURIComponent(exploreLocation.trim())}`);
   };
 
   const handleContinueExplorer = () => {
@@ -355,44 +391,92 @@ const Dashboard = () => {
               </p>
             )}
 
-            {/* Action Buttons - Clear hierarchy */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={handlePlanRoadTrip}
-                size="lg"
-                className="px-12 py-4 text-xl"
-              >
-                <Route className="w-6 h-6 mr-3" />
-                Plan Route
-              </Button>
-              <Button
-                onClick={handleExplore}
-                variant="outline"
-                size="lg"
-                className="px-12 py-4 text-xl"
-              >
-                <Search className="w-6 h-6 mr-3" />
-                Explore Places
-              </Button>
+            {/* Action Cards - Card-based design */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Plan Route Card */}
+              <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
+                <form onSubmit={handleRouteFormSubmit}>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Route className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Plan Route</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Discover amazing stops along your route between two cities
+                    </p>
+                    
+                    {/* Route Form Inputs */}
+                    <div className="space-y-3 mb-4">
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                        <Input
+                          type="text"
+                          placeholder="San Francisco"
+                          value={startLocation}
+                          onChange={(e) => setStartLocation(e.target.value)}
+                          className="w-full pl-10 placeholder:text-muted-foreground/40"
+                        />
+                      </div>
+                      <div className="relative">
+                        <Flag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                        <Input
+                          type="text"
+                          placeholder="Los Angeles"
+                          value={endLocation}
+                          onChange={(e) => setEndLocation(e.target.value)}
+                          className="w-full pl-10 placeholder:text-muted-foreground/40"
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button
+                      type="submit"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    >
+                      Start Planning →
+                    </Button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Explore Places Card */}
+              <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
+                <form onSubmit={handleExploreFormSubmit}>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Search className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Explore Places</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Find attractions and points of interest around any destination
+                    </p>
+                    
+                    {/* Explore Form Input */}
+                    <div className="space-y-3 mb-4">
+                      <Input
+                        type="text"
+                        placeholder="Location to explore (e.g., New York, NY)"
+                        value={exploreLocation}
+                        onChange={(e) => setExploreLocation(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      className="w-full border-border text-foreground hover:bg-muted/80 transition-colors"
+                    >
+                      Start Exploring →
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             {/* Only show additional content if NO Explorer progress */}
             {!hasExplorerProgress && (
               <>
-                {/* Trip Planning Icon */}
-                <div className="w-64 flex justify-center mx-auto relative">
-                  <div className="overflow-hidden h-48 relative">
-                    <img
-                      src="/planning.png"
-                      alt="Route planning illustration with road sign and map"
-                      className="w-sm h-auto drop-shadow-lg object-cover"
-                    />
-                  </div>
-                  {/* Scroll cue */}
-                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <div className="text-gray-400 text-xs">Scroll for more ↓</div>
-                  </div>
-                </div>
 
                 {/* Personalize Section - Only show for first-time users or users without interests */}
                 {(shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
@@ -437,127 +521,6 @@ const Dashboard = () => {
           {/* Seasonal Travel Section */}
           <SeasonalTravel />
 
-          {/* Spacer to push Suggested Trips to bottom */}
-          <div className="flex-grow"></div>
-
-          {/* Suggested Trips Section - Always show */}
-          <section className="text-center flex-shrink-0">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Suggested Trips</h2>
-
-            {hasTripsError ? (
-              <div className="text-center py-12">
-                <div className="max-w-md mx-auto">
-                  <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">Failed to load suggestions</h3>
-                  <p className="text-muted-foreground mb-6">
-                    We couldn't load your personalized trip suggestions. Please try again later.
-                  </p>
-                  <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
-                    Try Again
-                  </Button>
-                  {!hasExplorerProgress && (
-                    <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Update Interests
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ) : isLoadingSuggested ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Card key={i} className="overflow-hidden">
-                    <div className="h-48 bg-gray-200 animate-pulse"></div>
-                    <CardContent className="p-4">
-                      <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded mb-4 animate-pulse"></div>
-                      <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : suggestedTrips.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {suggestedTrips.map((trip) => (
-                  <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-                    <div className="relative h-48">
-                      <img 
-                        src={trip.image_url && !trip.image_url.includes('logo.svg') 
-                          ? trip.image_url 
-                          : `https://images.unsplash.com/photo-${Math.abs(trip.id) % 2 === 0 ? '1469474968133-88c9c0ceadeb' : '1539635278303-dd5c92632f4d'}?w=400&h=300&fit=crop&crop=center`}
-                        alt={trip.title} 
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                    <CardContent className="p-4 flex flex-col flex-grow">
-                      <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
-                      {/* Render route info for route-based trips, duration/distance for suggestions */}
-                      {trip.start_city && trip.end_city ? (
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {trip.start_city} to {trip.end_city}
-                        </p>
-                      ) : (trip.duration || trip.distance) ? (
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
-                        </p>
-                      ) : null}
-                      <p
-                        className="text-sm text-foreground mb-4 overflow-hidden flex-grow"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {trip.description}
-                      </p>
-                      <div className="flex gap-2 mt-auto">
-                        <Button
-                          onClick={() => {
-                            const predefinedTripSlugs = ['pacific-coast-highway', 'great-lakes', 'san-francisco', 'yellowstone', 'grand-canyon'];
-                            const tripSlug = trip.title?.toLowerCase()
-                              .replace(/\s+/g, '-')
-                              .replace(/[^a-z0-9-]/g, '')
-                              .replace(/-+/g, '-');
-                            
-                            if (predefinedTripSlugs.includes(tripSlug)) {
-                              setLocation(`/suggested-trip/${tripSlug}`);
-                            } else {
-                              handleStartTrip(trip);
-                            }
-                          }}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          onClick={() => handleStartTrip(trip)}
-                          className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                        >
-                          Start Trip
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="max-w-md mx-auto">
-                  <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">No trips available</h3>
-                  <p className="text-muted-foreground mb-6">Customize your interests to get personalized trip suggestions.</p>
-                  {!hasExplorerProgress && (
-                    <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Set Your Interests
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-          </section>
         </main>
       </AppShell>
     );
@@ -586,36 +549,102 @@ const Dashboard = () => {
         </div>
 
         <div className="text-center flex-shrink-0">
-          {/* Top Action Buttons - Clear hierarchy */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
-            <Button
-              onClick={handlePlanRoadTrip}
-              size="lg"
-              className="px-8 py-3"
-            >
-              <Route className="w-5 h-5 mr-2" />
-              Plan a Road Trip
-            </Button>
-            <Button
-              onClick={handleExplore}
-              variant="outline"
-              size="lg"
-              className="px-8 py-3"
-            >
-              <Search className="w-5 h-5 mr-2" />
-              Explore Places
-            </Button>
-            {!hasExplorerProgress && (
+          {/* Action Cards - Card-based design */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-6">
+            {/* Plan Route Card */}
+            <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
+              <form onSubmit={handleRouteFormSubmit}>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                    <Route className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Plan Route</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Discover amazing stops along your route between two cities
+                  </p>
+                  
+                  {/* Route Form Inputs */}
+                  <div className="space-y-3 mb-4">
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Input
+                        type="text"
+                        placeholder="San Francisco"
+                        value={startLocation}
+                        onChange={(e) => setStartLocation(e.target.value)}
+                        className="w-full pl-10 placeholder:text-muted-foreground/40"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Flag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Input
+                        type="text"
+                        placeholder="Los Angeles"
+                        value={endLocation}
+                        onChange={(e) => setEndLocation(e.target.value)}
+                        className="w-full pl-10 placeholder:text-muted-foreground/40"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    Start Planning →
+                  </Button>
+                </div>
+              </form>
+            </div>
+
+            {/* Explore Places Card */}
+            <div className="bg-card rounded-lg border border-border p-6 hover:shadow-lg transition-all group">
+              <form onSubmit={handleExploreFormSubmit}>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                    <Search className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Explore Places</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Find attractions and points of interest around any destination
+                  </p>
+                  
+                  {/* Explore Form Input */}
+                  <div className="space-y-3 mb-4">
+                    <Input
+                      type="text"
+                      placeholder="Location to explore (e.g., New York, NY)"
+                      value={exploreLocation}
+                      onChange={(e) => setExploreLocation(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    className="w-full border-border text-foreground hover:bg-muted/80 transition-colors"
+                  >
+                    Start Exploring →
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Help Me Plan Button - Keep as separate button when no Explorer progress */}
+          {!hasExplorerProgress && (
+            <div className="flex justify-center mb-6">
               <Button
                 onClick={handleHelpMePlan}
                 variant="outline"
-                className="bg-primary hover:bg-primary/90 text-primary-fg border-purple-600 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground border-primary px-6 py-3 rounded-lg font-medium flex items-center justify-center"
               >
                 <MapPin className="w-5 h-5 mr-2" />
                 Help Me Plan a Trip
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Only show personalize section if NO Explorer progress */}
           {!hasExplorerProgress && (shouldShowFirstTimeExperience || !hasInterestsConfigured) && (
@@ -658,127 +687,6 @@ const Dashboard = () => {
         {/* Seasonal Travel Section */}
         <SeasonalTravel />
 
-        {/* Spacer to push Suggested Trips to bottom */}
-        <div className="flex-grow"></div>
-
-        {/* Suggested Trips Section - Always show */}
-        <section className="text-center flex-shrink-0">
-          <h2 className="text-2xl font-bold text-foreground mb-8">Suggested Trips</h2>
-
-          {hasTripsError ? (
-            <div className="text-center py-12">
-              <div className="max-w-md mx-auto">
-                <Route className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">Failed to load suggestions</h3>
-                <p className="text-muted-foreground mb-6">
-                  We couldn't load your personalized trip suggestions. Please try again later.
-                </p>
-                <Button onClick={() => window.location.reload()} variant="outline" className="mr-2">
-                  Try Again
-                </Button>
-                {!hasExplorerProgress && (
-                  <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Update Interests
-                  </Button>
-                )}
-              </div>
-            </div>
-          ) : isLoadingSuggested ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <div className="h-48 bg-gray-200 animate-pulse"></div>
-                  <CardContent className="p-4">
-                    <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4 animate-pulse"></div>
-                    <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : suggestedTrips.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {suggestedTrips.map((trip) => (
-                <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-                  <div className="relative h-48">
-                    <img 
-                      src={trip.image_url && !trip.image_url.includes('logo.svg') 
-                        ? trip.image_url 
-                        : `https://images.unsplash.com/photo-${Math.abs(trip.id) % 2 === 0 ? '1469474968133-88c9c0ceadeb' : '1539635278303-dd5c92632f4d'}?w=400&h=300&fit=crop&crop=center`}
-                      alt={trip.title} 
-                      className="w-full h-full object-cover" 
-                    />
-                  </div>
-                  <CardContent className="p-4 flex flex-col flex-grow">
-                    <h3 className="font-bold text-lg mb-1">{trip.title}</h3>
-                    {/* Render route info for route-based trips, duration/distance for suggestions */}
-                    {trip.start_city && trip.end_city ? (
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {trip.start_city} to {trip.end_city}
-                      </p>
-                    ) : (trip.duration || trip.distance) ? (
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {trip.duration && trip.distance ? `${trip.duration} • ${trip.distance}` : trip.duration || trip.distance}
-                      </p>
-                    ) : null}
-                    <p
-                      className="text-sm text-foreground mb-4 overflow-hidden flex-grow"
-                      style={{
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {trip.description}
-                    </p>
-                    <div className="flex gap-2 mt-auto">
-                      <Button
-                        onClick={() => {
-                          const predefinedTripSlugs = ['pacific-coast-highway', 'great-lakes', 'san-francisco', 'yellowstone', 'grand-canyon'];
-                          const tripSlug = trip.title?.toLowerCase()
-                            .replace(/\s+/g, '-')
-                            .replace(/[^a-z0-9-]/g, '')
-                            .replace(/-+/g, '-');
-                          
-                          if (predefinedTripSlugs.includes(tripSlug)) {
-                            setLocation(`/suggested-trip/${tripSlug}`);
-                          } else {
-                            handleStartTrip(trip);
-                          }
-                        }}
-                        variant="outline"
-                        className="flex-1"
-                      >
-                        View Details
-                      </Button>
-                      <Button
-                        onClick={() => handleStartTrip(trip)}
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                      >
-                        Start Trip
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="max-w-md mx-auto">
-                <Route className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No trips available</h3>
-                <p className="text-muted-foreground mb-6">Customize your interests to get personalized trip suggestions.</p>
-                {!hasExplorerProgress && (
-                  <Button onClick={handleCustomizeInterests} className="bg-primary hover:bg-primary/90">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Set Your Interests
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
       </main>
     </AppShell>
   );
