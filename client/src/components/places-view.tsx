@@ -22,7 +22,6 @@ interface PlacesViewProps {
   // Map configuration
   showRouting?: boolean; // true for route mode, false for explore mode
   apiKey?: string;
-  enableClustering?: boolean; // Enable Phoenix WebSocket clustering
 
   // Event handlers
   onPoiClick: (poi: POI | Poi) => void;
@@ -107,7 +106,6 @@ export default function PlacesView({
   isLoading,
   showRouting = true,
   apiKey,
-  enableClustering = false,
   onPoiClick,
   onPoiSelect,
   onPoiHover,
@@ -371,7 +369,6 @@ export default function PlacesView({
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
-                enableClustering={enableClustering}
               />
             )}
           </div>
@@ -737,7 +734,6 @@ export default function PlacesView({
                 height="100%"
                 className="w-full h-full"
                 apiKey={apiKey}
-                enableClustering={enableClustering}
               />
             )}
           </ResizablePanel>

@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "wouter";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, Heart, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -124,6 +124,20 @@ export default function Header({
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => setLocation('/dashboard')}
+                      className="cursor-pointer focus:bg-[var(--primary-hover)] focus:text-white"
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => setLocation('/interests')}
+                      className="cursor-pointer focus:bg-[var(--primary-hover)] focus:text-white"
+                    >
+                      <Heart className="mr-2 h-4 w-4" />
+                      <span>Interests</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => setLocation('/profile')}
                       className="cursor-pointer focus:bg-[var(--primary-hover)] focus:text-white"

@@ -80,8 +80,7 @@ export default function UserMenu({ className }: UserMenuProps) {
   };
 
   const handleProfile = () => {
-    // TODO: Implement profile page
-    console.log('Profile clicked');
+    setLocation('/profile');
   };
 
   const handleSettings = () => {

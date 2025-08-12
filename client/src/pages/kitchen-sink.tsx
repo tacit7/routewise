@@ -1028,7 +1028,7 @@ export default function KitchenSinkDemo() {
                   <div className="space-y-4">
                     <h4 className="text-sm font-medium">Empty State Cards</h4>
                     <div className="space-y-4">
-                      <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
+                      <div className="border-2 border-solid border-muted rounded-lg p-8 text-center">
                         <div className="mx-auto h-12 w-12 bg-muted rounded-full flex items-center justify-center mb-4">
                           <Search className="h-6 w-6 text-muted-foreground" />
                         </div>
@@ -1041,7 +1041,7 @@ export default function KitchenSinkDemo() {
                         </Button>
                       </div>
 
-                      <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
+                      <div className="border-2 border-solid border-muted rounded-lg p-8 text-center">
                         <div className="mx-auto h-12 w-12 bg-muted rounded-full flex items-center justify-center mb-4">
                           <Plus className="h-6 w-6 text-muted-foreground" />
                         </div>

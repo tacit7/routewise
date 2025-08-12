@@ -19,8 +19,6 @@ export default function ExploreResults() {
     cacheInfo,
   } = useExploreResults();
 
-  // Clustering disabled by default (poor UX, visually unappealing)
-  const enableClustering = false;
   if (!exploreData) return null;
   if (error) {
     const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);
@@ -44,7 +42,6 @@ export default function ExploreResults() {
         headerTitle={`Exploring ${exploreData.startLocation}`}
         sidebarTitle="Places to Explore"
         backUrl="/dashboard"
-        enableClustering={enableClustering}
       />
       <DeveloperCacheFAB cacheInfo={cacheInfo} />
     </>

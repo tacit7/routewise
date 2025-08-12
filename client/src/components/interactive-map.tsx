@@ -6,7 +6,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Poi } from "@/types/schema";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useDevLog } from "@/components/developer-fab";
-import { useClientPOIClustering } from "@/hooks/useClientPOIClustering";
 
 interface InteractiveMapProps {
   startCity: string;
@@ -624,42 +623,6 @@ const MapContent: React.FC<{
       <MapControls />
       <MapLegend />
       
-      {/* Debug clustering status when enabled */}
-      {enableClustering && (
-        <div className="absolute top-20 right-4 z-20">
-          <div 
-            className="rounded-lg p-2 shadow-lg border text-xs"
-            style={{ 
-              backgroundColor: 'var(--surface)',
-              borderColor: 'var(--border)',
-              color: 'var(--text-muted)'
-            }}
-          >
-            <div className={`flex items-center gap-1 mb-1 ${clusteringConnected ? 'text-green-600' : 'text-red-600'}`}>
-              <div className={`w-2 h-2 rounded-full ${clusteringConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span>{clusteringConnected ? 'Client Clustering' : 'Clustering Off'}</span>
-            </div>
-            {shouldUseClustering && (
-              <>
-                <div>Clusters: {clusterCount}</div>
-                <div>Single: {singlePOICount}</div>
-                <div>Total: {totalClusters}</div>
-                <div className="text-xs text-green-600 mt-1">Zoom: {currentZoom}</div>
-              </>
-            )}
-            {!clusteringConnected && clusteringError && (
-              <div className="text-red-600 text-xs mt-1">
-                Error: {clusteringError}
-              </div>
-            )}
-            {!shouldUseClustering && enableClustering && (
-              <div className="text-yellow-600 text-xs mt-1">
-                High zoom - showing individual POIs
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 };

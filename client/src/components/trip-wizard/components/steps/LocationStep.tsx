@@ -230,7 +230,7 @@ export function LocationStep({
 
           {/* Add stop section */}
           {showAddStop ? (
-            <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg">
+            <div className="p-4 border-2 border-solid border-slate-300 rounded-lg">
               <AccessibleFormField
                 label="Add a Stop"
                 description="Add a city or location to visit along the way"
@@ -261,7 +261,7 @@ export function LocationStep({
                 variant="outline"
                 onClick={() => setShowAddStop(true)}
                 disabled={!canAddStop}
-                className="w-full border-dashed hover:bg-slate-50 hover:border-slate-400 transition-colors"
+                className="w-full border-solid hover:bg-slate-50 hover:border-slate-400 transition-colors"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add a Stop Along the Way

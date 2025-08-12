@@ -21,8 +21,6 @@ export default function RouteResults() {
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const { toast } = useToast();
 
-  // Clustering disabled by default (poor UX, visually unappealing)
-  const enableClustering = false;
 
   // Fetch POIs along the route using the correct Phoenix API endpoint
   const { data: routeResults, isLoading: poisLoading, error: poisError } = useQuery({
@@ -194,7 +192,6 @@ export default function RouteResults() {
         headerTitle={`${routeData.startCity} → ${routeData.endCity}`}
         sidebarTitle="Places Along Route"
         backUrl="/"
-        enableClustering={enableClustering}
       />
       <DeveloperCacheFAB cacheInfo={cacheInfo} />
     </>

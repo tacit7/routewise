@@ -16,8 +16,6 @@ import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { InteractiveMap } from "@/components/interactive-map";
 import { TopNav } from "@/features/marketing/top-nav";
-import { DndContext, DragOverlay, closestCenter, DragStartEvent, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
@@ -32,7 +30,6 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState("");
-  const [activeId, setActiveId] = useState<string | null>(null);
 
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -118,6 +115,10 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     });
   };
 
+  const handlePlaceAdd = (place: ItineraryPlace) => {
+    handlePlaceAssignment(place, activeDay);
+  };
+
   const handlePlaceUpdate = (placeId: string | number, updates: Partial<ItineraryPlace>) => {
     setDays((prev) =>
       prev.map((d) => ({
@@ -127,91 +128,6 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     );
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
-
-    if (!over || active.id === over.id) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    // Find the place being dragged
-    const draggedPlace = itineraryPlaces.find(p => getIdentifier(p) === activeId) ||
-                         days.flatMap(d => d.places).find(p => getIdentifier(p) === activeId);
-
-    if (!draggedPlace) return;
-
-    // Find source day index for the dragged place
-    const sourceDayIndex = days.findIndex(day => 
-      day.places.some(p => getIdentifier(p) === activeId)
-    );
-
-    // Check if dropping on another place (for reordering within same day)
-    const targetPlace = days.flatMap(d => d.places).find(p => getIdentifier(p) === overId);
-    
-    if (targetPlace && sourceDayIndex !== -1) {
-      const targetDayIndex = targetPlace.dayIndex!;
-      
-      // Handle reordering within the same day
-      if (sourceDayIndex === targetDayIndex) {
-        const sourceDay = days[sourceDayIndex];
-        const oldIndex = sourceDay.places.findIndex(p => getIdentifier(p) === activeId);
-        const newIndex = sourceDay.places.findIndex(p => getIdentifier(p) === overId);
-        
-        if (oldIndex !== newIndex) {
-          setDays(prev => {
-            const newDays = [...prev];
-            const reorderedPlaces = arrayMove(newDays[sourceDayIndex].places, oldIndex, newIndex);
-            
-            // Update dayOrder for all places in the reordered list
-            const placesWithUpdatedOrder = reorderedPlaces.map((place, index) => ({
-              ...place,
-              dayOrder: index
-            }));
-            
-            newDays[sourceDayIndex] = {
-              ...newDays[sourceDayIndex],
-              places: placesWithUpdatedOrder
-            };
-            return newDays;
-          });
-        }
-        return;
-      } else {
-        // Handle moving between different days
-        handlePlaceRemove(getIdentifier(draggedPlace));
-        handlePlaceAssignment(draggedPlace, targetDayIndex);
-        return;
-      }
-    }
-
-    // Handle dropping on unassigned area
-    if (overId === 'unassigned-drop-zone') {
-      if (draggedPlace.dayIndex !== undefined) {
-        handlePlaceRemove(getIdentifier(draggedPlace));
-      }
-      return;
-    }
-
-    // Handle dropping on a day container
-    const dayMatch = overId.match(/^day-(\d+)$/);
-    if (dayMatch) {
-      const dayIndex = parseInt(dayMatch[1]);
-      
-      // Remove from current day if already assigned
-      if (draggedPlace.dayIndex !== undefined) {
-        handlePlaceRemove(getIdentifier(draggedPlace));
-      }
-      
-      // Add to new day
-      handlePlaceAssignment(draggedPlace, dayIndex);
-    }
-  };
 
   const handleGoBack = () => setLocation("/route-results");
 
@@ -264,12 +180,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   }
 
   return (
-    <DndContext
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
         <TopNav />
       
       {/* Page Header */}
@@ -292,10 +203,10 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               <div key={index} className="relative group">
                 <TabsTrigger 
                   value={`day-${index}`} 
-                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
+                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8 px-3 py-2 text-sm"
                   style={{ 
-                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
-                    color: activeDay === index ? 'white' : 'var(--text)',
+                    backgroundColor: activeDay === index ? 'hsl(var(--primary) / 0.8)' : 'transparent',
+                    color: activeDay === index ? 'white' : 'hsl(var(--muted-foreground))',
                     borderColor: 'var(--border)'
                   }}
                 >
@@ -349,36 +260,12 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 className="w-full h-full"
             />
           ) : (
-          <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} />
+          <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} onPlaceAdd={handlePlaceAdd} />
           )
           }
           </div>
         </div>
       </Tabs>
-      </div>
-      
-      <DragOverlay>
-        {activeId ? (
-          <div className="transform rotate-2 opacity-95">
-            <div className="bg-white border-2 border-primary shadow-lg rounded-lg p-3 max-w-xs">
-              <div className="font-medium text-sm truncate">
-                {(() => {
-                  const draggedPlace = itineraryPlaces.find(p => getIdentifier(p) === activeId) ||
-                                       days.flatMap(d => d.places).find(p => getIdentifier(p) === activeId);
-                  return draggedPlace?.name || "Unknown Place";
-                })()}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {(() => {
-                  const draggedPlace = itineraryPlaces.find(p => getIdentifier(p) === activeId) ||
-                                       days.flatMap(d => d.places).find(p => getIdentifier(p) === activeId);
-                  return draggedPlace?.category || "place";
-                })()}
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    </div>
   );
 }
