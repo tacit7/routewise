@@ -49,14 +49,6 @@ export default function TripPlacesGrid({
         }
       }}
     >
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold mb-1">Your Trip Places</h2>
-          <p className="text-muted-foreground text-sm">
-            Drag places to schedule them, or drag scheduled places back here to unschedule
-          </p>
-        </div>
-      </div>
       {showMap && places.length > 0 && (
         <div className="h-64 rounded-2xl overflow-hidden mb-4">
           <InteractiveMap

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Check, LogIn, LogOut, Plus, Save, Settings, Share, User, X } from "lucide-react";
+import { ArrowLeft, Check, LogIn, LogOut, Plus, Save, Settings, Share, User, X, UtensilsCrossed, Bed, Building, Gamepad2, MapPin, Search, Trees, Coffee, Wine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/header/BackButton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/auth-context";
@@ -194,14 +195,15 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           </Button>
 
           {/* Center: Trip Name Input */}
-              <div className="flex-1 flex justify-center">
-    <Input
-      type="text"
-      placeholder="My Trip"
-      value="Hello"
-      className="text-center text-lg md:text-xl lg:text-2xl max-w-2xl border-0 shadow-none bg-transparent placeholder:text-gray-100 focus-visible:ring-2 focus-visible:ring-ring"
-    />
-  </div>
+          <div className="flex-1 flex justify-center">
+            <Input
+              type="text"
+              placeholder={generateTripTitle()}
+              value={tripTitle}
+              onChange={(e) => setTripTitle(e.target.value)}
+              className="text-center text-lg md:text-xl lg:text-2xl max-w-2xl border-0 shadow-none bg-transparent placeholder:text-gray-100 focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
           {/* Right: Save, Share, Avatar */}
           <div className="flex items-center gap-3">
             {/* Save Button */}
@@ -289,45 +291,153 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
 
       <Tabs value={`day-${activeDay}`} onValueChange={(v) => setActiveDay(parseInt(v.replace("day-", "")))} className="flex-1 flex flex-col">
-        <div className="px-6" style={{ backgroundColor: 'var(--surface)' }}>
-          <TabsList className="h-auto p-0 bg-transparent">
-            {days.map((day, index) => (
-              <div key={index} className="relative group">
-                <TabsTrigger
-                  value={`day-${index}`}
-                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
-                  style={{
-                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
-                    color: activeDay === index ? 'white' : 'var(--text)',
-                    borderColor: 'var(--border)'
-                  }}
-                >
-                  Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
-                </TabsTrigger>
-                {days.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteDay(index);
-                    }}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-all focus-ring hover:bg-gray-100"
+        <div className="flex" style={{ backgroundColor: 'var(--surface)' }}>
+          {/* Left Container - Tabs */}
+          <div className="w-96 px-6 border-r" style={{ borderColor: 'var(--border)' }}>
+            <TabsList className="h-auto p-0 bg-transparent">
+              {days.map((day, index) => (
+                <div key={index} className="relative group">
+                  <TabsTrigger
+                    value={`day-${index}`}
+                    className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
                     style={{
-                      backgroundColor: 'transparent',
-                      color: '#5f6368'
+                      backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
+                      color: activeDay === index ? 'white' : 'var(--text)',
+                      borderColor: 'var(--border)'
                     }}
-                    title={`Delete Day ${index + 1}`}
-                    aria-label={`Delete Day ${index + 1}`}
                   >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            ))}
+                    Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
+                  </TabsTrigger>
+                  {days.length > 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteDay(index);
+                      }}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-all focus-ring hover:bg-gray-100"
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#5f6368'
+                      }}
+                      title={`Delete Day ${index + 1}`}
+                      aria-label={`Delete Day ${index + 1}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
 
-            <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </TabsList>
+              <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </TabsList>
+          </div>
+          
+          {/* Right Container - Search and Filters */}
+          <div className="flex-1 px-6 flex items-center gap-3">
+            {/* Search Field */}
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+              <Input
+                placeholder="Search places..."
+                className="pl-7 h-8 w-48 text-sm"
+              />
+            </div>
+            
+            {/* Icon-only filters */}
+            <TooltipProvider>
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <UtensilsCrossed className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Food</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <MapPin className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Attractions</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Bed className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Lodging</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Building className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Culture</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Gamepad2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Entertainment</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Trees className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Parks</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Coffee className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Cafes</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Wine className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Bars</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
         </div>
 
         <div className="flex-1 flex">
