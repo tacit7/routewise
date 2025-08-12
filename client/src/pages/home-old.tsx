@@ -1,9 +1,9 @@
-import { MarketingShell } from "@/shells/marketing-shell";
-import { Hero } from "@/features/marketing/hero";
-import { QuickRouteFormInline, QuickRouteFormDrawer } from "@/features/route-planner/quick-route-form";
+import Header from "@/components/header";
+import HeroSection from "@/components/hero-section";
 import HiddenGems from "@/components/hidden-gems";
 import PoiSection from "@/components/poi-section";
 import FeaturesSection from "@/components/features-section";
+import Footer from "@/components/footer";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -16,21 +16,6 @@ export default function Home() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const { trips, legacyRoutes, loading, error, deleteTrip, deleteLegacyRoute } = useTrips();
-
-  const handleRouteSubmit = (startCity: string, endCity: string) => {
-    // Store route data and navigate to results
-    localStorage.setItem('currentRoute', JSON.stringify({
-      startCity: startCity,
-      endCity: endCity
-    }));
-    
-    setLocation(`/route?start=${encodeURIComponent(startCity)}&end=${encodeURIComponent(endCity)}`);
-    
-    toast({
-      title: "Planning your route!",
-      description: `Finding the best stops between ${startCity} and ${endCity}`,
-    });
-  };
 
   const loadTrip = (trip: Trip) => {
     // Store route data and navigate to results
@@ -88,38 +73,41 @@ export default function Home() {
   };
 
   return (
-    <MarketingShell navAuthButtons="menu">
-      {/* Mobile: Drawer CTA */}
-      <div className="lg:hidden">
-        <Hero 
-          overlay="strong"
-          align="center"
-          heightClass="min-h-[65vh]"
-          cta={
-            <QuickRouteFormDrawer 
-              onSubmit={handleRouteSubmit}
-              triggerText="Start Planning Your Route"
-            />
-          }
-        />
-      </div>
-
-      {/* Desktop: Inline Form */}
-      <div className="hidden lg:block">
-        <Hero 
-          overlay="soft"
-          align="center"
-          heightClass="min-h-[75vh]"
-          cta={
-            <QuickRouteFormInline 
-              onSubmit={handleRouteSubmit}
-              density="comfortable"
-            />
-          }
-        />
-      </div>
-
-      {/* Rest of the landing page content */}
+    <div className="min-h-screen">
+      <Header
+        leftContent={
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold text-primary">
+              RouteWise
+            </h1>
+          </div>
+        }
+        rightContent={
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation("/dashboard")}
+                className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-border text-foreground"
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => window.location.href = '/auth/google'}
+                className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground"
+              >
+                Sign Up
+              </Button>
+            )}
+          </div>
+        }
+      />
+      <HeroSection />
+      
+      {/* Hidden Gems Section */}
       <HiddenGems />
       
       {/* Saved Routes/Trips Section */}
@@ -158,7 +146,7 @@ export default function Home() {
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="mr-2 h-4 w-4 text-primary" />
+                      <MapPin className="mr-2 h-4 w-4 text-green-600" />
                       <span>{trip.startCity}</span>
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
@@ -167,7 +155,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Star className="mr-2 h-4 w-4 text-amber-500" />
-                      <span>{trip.poisData ? trip.poisData.length : 0} places discovered</span>
+                      <span>{trip.poisData.length} places discovered</span>
                     </div>
                     {trip.routeData && (
                       <div className="flex items-center text-sm text-muted-foreground">
@@ -211,7 +199,7 @@ export default function Home() {
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="mr-2 h-4 w-4 text-primary" />
+                      <MapPin className="mr-2 h-4 w-4 text-green-600" />
                       <span>{route.startCity}</span>
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
@@ -244,6 +232,7 @@ export default function Home() {
       
       <PoiSection />
       <FeaturesSection />
-    </MarketingShell>
+      <Footer />
+    </div>
   );
 }

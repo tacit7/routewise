@@ -11,7 +11,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import './debug-env';
 import { store, persistor } from '@/store';
 import Home from "@/pages/home";
-import LandingPage from "@/pages/marketing/landing-page";
 import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import DashboardTest from "@/pages/dashboard-test";
@@ -65,7 +64,6 @@ function AuthenticatedRouter() {
         <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
         <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
         <Route path="/plan" component={Home} />
-        <Route path="/landing" component={LandingPage} />
         <Route path="/trip-wizard" component={TripWizardPage} />
         <Route path="/places-explorer" component={PlacesExplorer} />
         <Route path="/route" component={RouteResults} />
