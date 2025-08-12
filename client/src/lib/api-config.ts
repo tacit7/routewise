@@ -157,7 +157,13 @@ export const authenticatedApiCall = async <T>(
   
   // Temporarily bypass for development while auth systems are out of sync
   if (!AuthManager.isAuthenticated() && !AuthManager.getToken()) {
-    throw new Error('User not authenticated');
+    // In development, allow requests to proceed without authentication for testing
+    if (import.meta.env.DEV) {
+      console.warn('🚧 DEV MODE: Proceeding without authentication for development testing');
+      // Continue without throwing error - let the backend handle it
+    } else {
+      throw new Error('User not authenticated');
+    }
   }
 
   const authHeaders = AuthManager.getAuthHeader();

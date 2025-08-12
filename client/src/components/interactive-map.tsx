@@ -505,46 +505,42 @@ const MapContent: React.FC<{
   // Real-time viewport tracking for clustering
   const [viewport, setViewport] = useState<{ north: number; south: number; east: number; west: number } | null>(null);
 
-  // Update viewport on map events  
+  // Update viewport on map events (debounced to prevent rapid updates)
   useEffect(() => {
-    if (!map) return;
+    if (!map || !enableClustering) {
+      setViewport(null);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
 
     const updateViewport = () => {
-      const bounds = map.getBounds();
-      if (!bounds) return;
+      // Debounce viewport updates to prevent rapid firing
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const bounds = map.getBounds();
+        if (!bounds) return;
 
-      const ne = bounds.getNorthEast();
-      const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
 
-      const newViewport = {
-        north: ne.lat(),
-        south: sw.lat(),
-        east: ne.lng(),
-        west: sw.lng()
-      };
-
-      // Minimal logging for viewport updates
-      if (enableClustering) {
-        console.log(`🗺️ Clustering at zoom ${map.getZoom()}`);
-      }
-      
-      setViewport(newViewport);
+        const newViewport = {
+          north: ne.lat(),
+          south: sw.lat(),
+          east: ne.lng(),
+          west: sw.lng()
+        };
+        
+        setViewport(newViewport);
+      }, 300); // 300ms debounce
     };
 
     // Initial viewport
     updateViewport();
 
-    // Use debounced idle event to prevent zoom fighting
-    let timeoutId: NodeJS.Timeout;
-    
-    const debouncedUpdateViewport = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(updateViewport, 300); // 300ms debounce
-    };
-
-    // Listen for map idle event (fires when map stops moving/zooming)
+    // Use 'idle' event which fires when map stops moving/zooming
     const listeners = [
-      map.addListener('idle', debouncedUpdateViewport)
+      map.addListener('idle', updateViewport)
     ];
 
     return () => {
@@ -555,7 +551,7 @@ const MapContent: React.FC<{
         }
       });
     };
-  }, [map]);
+  }, [map, enableClustering]);
 
   const currentZoom = map?.getZoom() || 10;
   
@@ -575,8 +571,8 @@ const MapContent: React.FC<{
     currentZoom,
     viewport,
     {
-      gridSize: 150,      // Good balance for visibility
-      maxZoom: 18,        // Cluster even at very high zoom levels
+      gridSize: 120,      // Optimized for small datasets
+      maxZoom: 13,        // Stop clustering at zoom 13 for better UX
       minimumClusterSize: 2  // At least 2 POIs to form cluster
     }
   );
@@ -685,7 +681,7 @@ const MapContent: React.FC<{
         }
       }
     }
-  }, [map, pois, devLog]);
+  }, [map, pois, devLog, enableClustering]);
 
   // Add Google POI click listener
   useEffect(() => {

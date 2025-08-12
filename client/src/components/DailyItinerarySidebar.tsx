@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, GripVertical, Star, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Calendar, Clock, GripVertical, Star, Trash2, MapPin, Plus } from "lucide-react";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier, sortByTime } from "@/utils/itinerary";
 import { Map as MapIcon } from "lucide-react";
@@ -27,6 +28,8 @@ export default function DailyItinerarySidebar({
   onToggleMap: () => void;
 }) {
   const [draggedOver, setDraggedOver] = useState(false);
+  const [startingPoint, setStartingPoint] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -38,13 +41,35 @@ export default function DailyItinerarySidebar({
     onPlaceAssignment?.(place, dayIndex);
   };
 
+  const handleAddStartingPoint = () => {
+    if (!startingPoint.trim()) return;
+    
+    const startingPointPOI: ItineraryPlace = {
+      id: `starting-point-${Date.now()}`,
+      name: "Starting Point",
+      description: startingPoint,
+      category: "lodging",
+      latitude: 0,
+      longitude: 0,
+      address: startingPoint,
+      rating: null,
+      dayIndex: dayIndex,
+      scheduledTime: "08:00",
+      dayOrder: 0,
+      notes: undefined,
+    };
+    
+    onPlaceAssignment?.(startingPointPOI, dayIndex);
+    setStartingPoint("");
+    setIsModalOpen(false);
+  };
+
   const sortedPlaces = sortByTime(day.places);
 
   return (
     <Card className="w-96 h-full rounded-none border-0 border-r">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
-          <span>Day {dayIndex + 1}</span>
                 <Button
         variant="ghost"
         size="icon"
@@ -59,10 +84,21 @@ export default function DailyItinerarySidebar({
       </Button>
         </CardTitle>
         {day.title && <CardDescription>{day.title}</CardDescription>}
-        <CardDescription className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          {day.date.toLocaleDateString()}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <CardDescription className="flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            {day.date.toLocaleDateString()}
+          </CardDescription>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            className="h-7 px-3 text-xs gap-2 bg-transparent border-dashed"
+          >
+            <MapPin className="h-3 w-3 text-blue-500" />
+            Starting point
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="p-4">
         <div
@@ -101,22 +137,20 @@ export default function DailyItinerarySidebar({
                   }}
                 >
                   <CardContent className="p-3">
-                    <div className="flex items-start gap-3">
-                      {/* POI Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={(place as any).imageUrl || '/placeholder-poi.jpg'}
-                          alt={place.name}
-                          className="w-12 h-12 rounded object-cover"
-                        />
-                      </div>
+                    {/* POI Image - Top */}
+                    <div className="w-full mb-3">
+                      <img
+                        src={(place as any).imageUrl || (place.name === "Starting Point" ? 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop&crop=center' : '/placeholder-poi.jpg')}
+                        alt={place.name}
+                        className="w-full h-24 rounded object-cover"
+                      />
+                    </div>
+                    
+                    {/* Content and Actions */}
+                    <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm mb-1">{place.name}</div>
-                        {(place as any).description && (
-                          <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
-                            {(place as any).description}
-                          </p>
-                        )}
+                        
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline" className="text-xs">{place.category}</Badge>
                           {place.rating && (
@@ -126,7 +160,8 @@ export default function DailyItinerarySidebar({
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 mt-2">
+                        
+                        <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <Input
                             type="time"
@@ -135,14 +170,9 @@ export default function DailyItinerarySidebar({
                             className="h-7 w-24 text-sm"
                           />
                         </div>
-                        {place.rating && (
-                          <div className="flex items-center text-xs text-muted-foreground mt-2">
-                            <Star className="h-3 w-3 mr-1" />
-                            <span>{place.rating}</span>
-                          </div>
-                        )}
                       </div>
-                      <div className="flex flex-col gap-1">
+                      
+                      <div className="flex flex-col gap-1 ml-2">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -175,6 +205,39 @@ export default function DailyItinerarySidebar({
           </ScrollArea>
         </div>
       </CardContent>
+      
+      {/* Starting Point Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Where are you staying?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500" />
+              <Input
+                placeholder="Enter your hotel, accommodation, or starting location..."
+                value={startingPoint}
+                onChange={(e) => setStartingPoint(e.target.value)}
+                className="pl-10"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddStartingPoint();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddStartingPoint} disabled={!startingPoint.trim()}>
+              Add Starting Point
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

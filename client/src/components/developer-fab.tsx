@@ -981,8 +981,8 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                     
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex justify-between items-center">
-                        <span class="text-sm font-medium">Est. Cost:</span>
-                        <span id="gmaps-estimated-cost" class="font-mono text-sm">$0.00</span>
+                        <span className="text-sm font-medium">Est. Cost:</span>
+                        <span id="gmaps-estimated-cost" className="font-mono text-sm">$0.00</span>
                       </div>
                     </div>
                   </Card>
@@ -1006,17 +1006,17 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         <span>Places API (Find Place):</span>
                         <span className="font-mono">$17.00/1K requests</span>
                       </div>
-                      <div class="flex justify-between">
+                      <div className="flex justify-between">
                         <span>Places API (Nearby):</span>
-                        <span class="font-mono">$32.00/1K requests</span>
+                        <span className="font-mono">$32.00/1K requests</span>
                       </div>
-                      <div class="flex justify-between font-medium text-red-600 pt-2 border-t border-border">
+                      <div className="flex justify-between font-medium text-red-600 pt-2 border-t border-border">
                         <span>Custom POI Search:</span>
-                        <span class="font-mono">$0.42-0.56/request</span>
+                        <span className="font-mono">$0.42-0.56/request</span>
                       </div>
                     </div>
                     
-                    <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                    <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
                       <strong>💡 Cost Optimization Tip:</strong><br/>
                       Google Maps shows FREE POI pins when users zoom in. Consider using Google's free POI layer for exploration vs. expensive POI API calls.
                     </div>
