@@ -21,6 +21,7 @@ import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { InteractiveMap } from "@/components/interactive-map";
 import { TopNav } from "@/features/marketing/top-nav";
+import { DeveloperFab } from "@/components/developer-fab";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
@@ -43,6 +44,22 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const { tripPlaces } = useTripPlaces();
   const dispatch = useAppDispatch();
   const { loading: isSavingToServer } = useAppSelector(state => state.trips);
+
+  // Developer debugging integration
+  useEffect(() => {
+    if (import.meta.env.DEV && (window as any).__devLog) {
+      const devLog = (window as any).__devLog;
+      
+      // Log initial itinerary state
+      devLog('Itinerary Page', 'Component Mounted', {
+        totalDays: days.length,
+        totalPlaces: days.reduce((sum, day) => sum + day.places.length, 0),
+        unassignedPlaces: itineraryPlaces.length - assignedPlaceIds.size,
+        tripTitle: tripTitle || generateTripTitle(),
+        isAuthenticated
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("itineraryData");
@@ -113,6 +130,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
       return next;
     });
     setAssignedPlaceIds((prev) => new Set([...prev, id]));
+
+    // Debug logging
+    if (import.meta.env.DEV && (window as any).__devLog) {
+      (window as any).__devLog('Itinerary', 'Place Assigned', {
+        placeName: place.name,
+        category: place.category,
+        dayIndex: dayIndex + 1,
+        totalPlacesInDay: days[dayIndex].places.length + 1
+      });
+    }
   };
 
   const handlePlaceRemove = (placeId: string | number) => {
@@ -136,6 +163,17 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const handleGoBack = () => setLocation("/route-results");
 
   const handleSaveTrip = async () => {
+    // Debug authentication state
+    if (import.meta.env.DEV) {
+      console.log('🔍 Save Trip Auth Debug:', {
+        useAuthAuthenticated: isAuthenticated,
+        user: user,
+        hasGoogleToken: !!(window as any).google?.accounts,
+        authManagerAuthenticated: (window as any).AuthManager?.isAuthenticated?.(),
+        authManagerToken: (window as any).AuthManager?.getToken?.()
+      });
+    }
+
     if (!isAuthenticated) {
       setLocation("/");
       return;
@@ -192,6 +230,17 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           title: "Trip Saved Successfully!",
           description: `Your trip "${tripTitle || generateTripTitle()}" has been saved.`,
         });
+        
+        // Debug logging
+        if (import.meta.env.DEV && (window as any).__devLog) {
+          (window as any).__devLog('Itinerary', 'Trip Saved Successfully', {
+            tripTitle: tripTitle || generateTripTitle(),
+            totalDays: days.length,
+            totalPlaces: days.reduce((sum, day) => sum + day.places.length, 0),
+            startCity,
+            endCity
+          });
+        }
       } else if (saveTrip.rejected.match(result)) {
         throw new Error(result.payload as string || "Failed to save trip");
       }
@@ -210,11 +259,23 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const toggleFilter = (category: string) => {
     setActiveFilters(prev => {
       const newFilters = new Set(prev);
-      if (newFilters.has(category)) {
+      const wasActive = newFilters.has(category);
+      if (wasActive) {
         newFilters.delete(category);
       } else {
         newFilters.add(category);
       }
+      
+      // Debug logging
+      if (import.meta.env.DEV && (window as any).__devLog) {
+        (window as any).__devLog('Itinerary', 'Filter Toggled', {
+          category,
+          action: wasActive ? 'removed' : 'added',
+          activeFilters: Array.from(newFilters),
+          filteredCount: itineraryPlaces.filter(p => newFilters.size === 0 || newFilters.has(p.category)).length
+        });
+      }
+      
       return newFilters;
     });
   };
@@ -657,6 +718,9 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           </div>
         </div>
       </Tabs>
+
+      {/* Developer FAB - Development only */}
+      <DeveloperFab />
     </div>
   );
 }
