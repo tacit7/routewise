@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle, Download } from 'lucide-react';
+import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
@@ -12,13 +12,6 @@ interface DebugData {
   component: string;
   event: string;
   data: any;
-}
-
-interface ConsoleLogEntry {
-  timestamp: string;
-  level: 'log' | 'error' | 'warn' | 'info' | 'debug';
-  message: string;
-  args: any[];
 }
 
 interface CacheInfo {
@@ -55,7 +48,6 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
   const [isOpen, setIsOpen] = useState(false);
   const [debugLogs, setDebugLogs] = useState<DebugData[]>([]);
-  const [consoleLogs, setConsoleLogs] = useState<ConsoleLogEntry[]>([]);
   const [systemInfo, setSystemInfo] = useState<any>({});
   const [hasConsoleErrors, setHasConsoleErrors] = useState(false);
 
@@ -118,108 +110,31 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
     };
   }, []);
 
-  // Console logging capture and error detection
+  // Console error detection
   useEffect(() => {
-    const originalConsole = {
-      log: console.log,
-      error: console.error,
-      warn: console.warn,
-      info: console.info,
-      debug: console.debug,
-    };
-
-    const captureConsoleLog = (level: ConsoleLogEntry['level'], args: any[]) => {
-      const timestamp = new Date().toISOString();
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-
-      const logEntry: ConsoleLogEntry = {
-        timestamp,
-        level,
-        message,
-        args
-      };
-
-      setConsoleLogs(prev => [logEntry, ...prev.slice(0, 499)]); // Keep last 500 entries
-
-      // Track errors/warnings for status indicator
-      if (level === 'error' || level === 'warn') {
-        setHasConsoleErrors(true);
-      }
-    };
-
-    // Override console methods
-    console.log = (...args) => {
-      captureConsoleLog('log', args);
-      originalConsole.log.apply(console, args);
-    };
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
 
     console.error = (...args) => {
-      captureConsoleLog('error', args);
-      originalConsole.error.apply(console, args);
+      setHasConsoleErrors(true);
+      originalConsoleError.apply(console, args);
     };
 
     console.warn = (...args) => {
-      captureConsoleLog('warn', args);
-      originalConsole.warn.apply(console, args);
-    };
-
-    console.info = (...args) => {
-      captureConsoleLog('info', args);
-      originalConsole.info.apply(console, args);
-    };
-
-    console.debug = (...args) => {
-      captureConsoleLog('debug', args);
-      originalConsole.debug.apply(console, args);
+      setHasConsoleErrors(true);
+      originalConsoleWarn.apply(console, args);
     };
 
     return () => {
-      // Restore original console methods
-      console.log = originalConsole.log;
-      console.error = originalConsole.error;
-      console.warn = originalConsole.warn;
-      console.info = originalConsole.info;
-      console.debug = originalConsole.debug;
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
     };
   }, []);
 
 
   const clearLogs = () => {
     setDebugLogs([]);
-    setConsoleLogs([]);
     setHasConsoleErrors(false); // Also clear console error status
-  };
-
-  const downloadConsoleLogs = () => {
-    const consoleData = {
-      timestamp: new Date().toISOString(),
-      sessionInfo: {
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        viewport: `${window.innerWidth}x${window.innerHeight}`,
-      },
-      systemInfo,
-      totalEntries: consoleLogs.length,
-      consoleLogs: consoleLogs.map(log => ({
-        timestamp: log.timestamp,
-        level: log.level,
-        message: log.message,
-        // Include raw args for debugging
-        args: log.args
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(consoleData, null, 2)], { 
-      type: 'application/json' 
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `console-logs-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const exportLogs = () => {
@@ -227,7 +142,6 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
       timestamp: new Date().toISOString(),
       systemInfo,
       debugLogs,
-      consoleLogs: consoleLogs.slice(0, 100), // Include recent console logs
       url: window.location.href,
     };
 
@@ -289,19 +203,9 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                   size="sm"
                   onClick={clearLogs}
                   className="h-8 px-2 text-xs"
-                  title="Clear all logs"
+                  title="Clear logs"
                 >
                   Clear
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={downloadConsoleLogs}
-                  className="h-8 px-2 text-xs bg-green-50 hover:bg-green-100 text-green-700 border border-green-200"
-                  title="Download console logs"
-                >
-                  <Download className="h-3 w-3 mr-1" />
-                  Console
                 </Button>
                 <Button
                   variant="ghost"
@@ -314,23 +218,14 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                 </Button>
               </div>
             </DialogTitle>
-            <div className="flex gap-2">
-              <Badge variant="secondary" className="w-fit text-sm">
-                {debugLogs.length} debug entries
-              </Badge>
-              <Badge variant="outline" className="w-fit text-sm">
-                {consoleLogs.length} console logs
-              </Badge>
-            </div>
+            <Badge variant="secondary" className="w-fit text-sm">
+              {debugLogs.length} debug entries
+            </Badge>
           </DialogHeader>
 
           <div className="h-[70vh] overflow-hidden">
-          <Tabs defaultValue="console" className="h-full">
-            <TabsList className={`grid w-full h-10 ${cacheInfo ? 'grid-cols-6' : 'grid-cols-5'}`}>
-              <TabsTrigger value="console" className="text-sm">
-                <Download className="h-4 w-4 mr-2" />
-                Console
-              </TabsTrigger>
+          <Tabs defaultValue="logs" className="h-full">
+            <TabsList className={`grid w-full h-10 ${cacheInfo ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="logs" className="text-sm">
                 <Database className="h-4 w-4 mr-2" />
                 Logs
@@ -354,72 +249,6 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                 </TabsTrigger>
               )}
             </TabsList>
-
-            <TabsContent value="console" className="mt-3 h-[calc(100%-50px)]">
-              <ScrollArea className="h-full">
-                <div className="space-y-2">
-                  {/* Console Controls */}
-                  <div className="flex gap-2 mb-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={downloadConsoleLogs}
-                      className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-                    >
-                      <Download className="h-3 w-3 mr-1" />
-                      Download Console Logs
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setConsoleLogs([])}
-                      className="text-xs"
-                    >
-                      Clear Console
-                    </Button>
-                  </div>
-
-                  {consoleLogs.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Download className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-base">No console logs yet</p>
-                      <p className="text-sm">Console output will appear here automatically</p>
-                    </div>
-                  ) : (
-                    consoleLogs.map((log, index) => (
-                      <Card key={index} className={`p-3 border-l-4 ${
-                        log.level === 'error' ? 'border-l-red-400 bg-red-50/50' :
-                        log.level === 'warn' ? 'border-l-yellow-400 bg-yellow-50/50' :
-                        log.level === 'info' ? 'border-l-blue-400 bg-blue-50/50' :
-                        log.level === 'debug' ? 'border-l-purple-400 bg-purple-50/50' :
-                        'border-l-gray-400'
-                      }`}>
-                        <div className="flex items-start justify-between mb-2">
-                          <Badge 
-                            variant="outline" 
-                            className={`text-sm font-mono ${
-                              log.level === 'error' ? 'text-red-600 border-red-300' :
-                              log.level === 'warn' ? 'text-yellow-600 border-yellow-300' :
-                              log.level === 'info' ? 'text-blue-600 border-blue-300' :
-                              log.level === 'debug' ? 'text-purple-600 border-purple-300' :
-                              'text-gray-600'
-                            }`}
-                          >
-                            {log.level.toUpperCase()}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {new Date(log.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <pre className="text-sm bg-muted/50 p-3 rounded overflow-x-auto whitespace-pre-wrap">
-                          {log.message}
-                        </pre>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </TabsContent>
 
             <TabsContent value="logs" className="mt-3 h-[calc(100%-50px)]">
               <ScrollArea className="h-full">
@@ -551,7 +380,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         <div className="w-2 h-2 rounded-full bg-green-500" id="clustering-status-dot" />
                         <span className="text-sm font-medium text-green-600" id="clustering-status-text">Client Clustering Ready</span>
                       </div>
-                      
+
                       <div className="text-sm space-y-1 font-mono" id="clustering-stats">
                         <div>Clusters: <span id="cluster-count" className="text-green-600">0</span></div>
                         <div>Single POIs: <span id="single-poi-count" className="text-green-600">0</span></div>
@@ -567,7 +396,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                             // Test client clustering functionality
                             console.log('🔍 Testing Client-Side Clustering');
                             console.log('✅ Client clustering is always available - no external dependencies');
-                            
+
                             if ((window as any).__devLog) {
                               (window as any).__devLog('Client Clustering Test', 'Testing clustering functionality', {
                                 clusteringType: 'client-side',
@@ -575,7 +404,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                                 timestamp: Date.now()
                               });
                             }
-                            
+
                             // Show current clustering stats if available
                             if ((window as any).__clientClustering) {
                               const stats = (window as any).__clientClustering;
@@ -594,19 +423,19 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         </Button>
 
                         <Button
-                          variant="outline" 
+                          variant="outline"
                           size="sm"
                           className="w-full text-xs"
                           onClick={() => {
                             // Enable clustering on map pages
                             const currentPath = window.location.pathname;
                             const isMapPage = currentPath.includes('route-results') || currentPath.includes('explore-results');
-                            
+
                             if (isMapPage) {
                               // Store clustering preference
                               localStorage.setItem('enableClustering', 'true');
                               window.location.reload();
-                              
+
                               if ((window as any).__devLog) {
                                 (window as any).__devLog('Clustering Toggle', 'Clustering Enabled', {
                                   currentPath,
@@ -629,7 +458,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
                         <Button
                           variant="outline"
-                          size="sm" 
+                          size="sm"
                           className="w-full text-xs"
                           onClick={() => {
                             // Client clustering refreshes automatically on zoom/pan
@@ -652,11 +481,11 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                             // Disable clustering
                             const currentPath = window.location.pathname;
                             const isMapPage = currentPath.includes('route-results') || currentPath.includes('explore-results');
-                            
+
                             if (isMapPage) {
                               localStorage.removeItem('enableClustering');
                               window.location.reload();
-                              
+
                               if ((window as any).__devLog) {
                                 (window as any).__devLog('Clustering Toggle', 'Clustering Disabled', {
                                   currentPath,
@@ -708,17 +537,17 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                           0
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Hovered:</span>
                         <span className="font-mono text-xs" id="hovered-poi-name">None</span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Last Added:</span>
                         <span className="font-mono text-xs" id="last-added-poi">None</span>
                       </div>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -727,13 +556,13 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                           // Get trip places from localStorage or global state
                           const tripPlaces = JSON.parse(localStorage.getItem('tripPlaces') || '[]');
                           const selectedPoiIds = JSON.parse(localStorage.getItem('selectedPoiIds') || '[]');
-                          
+
                           console.log('🎯 Selected POIs Debug:', {
                             tripPlacesCount: tripPlaces.length,
                             selectedPoiIds: selectedPoiIds,
                             tripPlaces: tripPlaces
                           });
-                          
+
                           if (tripPlaces.length > 0) {
                             console.log('📍 Trip Places Details:');
                             tripPlaces.forEach((poi, index) => {
@@ -742,12 +571,12 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                           } else {
                             console.log('ℹ️ No POIs currently selected for trip');
                           }
-                          
+
                           // Check for hovered POI
                           if ((window as any).__routewise_hovered_poi) {
                             console.log('👆 Currently Hovered POI:', (window as any).__routewise_hovered_poi);
                           }
-                          
+
                           if ((window as any).__devLog) {
                             (window as any).__devLog('Selected POIs', 'Trip Selection State', {
                               tripCount: tripPlaces.length,
@@ -759,7 +588,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                       >
                         Show Selected POIs
                       </Button>
-                      
+
                       <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                         <strong>Selection State:</strong><br/>
                         • Trip POIs stored in localStorage<br/>
@@ -784,15 +613,15 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         onClick={() => {
                           // Get POI data from the map component
                           const mapElement = document.querySelector('[data-testid="interactive-map"]') || document.querySelector('.map-container');
-                          
+
                           // Try to get POI data from various sources
                           let poisData = null;
-                          
+
                           // Check if there's POI data in the global window object
                           if ((window as any).__routewise_pois) {
                             poisData = (window as any).__routewise_pois.slice(0, 3); // First 3 POIs
                           }
-                          
+
                           // Fallback: try to extract from current page context
                           if (!poisData) {
                             const currentPath = window.location.pathname;
@@ -801,7 +630,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                               poisData = [{
                                 id: 1,
                                 name: "Example Restaurant",
-                                category: "restaurant", 
+                                category: "restaurant",
                                 lat: 30.2672,
                                 lng: -97.7431,
                                 rating: 4.5,
@@ -814,13 +643,13 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                               console.log('📋 Sample POI structure:', poisData[0]);
                             }
                           }
-                          
+
                           if (poisData && poisData.length > 0) {
                             console.log('🗺️ POI API Response Sample (first 3):');
                             poisData.forEach((poi, index) => {
                               console.log(`POI ${index + 1}:`, poi);
                             });
-                            
+
                             if ((window as any).__devLog) {
                               (window as any).__devLog('POI API Response', 'Sample POI Data', {
                                 sampleCount: poisData.length,
@@ -835,7 +664,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                       >
                         Show POI Structure
                       </Button>
-                      
+
                       <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                         <strong>POI Data Fields:</strong><br/>
                         • id, name, category, lat, lng<br/>
@@ -921,13 +750,13 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                             console.log('🔑 Testing Google Maps API key...');
                             const response = await fetch('/api/maps-key');
                             const data = await response.json();
-                            
+
                             console.log('📋 API Key Response:', {
                               status: response.status,
                               hasKey: !!data.api_key,
                               keyPreview: data.api_key ? `${data.api_key.substring(0, 8)}...` : 'none'
                             });
-                            
+
                             if ((window as any).__devLog) {
                               (window as any).__devLog('Google Maps API', 'API Key Test', {
                                 status: response.status,
@@ -935,12 +764,12 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                                 timestamp: Date.now()
                               });
                             }
-                            
+
                             // Update status indicators
                             const statusEl = document.getElementById('gmaps-key-status');
                             if (statusEl) {
                               statusEl.textContent = data.api_key ? 'Valid' : 'Missing';
-                              statusEl.className = data.api_key ? 
+                              statusEl.className = data.api_key ?
                                 'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/80' :
                                 'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-destructive/50 text-destructive';
                             }
@@ -978,7 +807,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         <span id="gmaps-places">0</span>
                       </div>
                     </div>
-                    
+
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Est. Cost:</span>
@@ -1015,7 +844,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         <span className="font-mono">$0.42-0.56/request</span>
                       </div>
                     </div>
-                    
+
                     <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
                       <strong>💡 Cost Optimization Tip:</strong><br/>
                       Google Maps shows FREE POI pins when users zoom in. Consider using Google's free POI layer for exploration vs. expensive POI API calls.
@@ -1038,9 +867,9 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                             apiCalls: parseInt(sessionStorage.getItem('gmaps-api-calls') || '0'),
                             estimatedCost: parseFloat(sessionStorage.getItem('gmaps-estimated-cost') || '0.007') // Default 1 map load
                           };
-                          
+
                           console.log('📊 Google Maps Usage Analytics:', analytics);
-                          
+
                           if ((window as any).__devLog) {
                             (window as any).__devLog('Google Maps Analytics', 'Session Usage Summary', analytics);
                           }
@@ -1048,7 +877,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                       >
                         Export Usage Data
                       </Button>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -1059,14 +888,14 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                           sessionStorage.removeItem('gmaps-map-loads');
                           sessionStorage.removeItem('gmaps-api-calls');
                           sessionStorage.removeItem('gmaps-estimated-cost');
-                          
+
                           // Reset UI counters
                           document.getElementById('gmaps-map-loads')!.textContent = '0';
                           document.getElementById('gmaps-marker-updates')!.textContent = '0';
                           document.getElementById('gmaps-geocoding')!.textContent = '0';
                           document.getElementById('gmaps-places')!.textContent = '0';
                           document.getElementById('gmaps-estimated-cost')!.textContent = '$0.00';
-                          
+
                           console.log('🔄 Google Maps usage counters reset');
                         }}
                       >

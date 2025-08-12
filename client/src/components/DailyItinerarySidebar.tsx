@@ -10,114 +10,6 @@ import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier, sortByTime } from "@/utils/itinerary";
 import { Map as MapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-
-function DraggableScheduledPlace({ 
-  place, 
-  onPlaceUpdate, 
-  onPlaceRemove 
-}: { 
-  place: ItineraryPlace;
-  onPlaceUpdate?: (placeId: string | number, updates: Partial<ItineraryPlace>) => void;
-  onPlaceRemove?: (placeId: string | number) => void;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: getIdentifier(place),
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 1,
-  };
-
-  return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      className={`group cursor-move hover:shadow-sm transition-shadow ${isDragging ? "shadow-lg z-10" : ""}`}
-    >
-      <CardContent className="p-3">
-        {/* POI Image - Top */}
-        <div className="w-full mb-3">
-          <img
-            src={(place as any).imageUrl || (place.name === "Starting Point" ? 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop&crop=center' : '/placeholder-poi.jpg')}
-            alt={place.name}
-            className="w-full h-24 rounded object-cover"
-          />
-        </div>
-        
-        {/* Content and Actions */}
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm mb-1">{place.name}</div>
-            
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="outline" className="text-xs">{place.category}</Badge>
-              {place.rating && (
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
-                  <span>{place.rating}</span>
-                </div>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <Input
-                type="time"
-                value={place.scheduledTime || "09:00"}
-                onChange={(e) => onPlaceUpdate?.(getIdentifier(place), { scheduledTime: e.target.value })}
-                className="h-7 w-24 text-sm"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          </div>
-          
-          <div className="flex flex-col gap-1 ml-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div {...listeners} {...attributes}>
-                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-move opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent><p>Drag to reorder</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPlaceRemove?.(getIdentifier(place));
-                    }}
-                  >
-                    <Trash2 className="h-3 w-3 text-destructive" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent><p>Remove from itinerary</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function DailyItinerarySidebar({
   day,
   dayIndex,
@@ -135,16 +27,23 @@ export default function DailyItinerarySidebar({
   showMap: boolean;
   onToggleMap: () => void;
 }) {
+  const [draggedOver, setDraggedOver] = useState(false);
   const [startingPoint, setStartingPoint] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { setNodeRef, isOver } = useDroppable({
-    id: `day-${dayIndex}`,
-  });
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDraggedOver(false);
+    const placeData = e.dataTransfer.getData("application/json");
+    if (!placeData) return;
+    const place = JSON.parse(placeData) as ItineraryPlace;
+    if (place.dayIndex !== undefined) onPlaceRemove?.(getIdentifier(place));
+    onPlaceAssignment?.(place, dayIndex);
+  };
 
   const handleAddStartingPoint = () => {
     if (!startingPoint.trim()) return;
-    
+
     const startingPointPOI: ItineraryPlace = {
       id: `starting-point-${Date.now()}`,
       name: "Starting Point",
@@ -159,7 +58,7 @@ export default function DailyItinerarySidebar({
       dayOrder: 0,
       notes: undefined,
     };
-    
+
     onPlaceAssignment?.(startingPointPOI, dayIndex);
     setStartingPoint("");
     setIsModalOpen(false);
@@ -203,10 +102,20 @@ export default function DailyItinerarySidebar({
       </CardHeader>
       <CardContent className="p-4">
         <div
-          ref={setNodeRef}
           className={`min-h-32 border-2 border-dashed rounded-lg p-4 transition-colors bg-bg ${
-            isOver ? "border-primary !bg-primary/5" : "border-border hover:border-muted-fg"
+            draggedOver ? "border-primary !bg-primary/5" : "border-border hover:border-muted-fg"
           }`}
+          onDrop={handleDrop}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "copy";
+          }}
+          onDragEnter={() => setDraggedOver(true)}
+          onDragLeave={(e) => {
+            if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
+              setDraggedOver(false);
+            }
+          }}
         >
           {sortedPlaces.length === 0 && (
             <div className="text-center py-8">
@@ -216,25 +125,87 @@ export default function DailyItinerarySidebar({
             </div>
           )}
           <ScrollArea className="h-[calc(100vh-300px)]">
-            <SortableContext 
-              items={sortedPlaces.map(place => getIdentifier(place))} 
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {sortedPlaces.map((place) => (
-                  <DraggableScheduledPlace
-                    key={getIdentifier(place)}
-                    place={place}
-                    onPlaceUpdate={onPlaceUpdate}
-                    onPlaceRemove={onPlaceRemove}
-                  />
-                ))}
-              </div>
-            </SortableContext>
+            <div className="space-y-3">
+              {sortedPlaces.map((place) => (
+                <Card
+                  key={getIdentifier(place)}
+                  className="group cursor-move hover:shadow-sm transition-shadow"
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("application/json", JSON.stringify(place));
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                >
+                  <CardContent className="p-3">
+                    {/* POI Image - Top */}
+                    <div className="w-full mb-3">
+                      <img
+                        src={(place as any).imageUrl || (place.name === "Starting Point" ? 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop&crop=center' : '/placeholder-poi.jpg')}
+                        alt={place.name}
+                        className="w-full h-24 rounded object-cover"
+                      />
+                    </div>
+
+                    {/* Content and Actions */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm mb-1">{place.name}</div>
+
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline" className="text-xs">{place.category}</Badge>
+                          {place.rating && (
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
+                              <span>{place.rating}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="time"
+                            value={place.scheduledTime || "09:00"}
+                            onChange={(e) => onPlaceUpdate?.(getIdentifier(place), { scheduledTime: e.target.value })}
+                            className="h-7 w-24 text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1 ml-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Drag to reorder</p></TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => onPlaceRemove?.(getIdentifier(place))}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Remove from itinerary</p></TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </ScrollArea>
         </div>
       </CardContent>
-      
+
       {/* Starting Point Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">

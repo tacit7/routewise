@@ -273,50 +273,14 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
         <TopNav />
       
       {/* Page Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <BackButton onClick={handleGoBack} text="Back to Route Results" />
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Input
-                  type="text"
-                  placeholder={generateTripTitle()}
-                  value={tripTitle}
-                  onChange={(e) => setTripTitle(e.target.value)}
-                  className="text-lg sm:text-xl lg:text-2xl font-bold h-auto py-1 px-2 border-0 shadow-none w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-0 focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                  style={{ backgroundColor: 'var(--surface)', color: 'var(--text)' }}
-                />
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                Organize your {itineraryPlaces.length} saved places into daily plans
-                {!isAuthenticated && <Badge variant="secondary" className="ml-2" style={{ backgroundColor: 'var(--surface-alt)', color: 'var(--text-muted)' }}>Sign in to save</Badge>}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {lastSavedAt && (
-              <div className="text-sm flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                <Check className="h-4 w-4" />
-                Saved {lastSavedAt.toLocaleTimeString()}
-              </div>
-            )}
-            <button
-              onClick={isAuthenticated ? () => {} : () => setLocation("/")}
-              disabled={isSaving || days.every((d) => d.places.length === 0)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
-              aria-label={isSaving ? "Saving..." : isAuthenticated ? "Save Trip" : "Sign In to Save"}
-            >
-              {isSaving ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
-              ) : isAuthenticated ? (
-                <Save className="h-5 w-5 text-gray-600" />
-              ) : (
-                <LogIn className="h-5 w-5 text-gray-600" />
-              )}
-            </button>
+      <div className="bg-white px-6 py-4">
+        <div className="flex items-center justify-center">
+          <div className="w-full max-w-md">
+            <Input
+              type="text"
+              placeholder="Search places..."
+              className="w-full"
+            />
           </div>
         </div>
       </div>

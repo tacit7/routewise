@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { UserCircle, Settings, LogOut, Loader2, Heart } from "lucide-react";
+import { UserCircle, Settings, LogOut, Loader2, Heart, LayoutDashboard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,6 +84,14 @@ export default function UserMenu({ className }: UserMenuProps) {
     console.log('Profile clicked');
   };
 
+  const handleSettings = () => {
+    setLocation('/settings');
+  };
+
+  const handleDashboard = () => {
+    setLocation('/dashboard');
+  };
+
   const handleInterests = () => {
     setLocation('/interests');
   };
@@ -112,7 +120,6 @@ export default function UserMenu({ className }: UserMenuProps) {
         className="w-56" 
         align="end" 
         forceMount
-        style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)' }}
       >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
@@ -127,16 +134,28 @@ export default function UserMenu({ className }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem 
+            onClick={handleDashboard}
+          >
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <span>Dashboard</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={handleInterests}
+          >
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Interests</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
             onClick={handleProfile}
           >
             <UserCircle className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>
           <DropdownMenuItem 
-            onClick={handleInterests}
+            onClick={handleSettings}
           >
             <Settings className="mr-2 h-4 w-4" />
-            <span>Interests</span>
+            <span>Settings</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

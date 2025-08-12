@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Menu, LogIn, UserPlus, User, Settings, LogOut } from "lucide-react";
+import { Menu, LogIn, UserPlus, User, Settings, LogOut, Heart, Share, CheckCircle, Save, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonGhost } from "@/components/ui/button-ghost";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/auth-context";
+import UserMenu from "@/components/UserMenu";
 
 type TopNavProps = {
   authButtons?: "inline" | "menu";
@@ -24,6 +19,7 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
   const [, setLocation] = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [tripName, setTripName] = useState("My Trip");
 
   const handleSignIn = () => {
     window.location.href = '/auth/google';
@@ -60,98 +56,89 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          {showLogo && (
-            <div className="flex-shrink-0">
-              <button
-                onClick={() => setLocation('/')}
-                className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+    <TooltipProvider>
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Left - Add more results button */}
+            <div className="flex-1">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation('/route-results')}
+                className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
               >
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                  <i className="fas fa-route text-white text-lg md:text-xl"></i>
-                </div>
-                <span className="text-xl md:text-2xl font-bold text-slate-900">RouteWise</span>
-              </button>
+                <ArrowLeft className="h-4 w-4" />
+                Add more results
+              </Button>
             </div>
-          )}
-
-          {/* Desktop Auth Buttons - Always show on desktop for better UX */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-10 w-10 rounded-full p-0 hover:bg-slate-100"
-                    aria-label={`User menu for ${user?.name || 'User'}`}
-                  >
-                    <Avatar className="h-9 w-9">
-                      {user?.picture && (
-                        <AvatarImage 
-                          src={user.picture} 
-                          alt={user.name || 'User avatar'} 
-                        />
-                      )}
-                      <AvatarFallback className="bg-primary text-primary-foreground font-medium">
-                        {user?.name ? getUserInitials(user.name) : 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+            
+            {/* Center - Trip Name Input */}
+            <div className="flex-1 flex justify-center">
+              <Input
+                type="text"
+                value={tripName}
+                onChange={(e) => setTripName(e.target.value)}
+                placeholder="My Trip"
+                className="text-lg font-semibold text-center border-0 shadow-none bg-transparent max-w-xs focus-visible:ring-1 focus-visible:ring-slate-400"
+              />
+            </div>
+            
+            {/* Right - Action Buttons and Avatar */}
+            <div className="flex-1 flex items-center justify-end space-x-2">
+              {/* Action Icons */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                    <Save className="h-4 w-4" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 shadow-lg border bg-white">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user?.name || 'User'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={handleDashboard}
-                    className="cursor-pointer"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setLocation('/profile')}
-                    className="cursor-pointer"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={handleLogout}
-                    className="cursor-pointer text-destructive"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
-                <Button onClick={handleSignIn} variant="ghost" className="text-slate-600 hover:text-slate-900">
-                  Sign In
-                </Button>
-                <Button onClick={handleSignUp} className="bg-primary hover:bg-primary-hover text-white">
-                  Sign Up
-                </Button>
-              </>
-            )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Save</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                    <Share className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Share</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                    <CheckCircle className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Finalize</p>
+                </TooltipContent>
+              </Tooltip>
+            
+            {/* Auth Section - Desktop */}
+            <div className="hidden md:flex items-center">
+              {isAuthenticated ? (
+                <UserMenu />
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Button onClick={handleSignIn} variant="ghost" className="text-slate-600 hover:text-slate-900">
+                    Sign In
+                  </Button>
+                  <Button onClick={handleSignUp} className="bg-primary hover:bg-primary-hover text-white">
+                    Sign Up
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          {authButtons === "menu" && (
-            <div className="md:hidden">
+            {/* Mobile Menu Button */}
+            {authButtons === "menu" && (
+              <div className="md:hidden ml-3">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <ButtonGhost size="icon" className="text-slate-600 hover:text-slate-900">
@@ -192,14 +179,25 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
                         </Button>
                         <Button
                           onClick={() => {
+                            setLocation('/interests');
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="justify-start w-full h-12"
+                        >
+                          <Heart className="mr-3 h-5 w-5" />
+                          Interests
+                        </Button>
+                        <Button
+                          onClick={() => {
                             setLocation('/profile');
                             setMobileMenuOpen(false);
                           }}
                           variant="ghost"
                           className="justify-start w-full h-12"
                         >
-                          <Settings className="mr-3 h-5 w-5" />
-                          Settings
+                          <User className="mr-3 h-5 w-5" />
+                          Profile
                         </Button>
                         <Button
                           onClick={handleLogout}
@@ -238,5 +236,6 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
         </div>
       </div>
     </nav>
+    </TooltipProvider>
   );
 }

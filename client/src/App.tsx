@@ -22,6 +22,7 @@ import TripWizardPage from "@/pages/trip-wizard";
 import PlacesExplorer from "@/pages/places-explorer";
 import InterestsDemo from "@/pages/interests-demo";
 import InterestsPage from "@/pages/interests";
+import SettingsPage from "@/pages/settings";
 import KitchenSinkDemo from "@/pages/kitchen-sink";
 import SuggestedTrip from "@/pages/suggested-trip";
 import NotFound from "@/pages/not-found";
@@ -63,6 +64,7 @@ function AuthenticatedRouter() {
         <Route path="/login" component={isAuthenticated ? Dashboard : LoginPage} />
         <Route path="/dashboard" component={isAuthenticated ? Dashboard : Home} />
         <Route path="/interests" component={isAuthenticated ? InterestsPage : Home} />
+        <Route path="/settings" component={isAuthenticated ? SettingsPage : Home} />
         <Route path="/plan" component={Home} />
         <Route path="/trip-wizard" component={TripWizardPage} />
         <Route path="/places-explorer" component={PlacesExplorer} />
