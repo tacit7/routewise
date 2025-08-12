@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { UserCircle, Settings, LogOut, Loader2 } from "lucide-react";
+import { UserCircle, Settings, LogOut, Loader2, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

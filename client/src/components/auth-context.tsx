@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from "@/hooks/use-toast";
-import { googleAuth, GoogleUser } from '@/services/GoogleAuth';
 
-// User interface matching GoogleUser structure
+// User interface for server-side OAuth
 interface User {
   id: string;
   email: string;
@@ -17,14 +16,8 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signInWithGoogle: () => Promise<AuthResult>;
+  checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
-}
-
-interface AuthResult {
-  success: boolean;
-  message?: string;
-  user?: User;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,121 +41,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = user !== null;
 
-  // Initialize GoogleAuth and check authentication on mount
+  // Check authentication status on mount
   useEffect(() => {
-    initializeAuth();
+    checkAuth();
   }, []);
 
-  // Listen for Google auth state changes
-  useEffect(() => {
-    const handleAuthStateChange = (event: CustomEvent) => {
-      const { user: googleUser } = event.detail;
-      if (googleUser) {
-        setUser(googleUser);
+  const checkAuth = async (): Promise<void> => {
+    try {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include' // Important: Include HTTP-only cookies
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
       } else {
         setUser(null);
       }
-    };
-
-    window.addEventListener('googleAuthStateChanged', handleAuthStateChange as EventListener);
-    return () => {
-      window.removeEventListener('googleAuthStateChanged', handleAuthStateChange as EventListener);
-    };
-  }, []);
-
-  const initializeAuth = async () => {
-    try {
-      await googleAuth.initialize();
-      
-      // Check if user is already authenticated from stored credentials
-      const currentUser = googleAuth.getCurrentUser();
-      if (currentUser && googleAuth.isAuthenticated()) {
-        setUser(currentUser);
-      } else {
-        // DEV AUTH: Get JWT token from Phoenix backend
-        try {
-          const response = await fetch('/api/auth/dev-token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include', // Important: Include cookies for JWT
-            body: JSON.stringify({
-              username: 'test_user',
-              email: 'test@example.com',
-              full_name: 'Test User'
-            })
-          });
-
-          if (response.ok) {
-            const authData = await response.json();
-            console.log('🔐 Development JWT token obtained:', authData);
-            
-            // Use the user data from backend response
-            const devUser: User = {
-              id: authData.user.id.toString(),
-              email: authData.user.email,
-              name: authData.user.full_name,
-              picture: "https://via.placeholder.com/96",
-              email_verified: true,
-              given_name: authData.user.full_name.split(' ')[0],
-              family_name: authData.user.full_name.split(' ').slice(1).join(' ')
-            };
-            setUser(devUser);
-            console.log('🎭 Using development user with JWT token');
-          } else {
-            console.error('Failed to get dev token:', response.statusText);
-            setUser(null);
-          }
-        } catch (devError) {
-          console.error('Dev token request failed:', devError);
-          setUser(null);
-        }
-      }
     } catch (error) {
-      console.error('Failed to initialize Google Auth:', error);
+      console.error('Auth check failed:', error);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const signInWithGoogle = async (): Promise<AuthResult> => {
-    try {
-      const googleUser = await googleAuth.signIn();
-      
-      toast({
-        title: "Welcome!",
-        description: "Successfully signed in with Google",
-      });
-      
-      return { success: true, user: googleUser, message: 'Successfully signed in' };
-    } catch (error) {
-      console.error('Google sign-in error:', error);
-      
-      const errorMessage = error instanceof Error ? error.message : 'Google sign-in failed';
-      toast({
-        title: "Sign-in Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      
-      return { success: false, message: errorMessage };
-    }
-  };
-
   const logout = async (): Promise<void> => {
     try {
-      // Sign out from Google Auth service only (no backend call)
-      googleAuth.signOut();
-      
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
       });
+      
+      if (response.ok) {
+        setUser(null);
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out.",
+        });
+      } else {
+        throw new Error('Logout failed');
+      }
     } catch (error) {
       console.error('Logout error:', error);
       // Force clear user state even if logout fails
       setUser(null);
+      toast({
+        title: "Error",
+        description: "There was an issue signing out, but you've been logged out locally.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -170,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isLoading,
     isAuthenticated,
-    signInWithGoogle,
+    checkAuth,
     logout,
   };
 

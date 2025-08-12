@@ -10,8 +10,20 @@ export default function AuthSuccess() {
 
   useEffect(() => {
     const handleOAuthSuccess = async () => {
-      // Check authentication status to refresh user data
-      await checkAuth();
+      // Server-side OAuth sets HTTP-only cookies
+      // Manually check auth status to refresh the context
+      try {
+        if (typeof checkAuth === 'function') {
+          await checkAuth();
+        } else {
+          // Fallback: force refresh the page to trigger auth check
+          console.log('checkAuth not available, refreshing context manually');
+          window.location.reload();
+          return;
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
       
       // Show success message
       toast({

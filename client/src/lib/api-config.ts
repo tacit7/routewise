@@ -1,9 +1,7 @@
 /**
  * API Configuration for Route Wise Frontend
- * Handles backend URL configuration and request utilities with Google OAuth integration
+ * Handles backend URL configuration and request utilities with server-side OAuth
  */
-
-import { googleAuth } from '@/services/GoogleAuth';
 
 // Dynamic backend URL configuration for development and mobile access
 const getBackendUrl = (): string => {
@@ -54,7 +52,7 @@ export const createApiUrl = (endpoint: string): string => {
 };
 
 /**
- * Default fetch options for API calls with Google authentication
+ * Default fetch options for API calls with server-side authentication
  */
 export const getDefaultFetchOptions = (options: RequestInit = {}): RequestInit => {
   const headers: Record<string, string> = {
@@ -62,14 +60,8 @@ export const getDefaultFetchOptions = (options: RequestInit = {}): RequestInit =
     ...options.headers as Record<string, string>,
   };
 
-  // Add Google ID token if user is authenticated
-  const idToken = googleAuth.getIdToken();
-  if (idToken && googleAuth.isAuthenticated()) {
-    headers['Authorization'] = `Bearer ${idToken}`;
-  }
-
   return {
-    credentials: 'include',
+    credentials: 'include', // Important: Include HTTP-only cookies
     headers,
     ...options,
   };
@@ -100,92 +92,65 @@ export const apiCall = async <T>(
 };
 
 /**
- * Google Authentication utilities for API calls
+ * Server-side Authentication utilities for API calls
+ * Note: Authentication is now handled via HTTP-only cookies
  */
 export const AuthManager = {
   /**
-   * Get Google ID token
+   * Check authentication status via server
    */
-  getToken(): string | null {
-    return googleAuth.getIdToken();
-  },
-
-  /**
-   * Check if user is authenticated
-   */
-  isAuthenticated(): boolean {
-    return googleAuth.isAuthenticated();
-  },
-
-  /**
-   * Get authorization header for API calls
-   */
-  getAuthHeader(): Record<string, string> {
-    const token = this.getToken();
-    return token && this.isAuthenticated() ? { Authorization: `Bearer ${token}` } : {};
+  async isAuthenticated(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include'
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
   },
 
   /**
    * Get current user information
    */
-  getCurrentUser() {
-    return googleAuth.getCurrentUser();
+  async getCurrentUser(): Promise<any> {
+    try {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.user;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   },
 };
 
 // Legacy TokenManager for backward compatibility
 export const TokenManager = {
-  getToken: () => AuthManager.getToken(),
-  setToken: () => { /* No-op - Google tokens are managed by GoogleAuth service */ },
-  removeToken: () => { /* No-op - Google tokens are managed by GoogleAuth service */ },
-  getAuthHeader: () => AuthManager.getAuthHeader(),
+  getToken: () => null, // No tokens with server-side auth
+  setToken: () => { /* No-op - Auth handled server-side */ },
+  removeToken: () => { /* No-op - Auth handled server-side */ },
+  getAuthHeader: () => ({}), // No auth headers needed
 };
 
 /**
- * Enhanced API call with Google authentication
+ * Enhanced API call with server-side authentication
+ * Uses HTTP-only cookies for authentication
  */
 export const authenticatedApiCall = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  // Check if user is authenticated
-  // TODO: Fix auth sync between useAuth and googleAuth
-  console.log('🔍 Auth Check:', { 
-    AuthManager: AuthManager.isAuthenticated(),
-    hasToken: !!AuthManager.getToken()
-  });
-  
-  // Temporarily bypass for development while auth systems are out of sync
-  if (!AuthManager.isAuthenticated() && !AuthManager.getToken()) {
-    // In development, allow requests to proceed without authentication for testing
-    if (import.meta.env.DEV) {
-      console.warn('🚧 DEV MODE: Proceeding without authentication for development testing');
-      // Continue without throwing error - let the backend handle it
-    } else {
-      throw new Error('User not authenticated');
-    }
-  }
-
-  const authHeaders = AuthManager.getAuthHeader();
-  const enhancedOptions = {
-    ...options,
-    headers: {
-      ...getDefaultFetchOptions(options).headers,
-      ...authHeaders,
-      ...options.headers,
-    },
-  };
-
-  return apiCall<T>(endpoint, enhancedOptions);
+  // Server-side auth doesn't require client-side auth checks
+  // The backend will handle authentication via HTTP-only cookies
+  return apiCall<T>(endpoint, options);
 };
 
 /**
- * API call wrapper that automatically includes Google ID token if available
+ * Alias for consistency with server-side OAuth
  */
-export const googleApiCall = async <T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  // Use enhanced fetch options that automatically include Google ID token
-  return apiCall<T>(endpoint, options);
-};
+export const googleApiCall = authenticatedApiCall;
