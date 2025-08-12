@@ -176,3 +176,42 @@ interface Poi {
 ```
 
 Coordinate resolution priority: `lat/lng` → `latitude/longitude` → safe default (center of US).
+
+## Branch Management Issues
+
+### Refactor Branch Merge Problems (August 12, 2025)
+
+**Issue**: After merging refactor branch into main, map zoom controls became unresponsive and compilation errors appeared.
+
+**Root Cause**: Refactor branch contained problematic code patterns:
+1. **Aggressive cache busting** in TanStack Query:
+   ```tsx
+   staleTime: 0,
+   gcTime: 0, 
+   refetchOnMount: "always",
+   refetchOnWindowFocus: true
+   ```
+
+2. **Rapid-fire event listeners** causing zoom fighting:
+   ```tsx
+   map.addListener('bounds_changed', updateViewport), // Fires every frame
+   map.addListener('zoom_changed', updateViewport),
+   map.addListener('dragend', updateViewport)
+   ```
+
+3. **JSX syntax errors** preventing compilation:
+   ```tsx
+   class="text-sm font-medium"  // ❌ HTML syntax
+   className="text-sm font-medium" // ✅ JSX syntax
+   ```
+
+**Why No Merge Conflicts**: Both branches developed similar clustering implementations independently, so Git saw them as "compatible" changes despite performance issues.
+
+**Solutions Applied**:
+- **Debounced viewport updates** (300ms) with `setTimeout`
+- **Switched to `idle` event** instead of rapid-fire events
+- **Fixed JSX syntax errors** (`class=` → `className=`)
+- **Proper dependency arrays** in useEffect hooks
+- **Only track viewport when clustering enabled**
+
+**Prevention**: Test refactor branches thoroughly before merging, especially performance-sensitive features like map interactions.

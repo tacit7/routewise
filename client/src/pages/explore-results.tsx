@@ -19,8 +19,8 @@ export default function ExploreResults() {
     cacheInfo,
   } = useExploreResults();
 
-  // Check if clustering is enabled via debug tools
-  const enableClustering = localStorage.getItem('enableClustering') === 'true';
+  // Clustering disabled by default (poor UX, visually unappealing)
+  const enableClustering = false;
   if (!exploreData) return null;
   if (error) {
     const devLog = (...args: any[]) => import.meta.env.DEV && console.log(...args);

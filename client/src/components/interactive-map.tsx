@@ -534,14 +534,21 @@ const MapContent: React.FC<{
     // Initial viewport
     updateViewport();
 
-    // Listen for map events that change the viewport
+    // Use debounced idle event to prevent zoom fighting
+    let timeoutId: NodeJS.Timeout;
+    
+    const debouncedUpdateViewport = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateViewport, 300); // 300ms debounce
+    };
+
+    // Listen for map idle event (fires when map stops moving/zooming)
     const listeners = [
-      map.addListener('bounds_changed', updateViewport),
-      map.addListener('zoom_changed', updateViewport),
-      map.addListener('dragend', updateViewport)
+      map.addListener('idle', debouncedUpdateViewport)
     ];
 
     return () => {
+      clearTimeout(timeoutId);
       listeners.forEach(listener => {
         if (listener && typeof listener.remove === 'function') {
           listener.remove();

@@ -21,8 +21,8 @@ export default function RouteResults() {
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
   const { toast } = useToast();
 
-  // Check if clustering is enabled via debug tools
-  const enableClustering = localStorage.getItem('enableClustering') === 'true';
+  // Clustering disabled by default (poor UX, visually unappealing)
+  const enableClustering = false;
 
   // Fetch POIs along the route using the correct Phoenix API endpoint
   const { data: routeResults, isLoading: poisLoading, error: poisError } = useQuery({
