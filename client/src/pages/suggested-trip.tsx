@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Clock, Calendar, Users, Star, Play, DollarSign, Sun, Navigation, CheckCircle2 } from "lucide-react";
-import Header from "@/components/header";
+import { AppShell } from "@/shells/app-shell";
 import { useAuth } from "@/components/auth-context";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
@@ -80,30 +80,28 @@ export default function SuggestedTrip({ params }: { params: { tripSlug?: string 
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <Header
-        leftContent={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="hover:bg-white/10 text-white"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        }
-        centerContent={null}
-        rightContent={
-          user && (
-            <div className="flex items-center gap-2">
-              <UserMenu className="hidden md:block" />
-              <MobileMenu />
-            </div>
-          )
-        }
-      />
+    <AppShell
+      leftContent={
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="hover:bg-white/10 text-white"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+      }
+      centerContent={null}
+      rightContent={
+        user && (
+          <div className="flex items-center gap-2">
+            <UserMenu className="hidden md:block" />
+            <MobileMenu />
+          </div>
+        )
+      }
+    >
 
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
@@ -333,6 +331,6 @@ export default function SuggestedTrip({ params }: { params: { tripSlug?: string 
           </div>
         </section>
       </main>
-    </div>
+    </AppShell>
   );
 }

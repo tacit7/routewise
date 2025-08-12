@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-context";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import Header from "@/components/header";
+import { AppShell } from "@/shells/app-shell";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
@@ -315,19 +315,17 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header
-          centerContent={null}
-          rightContent={
-            user && (
-              <div className="flex items-center gap-2">
-                <UserMenu className="hidden md:block" />
-                <MobileMenu />
-              </div>
-            )
-          }
-        />
-
+      <AppShell
+        centerContent={null}
+        rightContent={
+          user && (
+            <div className="flex items-center gap-2">
+              <UserMenu className="hidden md:block" />
+              <MobileMenu />
+            </div>
+          )
+        }
+      >
         {/* Dashboard Hero Section - Full Width */}
         <DashboardHero />
 
@@ -561,25 +559,22 @@ const Dashboard = () => {
             )}
           </section>
         </main>
-      </div>
+      </AppShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <Header
-        centerContent={null}
-        rightContent={
-          user && (
-            <div className="flex items-center gap-2">
-              <UserMenu className="hidden md:block" />
-              <MobileMenu />
-            </div>
-          )
-        }
-      />
-
+    <AppShell
+      centerContent={null}
+      rightContent={
+        user && (
+          <div className="flex items-center gap-2">
+            <UserMenu className="hidden md:block" />
+            <MobileMenu />
+          </div>
+        )
+      }
+    >
       {/* Dashboard Hero Section - Full Width */}
       <DashboardHero />
 
@@ -785,7 +780,7 @@ const Dashboard = () => {
           )}
         </section>
       </main>
-    </div>
+    </AppShell>
   );
 };
 

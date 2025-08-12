@@ -150,7 +150,7 @@ export default function Header({
                 </DropdownMenu>
               ) : (
                 <Button
-                  onClick={() => setLocation('/auth')}
+                  onClick={() => window.location.href = '/auth/google'}
                   variant="default"
                   size="sm"
                   className="focus-ring"

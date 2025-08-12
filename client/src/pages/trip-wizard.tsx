@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/auth-context";
 import { createDraftTrip, updateTrip, selectCurrentTripId } from "@/store/slices/tripSlice";
-import Header from "@/components/header";
+import { AppShell } from "@/shells/app-shell";
 import { TripPlannerWizard } from "@/components/trip-wizard/TripPlannerWizard";
 import { TripWizardData } from "@/types/trip-wizard";
 import {
@@ -374,28 +374,27 @@ export default function TripWizardPage() {
 
   if (isCalculating) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-        <Header
-          leftContent={
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleWizardCancel}
-              className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              style={{ color: 'var(--text)' }}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-          }
-          centerContent={
-            <div className="flex items-center justify-center">
-              <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
-                Planning Your Trip
-              </h1>
-            </div>
-          }
-        />
+      <AppShell
+        leftContent={
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleWizardCancel}
+            className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={{ color: 'var(--text)' }}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+        }
+        centerContent={
+          <div className="flex items-center justify-center">
+            <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
+              Planning Your Trip
+            </h1>
+          </div>
+        }
+      >
         <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 73px)' }}>
           <div className="bg-surface p-8 rounded-lg shadow-sm border border-border max-w-md mx-4">
           <div className="text-center">
@@ -451,7 +450,7 @@ export default function TripWizardPage() {
           </div>
         </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 

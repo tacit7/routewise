@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Header from "@/components/header";
+import { AppShell } from "@/shells/app-shell";
 import UserInterests from "@/components/user-interests";
 
 const InterestsPage = () => {
@@ -45,28 +45,27 @@ const InterestsPage = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      <Header
-        leftContent={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/dashboard")}
-            className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-            style={{ color: 'var(--text)' }}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        }
-        centerContent={
-          <div className="flex items-center justify-center">
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-              Travel Preferences
-            </h1>
-          </div>
-        }
-      />
+    <AppShell
+      leftContent={
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLocation("/dashboard")}
+          className="hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          style={{ color: 'var(--text)' }}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+      }
+      centerContent={
+        <div className="flex items-center justify-center">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+            Travel Preferences
+          </h1>
+        </div>
+      }
+    >
       
       {/* Welcome section for new users */}
       <div className="bg-surface border-b border-border">
@@ -85,7 +84,7 @@ const InterestsPage = () => {
 
       {/* User Interests Component */}
       <UserInterests onRouteRequest={handleRouteRequest} />
-    </div>
+    </AppShell>
   );
 };
 
