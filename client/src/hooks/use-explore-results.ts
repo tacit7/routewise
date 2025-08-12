@@ -75,10 +75,9 @@ export function useExploreResults() {
         ? fetchExploreResults(exploreData.startLocation)
         : Promise.resolve({ pois: [], maps_api_key: null, meta: null }),
     enabled: !!exploreData,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes - explore data is stable
+    gcTime: 30 * 60 * 1000, // 30 minutes in cache
+    refetchOnWindowFocus: false, // Explore data doesn't change often
     refetchOnReconnect: true,
   });
   const pois = useMemo(() => query.data?.pois || [], [query.data]);

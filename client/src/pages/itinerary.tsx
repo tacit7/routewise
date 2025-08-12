@@ -13,6 +13,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/auth-context";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { saveTrip } from "@/store/slices/tripSlice";
 import DailyItinerarySidebar from "@/components/DailyItinerarySidebar";
 import TripPlacesGrid from "@/components/TripPlacesGrid";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
@@ -39,6 +41,8 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const { isAuthenticated, user, logout } = useAuth();
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
+  const dispatch = useAppDispatch();
+  const { loading: isSavingToServer } = useAppSelector(state => state.trips);
 
   useEffect(() => {
     const saved = localStorage.getItem("itineraryData");
@@ -130,6 +134,78 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   };
 
   const handleGoBack = () => setLocation("/route-results");
+
+  const handleSaveTrip = async () => {
+    if (!isAuthenticated) {
+      setLocation("/");
+      return;
+    }
+
+    if (days.every((d) => d.places.length === 0)) {
+      toast({
+        title: "Cannot Save Empty Trip",
+        description: "Please add places to your itinerary before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // Get meaningful start/end cities
+      const getLocationName = (place?: ItineraryPlace): string => {
+        if (!place) return "Unknown";
+        if (place.address) {
+          const parts = place.address.split(',');
+          return parts.length > 1 ? parts[parts.length - 2].trim() : parts[0].trim();
+        }
+        return place.name || "Unknown";
+      };
+
+      const firstDay = days[0];
+      const lastDay = days[days.length - 1];
+      const startCity = firstDay?.places.length > 0 ? getLocationName(firstDay.places[0]) : "Unknown";
+      const endCity = lastDay?.places.length > 0 ? getLocationName(lastDay.places[lastDay.places.length - 1]) : "Unknown";
+
+      // Format the trip data for saving
+      const tripData = {
+        route_data: {
+          title: tripTitle || generateTripTitle(),
+          days: days.map(day => ({
+            ...day,
+            date: day.date.toISOString(),
+          })),
+          total_places: days.reduce((sum, day) => sum + day.places.length, 0),
+          duration_days: days.length,
+          created_at: new Date().toISOString(),
+        },
+        start_city: startCity,
+        end_city: endCity,
+      };
+
+      const result = await dispatch(saveTrip(tripData));
+      
+      if (saveTrip.fulfilled.match(result)) {
+        setLastSavedAt(new Date());
+        toast({
+          title: "Trip Saved Successfully!",
+          description: `Your trip "${tripTitle || generateTripTitle()}" has been saved.`,
+        });
+      } else if (saveTrip.rejected.match(result)) {
+        throw new Error(result.payload as string || "Failed to save trip");
+      }
+    } catch (error) {
+      console.error("Failed to save trip:", error);
+      toast({
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : "Failed to save trip. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const toggleFilter = (category: string) => {
     setActiveFilters(prev => {
@@ -238,30 +314,38 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           {/* Right: Save, Share, Avatar */}
           <div className="flex items-center gap-3">
             {/* Save Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={isAuthenticated ? () => {} : () => setLocation("/")}
-              disabled={isSaving || days.every((d) => d.places.length === 0)}
-              className="gap-2"
-            >
-              {isSaving ? (
-                <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"></div>
-                  Save
-                </>
-              ) : isAuthenticated ? (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save
-                </>
-              ) : (
-                <>
-                  <LogIn className="h-4 w-4" />
-                  Sign In
-                </>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSaveTrip}
+                disabled={(isSaving || isSavingToServer) || days.every((d) => d.places.length === 0)}
+                className="gap-2"
+              >
+                {(isSaving || isSavingToServer) ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"></div>
+                    Saving...
+                  </>
+                ) : isAuthenticated ? (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4" />
+                    Sign In
+                  </>
+                )}
+              </Button>
+              {lastSavedAt && isAuthenticated && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Check className="h-3 w-3 text-green-600" />
+                  <span>Saved {lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
               )}
-            </Button>
+            </div>
 
             {/* Share Button */}
             <Button variant="ghost" size="sm" className="gap-2">
