@@ -10,7 +10,7 @@ import { AppShell } from "@/shells/app-shell";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag, Globe2 } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import MobileMenu from "@/components/MobileMenu";
 import TripOfTheWeek from "@/components/trip-of-the-week";
@@ -454,7 +454,7 @@ const Dashboard = () => {
                     {/* Explore Form Input */}
                     <div className="space-y-3 mb-6 flex-grow">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                        <Globe2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                         <Input
                           type="text"
                           placeholder="New York, Grand Canyon, France"
@@ -625,7 +625,7 @@ const Dashboard = () => {
                   {/* Explore Form Input */}
                   <div className="space-y-3 mb-6 flex-grow">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Globe2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                       <Input
                         type="text"
                         placeholder="New York, Grand Canyon, France"
