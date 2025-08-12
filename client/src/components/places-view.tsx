@@ -148,6 +148,25 @@ export default function PlacesView({
   const handleEnhancedPoiClick = (poi: POI | Poi) => {
     setSelectedPoiId(poi.id);
     onPoiClick(poi);
+    
+    // Track last added POI for debug tools
+    localStorage.setItem('lastPoiAction', `clicked: ${poi.name}`);
+    const lastAddedEl = document.getElementById('last-added-poi');
+    if (lastAddedEl) {
+      lastAddedEl.textContent = poi.name;
+    }
+  };
+
+  // Enhanced POI hover handler that tracks hover state
+  const handleEnhancedPoiHover = (poi: POI | Poi | null) => {
+    onPoiHover(poi);
+    
+    // Expose hover state to debug tools
+    (window as any).__routewise_hovered_poi = poi;
+    const hoveredEl = document.getElementById('hovered-poi-name');
+    if (hoveredEl) {
+      hoveredEl.textContent = poi ? poi.name : 'None';
+    }
   };
 
 
@@ -178,6 +197,46 @@ export default function PlacesView({
   const [sidebarSizePercent, setSidebarSizePercent] = useState(30);
   const [panelKey, setPanelKey] = useState(0); // Force re-render on panel resize
   const { tripPlaces, addToTrip, removeFromTrip, isInTrip, isAddingToTrip, isRemovingFromTrip } = useTripPlaces();
+
+  // Enhanced trip management with debug tracking
+  const handleAddToTrip = async (poi: POI | Poi) => {
+    await addToTrip(poi);
+    
+    // Track for debug tools
+    localStorage.setItem('lastPoiAction', `added: ${poi.name}`);
+    const lastAddedEl = document.getElementById('last-added-poi');
+    if (lastAddedEl) {
+      lastAddedEl.textContent = poi.name;
+    }
+    
+    // Update count
+    const countEl = document.getElementById('selected-pois-count');
+    if (countEl) {
+      const newCount = JSON.parse(localStorage.getItem('tripPlaces') || '[]').length;
+      countEl.textContent = newCount.toString();
+    }
+  };
+
+  const handleRemoveFromTrip = async (poiId: number) => {
+    const poi = pois.find(p => p.id === poiId);
+    await removeFromTrip(poiId);
+    
+    // Track for debug tools
+    if (poi) {
+      localStorage.setItem('lastPoiAction', `removed: ${poi.name}`);
+      const lastAddedEl = document.getElementById('last-added-poi');
+      if (lastAddedEl) {
+        lastAddedEl.textContent = `Removed: ${poi.name}`;
+      }
+    }
+    
+    // Update count
+    const countEl = document.getElementById('selected-pois-count');
+    if (countEl) {
+      const newCount = JSON.parse(localStorage.getItem('tripPlaces') || '[]').length;
+      countEl.textContent = newCount.toString();
+    }
+  };
 
   // Filter and dedupe POIs
   const uniquePois = pois.filter((poi, index, self) => {
@@ -353,8 +412,8 @@ export default function PlacesView({
                       {filteredPois.map((poi, index) => (
                         <div
                           key={poi.placeId || poi.id || `poi-${index}`}
-                          onMouseEnter={() => onPoiHover(poi)}
-                          onMouseLeave={() => onPoiHover(null)}
+                          onMouseEnter={() => handleEnhancedPoiHover(poi)}
+                          onMouseLeave={() => handleEnhancedPoiHover(null)}
                           className="transition-all"
                         >
                           <PoiCard
@@ -477,8 +536,8 @@ export default function PlacesView({
                         // Vertical card layout - image on top
                         <div
                           key={poi.placeId || poi.id || `poi-list-${index}`}
-                          onMouseEnter={() => onPoiHover(poi)}
-                          onMouseLeave={() => onPoiHover(null)}
+                          onMouseEnter={() => handleEnhancedPoiHover(poi)}
+                          onMouseLeave={() => handleEnhancedPoiHover(null)}
                           className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-3"
                         >
                           {/* Image on top */}
@@ -524,9 +583,9 @@ export default function PlacesView({
                               <button
                                 onClick={() => {
                                   if (isInTrip(poi)) {
-                                    removeFromTrip(poi.id);
+                                    handleRemoveFromTrip(poi.id);
                                   } else {
-                                    addToTrip(poi);
+                                    handleAddToTrip(poi);
                                   }
                                 }}
                                 disabled={isAddingToTrip || isRemovingFromTrip}
@@ -564,8 +623,8 @@ export default function PlacesView({
                         // Multi-column compact card layout
                         <div
                           key={poi.placeId || poi.id || `poi-card-${index}`}
-                          onMouseEnter={() => onPoiHover(poi)}
-                          onMouseLeave={() => onPoiHover(null)}
+                          onMouseEnter={() => handleEnhancedPoiHover(poi)}
+                          onMouseLeave={() => handleEnhancedPoiHover(null)}
                           className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-2"
                         >
                           {/* Compact image */}
@@ -614,9 +673,9 @@ export default function PlacesView({
                               <button
                                 onClick={() => {
                                   if (isInTrip(poi)) {
-                                    removeFromTrip(poi.id);
+                                    handleRemoveFromTrip(poi.id);
                                   } else {
-                                    addToTrip(poi);
+                                    handleAddToTrip(poi);
                                   }
                                 }}
                                 disabled={isAddingToTrip || isRemovingFromTrip}
