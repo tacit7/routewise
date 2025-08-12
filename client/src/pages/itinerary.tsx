@@ -33,6 +33,8 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
 
   const { isAuthenticated, user, logout } = useAuth();
   const { toast } = useToast();
@@ -129,6 +131,18 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
   const handleGoBack = () => setLocation("/route-results");
 
+  const toggleFilter = (category: string) => {
+    setActiveFilters(prev => {
+      const newFilters = new Set(prev);
+      if (newFilters.has(category)) {
+        newFilters.delete(category);
+      } else {
+        newFilters.add(category);
+      }
+      return newFilters;
+    });
+  };
+
   const generateTripTitle = () => {
     const scheduled = days.flatMap((d) => d.places);
     if (scheduled.length === 0) return "My Trip";
@@ -149,10 +163,27 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     return `${list[0]} to ${list[list.length - 1]} (+${list.length - 2} more)`;
   };
 
-  const unassigned = useMemo(
-    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
-    [itineraryPlaces, assignedPlaceIds]
-  );
+  const unassigned = useMemo(() => {
+    let filtered = itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p)));
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((place) =>
+        place.name.toLowerCase().includes(query) ||
+        (place as any).description?.toLowerCase().includes(query) ||
+        (place as any).address?.toLowerCase().includes(query) ||
+        place.category.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filters
+    if (activeFilters.size > 0) {
+      filtered = filtered.filter((place) => activeFilters.has(place.category));
+    }
+
+    return filtered;
+  }, [itineraryPlaces, assignedPlaceIds, searchQuery, activeFilters]);
 
   if (itineraryPlaces.length === 0) {
     return (
@@ -341,6 +372,8 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
               <Input
                 placeholder="Search places..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-7 h-8 w-48 text-sm"
               />
             </div>
@@ -350,7 +383,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               <div className="flex items-center gap-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("restaurant")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("restaurant")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <UtensilsCrossed className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -361,7 +403,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("tourist_attraction")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("tourist_attraction")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <MapPin className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -372,7 +423,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("lodging")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("lodging")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Bed className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -383,7 +443,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("museum")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("museum")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Building className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -394,7 +463,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("amusement_park")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("amusement_park")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Gamepad2 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -405,7 +483,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("park")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("park")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Trees className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -416,7 +503,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("cafe")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("cafe")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Coffee className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -427,7 +523,16 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-primary/10 hover:text-primary transition-colors">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleFilter("bar")}
+                      className={`w-8 h-8 p-0 transition-colors ${
+                        activeFilters.has("bar")
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
                       <Wine className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>

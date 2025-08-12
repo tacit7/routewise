@@ -137,22 +137,20 @@ export default function DailyItinerarySidebar({
                   }}
                 >
                   <CardContent className="p-3">
-                    <div className="flex items-start gap-3">
-                      {/* POI Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={(place as any).imageUrl || (place.name === "Starting Point" ? 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop&crop=center' : '/placeholder-poi.jpg')}
-                          alt={place.name}
-                          className="w-12 h-12 rounded object-cover"
-                        />
-                      </div>
+                    {/* POI Image - Top */}
+                    <div className="w-full mb-3">
+                      <img
+                        src={(place as any).imageUrl || (place.name === "Starting Point" ? 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop&crop=center' : '/placeholder-poi.jpg')}
+                        alt={place.name}
+                        className="w-full h-24 rounded object-cover"
+                      />
+                    </div>
+                    
+                    {/* Content and Actions */}
+                    <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm mb-1">{place.name}</div>
-                        {(place as any).description && (
-                          <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
-                            {(place as any).description}
-                          </p>
-                        )}
+                        
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline" className="text-xs">{place.category}</Badge>
                           {place.rating && (
@@ -162,7 +160,8 @@ export default function DailyItinerarySidebar({
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 mt-2">
+                        
+                        <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <Input
                             type="time"
@@ -171,14 +170,9 @@ export default function DailyItinerarySidebar({
                             className="h-7 w-24 text-sm"
                           />
                         </div>
-                        {place.rating && (
-                          <div className="flex items-center text-xs text-muted-foreground mt-2">
-                            <Star className="h-3 w-3 mr-1" />
-                            <span>{place.rating}</span>
-                          </div>
-                        )}
                       </div>
-                      <div className="flex flex-col gap-1">
+                      
+                      <div className="flex flex-col gap-1 ml-2">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
