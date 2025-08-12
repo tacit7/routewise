@@ -502,26 +502,53 @@ const MapContent: React.FC<{
   const map = useMap();
   const devLog = useDevLog();
 
-  // Phoenix clustering integration
-  const viewport = useMemo(() => {
-    if (!map || !pois.length) return null;
-    
-    // Calculate viewport from POIs
-    const coords = pois.map(poi => getPoiCoordinates(poi));
-    const bounds = coords.reduce((acc, coord) => ({
-      north: Math.max(acc.north, coord.lat),
-      south: Math.min(acc.south, coord.lat),
-      east: Math.max(acc.east, coord.lng),
-      west: Math.min(acc.west, coord.lng)
-    }), {
-      north: coords[0]?.lat || 0,
-      south: coords[0]?.lat || 0,
-      east: coords[0]?.lng || 0,
-      west: coords[0]?.lng || 0
-    });
-    
-    return bounds;
-  }, [map, pois]);
+  // Real-time viewport tracking for clustering
+  const [viewport, setViewport] = useState<{ north: number; south: number; east: number; west: number } | null>(null);
+
+  // Update viewport on map events  
+  useEffect(() => {
+    if (!map) return;
+
+    const updateViewport = () => {
+      const bounds = map.getBounds();
+      if (!bounds) return;
+
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+
+      const newViewport = {
+        north: ne.lat(),
+        south: sw.lat(),
+        east: ne.lng(),
+        west: sw.lng()
+      };
+
+      // Minimal logging for viewport updates
+      if (enableClustering) {
+        console.log(`🗺️ Clustering at zoom ${map.getZoom()}`);
+      }
+      
+      setViewport(newViewport);
+    };
+
+    // Initial viewport
+    updateViewport();
+
+    // Listen for map events that change the viewport
+    const listeners = [
+      map.addListener('bounds_changed', updateViewport),
+      map.addListener('zoom_changed', updateViewport),
+      map.addListener('dragend', updateViewport)
+    ];
+
+    return () => {
+      listeners.forEach(listener => {
+        if (listener && typeof listener.remove === 'function') {
+          listener.remove();
+        }
+      });
+    };
+  }, [map]);
 
   const currentZoom = map?.getZoom() || 10;
   
@@ -541,8 +568,8 @@ const MapContent: React.FC<{
     currentZoom,
     viewport,
     {
-      gridSize: 60,       // 60px grid for clustering
-      maxZoom: 15,        // Don't cluster above zoom 15
+      gridSize: 150,      // Good balance for visibility
+      maxZoom: 18,        // Cluster even at very high zoom levels
       minimumClusterSize: 2  // At least 2 POIs to form cluster
     }
   );
@@ -604,9 +631,9 @@ const MapContent: React.FC<{
     };
   }, [enableClustering, clusteringConnected, clusteringError, totalClusters, singlePOICount, clusterCount, clientClusters, devLog]);
 
-  // Auto-fit map bounds to show all POIs optimally
+  // Auto-fit map bounds to show all POIs optimally (but not when clustering is enabled)
   useEffect(() => {
-    if (map && pois.length > 0) {
+    if (map && pois.length > 0 && !enableClustering) {
       devLog('InteractiveMap', 'Auto-fitting map bounds', { poisCount: pois.length });
       
       const bounds = new window.google.maps.LatLngBounds();

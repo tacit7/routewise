@@ -61,13 +61,17 @@ export function useClientPOIClustering(
       }));
     }
 
-    // Filter POIs within viewport bounds
+    // Filter POIs within viewport bounds (with expanded bounds for better clustering)
+    const latPadding = (viewport.north - viewport.south) * 0.2; // 20% padding
+    const lngPadding = (viewport.east - viewport.west) * 0.2; // 20% padding
+    
     const visiblePois = pois.filter(poi => 
-      poi.lat <= viewport.north &&
-      poi.lat >= viewport.south &&
-      poi.lng <= viewport.east &&
-      poi.lng >= viewport.west
+      poi.lat <= viewport.north + latPadding &&
+      poi.lat >= viewport.south - latPadding &&
+      poi.lng <= viewport.east + lngPadding &&
+      poi.lng >= viewport.west - lngPadding
     );
+
 
     if (visiblePois.length === 0) {
       return [];
@@ -165,6 +169,7 @@ export function useClientPOIClustering(
         });
       }
     });
+
 
     return resultClusters;
   }, [pois, zoom, viewport, gridSize, maxZoom, minimumClusterSize]);
