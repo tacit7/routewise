@@ -203,10 +203,10 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
               <div key={index} className="relative group">
                 <TabsTrigger 
                   value={`day-${index}`} 
-                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8 px-3 py-2 text-sm"
+                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
                   style={{ 
-                    backgroundColor: activeDay === index ? 'hsl(var(--primary) / 0.8)' : 'transparent',
-                    color: activeDay === index ? 'white' : 'hsl(var(--muted-foreground))',
+                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
+                    color: activeDay === index ? 'white' : 'var(--text)',
                     borderColor: 'var(--border)'
                   }}
                 >
