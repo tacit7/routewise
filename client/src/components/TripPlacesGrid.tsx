@@ -30,7 +30,7 @@ export default function TripPlacesGrid({
 
   return (
     <div
-      className={`flex-1 p-6 transition-colors ${isDraggedOver ? "bg-primary/5" : ""}`}
+      className={`flex-1 p-6 border-t transition-colors ${isDraggedOver ? "bg-primary/5" : ""}`}
       onDrop={(e) => {
         e.preventDefault();
         setIsDraggedOver(false);
