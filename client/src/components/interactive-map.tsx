@@ -1,7 +1,8 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap, Pin } from "@vis.gl/react-google-maps";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Poi } from "@/types/schema";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useDevLog } from "@/components/developer-fab";
@@ -294,12 +295,17 @@ const MapControls: React.FC = () => {
   };
 
   return (
-    <div className="absolute top-4 right-4 flex flex-col gap-1 z-20">
+    <div className="absolute bottom-24 left-4 flex flex-col gap-1 z-20">
       <Button
         size="sm"
         variant="secondary"
         onClick={zoomIn}
-        className="bg-card/90 backdrop-blur-sm hover:bg-card shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
+        className="w-10 h-10 p-0 flex items-center justify-center shadow-xl"
+        style={{ 
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          color: 'var(--text)'
+        }}
         aria-label="Zoom in"
       >
         <span className="text-lg font-bold">+</span>
@@ -308,7 +314,12 @@ const MapControls: React.FC = () => {
         size="sm"
         variant="secondary"
         onClick={zoomOut}
-        className="bg-card/90 backdrop-blur-sm hover:bg-card shadow-lg w-10 h-10 p-0 flex items-center justify-center border border-border/50"
+        className="w-10 h-10 p-0 flex items-center justify-center shadow-xl"
+        style={{ 
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          color: 'var(--text)'
+        }}
         aria-label="Zoom out"
       >
         <span className="text-lg font-bold">−</span>
@@ -319,11 +330,17 @@ const MapControls: React.FC = () => {
 
 // Map legend component
 const MapLegend: React.FC = () => (
-  <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded-lg p-3 shadow-lg z-20 border border-border/50">
-    <div className="text-xs font-semibold text-foreground mb-2">
+  <div 
+    className="absolute top-4 right-4 rounded-lg p-3 shadow-lg z-20 border"
+    style={{ 
+      backgroundColor: 'var(--surface)',
+      borderColor: 'var(--border)'
+    }}
+  >
+    <div className="text-xs font-semibold mb-2" style={{ color: 'var(--text)' }}>
       Map Legend
     </div>
-    <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+    <div className="flex flex-col gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(217 92% 60%)" }}>
           <div className="w-2 h-2 rounded-full bg-white"></div>
@@ -331,11 +348,65 @@ const MapLegend: React.FC = () => (
         <span>Points of Interest</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(160 84% 36%)" }}>
+        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--primary)" }}>
           <div className="w-2 h-2 rounded-full bg-white"></div>
         </div>
         <span>Selected POI</span>
       </div>
+    </div>
+  </div>
+);
+
+// Map loading skeleton component
+const MapSkeleton: React.FC<{ className?: string; height?: string }> = ({ className, height }) => (
+  <div
+    className={`relative overflow-hidden border border-border bg-muted/30 ${className}`}
+    style={{ height }}
+  >
+    {/* Map background pattern */}
+    <div className="absolute inset-0 opacity-20">
+      <div className="w-full h-full bg-gradient-to-br from-primary/5 via-background to-primary/10" />
+      {/* Grid pattern to simulate map tiles */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
+    </div>
+
+    {/* Skeleton markers at various positions */}
+    <div className="absolute top-1/4 left-1/3 z-10">
+      <div className="w-6 h-6 bg-primary/40 rounded-full animate-pulse flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-primary/60" />
+      </div>
+    </div>
+    <div className="absolute top-1/2 right-1/3 z-10">
+      <div className="w-6 h-6 bg-primary/40 rounded-full animate-pulse flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-primary/60" />
+      </div>
+    </div>
+    <div className="absolute bottom-1/3 left-1/4 z-10">
+      <div className="w-6 h-6 bg-primary/40 rounded-full animate-pulse flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-primary/60" />
+      </div>
+    </div>
+    <div className="absolute top-2/3 right-1/4 z-10">
+      <div className="w-6 h-6 bg-primary/40 rounded-full animate-pulse flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-primary/60" />
+      </div>
+    </div>
+
+    {/* Skeleton controls */}
+    <div className="absolute bottom-24 left-4 flex flex-col gap-1 z-20">
+      <Skeleton className="w-10 h-10 rounded" />
+      <Skeleton className="w-10 h-10 rounded" />
+    </div>
+
+    {/* Skeleton legend */}
+    <div className="absolute top-4 right-4 z-20">
+      <Skeleton className="w-24 h-16 rounded-lg" />
+    </div>
+
+    {/* Loading overlay */}
+    <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] flex flex-col items-center justify-center z-30">
+      <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+      <p className="text-xs text-muted-foreground">Loading map...</p>
     </div>
   </div>
 );
@@ -356,6 +427,45 @@ const MapContent: React.FC<{
   } | null>(null);
   const map = useMap();
   const devLog = useDevLog();
+
+  // Auto-fit map bounds to show all POIs optimally
+  useEffect(() => {
+    if (map && pois.length > 0) {
+      devLog('InteractiveMap', 'Auto-fitting map bounds', { poisCount: pois.length });
+      
+      const bounds = new window.google.maps.LatLngBounds();
+      let validPoisCount = 0;
+      
+      // Add all valid POI coordinates to bounds
+      pois.forEach(poi => {
+        const coords = getPoiCoordinates(poi);
+        if (coords.lat !== 0 || coords.lng !== 0) { // Skip default fallback coordinates
+          bounds.extend(new window.google.maps.LatLng(coords.lat, coords.lng));
+          validPoisCount++;
+        }
+      });
+      
+      if (validPoisCount > 0) {
+        if (validPoisCount === 1) {
+          // Single POI: center and use reasonable zoom
+          const poi = pois.find(p => {
+            const coords = getPoiCoordinates(p);
+            return coords.lat !== 0 || coords.lng !== 0;
+          });
+          if (poi) {
+            const coords = getPoiCoordinates(poi);
+            map.setCenter({ lat: coords.lat, lng: coords.lng });
+            map.setZoom(14); // Good zoom for single location
+          }
+        } else {
+          // Multiple POIs: fit bounds with padding
+          map.fitBounds(bounds, { 
+            padding: { top: 60, right: 60, bottom: 60, left: 60 }
+          });
+        }
+      }
+    }
+  }, [map, pois, devLog]);
 
   // Add Google POI click listener
   useEffect(() => {
@@ -577,17 +687,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }
 
   if (isLoading || !googleMapsKey) {
-    return (
-      <div
-        className={`relative overflow-hidden border border-border ${className}`}
-        style={{ height }}
-      >
-        <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-          <p className="text-sm text-muted-foreground">Loading interactive map...</p>
-        </div>
-      </div>
-    );
+    return <MapSkeleton className={className} height={height} />;
   }
 
   return (
