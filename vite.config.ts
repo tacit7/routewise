@@ -62,7 +62,7 @@ export default defineConfig({
           });
         },
       },
-      '/auth': {
+      '/auth/google': {
         target: 'http://localhost:4001',
         changeOrigin: true,
         secure: false,
