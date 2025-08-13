@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Check, LogIn, Plus, Save, X } from "lucide-react";
+import { ArrowLeft, Check, LogIn, Plus, Save, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/header/BackButton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,12 +10,14 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/auth-context";
+import { authenticatedApiCall, API_CONFIG } from "@/lib/api-config";
 import DailyItinerarySidebar from "@/components/DailyItinerarySidebar";
 import TripPlacesGrid from "@/components/TripPlacesGrid";
 import type { DayData, ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { InteractiveMap } from "@/components/interactive-map";
 import { TopNav } from "@/features/marketing/top-nav";
+import { DeveloperFab } from "@/components/developer-fab";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
@@ -30,6 +32,18 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState("");
+  const [savedTripId, setSavedTripId] = useState<number | null>(() => {
+    console.log('🔄 Initial savedTripId state loading...');
+    return null;
+  });
+  const [lastApiRequest, setLastApiRequest] = useState<{
+    endpoint: string;
+    method: string;
+    body: string;
+    timestamp: Date;
+    status?: 'pending' | 'success' | 'error';
+    response?: any;
+  } | null>(null);
 
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -37,25 +51,35 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
   useEffect(() => {
     const saved = localStorage.getItem("itineraryData");
+    console.log('📂 Loading from localStorage:', saved);
     if (saved) {
       try {
-        const { days: rawDays, activeDay: rawActiveDay, tripTitle: rawTitle } = JSON.parse(saved);
+        const { days: rawDays, activeDay: rawActiveDay, tripTitle: rawTitle, savedTripId: rawTripId } = JSON.parse(saved);
+        console.log('📊 Parsed localStorage data:', { rawTripId, rawTitle, daysCount: rawDays?.length });
         if (Array.isArray(rawDays)) {
           const restored = rawDays.map((d: any) => ({ ...d, date: new Date(d.date) }));
           setDays(restored);
           setActiveDay(rawActiveDay || 0);
           setTripTitle(rawTitle || "");
+          setSavedTripId(rawTripId || null);
+          console.log('✅ Set savedTripId to:', rawTripId || null);
           const assigned = new Set<string | number>();
           restored.forEach((day: DayData) => day.places.forEach((p) => assigned.add(getIdentifier(p))));
           setAssignedPlaceIds(assigned);
         }
-      } catch {}
+      } catch (e) {
+        console.error('❌ Error parsing localStorage:', e);
+      }
+    } else {
+      console.log('ℹ️ No itineraryData in localStorage');
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("itineraryData", JSON.stringify({ days, activeDay, tripTitle }));
-  }, [days, activeDay, tripTitle]);
+    const data = { days, activeDay, tripTitle, savedTripId };
+    console.log('💾 Saving to localStorage:', data);
+    localStorage.setItem("itineraryData", JSON.stringify(data));
+  }, [days, activeDay, tripTitle, savedTripId]);
 
   const itineraryPlaces: ItineraryPlace[] = useMemo(
     () => tripPlaces.map((p) => ({ ...p, dayIndex: undefined, scheduledTime: undefined, dayOrder: undefined, notes: undefined })),
@@ -131,6 +155,221 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
   const handleGoBack = () => setLocation("/route-results");
 
+  const handleNewTrip = () => {
+    if (window.confirm("Start a new trip? This will clear your current itinerary.")) {
+      // Clear all state
+      setDays([{ date: new Date(), title: "", places: [] }]);
+      setActiveDay(0);
+      setTripTitle("");
+      setSavedTripId(null);
+      setAssignedPlaceIds(new Set());
+      setLastSavedAt(null);
+      setLastApiRequest(null);
+      
+      // Clear localStorage
+      localStorage.removeItem('itineraryData');
+      localStorage.removeItem('tripPlaces');
+      
+      toast({
+        title: "New Trip Started",
+        description: "You can now plan a new itinerary from scratch.",
+      });
+    }
+  };
+
+  const handleSaveTrip = async () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to save your trip.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (days.every(day => day.places.length === 0)) {
+      toast({
+        title: "No Places Added",
+        description: "Add some places to your itinerary before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate trip title
+    const finalTripTitle = tripTitle?.trim() || generateTripTitle();
+    if (finalTripTitle === "My Trip" || finalTripTitle === "") {
+      toast({
+        title: "Trip Title Required",
+        description: "Please enter a descriptive title for your trip.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Get all scheduled places across all days
+      const allScheduledPlaces = days.flatMap(day => day.places);
+      
+      // Extract start and end locations from first and last places
+      const firstPlace = allScheduledPlaces.find(p => p.dayIndex === 0);
+      const lastDayIndex = Math.max(...days.map((_, i) => i));
+      const lastPlace = allScheduledPlaces.find(p => p.dayIndex === lastDayIndex);
+      
+      // Get unique cities for checkpoints
+      const cities = new Set<string>();
+      const stops: string[] = [];
+      
+      allScheduledPlaces.forEach((p) => {
+        const addr = p.address;
+        if (addr) {
+          const parts = addr.split(",");
+          if (parts.length > 1) {
+            const city = parts[parts.length - 2]?.trim();
+            if (city) cities.add(city);
+          }
+        }
+      });
+      
+      const cityList = Array.from(cities);
+      const startCity = firstPlace?.address || cityList[0] || "Unknown";
+      const endCity = lastPlace?.address || cityList[cityList.length - 1] || startCity;
+      
+      // Middle cities as stops (excluding start and end)
+      if (cityList.length > 2) {
+        stops.push(...cityList.slice(1, -1));
+      }
+      
+      // Extract unique interests/categories
+      const interests = Array.from(new Set(allScheduledPlaces.map(p => p.category)));
+      
+      // Create trip data structure for Phoenix backend (Method 1 - Direct)
+      const tripData = {
+        title: finalTripTitle,
+        start_city: startCity,
+        end_city: endCity,
+        trip_type: "road-trip", // Valid trip type from schema
+        is_public: false
+      };
+
+      // Determine if this is a new trip or update
+      const isUpdate = savedTripId !== null;
+      const endpoint = isUpdate ? `${API_CONFIG.ENDPOINTS.TRIPS}/${savedTripId}` : API_CONFIG.ENDPOINTS.TRIPS;
+      const method = isUpdate ? 'PUT' : 'POST';
+      
+      console.log('💾 Save operation:', { 
+        isUpdate, 
+        savedTripId, 
+        endpoint, 
+        method 
+      });
+
+      // Capture API request details for FOB
+      const requestBody = JSON.stringify({
+        trip: tripData
+      });
+
+      const apiRequest = {
+        endpoint,
+        method,
+        body: requestBody,
+        timestamp: new Date(),
+        status: 'pending' as const
+      };
+
+      setLastApiRequest(apiRequest);
+
+      // Log to developer console
+      if ((window as any).__devLog) {
+        (window as any).__devLog('Itinerary Save', `API Request Started (${isUpdate ? 'Update' : 'Create'})`, {
+          endpoint: apiRequest.endpoint,
+          method: apiRequest.method,
+          tripId: savedTripId,
+          bodySize: requestBody.length,
+          timestamp: apiRequest.timestamp.toISOString()
+        });
+      }
+
+      // Use appropriate endpoint based on whether trip exists
+      const response = await authenticatedApiCall<{ data: any }>(
+        endpoint,
+        {
+          method,
+          body: requestBody,
+        }
+      );
+
+      // Update API request with success
+      setLastApiRequest(prev => prev ? {
+        ...prev,
+        status: 'success',
+        response: response
+      } : null);
+
+      if ((window as any).__devLog) {
+        (window as any).__devLog('Itinerary Save', 'API Request Success', {
+          responseReceived: true,
+          responseData: response,
+          isUpdate,
+          totalTime: Date.now() - apiRequest.timestamp.getTime() + 'ms'
+        });
+      }
+
+      // Store trip ID for future updates (only if this was a create operation)
+      if (!isUpdate) {
+        // Check different possible response structures
+        const tripId = response.id || response.data?.id || response.trip?.id;
+        if (tripId) {
+          setSavedTripId(tripId);
+          console.log('🎯 Trip ID saved:', tripId);
+        } else {
+          console.warn('⚠️ No trip ID found in response:', response);
+        }
+      }
+
+      setLastSavedAt(new Date());
+      toast({
+        title: isUpdate ? "Trip Updated!" : "Trip Saved!",
+        description: isUpdate 
+          ? "Your itinerary changes have been saved successfully." 
+          : "Your itinerary has been saved successfully.",
+      });
+
+      // Note: Keep localStorage to maintain trip ID for future updates
+      // Only clear if user explicitly wants to start a new trip
+      
+      // Optionally redirect to trips list or saved trip view
+      // setLocation(`/trips/${response.id}`);
+
+    } catch (err) {
+      // Update API request with error
+      setLastApiRequest(prev => prev ? {
+        ...prev,
+        status: 'error',
+        response: {
+          error: err instanceof Error ? err.message : 'Unknown error'
+        }
+      } : null);
+
+      if ((window as any).__devLog) {
+        (window as any).__devLog('Itinerary Save', 'API Request Error', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+          errorObject: err
+        });
+      }
+
+      console.error('Error saving trip:', err);
+      toast({
+        title: "Save Failed",
+        description: err instanceof Error ? err.message : "Failed to save trip. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const generateTripTitle = () => {
     const scheduled = days.flatMap((d) => d.places);
     if (scheduled.length === 0) return "My Trip";
@@ -184,14 +423,68 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
         <TopNav />
       
       {/* Page Header */}
-      <div className="bg-white px-6 py-4">
-        <div className="flex items-center justify-center">
-          <div className="w-full max-w-md">
-            <Input
-              type="text"
-              placeholder="Search places..."
-              className="w-full"
-            />
+      <div className="bg-white px-6 py-4 border-b">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex-1 max-w-md space-y-2">
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                placeholder="Enter trip title..."
+                value={tripTitle}
+                onChange={(e) => setTripTitle(e.target.value)}
+                className="font-medium text-lg h-10"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {days.length} day{days.length !== 1 ? 's' : ''} • {days.flatMap(d => d.places).length} places scheduled
+              {savedTripId && (
+                <span className="ml-2 inline-flex items-center gap-1 text-green-600">
+                  <Check className="h-3 w-3" />
+                  Saved (ID: {savedTripId})
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="ml-4 flex items-center gap-2">
+            {lastSavedAt && (
+              <span className="text-sm text-gray-500">
+                Saved {lastSavedAt.toLocaleTimeString()}
+              </span>
+            )}
+            {savedTripId && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNewTrip}
+                className="flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                New Trip
+              </Button>
+            )}
+            <Button
+              onClick={handleSaveTrip}
+              disabled={isSaving || !isAuthenticated}
+              className="flex items-center gap-2"
+            >
+              {isSaving ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  {savedTripId ? 'Updating...' : 'Saving...'}
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {savedTripId ? 'Update Trip' : 'Save Trip'}
+                </>
+              )}
+            </Button>
+            {!isAuthenticated && (
+              <Button variant="outline" size="sm">
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -266,6 +559,23 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           </div>
         </div>
       </Tabs>
+      
+      {/* Developer Debug FOB */}
+      <DeveloperFab 
+        className="itinerary-page-fab"
+        cacheInfo={{
+          backendStatus: lastApiRequest?.status === 'success' ? 'hit' : 'unknown',
+          backendType: 'Phoenix',
+          environment: 'dev',
+          queryStatus: 'fresh',
+          pageType: 'explore-results', // Using explore-results as closest match
+          apiEndpoint: lastApiRequest?.endpoint || '/api/trips',
+          dataCount: days.flatMap(d => d.places).length,
+          hasLocalData: Boolean(localStorage.getItem('itineraryData')),
+          localStorageKeys: ['itineraryData', 'tripPlaces'].filter(key => localStorage.getItem(key))
+        }}
+        apiRequest={lastApiRequest || undefined}
+      />
     </div>
   );
 }
