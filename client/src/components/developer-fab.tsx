@@ -35,12 +35,22 @@ interface CacheInfo {
   localStorageKeys: string[];
 }
 
+interface ApiRequest {
+  endpoint: string;
+  method: string;
+  body: string;
+  timestamp: Date;
+  status?: 'pending' | 'success' | 'error';
+  response?: any;
+}
+
 interface DeveloperFabProps {
   className?: string;
   cacheInfo?: CacheInfo;
+  apiRequest?: ApiRequest;
 }
 
-export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cacheInfo }) => {
+export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cacheInfo, apiRequest }) => {
   // Only show in development
   if (!import.meta.env.DEV) {
     return null;
@@ -225,11 +235,17 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
           <div className="h-[70vh] overflow-hidden">
           <Tabs defaultValue="logs" className="h-full">
-            <TabsList className={`grid w-full h-10 ${cacheInfo ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            <TabsList className={`grid w-full h-10 ${apiRequest ? (cacheInfo ? 'grid-cols-6' : 'grid-cols-5') : (cacheInfo ? 'grid-cols-5' : 'grid-cols-4')}`}>
               <TabsTrigger value="logs" className="text-sm">
                 <Database className="h-4 w-4 mr-2" />
                 Logs
               </TabsTrigger>
+              {apiRequest && (
+                <TabsTrigger value="api" className="text-sm">
+                  <Network className="h-4 w-4 mr-2" />
+                  API
+                </TabsTrigger>
+              )}
               <TabsTrigger value="system" className="text-sm">
                 <Monitor className="h-4 w-4 mr-2" />
                 System
@@ -280,6 +296,160 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                 </div>
               </ScrollArea>
             </TabsContent>
+
+            {apiRequest && (
+              <TabsContent value="api" className="mt-3 h-[calc(100%-50px)]">
+                <ScrollArea className="h-full">
+                  <div className="space-y-4">
+                    <Card className="p-4">
+                      <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                        <Network className="h-5 w-5" />
+                        Last API Request
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Status:</span>
+                          <Badge
+                            variant={
+                              apiRequest.status === 'success' ? 'default' :
+                              apiRequest.status === 'error' ? 'destructive' :
+                              'secondary'
+                            }
+                          >
+                            {apiRequest.status?.toUpperCase() || 'PENDING'}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Method:</span>
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {apiRequest.method}
+                          </Badge>
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">Endpoint:</span>
+                          <div className="mt-1">
+                            <code className="text-xs bg-muted px-2 py-1 rounded break-all">
+                              {apiRequest.endpoint}
+                            </code>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-sm text-muted-foreground">Timestamp:</span>
+                          <div className="font-mono text-sm mt-1">
+                            {apiRequest.timestamp.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <Card className="p-4">
+                      <h4 className="font-medium text-base mb-3">Request Body</h4>
+                      <div className="relative">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="absolute top-2 right-2 z-10"
+                          onClick={() => {
+                            navigator.clipboard.writeText(apiRequest.body);
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('Developer Tools', 'Request Body Copied', {
+                                bodySize: apiRequest.body.length
+                              });
+                            }
+                          }}
+                        >
+                          Copy
+                        </Button>
+                        <pre className="text-xs bg-muted p-4 rounded overflow-x-auto max-h-48 font-mono">
+                          {JSON.stringify(JSON.parse(apiRequest.body), null, 2)}
+                        </pre>
+                      </div>
+                    </Card>
+
+                    {apiRequest.response && (
+                      <Card className="p-4">
+                        <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                          {apiRequest.status === 'success' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : (
+                            <AlertCircle className="h-5 w-5 text-red-500" />
+                          )}
+                          Response {apiRequest.status === 'success' ? 'Data' : 'Error'}
+                        </h4>
+                        <div className="relative">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="absolute top-2 right-2 z-10"
+                            onClick={() => {
+                              const responseText = JSON.stringify(apiRequest.response, null, 2);
+                              navigator.clipboard.writeText(responseText);
+                              if ((window as any).__devLog) {
+                                (window as any).__devLog('Developer Tools', 'Response Copied', {
+                                  responseSize: responseText.length
+                                });
+                              }
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <pre className="text-xs bg-muted p-4 rounded overflow-x-auto max-h-48 font-mono">
+                            {JSON.stringify(apiRequest.response, null, 2)}
+                          </pre>
+                        </div>
+                      </Card>
+                    )}
+
+                    <Card className="p-4">
+                      <h4 className="font-medium text-base mb-3">Debug Actions</h4>
+                      <div className="space-y-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={() => {
+                            console.log('🌐 API Request Details:', {
+                              endpoint: apiRequest.endpoint,
+                              method: apiRequest.method,
+                              timestamp: apiRequest.timestamp,
+                              status: apiRequest.status,
+                              body: JSON.parse(apiRequest.body),
+                              response: apiRequest.response
+                            });
+                          }}
+                        >
+                          Log Full Request to Console
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={() => {
+                            const curlCommand = `curl -X ${apiRequest.method} \\
+  '${window.location.origin}${apiRequest.endpoint}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Authorization: Bearer <your-token>' \\
+  -d '${apiRequest.body}'`;
+                            
+                            navigator.clipboard.writeText(curlCommand);
+                            console.log('📋 cURL command copied to clipboard:', curlCommand);
+                            
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('Developer Tools', 'cURL Command Generated', {
+                                endpoint: apiRequest.endpoint,
+                                method: apiRequest.method
+                              });
+                            }
+                          }}
+                        >
+                          Copy as cURL
+                        </Button>
+                      </div>
+                    </Card>
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+            )}
 
             <TabsContent value="system" className="mt-3 h-[calc(100%-50px)]">
               <ScrollArea className="h-full">
