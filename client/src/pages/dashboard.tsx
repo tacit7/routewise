@@ -605,7 +605,6 @@ const Dashboard = () => {
                       className="w-full"
                       countries="us,ca,mx,pr"
                     />
-                  </div>
                     
                     {/* Invisible inactive button */}
                     <Button
