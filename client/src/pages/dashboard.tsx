@@ -11,8 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag, Globe2 } from "lucide-react";
-import UserMenu from "@/components/UserMenu";
-import MobileMenu from "@/components/MobileMenu";
 import TripOfTheWeek from "@/components/trip-of-the-week";
 import SeasonalTravel from "@/components/seasonal-travel";
 import DashboardHero from "@/components/dashboard-hero";
@@ -351,17 +349,7 @@ const Dashboard = () => {
   // Show empty state for users with no trips
   if (!hasUserTrips) {
     return (
-      <AppShell
-        centerContent={null}
-        rightContent={
-          user && (
-            <div className="flex items-center gap-2">
-              <UserMenu className="hidden md:block" />
-              <MobileMenu />
-            </div>
-          )
-        }
-      >
+      <AppShell>
         {/* Dashboard Hero Section - Full Width */}
         <DashboardHero />
 
@@ -540,17 +528,7 @@ const Dashboard = () => {
   }
 
   return (
-    <AppShell
-      centerContent={null}
-      rightContent={
-        user && (
-          <div className="flex items-center gap-2">
-            <UserMenu className="hidden md:block" />
-            <MobileMenu />
-          </div>
-        )
-      }
-    >
+    <AppShell>
       {/* Dashboard Hero Section - Full Width */}
       <DashboardHero />
 

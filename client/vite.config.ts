@@ -19,6 +19,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/auth/google': {
+        target: 'http://localhost:4001',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

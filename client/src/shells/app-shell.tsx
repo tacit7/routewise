@@ -7,6 +7,7 @@ type AppShellProps = {
   rightContent?: React.ReactNode;
   showLogo?: boolean;
   showUserMenu?: boolean;
+  authButtons?: "inline" | "menu";
 };
 
 export function AppShell({ 
@@ -15,11 +16,12 @@ export function AppShell({
   centerContent, 
   rightContent,
   showLogo = true,
-  showUserMenu = true 
+  showUserMenu = true,
+  authButtons = "menu"
 }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
-      <TopNav />
+      <TopNav authButtons={authButtons} showLogo={showLogo} />
       
       <main className="flex-1">
         {children}

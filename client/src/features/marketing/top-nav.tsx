@@ -16,8 +16,9 @@ type TopNavProps = {
 };
 
 export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
+  const isHomePage = location === '/' || location === '/dashboard';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [tripName, setTripName] = useState("My Trip");
 
@@ -60,64 +61,82 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Left - Add more results button */}
+            {/* Left - Logo on home page, back button on other pages */}
             <div className="flex-1">
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/route-results')}
-                className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Add more results
-              </Button>
+              {isHomePage ? (
+                showLogo && (
+                  <div className="flex items-center">
+                    <img 
+                      src="/logo.svg" 
+                      alt="RouteWise" 
+                      className="h-16 w-auto"
+                    />
+                  </div>
+                )
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setLocation('/route-results')}
+                  className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Add more results
+                </Button>
+              )}
             </div>
             
-            {/* Center - Trip Name Input */}
-            <div className="flex-1 flex justify-center">
-              <Input
-                type="text"
-                value={tripName}
-                onChange={(e) => setTripName(e.target.value)}
-                placeholder="My Trip"
-                className="text-lg font-semibold text-center border-0 shadow-none bg-transparent max-w-xs focus-visible:ring-1 focus-visible:ring-slate-400"
-              />
-            </div>
+            {/* Center - Trip Name Input (only on non-home pages) */}
+            {!isHomePage && (
+              <div className="flex-1 flex justify-center">
+                <Input
+                  type="text"
+                  value={tripName}
+                  onChange={(e) => setTripName(e.target.value)}
+                  placeholder="My Trip"
+                  className="text-lg font-semibold text-center border-0 shadow-none bg-transparent max-w-xs focus-visible:ring-1 focus-visible:ring-slate-400"
+                />
+              </div>
+            )}
             
             {/* Right - Action Buttons and Avatar */}
             <div className="flex-1 flex items-center justify-end space-x-2">
-              {/* Action Icons */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
-                    <Save className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Save</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
-                    <Share className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Share</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
-                    <CheckCircle className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Finalize</p>
-                </TooltipContent>
-              </Tooltip>
+              {/* Action Icons (only on non-home pages) */}
+              {!isHomePage && (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                        <Save className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Save</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                        <Share className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Share</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-green-50 hover:text-green-700">
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Finalize</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </>
+              )}
             
             {/* Auth Section - Desktop */}
             <div className="hidden md:flex items-center">
