@@ -10,7 +10,8 @@ import { AppShell } from "@/shells/app-shell";
 import { useToast } from "@/hooks/use-toast";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag, Globe2 } from "lucide-react";
+import { MapPin, Clock, Route, CheckCircle, Search, Settings, Play, Calendar, Plane, Car, Bus, Bike, X, Flag } from "lucide-react";
+import { PlaceAutocomplete } from "@/components/place-autocomplete";
 import TripOfTheWeek from "@/components/trip-of-the-week";
 import SeasonalTravel from "@/components/seasonal-travel";
 import DashboardHero from "@/components/dashboard-hero";
@@ -209,6 +210,7 @@ const Dashboard = () => {
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [exploreLocation, setExploreLocation] = useState("");
+  const [selectedExplorePlace, setSelectedExplorePlace] = useState<any>(null);
 
   // Use the consolidated dashboard data hook
   const { data: dashboardData, isLoading, error } = useDashboardData();
@@ -441,25 +443,16 @@ const Dashboard = () => {
                     
                     {/* Explore Form Input */}
                     <div className="space-y-3 mb-6 flex-grow">
-                      <div className="relative">
-                        <Globe2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                        <Input
-                          type="text"
-                          placeholder="New York, Grand Canyon, France"
-                          value={exploreLocation}
-                          onChange={(e) => setExploreLocation(e.target.value)}
-                          className="w-full pl-10 placeholder:text-muted-foreground/40"
-                        />
-                      </div>
-                      
-                      {/* Invisible inactive button */}
-                      <Button
-                        type="button"
-                        disabled
-                        className="w-full invisible opacity-0 pointer-events-none"
-                      >
-                        Hidden Button
-                      </Button>
+                      <PlaceAutocomplete
+                        value={exploreLocation}
+                        onSelect={(place) => {
+                          setExploreLocation(place.description);
+                          setSelectedExplorePlace(place);
+                        }}
+                        placeholder="New York, Grand Canyon, France, Puerto Rico"
+                        className="w-full"
+                        countries="us,ca,mx,pr"
+                      />
                     </div>
                     
                     <div className="mt-auto">
@@ -602,16 +595,17 @@ const Dashboard = () => {
                   
                   {/* Explore Form Input */}
                   <div className="space-y-3 mb-6 flex-grow">
-                    <div className="relative">
-                      <Globe2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                      <Input
-                        type="text"
-                        placeholder="New York, Grand Canyon, France"
-                        value={exploreLocation}
-                        onChange={(e) => setExploreLocation(e.target.value)}
-                        className="w-full pl-10 placeholder:text-muted-foreground/40"
-                      />
-                    </div>
+                    <PlaceAutocomplete
+                      value={exploreLocation}
+                      onSelect={(place) => {
+                        setExploreLocation(place.description);
+                        setSelectedExplorePlace(place);
+                      }}
+                      placeholder="New York, Grand Canyon, France, Puerto Rico"
+                      className="w-full"
+                      countries="us,ca,mx,pr"
+                    />
+                  </div>
                     
                     {/* Invisible inactive button */}
                     <Button
