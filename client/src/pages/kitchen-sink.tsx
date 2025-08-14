@@ -163,7 +163,7 @@ export default function KitchenSinkDemo() {
                       <ChevronDown className="h-4 w-4 hidden lg:block" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 shadow-lg border-2 bg-white border-border">
+                  <DropdownMenuContent align="end" className="w-56 shadow-lg border-2 bg-white/100 border-border backdrop-blur-none">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
@@ -373,7 +373,7 @@ export default function KitchenSinkDemo() {
                         <SelectTrigger id="role" className="h-11">
                           <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border-border">
+                        <SelectContent className="bg-white/100 border-border backdrop-blur-none">
                           <SelectItem value="dev" className="focus:bg-[var(--primary-hover)] focus:text-white data-[state=checked]:bg-primary data-[state=checked]:text-white">Developer</SelectItem>
                           <SelectItem value="designer" className="focus:bg-[var(--primary-hover)] focus:text-white">Designer</SelectItem>
                           <SelectItem value="pm" className="focus:bg-[var(--primary-hover)] focus:text-white">Product Manager</SelectItem>
@@ -387,7 +387,7 @@ export default function KitchenSinkDemo() {
                         <SelectTrigger id="role-disabled" className="h-11">
                           <SelectValue placeholder="Disabled select" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border-border">
+                        <SelectContent className="bg-white/100 border-border backdrop-blur-none">
                           <SelectItem value="dev" className="focus:bg-[var(--primary-hover)] focus:text-white data-[state=checked]:bg-primary data-[state=checked]:text-white">Developer</SelectItem>
                         </SelectContent>
                       </Select>
@@ -835,7 +835,7 @@ export default function KitchenSinkDemo() {
                             <SelectTrigger className="w-16 h-8">
                               <SelectValue placeholder="10" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-border">
+                            <SelectContent className="bg-white/100 border-border backdrop-blur-none">
                               <SelectItem value="5" className="focus:bg-[var(--primary-hover)] focus:text-white">5</SelectItem>
                               <SelectItem value="10" className="focus:bg-[var(--primary-hover)] focus:text-white">10</SelectItem>
                               <SelectItem value="20" className="focus:bg-[var(--primary-hover)] focus:text-white">20</SelectItem>
@@ -860,7 +860,7 @@ export default function KitchenSinkDemo() {
                             <ChevronDown className="ml-2 h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 bg-white border-border">
+                        <DropdownMenuContent className="w-56 bg-white/100 border-border backdrop-blur-none">
                           <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
@@ -884,7 +884,7 @@ export default function KitchenSinkDemo() {
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-48 bg-white border-border">
+                        <DropdownMenuContent className="w-48 bg-white/100 border-border backdrop-blur-none">
                           <DropdownMenuLabel>Mobile Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">
@@ -1210,7 +1210,7 @@ export default function KitchenSinkDemo() {
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-white border-border">
+                                <DropdownMenuContent align="end" className="bg-white/100 border-border backdrop-blur-none">
                                   <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">Edit</DropdownMenuItem>
                                   <DropdownMenuItem className="focus:bg-[var(--primary-hover)] focus:text-white">View</DropdownMenuItem>
                                   <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-white">Delete</DropdownMenuItem>
@@ -1543,7 +1543,7 @@ export default function KitchenSinkDemo() {
                         <ChevronDown className="ml-2 h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56 shadow-lg border-2 bg-white border-border">
+                    <DropdownMenuContent className="w-56 shadow-lg border-2 bg-white/100 border-border backdrop-blur-none">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuCheckboxItem checked className="focus:bg-[var(--primary-hover)] focus:text-white data-[state=checked]:bg-primary data-[state=checked]:text-white">

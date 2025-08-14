@@ -116,7 +116,7 @@ export default function UserMenu({ className }: UserMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="w-56 bg-white border-border shadow-lg" 
+        className="w-56 bg-white/100 border-border shadow-lg backdrop-blur-none" 
         align="end" 
         forceMount
       >
