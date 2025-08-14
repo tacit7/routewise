@@ -23,9 +23,9 @@ export default function Home() {
       startCity: startCity,
       endCity: endCity
     }));
-    
+
     setLocation(`/route?start=${encodeURIComponent(startCity)}&end=${encodeURIComponent(endCity)}`);
-    
+
     toast({
       title: "Planning your route!",
       description: `Finding the best stops between ${startCity} and ${endCity}`,
@@ -38,9 +38,10 @@ export default function Home() {
       startCity: trip.startCity,
       endCity: trip.endCity
     }));
-    
+
     setLocation(`/route?start=${encodeURIComponent(trip.startCity)}&end=${encodeURIComponent(trip.endCity)}`);
-    
+
+    debugger;
     const placesCount = trip.poisData ? trip.poisData.length : 0;
     toast({
       title: "Trip loaded",
@@ -54,9 +55,9 @@ export default function Home() {
       startCity: route.startCity,
       endCity: route.endCity
     }));
-    
+
     setLocation(`/route?start=${encodeURIComponent(route.startCity)}&end=${encodeURIComponent(route.endCity)}`);
-    
+
     toast({
       title: "Route loaded",
       description: `Loading ${route.name} with ${route.placesCount} places`,
@@ -91,12 +92,12 @@ export default function Home() {
     <MarketingShell navAuthButtons="menu">
       {/* Mobile: Drawer CTA */}
       <div className="lg:hidden">
-        <Hero 
+        <Hero
           overlay="strong"
           align="center"
           heightClass="min-h-[65vh]"
           cta={
-            <QuickRouteFormDrawer 
+            <QuickRouteFormDrawer
               onSubmit={handleRouteSubmit}
               triggerText="Start Planning Your Route"
             />
@@ -106,12 +107,12 @@ export default function Home() {
 
       {/* Desktop: Inline Form */}
       <div className="hidden lg:block">
-        <Hero 
+        <Hero
           overlay="soft"
           align="center"
           heightClass="min-h-[75vh]"
           cta={
-            <QuickRouteFormInline 
+            <QuickRouteFormInline
               onSubmit={handleRouteSubmit}
               density="comfortable"
             />
@@ -121,7 +122,7 @@ export default function Home() {
 
       {/* Rest of the landing page content */}
       <HiddenGems />
-      
+
       {/* Saved Routes/Trips Section */}
       {(trips.length > 0 || legacyRoutes.length > 0) && (
         <section className="py-12 sm:py-16 bg-background">
@@ -140,7 +141,7 @@ export default function Home() {
                 <p className="text-red-500 mt-2">Error loading trips: {error}</p>
               )}
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Backend Trips (for authenticated users) */}
               {trips.map((trip) => (
@@ -155,7 +156,7 @@ export default function Home() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  
+
                   <div className="space-y-1.5 mb-4">
                     <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
                       <MapPin className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
@@ -176,11 +177,11 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="text-xs text-muted-foreground mb-4">
                     Saved {new Date(trip.createdAt).toLocaleDateString()}
                   </div>
-                  
+
                   <Button
                     onClick={() => loadTrip(trip)}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base h-12 sm:h-10 touch-manipulation"
@@ -197,7 +198,7 @@ export default function Home() {
                   <div className="absolute top-2 right-2">
                     <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Legacy</span>
                   </div>
-                  
+
                   <div className="flex items-start justify-between mb-4 pt-6 sm:pt-0">
                     <h3 className="font-semibold text-foreground text-sm sm:text-base flex-1 pr-2 line-clamp-2">{route.name}</h3>
                     <button
@@ -208,7 +209,7 @@ export default function Home() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  
+
                   <div className="space-y-1.5 mb-4">
                     <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
                       <MapPin className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
@@ -223,11 +224,11 @@ export default function Home() {
                       <span>{route.placesCount} places</span>
                     </div>
                   </div>
-                  
+
                   <div className="text-xs text-muted-foreground mb-4">
                     Saved {new Date(route.createdAt).toLocaleDateString()}
                   </div>
-                  
+
                   <Button
                     onClick={() => loadLegacyRoute(route)}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-12 sm:h-10 touch-manipulation"
@@ -241,7 +242,7 @@ export default function Home() {
           </div>
         </section>
       )}
-      
+
       <PoiSection />
       <FeaturesSection />
     </MarketingShell>

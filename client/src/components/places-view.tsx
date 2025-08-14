@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Loader2, Map as MapIcon, Calendar, Eye, EyeOff, MapPin, Star, Check } from "lucide-react";
+import { ArrowLeft, Loader2, Map as MapIcon, Calendar, Eye, EyeOff, MapPin, Star, Check, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import type { POI } from "@/types/api";
@@ -10,6 +10,7 @@ import { useTripPlaces } from "@/hooks/use-trip-places";
 import CategoryFilter from "@/components/category-filter";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDevLog } from "@/components/developer-fab";
 
 interface PlacesViewProps {
@@ -449,10 +450,41 @@ export default function PlacesView({
 
               {/* Sidebar Header */}
               <div className="p-3 border-b border-border bg-muted">
+                {/* Map View Header */}
+                <div className="mb-3">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <MapIcon className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold text-foreground">Map View</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Explore locations on the map and see your itinerary geographically
+                  </p>
+                </div>
+
+                {/* View Toggle Buttons */}
+                <div className="flex mb-3 bg-white rounded-lg p-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex-1 ${selectedCity === "all" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+                    onClick={() => setSelectedCity("all")}
+                  >
+                    All Locations
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex-1 ${showTripOnly ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+                    onClick={() => setShowTripOnly(!showTripOnly)}
+                  >
+                    My Itinerary
+                  </Button>
+                </div>
+
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-foreground" id="places-sidebar-heading">
-                    {displaySidebarTitle}
-                  </h2>
+                  <h3 className="text-base font-medium text-foreground" id="places-sidebar-heading">
+                    {sidebarTitle || "Search & Filter"}
+                  </h3>
                   {tripPlaces.length > 0 && (
                     <Button
                       onClick={() => setLocation("/itinerary")}
@@ -463,245 +495,109 @@ export default function PlacesView({
                     </Button>
                   )}
                 </div>
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  <button
-                    onClick={() => setSelectedCity("all")}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
-                      selectedCity === "all"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                    }`}
-                    aria-label={`Show all places. ${uniquePois.length} places total. ${selectedCity === "all" ? "Currently selected" : "Click to select"}`}
-                    aria-pressed={selectedCity === "all"}
-                  >
-                    All ({uniquePois.length})
-                  </button>
-                  {tripPlaces.length > 0 && (
-                    <button
-                      onClick={() => setShowTripOnly(!showTripOnly)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer focus-ring ${
-                        showTripOnly
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                      }`}
-                      aria-label={`Show only places in trip. ${tripPlaces.length} places in your trip. ${showTripOnly ? "Currently showing trip places only" : "Click to filter to trip places only"}`}
-                      aria-pressed={showTripOnly}
-                    >
-                      Trip Only ({tripPlaces.length})
-                    </button>
-                  )}
+
+                {/* Search Input */}
+                <div className="mb-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search locations..."
+                      className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
                 </div>
+
+                {/* Category Dropdown */}
+                <div className="mb-3">
+                  <select className="w-full px-3 py-2 border border-border rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option>All Categories</option>
+                    <option>Landmarks</option>
+                    <option>Museums</option>
+                    <option>Restaurants</option>
+                    <option>Parks</option>
+                    <option>Shopping</option>
+                    <option>Religious Sites</option>
+                  </select>
+                </div>
+
+                {/* Locations Found */}
+                <p className="text-sm text-muted-foreground mb-3">
+                  {filteredPois.length} locations found
+                </p>
               </div>
 
-              {/* POI List */}
-              <div className="flex-1 overflow-y-auto">
+              {/* Points of Interest */}
+              <div className="flex-1 overflow-y-auto p-3">
+                <div className="flex items-center space-x-2 mb-3">
+                  <MapPin className="h-5 w-5 text-foreground" />
+                  <h3 className="text-base font-semibold text-foreground">Points of Interest</h3>
+                </div>
+
                 {isLoading && (
-                  <div className="p-4 text-center">
+                  <div className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
-                    <p className="text-xs text-muted-foreground">
-                      Loading places...
-                    </p>
+                    <p className="text-sm text-muted-foreground">Loading places...</p>
                   </div>
                 )}
 
-                {!isLoading && uniquePois.length === 0 && (
-                  <div className="p-4 text-center">
+                {!isLoading && filteredPois.length === 0 && (
+                  <div className="text-center py-8">
                     <MapPin className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold mb-1 text-foreground">
-                      No places found
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Try a different {showRouting ? "route" : "location"}.
-                    </p>
+                    <h4 className="text-sm font-semibold mb-1 text-foreground">No places found</h4>
+                    <p className="text-xs text-muted-foreground">Try adjusting your search or filters</p>
                   </div>
                 )}
 
-                {uniquePois.length > 0 && (
-                  <div
-                    key={`poi-container-${panelKey}`}
-                    className={`p-2 max-w-full overflow-hidden transition-all duration-300 ${
-                      isMultiColumn 
-                        ? "grid gap-2" 
-                        : "space-y-2"
-                    }`}
-                    style={isMultiColumn ? { 
-                      gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` 
-                    } : {}}
-                  >
-                    {filteredPois.map((poi, index) => (
-                      !isMultiColumn ? (
-                        // Vertical card layout - image on top
-                        <div
-                          key={poi.placeId || poi.id || `poi-list-${index}`}
-                          onMouseEnter={() => handleEnhancedPoiHover(poi)}
-                          onMouseLeave={() => handleEnhancedPoiHover(null)}
-                          className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-3"
-                        >
-                          {/* Image on top */}
-                          <div className="relative">
-                            <img
-                              src={poi.imageUrl || '/placeholder-poi.jpg'}
-                              alt={poi.name}
-                              className="w-full h-32 object-cover rounded"
-                            />
-                            {/* Category badge on image */}
-                            <div className="absolute top-2 left-2">
-                              <div className="text-xs px-2 py-1 rounded-full bg-black/60 text-white backdrop-blur-sm">
-                                {poi.category.charAt(0).toUpperCase() + poi.category.slice(1).replace('_', ' ')}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Content below image */}
-                          <div className="mt-3">
-                            {/* Name */}
-                            <h4 className="font-medium text-base line-clamp-2">
-                              {poi.name}
-                            </h4>
-
-                            {/* Description - full text display */}
-                            {poi.description && (
-                              <p className="text-muted-foreground text-sm mt-2">
-                                {poi.description}
-                              </p>
+                {/* POI List Items */}
+                <div className="space-y-3">
+                  {filteredPois.slice(0, 4).map((poi) => {
+                    const isInItinerary = isInTrip(poi);
+                    return (
+                      <div key={poi.id} className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h4 className="font-medium text-foreground truncate">{poi.name}</h4>
+                            {isInItinerary && (
+                              <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                                In Trip
+                              </Badge>
                             )}
-
-                            {/* Rating */}
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="flex items-center gap-1 text-warning text-base">
-                                <Star className="h-4 w-4 fill-current" />
-                                <span className="font-medium">{poi.rating}</span>
-                                {poi.timeFromStart && (
-                                  <span className="text-muted-foreground text-xs ml-2">{poi.timeFromStart}</span>
-                                )}
-                              </div>
-
-                              {/* Add/Remove Trip button */}
-                              <button
-                                onClick={() => {
-                                  if (isInTrip(poi)) {
-                                    handleRemoveFromTrip(poi.id);
-                                  } else {
-                                    handleAddToTrip(poi);
-                                  }
-                                }}
-                                disabled={isAddingToTrip || isRemovingFromTrip}
-                                className={`text-xs px-3 py-1 rounded transition-colors focus-ring ${
-                                  isInTrip(poi)
-                                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                                    : isAddingToTrip || isRemovingFromTrip
-                                    ? "bg-primary/60 text-primary-foreground cursor-not-allowed"
-                                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                                }`}
-                                aria-label={
-                                  isInTrip(poi) 
-                                    ? `Remove ${poi.name} from trip` 
-                                    : isAddingToTrip || isRemovingFromTrip
-                                    ? "Processing request..."
-                                    : `Add ${poi.name} to trip`
-                                }
-                                aria-describedby={`poi-${poi.id}-status`}
-                              >
-                                {isInTrip(poi) ? (
-                                  <div className="flex items-center gap-1">
-                                    <Check className="h-3 w-3" aria-hidden="true" />
-                                    Remove
-                                  </div>
-                                ) : isAddingToTrip || isRemovingFromTrip ? "..." : "+ Trip"}
-                              </button>
-                              {/* Hidden status text for screen readers */}
-                              <span id={`poi-${poi.id}-status`} className="sr-only">
-                                {isInTrip(poi) ? "This place is in your trip" : "This place is not in your trip"}
-                              </span>
-                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground capitalize">{poi.category}</p>
+                          <div className="flex items-center space-x-1 mt-1">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                            <span className="text-xs text-muted-foreground">
+                              {poi.rating || "4.5"}
+                            </span>
                           </div>
                         </div>
-                      ) : (
-                        // Multi-column compact card layout
-                        <div
-                          key={poi.placeId || poi.id || `poi-card-${index}`}
-                          onMouseEnter={() => handleEnhancedPoiHover(poi)}
-                          onMouseLeave={() => handleEnhancedPoiHover(null)}
-                          className="rounded-md border border-border bg-card hover:shadow-sm transition-all cursor-pointer p-2"
-                        >
-                          {/* Compact image */}
-                          <div className="relative">
-                            <img
-                              src={poi.imageUrl || '/placeholder-poi.jpg'}
-                              alt={poi.name}
-                              className={`w-full object-cover rounded ${
-                                gridColumns >= 3 ? 'h-20' : 'h-24'
-                              }`}
-                            />
-                            {/* Category badge */}
-                            <div className="absolute top-1 left-1">
-                              <div className="text-xs px-1.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
-                                {poi.category.charAt(0).toUpperCase() + poi.category.slice(1).replace('_', ' ')}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Compact content */}
-                          <div className="mt-2">
-                            {/* Name - shorter for grid */}
-                            <h4 className={`font-medium line-clamp-1 ${
-                              gridColumns >= 3 ? 'text-xs' : 'text-sm'
-                            }`}>
-                              {poi.name}
-                            </h4>
-
-                            {/* Description - compact version for grid */}
-                            {poi.description && (
-                              <p className={`text-muted-foreground mt-1 ${
-                                gridColumns >= 3 ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3'
-                              }`}>
-                                {poi.description}
-                              </p>
-                            )}
-
-                            {/* Rating and trip button row */}
-                            <div className="flex items-center justify-between mt-1.5">
-                              <div className="flex items-center gap-1 text-warning text-xs">
-                                <Star className="h-3 w-3 fill-current" />
-                                <span className="font-medium">{poi.rating}</span>
-                              </div>
-
-                              {/* Compact trip button */}
-                              <button
-                                onClick={() => {
-                                  if (isInTrip(poi)) {
-                                    handleRemoveFromTrip(poi.id);
-                                  } else {
-                                    handleAddToTrip(poi);
-                                  }
-                                }}
-                                disabled={isAddingToTrip || isRemovingFromTrip}
-                                className={`text-xs px-2 py-1 rounded transition-colors focus-ring ${
-                                  isInTrip(poi)
-                                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                                    : isAddingToTrip || isRemovingFromTrip
-                                    ? "bg-primary/60 text-primary-foreground cursor-not-allowed"
-                                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                                }`}
-                                aria-label={
-                                  isInTrip(poi) 
-                                    ? `Remove ${poi.name} from trip` 
-                                    : isAddingToTrip || isRemovingFromTrip
-                                    ? "Processing request..."
-                                    : `Add ${poi.name} to trip`
-                                }
-                              >
-                                {isInTrip(poi) ? (
-                                  <Check className="h-3 w-3" aria-hidden="true" />
-                                ) : isAddingToTrip || isRemovingFromTrip ? "..." : "+"}
-                              </button>
-                            </div>
-                          </div>
+                        <div className="ml-3">
+                          <div className={`w-3 h-3 rounded-full ${isInItinerary ? 'bg-blue-500' : 'bg-red-500'}`} />
                         </div>
-                      )
-                    ))}
-                  </div>
-                )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Trip Overview */}
+                <div className="mt-6 pt-4 border-t border-border">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Trip Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Total Locations:</span>
+                        <span className="font-medium">{tripPlaces.length || 3}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Trip Duration:</span>
+                        <span className="font-medium">7 days</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
 
             </aside>

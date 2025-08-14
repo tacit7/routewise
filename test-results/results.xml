@@ -1,0 +1,20 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="6.040487">
+<testsuite name="dashboard/dashboard-autocomplete.spec.ts" timestamp="2025-08-13T22:18:16.482Z" hostname="chromium" tests="1" failures="1" skipped="0" time="2.081" errors="0">
+<testcase name="Dashboard Autocomplete › PlaceAutocomplete component functions correctly on dashboard" classname="dashboard/dashboard-autocomplete.spec.ts" time="2.081">
+<failure message="dashboard-autocomplete.spec.ts:4:3 PlaceAutocomplete component functions correctly on dashboard" type="FAILURE">
+<![CDATA[  [chromium] › dashboard/dashboard-autocomplete.spec.ts:4:3 › Dashboard Autocomplete › PlaceAutocomplete component functions correctly on dashboard 
+
+    Error: browserContext.newPage: Executable doesn't exist at /Users/urielmaldonado/Library/Caches/ms-playwright/ffmpeg-1011/ffmpeg-mac
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
+</testsuites>

@@ -19,27 +19,23 @@ import FeaturedSeasonalTrips from "@/components/featured-seasonal-trips";
 import NearbyTrendingPOIs from "@/components/nearby-trending-pois";
 import PersonalRecommendations from "@/components/personal-recommendations";
 import QuickTools from "@/components/quick-tools";
+import { DeveloperFab } from "@/components/developer-fab";
 
 // Function to get saved Explorer Wizard data
 const getExplorerWizardData = () => {
   try {
     const saved = localStorage.getItem('routewise-trip-wizard-draft');
-    console.log('getExplorerWizardData: Raw localStorage:', saved);
     
     if (saved) {
       const draft = JSON.parse(saved);
-      console.log('getExplorerWizardData: Parsed draft:', draft);
       
       // Check if draft is expired
       if (Date.now() > draft.expiresAt) {
-        console.log('getExplorerWizardData: Draft expired');
         return null;
       }
       
-      console.log('getExplorerWizardData: Returning data:', draft?.data);
       return draft?.data || null;
     }
-    console.log('getExplorerWizardData: No saved data found');
     return null;
   } catch (error) {
     console.error('getExplorerWizardData: Error:', error);
@@ -54,7 +50,6 @@ const ExplorerWizardCard = ({ onContinue, onDelete }: { onContinue: () => void; 
   useEffect(() => {
     const checkForData = () => {
       const data = getExplorerWizardData();
-      console.log('ExplorerWizardCard: Retrieved data:', data);
       setSavedData(data);
     };
 
@@ -71,7 +66,6 @@ const ExplorerWizardCard = ({ onContinue, onDelete }: { onContinue: () => void; 
   }, []);
 
   if (!savedData) {
-    console.log('ExplorerWizardCard: No savedData, not rendering');
     return null;
   }
 
@@ -446,7 +440,7 @@ const Dashboard = () => {
                       <PlaceAutocomplete
                         value={exploreLocation}
                         onSelect={(place) => {
-                          setExploreLocation(place.description);
+                          setExploreLocation(place.main_text);
                           setSelectedExplorePlace(place);
                         }}
                         placeholder="New York, Grand Canyon, France, Puerto Rico"
@@ -516,6 +510,7 @@ const Dashboard = () => {
           <SeasonalTravel />
 
         </main>
+        <DeveloperFab />
       </AppShell>
     );
   }
@@ -598,7 +593,7 @@ const Dashboard = () => {
                     <PlaceAutocomplete
                       value={exploreLocation}
                       onSelect={(place) => {
-                        setExploreLocation(place.description);
+                        setExploreLocation(place.main_text);
                         setSelectedExplorePlace(place);
                       }}
                       placeholder="New York, Grand Canyon, France, Puerto Rico"
@@ -685,6 +680,7 @@ const Dashboard = () => {
         <SeasonalTravel />
 
       </main>
+      <DeveloperFab />
     </AppShell>
   );
 };

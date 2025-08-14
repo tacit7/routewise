@@ -129,8 +129,8 @@ export function useCityAutocomplete(
           else {
             return {
               place_id: suggestion.id || suggestion.place_id,
-              description: `${suggestion.name}, ${suggestion.state}`,
-              main_text: suggestion.name,
+              description: suggestion.description,
+              main_text: suggestion.description ? suggestion.description.split(',')[0].trim() : suggestion.name,
               secondary_text: suggestion.state,
               geometry: {
                 location: {
@@ -166,8 +166,18 @@ export function useCityPrefetch() {
       'mex', 'gua', 'can', // MX cities
     ];
 
-    // Prefetch popular queries in background
-    for (const query of popularQueries) {
+    // Add delay helper function
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Prefetch popular queries in background with delays to avoid spamming
+    for (let i = 0; i < popularQueries.length; i++) {
+      const query = popularQueries[i];
+      
+      // Add 200ms delay between each request to avoid overwhelming the backend
+      if (i > 0) {
+        await delay(200);
+      }
+
       queryClient.prefetchQuery({
         queryKey: ['cities', query, 10, countries],
         queryFn: async () => {
@@ -190,6 +200,9 @@ export function useCityPrefetch() {
                   secondary_text: suggestion.structured_formatting.secondary_text,
                 }));
               }
+            } else {
+              // Log backend errors but don't throw for prefetch
+              console.debug(`Prefetch request failed for query: ${query}, status: ${response.status}`);
             }
           } catch (error) {
             // Silently fail prefetch attempts

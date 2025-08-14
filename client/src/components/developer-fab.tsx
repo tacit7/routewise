@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle } from 'lucide-react';
+import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
@@ -58,6 +59,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
   const [isOpen, setIsOpen] = useState(false);
   const [debugLogs, setDebugLogs] = useState<DebugData[]>([]);
+  const queryClient = useQueryClient();
   const [systemInfo, setSystemInfo] = useState<any>({});
   const [hasConsoleErrors, setHasConsoleErrors] = useState(false);
 
@@ -456,6 +458,39 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                 <div className="space-y-4">
                   <Card className="p-4">
                     <h4 className="font-medium text-base mb-3 flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Environment Variables
+                    </h4>
+                    <div className="text-sm space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span>VITE_GOOGLE_CLIENT_ID:</span>
+                        <Badge variant={import.meta.env.VITE_GOOGLE_CLIENT_ID ? 'default' : 'destructive'}>
+                          {import.meta.env.VITE_GOOGLE_CLIENT_ID ? 'Present ✅' : 'Missing ❌'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>VITE_API_URL:</span>
+                        <span className="font-mono text-xs">
+                          {import.meta.env.VITE_API_URL || 'Not set (using default)'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>VITE_MSW_DISABLED:</span>
+                        <Badge variant={import.meta.env.VITE_MSW_DISABLED === 'true' ? 'default' : 'secondary'}>
+                          {import.meta.env.VITE_MSW_DISABLED || 'false'}
+                        </Badge>
+                      </div>
+                      {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+                        <div className="mt-2 p-2 bg-muted rounded text-xs font-mono break-all">
+                          <div className="text-muted-foreground mb-1">Client ID Preview:</div>
+                          {`${import.meta.env.VITE_GOOGLE_CLIENT_ID.substring(0, 12)}...${import.meta.env.VITE_GOOGLE_CLIENT_ID.substring(import.meta.env.VITE_GOOGLE_CLIENT_ID.length - 12)}`}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+
+                  <Card className="p-4">
+                    <h4 className="font-medium text-base mb-3 flex items-center gap-2">
                       <Monitor className="h-5 w-5" />
                       Viewport
                     </h4>
@@ -619,75 +654,139 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                   <Card className="p-4">
                     <h4 className="font-medium text-base mb-3 flex items-center gap-2">
                       <Database className="h-5 w-5" />
-                      POI API Response Sample
+                      POI API Response Data
                     </h4>
                     <div className="space-y-3">
+                      {/* POI Count and Status */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Available POIs:</span>
+                          <Badge variant="outline" id="poi-count-badge">
+                            {(window as any).__routewise_pois?.length || 0}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Page Type:</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {window.location.pathname.includes('explore-results') ? 'EXPLORE' : 
+                             window.location.pathname.includes('route-results') ? 'ROUTE' : 'OTHER'}
+                          </Badge>
+                        </div>
+
+                        {(window as any).__routewise_explore_data && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Location:</span>
+                            <span className="font-mono text-xs">
+                              {(window as any).__routewise_explore_data.startLocation || 'N/A'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
                       <Button
                         variant="outline"
                         size="sm"
                         className="w-full text-xs"
                         onClick={() => {
-                          // Get POI data from the map component
-                          const mapElement = document.querySelector('[data-testid="interactive-map"]') || document.querySelector('.map-container');
-
-                          // Try to get POI data from various sources
-                          let poisData = null;
-
-                          // Check if there's POI data in the global window object
-                          if ((window as any).__routewise_pois) {
-                            poisData = (window as any).__routewise_pois.slice(0, 3); // First 3 POIs
-                          }
-
-                          // Fallback: try to extract from current page context
-                          if (!poisData) {
-                            const currentPath = window.location.pathname;
-                            if (currentPath.includes('route-results') || currentPath.includes('explore-results')) {
-                              console.log('ℹ️ POI data not exposed to debug tools yet');
-                              poisData = [{
-                                id: 1,
-                                name: "Example Restaurant",
-                                category: "restaurant",
-                                lat: 30.2672,
-                                lng: -97.7431,
-                                rating: 4.5,
-                                address: "123 Main St, Austin, TX",
-                                description: "Great local food",
-                                imageUrl: "https://example.com/image.jpg",
-                                placeId: "ChIJ123...",
-                                timeFromStart: "15 min"
-                              }];
-                              console.log('📋 Sample POI structure:', poisData[0]);
-                            }
-                          }
+                          // Get POI data from the global window object
+                          const poisData = (window as any).__routewise_pois;
+                          const exploreData = (window as any).__routewise_explore_data;
 
                           if (poisData && poisData.length > 0) {
-                            console.log('🗺️ POI API Response Sample (first 3):');
-                            poisData.forEach((poi, index) => {
-                              console.log(`POI ${index + 1}:`, poi);
+                            console.log('🗺️ LIVE POI API Response Data:');
+                            console.log(`📊 Total POIs: ${poisData.length}`);
+                            
+                            if (exploreData) {
+                              console.log('🌍 Explore Context:', exploreData);
+                            }
+
+                            // Show first 3 POIs with full structure
+                            const samplePois = poisData.slice(0, 3);
+                            console.log('📋 Sample POIs (first 3):');
+                            samplePois.forEach((poi: any, index: number) => {
+                              console.log(`\n${index + 1}. ${poi.name || 'Unknown'}`);
+                              console.log('   Category:', poi.category || 'N/A');
+                              console.log('   Rating:', poi.rating || 'N/A');
+                              console.log('   Address:', poi.address || poi.formatted_address || 'N/A');
+                              console.log('   Coordinates:', `${poi.latitude || poi.lat}, ${poi.longitude || poi.lng}`);
+                              console.log('   Full Object:', poi);
                             });
 
+                            // Show categories breakdown
+                            const categories = poisData.reduce((acc: any, poi: any) => {
+                              const cat = poi.category || 'uncategorized';
+                              acc[cat] = (acc[cat] || 0) + 1;
+                              return acc;
+                            }, {});
+                            console.log('📊 POI Categories:', categories);
+
+                            // Log to debug system
                             if ((window as any).__devLog) {
-                              (window as any).__devLog('POI API Response', 'Sample POI Data', {
-                                sampleCount: poisData.length,
-                                totalAvailable: (window as any).__routewise_pois?.length || 'unknown',
-                                firstPOI: poisData[0]
+                              (window as any).__devLog('POI API Response', 'Live POI Data Analysis', {
+                                totalCount: poisData.length,
+                                categories: Object.keys(categories),
+                                samplePoi: samplePois[0],
+                                exploreContext: exploreData
                               });
                             }
+
+                            // Update UI badge
+                            const badge = document.getElementById('poi-count-badge');
+                            if (badge) badge.textContent = poisData.length.toString();
+
                           } else {
-                            console.log('ℹ️ No POI data available - navigate to a map page with POIs');
+                            console.log('ℹ️ No POI data available');
+                            console.log('💡 To see POI data:');
+                            console.log('   1. Navigate to /explore-results?location=YourCity');
+                            console.log('   2. Or go to /route-results with route data');
+                            console.log('   3. POI data will be automatically exposed to debug tools');
                           }
                         }}
                       >
-                        Show POI Structure
+                        Analyze POI Data
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs"
+                        onClick={() => {
+                          const poisData = (window as any).__routewise_pois;
+                          if (poisData && poisData.length > 0) {
+                            // Copy full POI array to clipboard
+                            const jsonData = JSON.stringify(poisData, null, 2);
+                            navigator.clipboard.writeText(jsonData);
+                            console.log('📋 Copied all POI data to clipboard');
+                            console.log(`📊 Data size: ${jsonData.length} characters, ${poisData.length} POIs`);
+                            
+                            if ((window as any).__devLog) {
+                              (window as any).__devLog('POI API Response', 'Data Copied to Clipboard', {
+                                dataSize: jsonData.length,
+                                poiCount: poisData.length
+                              });
+                            }
+                          } else {
+                            console.log('❌ No POI data available to copy');
+                          }
+                        }}
+                      >
+                        Copy POI JSON
                       </Button>
 
                       <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-                        <strong>POI Data Fields:</strong><br/>
-                        • id, name, category, lat, lng<br/>
-                        • rating, address, description<br/>
-                        • imageUrl, placeId, timeFromStart<br/>
+                        <strong>Complete Places Table Schema:</strong><br/>
+                        📋 <strong>Identifiers:</strong> id, google_place_id, location_iq_place_id<br/>
+                        📍 <strong>Location:</strong> name, formatted_address, latitude, longitude, location (PostGIS)<br/>
+                        📊 <strong>Details:</strong> place_types, rating, price_level, reviews_count<br/>
+                        📞 <strong>Contact:</strong> phone_number, website, opening_hours<br/>
+                        🖼️ <strong>Media:</strong> photos, wiki_image<br/>
+                        🔍 <strong>Search:</strong> description, search_vector, popularity_score<br/>
+                        📦 <strong>Raw Data:</strong> google_data, location_iq_data<br/>
+                        ⏰ <strong>Timestamps:</strong> cached_at, last_updated, inserted_at, updated_at<br/>
                         <br/>
-                        <strong>Usage:</strong> Click button to log POI structure to console
+                        <strong>Live Data:</strong> Shows actual API response from /api/explore-results<br/>
+                        <strong>Puerto Rico:</strong> 30+ POIs with rich descriptions and coordinates
                       </div>
                     </div>
                   </Card>
@@ -710,6 +809,30 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
                         }}
                       >
                         Add Test Log
+                      </Button>
+
+                      <Button
+                        variant="destructive"
+                        size="default"
+                        className="w-full text-sm"
+                        onClick={() => {
+                          // Clear autocomplete cache
+                          queryClient.removeQueries({ queryKey: ['city-autocomplete'] });
+                          queryClient.removeQueries({ queryKey: ['places-autocomplete'] });
+                          
+                          console.log('🗑️ Cache Cleared: Autocomplete cache has been cleared');
+                          
+                          if ((window as any).__devLog) {
+                            (window as any).__devLog('Developer Tools', 'Cache Cleared', {
+                              message: 'Autocomplete cache cleared successfully',
+                              timestamp: Date.now(),
+                              clearedKeys: ['city-autocomplete', 'places-autocomplete']
+                            });
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Clear Autocomplete Cache
                       </Button>
 
                       <Button

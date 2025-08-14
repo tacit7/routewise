@@ -1,34 +1,26 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Check, LogIn, Plus, Save, X, FileText } from "lucide-react";
+import { Check, LogIn, Save, X, FileText, Search, MapPin, Clock, Globe, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BackButton from "@/components/header/BackButton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTripPlaces } from "@/hooks/use-trip-places";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/auth-context";
 import { authenticatedApiCall, API_CONFIG } from "@/lib/api-config";
-import DailyItinerarySidebar from "@/components/DailyItinerarySidebar";
-import TripPlacesGrid from "@/components/TripPlacesGrid";
-import type { DayData, ItineraryPlace } from "@/types/itinerary";
+import type { ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
-import { InteractiveMap } from "@/components/interactive-map";
-import { TopNav } from "@/features/marketing/top-nav";
 import { DeveloperFab } from "@/components/developer-fab";
 
 export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
 
-  const [showMap, setShowMap] = useState<boolean>(() => {
-  try { return JSON.parse(localStorage.getItem("itinerary.showMap") || "false"); } catch { return false; }
-});
-
-  const [activeDay, setActiveDay] = useState(0);
-  const [assignedPlaceIds, setAssignedPlaceIds] = useState<Set<string | number>>(new Set());
-  const [days, setDays] = useState<DayData[]>([{ date: new Date(), title: "", places: [] }]);
+  // Day-based itinerary state
+  const [days, setDays] = useState<Array<{ id: number; title: string; places: ItineraryPlace[] }>>([{ id: 1, title: "Day 1", places: [] }]);
+  const [selectedDayId, setSelectedDayId] = useState<number>(1); // Track which day is selected for adding POIs
+  const [availableFilter, setAvailableFilter] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [tripTitle, setTripTitle] = useState("");
@@ -49,23 +41,19 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
 
+  // Load saved itinerary from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("itineraryData");
     console.log('📂 Loading from localStorage:', saved);
     if (saved) {
       try {
-        const { days: rawDays, activeDay: rawActiveDay, tripTitle: rawTitle, savedTripId: rawTripId } = JSON.parse(saved);
+        const { days: rawDays, tripTitle: rawTitle, savedTripId: rawTripId } = JSON.parse(saved);
         console.log('📊 Parsed localStorage data:', { rawTripId, rawTitle, daysCount: rawDays?.length });
         if (Array.isArray(rawDays)) {
-          const restored = rawDays.map((d: any) => ({ ...d, date: new Date(d.date) }));
-          setDays(restored);
-          setActiveDay(rawActiveDay || 0);
+          setDays(rawDays);
           setTripTitle(rawTitle || "");
           setSavedTripId(rawTripId || null);
           console.log('✅ Set savedTripId to:', rawTripId || null);
-          const assigned = new Set<string | number>();
-          restored.forEach((day: DayData) => day.places.forEach((p) => assigned.add(getIdentifier(p))));
-          setAssignedPlaceIds(assigned);
         }
       } catch (e) {
         console.error('❌ Error parsing localStorage:', e);
@@ -75,94 +63,89 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     }
   }, []);
 
+  // Save to localStorage when state changes
   useEffect(() => {
-    const data = { days, activeDay, tripTitle, savedTripId };
+    const data = { days, tripTitle, savedTripId };
     console.log('💾 Saving to localStorage:', data);
     localStorage.setItem("itineraryData", JSON.stringify(data));
-  }, [days, activeDay, tripTitle, savedTripId]);
+  }, [days, tripTitle, savedTripId]);
 
-  const itineraryPlaces: ItineraryPlace[] = useMemo(
-    () => tripPlaces.map((p) => ({ ...p, dayIndex: undefined, scheduledTime: undefined, dayOrder: undefined, notes: undefined })),
-    [tripPlaces]
+  // Get all places across all days for filtering
+  const allItineraryPlaces = useMemo(() => 
+    days.flatMap(day => day.places),
+    [days]
   );
 
-  const handleAddDay = () => {
-    const date = new Date(Date.now() + days.length * 24 * 60 * 60 * 1000);
-    setDays([...days, { date, title: "", places: [] }]);
-    setActiveDay(days.length);
-  };
+  // Available places from trip places hook, filtered out already added ones
+  const availablePlaces: ItineraryPlace[] = useMemo(
+    () => tripPlaces.filter(p => !allItineraryPlaces.find(ip => getIdentifier(ip) === getIdentifier(p))),
+    [tripPlaces, allItineraryPlaces]
+  );
 
-  const handleDeleteDay = (dayIndex: number) => {
-    if (days.length <= 1) return; // Don't delete if it's the only day
-    
-    // Remove places from that day from assignedPlaceIds
-    const dayToDelete = days[dayIndex];
-    dayToDelete.places.forEach((place) => {
-      const id = getIdentifier(place);
-      setAssignedPlaceIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    });
-
-    // Remove the day
-    const newDays = days.filter((_, index) => index !== dayIndex);
-    setDays(newDays);
-    
-    // Adjust active day if necessary
-    if (activeDay >= newDays.length) {
-      setActiveDay(newDays.length - 1);
-    } else if (activeDay >= dayIndex) {
-      setActiveDay(Math.max(0, activeDay - 1));
-    }
-  };
-
-  const handlePlaceAssignment = (place: ItineraryPlace, dayIndex: number) => {
-    const id = getIdentifier(place);
-    if (assignedPlaceIds.has(id)) return;
-    const updated: ItineraryPlace = { ...place, dayIndex, scheduledTime: "09:00", dayOrder: days[dayIndex].places.length };
-    setDays((prev) => {
-      const next = [...prev];
-      next[dayIndex] = { ...next[dayIndex], places: [...next[dayIndex].places, updated] };
-      return next;
-    });
-    setAssignedPlaceIds((prev) => new Set([...prev, id]));
-  };
-
-  const handlePlaceRemove = (placeId: string | number) => {
-    setDays((prev) => prev.map((d) => ({ ...d, places: d.places.filter((p) => getIdentifier(p) !== placeId) })));
-    setAssignedPlaceIds((prev) => {
-      const n = new Set(prev);
-      n.delete(placeId);
-      return n;
-    });
-  };
-
+  // Add place to the selected day's itinerary
   const handlePlaceAdd = (place: ItineraryPlace) => {
-    handlePlaceAssignment(place, activeDay);
+    const id = getIdentifier(place);
+    const exists = allItineraryPlaces.find(p => getIdentifier(p) === id);
+    if (exists) return;
+    
+    const selectedDayIndex = days.findIndex(day => day.id === selectedDayId);
+    if (selectedDayIndex === -1) return; // Selected day not found
+    
+    const updated: ItineraryPlace = { 
+      ...place, 
+      dayIndex: selectedDayIndex, 
+      scheduledTime: "09:00", 
+      dayOrder: days[selectedDayIndex].places.length,
+      notes: undefined 
+    };
+    
+    setDays(prev => {
+      const newDays = [...prev];
+      newDays[selectedDayIndex] = {
+        ...newDays[selectedDayIndex],
+        places: [...newDays[selectedDayIndex].places, updated]
+      };
+      return newDays;
+    });
   };
 
-  const handlePlaceUpdate = (placeId: string | number, updates: Partial<ItineraryPlace>) => {
-    setDays((prev) =>
-      prev.map((d) => ({
-        ...d,
-        places: d.places.map((p) => (getIdentifier(p) === placeId ? { ...p, ...updates } : p)),
+  // Remove place from itinerary
+  const handlePlaceRemove = (placeId: string | number) => {
+    setDays(prev => 
+      prev.map(day => ({
+        ...day,
+        places: day.places.filter(p => getIdentifier(p) !== placeId)
       }))
     );
+  };
+
+  // Add new day
+  const handleAddDay = () => {
+    const newDayNumber = days.length + 1;
+    const newDay = {
+      id: newDayNumber,
+      title: `Day ${newDayNumber}`,
+      places: []
+    };
+    setDays(prev => [...prev, newDay]);
+    // Auto-select the new day for adding POIs
+    setSelectedDayId(newDayNumber);
+  };
+
+  // Remove day (only if more than one day exists)
+  const handleRemoveDay = (dayId: number) => {
+    if (days.length <= 1) return;
+    setDays(prev => prev.filter(day => day.id !== dayId));
   };
 
 
   const handleGoBack = () => setLocation("/route-results");
 
-  const handleNewTrip = () => {
-    if (window.confirm("Start a new trip? This will clear your current itinerary.")) {
-      // Clear all state
-      setDays([{ date: new Date(), title: "", places: [] }]);
-      setActiveDay(0);
+  const handleClearAll = () => {
+    if (window.confirm("Clear all destinations? This will clear your current itinerary.")) {
+      setDays([{ id: 1, title: "Day 1", places: [] }]);
       setTripTitle("");
       setSavedTripId(null);
-      setAssignedPlaceIds(new Set());
       setLastSavedAt(null);
       setLastApiRequest(null);
       
@@ -171,7 +154,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
       localStorage.removeItem('tripPlaces');
       
       toast({
-        title: "New Trip Started",
+        title: "Itinerary Cleared",
         description: "You can now plan a new itinerary from scratch.",
       });
     }
@@ -187,7 +170,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
       return;
     }
 
-    if (days.every(day => day.places.length === 0)) {
+    if (allItineraryPlaces.length === 0) {
       toast({
         title: "No Places Added",
         description: "Add some places to your itinerary before saving.",
@@ -209,19 +192,15 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
 
     setIsSaving(true);
     try {
-      // Get all scheduled places across all days
-      const allScheduledPlaces = days.flatMap(day => day.places);
-      
       // Extract start and end locations from first and last places
-      const firstPlace = allScheduledPlaces.find(p => p.dayIndex === 0);
-      const lastDayIndex = Math.max(...days.map((_, i) => i));
-      const lastPlace = allScheduledPlaces.find(p => p.dayIndex === lastDayIndex);
+      const firstPlace = allItineraryPlaces[0];
+      const lastPlace = allItineraryPlaces[allItineraryPlaces.length - 1];
       
       // Get unique cities for checkpoints
       const cities = new Set<string>();
       const stops: string[] = [];
       
-      allScheduledPlaces.forEach((p) => {
+      allItineraryPlaces.forEach((p) => {
         const addr = p.address;
         if (addr) {
           const parts = addr.split(",");
@@ -242,7 +221,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
       }
       
       // Extract unique interests/categories
-      const interests = Array.from(new Set(allScheduledPlaces.map(p => p.category)));
+      const interests = Array.from(new Set(allItineraryPlaces.map(p => p.category)));
       
       // Create trip data structure for Phoenix backend (Method 1 - Direct)
       const tripData = {
@@ -371,10 +350,9 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   };
 
   const generateTripTitle = () => {
-    const scheduled = days.flatMap((d) => d.places);
-    if (scheduled.length === 0) return "My Trip";
+    if (allItineraryPlaces.length === 0) return "My Trip";
     const cities = new Set<string>();
-    scheduled.forEach((p) => {
+    allItineraryPlaces.forEach((p) => {
       const addr = (p as any).address as string | undefined;
       if (!addr) return;
       const parts = addr.split(",");
@@ -390,92 +368,118 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
     return `${list[0]} to ${list[list.length - 1]} (+${list.length - 2} more)`;
   };
 
-  const unassigned = useMemo(
-    () => itineraryPlaces.filter((p) => !assignedPlaceIds.has(getIdentifier(p))),
-    [itineraryPlaces, assignedPlaceIds]
-  );
+  // Filter available places based on search and category
+  const filteredAvailablePlaces = useMemo(() => {
+    let filtered = availablePlaces;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(place => 
+        place.name?.toLowerCase().includes(query) ||
+        place.address?.toLowerCase().includes(query) ||
+        place.category?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Filter by category
+    if (availableFilter !== "All") {
+      filtered = filtered.filter(place => place.category === availableFilter);
+    }
+    
+    return filtered;
+  }, [availablePlaces, searchQuery, availableFilter]);
+  
+  // Get unique categories for filtering
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    cats.add("All");
+    availablePlaces.forEach(place => {
+      if (place.category) cats.add(place.category);
+    });
+    return Array.from(cats);
+  }, [availablePlaces]);
+  
+  // Calculate trip summary
+  const tripSummary = useMemo(() => {
+    const destinations = allItineraryPlaces.length;
+    const cities = new Set<string>();
+    
+    allItineraryPlaces.forEach(place => {
+      const addr = place.address;
+      if (addr) {
+        const parts = addr.split(",");
+        if (parts.length > 1) {
+          const city = parts[parts.length - 2]?.trim();
+          if (city) cities.add(city);
+        }
+      }
+    });
+    
+    return {
+      destinations,
+      cities: cities.size,
+      days: days.length
+    };
+  }, [allItineraryPlaces, days]);
 
-  if (itineraryPlaces.length === 0) {
+  if (tripPlaces.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
-        <Card className="max-w-md" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="max-w-md">
           <CardHeader>
-            <CardTitle style={{ color: 'var(--text)' }}>No Trip Places Found</CardTitle>
-            <CardDescription style={{ color: 'var(--text-muted)' }}>You need to add places to your trip first.</CardDescription>
+            <CardTitle>No Trip Places Found</CardTitle>
+            <CardDescription>You need to add places to your trip first.</CardDescription>
           </CardHeader>
-          <CardFooter>
-            <Button 
-              onClick={handleGoBack}
-              className="focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              style={{ backgroundColor: 'var(--primary)', color: 'white' }}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+          <div className="p-6 pt-0">
+            <Button onClick={handleGoBack}>
               Back to Route Results
             </Button>
-          </CardFooter>
+          </div>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
-        <TopNav />
-      
-      {/* Page Header */}
-      <div className="bg-white px-6 py-4 border-b">
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
-          <div className="flex-1 max-w-md space-y-2">
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                placeholder="Enter trip title..."
-                value={tripTitle}
-                onChange={(e) => setTripTitle(e.target.value)}
-                className="font-medium text-lg h-10"
-              />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-card border-b px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+              <MapPin className="h-5 w-5 text-white" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {days.length} day{days.length !== 1 ? 's' : ''} • {days.flatMap(d => d.places).length} places scheduled
-              {savedTripId && (
-                <span className="ml-2 inline-flex items-center gap-1 text-green-600">
-                  <Check className="h-3 w-3" />
-                  Saved (ID: {savedTripId})
-                </span>
-              )}
-            </p>
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">Travel Itinerary Planner</h1>
+              <p className="text-sm text-muted-foreground">Drag locations to build your perfect trip</p>
+            </div>
           </div>
-          <div className="ml-4 flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {lastSavedAt && (
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-muted-foreground">
                 Saved {lastSavedAt.toLocaleTimeString()}
               </span>
             )}
             {savedTripId && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNewTrip}
-                className="flex items-center gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                New Trip
+              <Button variant="outline" size="sm" onClick={handleClearAll}>
+                Clear All
               </Button>
             )}
             <Button
               onClick={handleSaveTrip}
               disabled={isSaving || !isAuthenticated}
-              className="flex items-center gap-2"
+              className="bg-teal-600 hover:bg-teal-700 text-white"
             >
               {isSaving ? (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
                   {savedTripId ? 'Updating...' : 'Saving...'}
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4" />
-                  {savedTripId ? 'Update Trip' : 'Save Trip'}
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Itinerary
                 </>
               )}
             </Button>
@@ -487,78 +491,236 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
             )}
           </div>
         </div>
-      </div>
+      </header>
 
-      <Tabs value={`day-${activeDay}`} onValueChange={(v) => setActiveDay(parseInt(v.replace("day-", "")))} className="flex-1 flex flex-col">
-        <div className="border-b px-6" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <TabsList className="h-auto p-0 bg-transparent">
-            {days.map((day, index) => (
-              <div key={index} className="relative group">
-                <TabsTrigger 
-                  value={`day-${index}`} 
-                  className="rounded-b-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] pr-8"
-                  style={{ 
-                    backgroundColor: activeDay === index ? 'var(--primary)' : 'transparent',
-                    color: activeDay === index ? 'white' : 'var(--text)',
-                    borderColor: 'var(--border)'
-                  }}
-                >
-                  Day {index + 1}{day.title && <span className="ml-1 opacity-75">- {day.title}</span>}
-                </TabsTrigger>
-                {days.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteDay(index);
-                    }}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-all focus-ring hover:bg-gray-100"
-                    style={{ 
-                      backgroundColor: 'transparent',
-                      color: '#5f6368'
-                    }}
-                    title={`Delete Day ${index + 1}`}
-                    aria-label={`Delete Day ${index + 1}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex gap-8">
+          {/* Left Side - Itinerary */}
+          <div className="w-96 space-y-4">
+            {/* Trip Title */}
+            <div>
+              <Input
+                placeholder="My Paris Trip"
+                value={tripTitle}
+                onChange={(e) => setTripTitle(e.target.value)}
+                className="font-medium text-lg h-12"
+              />
+              <div className="mt-2 flex items-center gap-2">
+                {savedTripId && (
+                  <span className="inline-flex items-center gap-1 text-sm text-green-600">
+                    <Check className="h-3 w-3" />
+                    Saved (ID: {savedTripId})
+                  </span>
                 )}
               </div>
-            ))}
-
-            <Button variant="ghost" size="sm" onClick={handleAddDay} className="ml-2 hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]" style={{ color: 'var(--text)' }}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </TabsList>
-        </div>
-
-        <div className="flex-1 flex">
-          <DailyItinerarySidebar
-            day={days[activeDay] || days[0]}
-            dayIndex={activeDay}
-            onPlaceUpdate={handlePlaceUpdate}
-            onPlaceRemove={handlePlaceRemove}
-            onPlaceAssignment={handlePlaceAssignment}
-            showMap={showMap}
-            onToggleMap={() => setShowMap(!showMap)}
-          />
+            </div>
+            
+            {/* Day Cards */}
+            <div className="space-y-4">
+              {days.map((day, dayIndex) => {
+                const isSelected = selectedDayId === day.id;
+                return (
+                  <Card key={day.id} className={`p-4 transition-all cursor-pointer ${
+                    isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:shadow-md'
+                  }`} onClick={() => setSelectedDayId(day.id)}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-lg font-semibold">{day.title}</h2>
+                        {isSelected && (
+                          <Badge variant="default" className="bg-blue-600">
+                            Selected
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {day.places.length > 0 && (
+                          <Badge variant="secondary" className="bg-red-100 text-red-700">
+                            {day.places.length} stops
+                          </Badge>
+                        )}
+                        {days.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent day selection when clicking remove
+                              handleRemoveDay(day.id);
+                            }}
+                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                            title="Remove day"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  
+                  {day.places.length === 0 ? (
+                    <div className="text-center py-6 border-2 border-dashed border-border rounded-lg bg-muted/30">
+                      <p className="text-sm text-muted-foreground">
+                        {isSelected 
+                          ? "Select locations from the right to add to this day"
+                          : "Click this day to select it, then add locations"
+                        }
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {day.places.map((place, placeIndex) => (
+                        <Card key={getIdentifier(place)} className="p-3 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                          <div className="flex items-start gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
+                              placeIndex === 0 ? 'bg-blue-500' : 
+                              placeIndex === 1 ? 'bg-green-500' : 
+                              placeIndex === 2 ? 'bg-purple-500' :
+                              'bg-gray-500'
+                            }`}>
+                              {placeIndex + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm text-foreground truncate">
+                                {place.name || 'Unnamed Location'}
+                              </h3>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">
+                                {place.address || 'No address'}
+                              </p>
+                              {place.category && (
+                                <Badge variant="outline" className="text-xs mt-1">
+                                  {place.category}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handlePlaceRemove(getIdentifier(place))}
+                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                title="Remove from itinerary"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+                );
+              })}
+              
+              {/* Add Day Button */}
+              <Button
+                variant="outline"
+                onClick={handleAddDay}
+                className="w-full h-12 border-dashed border-2 text-muted-foreground hover:text-foreground hover:border-solid"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Day
+              </Button>
+            </div>
+            
+            {/* Trip Summary */}
+            <Card className="p-4 bg-muted/30">
+              <h3 className="font-medium text-sm mb-3">Trip Summary</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Destinations</span>
+                  <span className="font-medium">{tripSummary.destinations}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Estimated Duration</span>
+                  <span className="font-medium">{tripSummary.days} days</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Cities</span>
+                  <span className="font-medium">{tripSummary.cities}</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+          
+          {/* Right Side - Available Destinations */}
           <div className="flex-1">
-          {showMap ? (
-              <InteractiveMap
-                startCity="My Trip"
-                endCity=""
-                pois={days[activeDay]?.places || []} // Show places scheduled for the active day
-                selectedPoiIds={days[activeDay]?.places.map(p => Number(getIdentifier(p))) || []}
-                hoveredPoi={null}
-                height="100%"
-                className="w-full h-full"
-            />
-          ) : (
-          <TripPlacesGrid places={unassigned} onPlaceReturn={handlePlaceRemove} onPlaceAdd={handlePlaceAdd} />
-          )
-          }
+            {/* Search and Filter */}
+            <div className="mb-6">
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search destinations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap gap-2">
+                {categories.map(category => (
+                  <Button
+                    key={category}
+                    variant={availableFilter === category ? "default" : "secondary"}
+                    size="sm"
+                    onClick={() => setAvailableFilter(category)}
+                    className="h-8 text-xs"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Available Destinations */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-medium">Available Destinations</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Adding to: <span className="font-medium text-blue-600">Day {selectedDayId}</span>
+                  </p>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {filteredAvailablePlaces.length} locations
+                </span>
+              </div>
+              
+              {filteredAvailablePlaces.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                    <Search className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <p className="font-medium text-foreground">No destinations found</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Try adjusting your search or category filters
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredAvailablePlaces.map((place) => (
+                    <Card key={getIdentifier(place)} className="p-4 hover:shadow-md transition-all cursor-pointer group" onClick={() => handlePlaceAdd(place)}>
+                      <div className="space-y-2">
+                        <h3 className="font-medium text-sm group-hover:text-blue-600 transition-colors">
+                          {place.name || 'Unnamed Location'}
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {place.address || 'No address available'}
+                        </p>
+                        {place.category && (
+                          <Badge variant="secondary" className="text-xs">
+                            {place.category}
+                          </Badge>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </Tabs>
+      </div>
       
       {/* Developer Debug FOB */}
       <DeveloperFab 
@@ -568,9 +730,9 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
           backendType: 'Phoenix',
           environment: 'dev',
           queryStatus: 'fresh',
-          pageType: 'explore-results', // Using explore-results as closest match
+          pageType: 'itinerary',
           apiEndpoint: lastApiRequest?.endpoint || '/api/trips',
-          dataCount: days.flatMap(d => d.places).length,
+          dataCount: allItineraryPlaces.length,
           hasLocalData: Boolean(localStorage.getItem('itineraryData')),
           localStorageKeys: ['itineraryData', 'tripPlaces'].filter(key => localStorage.getItem(key))
         }}
