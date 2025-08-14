@@ -621,7 +621,6 @@ const MapContent: React.FC<{
       </Map>
       
       <MapControls />
-      <MapLegend />
       
     </>
   );

@@ -61,27 +61,17 @@ export function TopNav({ authButtons = "menu", showLogo = true }: TopNavProps) {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Left - Logo on home page, back button on other pages */}
+            {/* Left - Logo */}
             <div className="flex-1">
-              {isHomePage ? (
-                showLogo && (
-                  <div className="flex items-center">
-                    <img 
-                      src="/logo.svg" 
-                      alt="RouteWise" 
-                      className="h-16 w-auto"
-                    />
-                  </div>
-                )
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setLocation('/route-results')}
-                  className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Add more results
-                </Button>
+              {showLogo && (
+                <div className="flex items-center">
+                  <img 
+                    src="/logo.svg" 
+                    alt="RouteWise" 
+                    className="h-16 w-auto cursor-pointer"
+                    onClick={() => setLocation('/')}
+                  />
+                </div>
               )}
             </div>
             

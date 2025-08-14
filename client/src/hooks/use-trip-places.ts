@@ -23,15 +23,20 @@ export function useTripPlaces() {
     queryKey: ['tripPlaces'],
     queryFn: async (): Promise<TripPlace[]> => {
       const saved = localStorage.getItem('tripPlaces');
+      console.log('🔍 Loading trip places from localStorage:', saved);
       if (saved) {
         const places = JSON.parse(saved) as Poi[];
+        console.log('📦 Parsed trip places:', places);
         // Convert to TripPlace format with metadata
-        return places.map((place, index) => ({
+        const tripPlaces = places.map((place, index) => ({
           ...place,
           addedAt: new Date().toISOString(),
           order: index
         }));
+        console.log('✅ Trip places with metadata:', tripPlaces);
+        return tripPlaces;
       }
+      console.log('📭 No trip places in localStorage');
       return [];
     },
     staleTime: 0, // Always fresh for localStorage
@@ -62,12 +67,15 @@ export function useTripPlaces() {
   // Add POI to trip mutation
   const addToTripMutation = useMutation({
     mutationFn: async (poi: Poi): Promise<TripPlace[]> => {
+      console.log('🚀 Adding POI to trip:', poi);
       const current = tripPlaces || [];
+      console.log('📋 Current trip places:', current);
       const poiIdentifier = poi.placeId || poi.id;
       
       // Check if already exists
       const exists = current.some(p => (p.placeId || p.id) === poiIdentifier);
       if (exists) {
+        console.log('⚠️ POI already exists in trip');
         throw new Error('Place already in trip');
       }
 
@@ -78,9 +86,12 @@ export function useTripPlaces() {
       };
 
       const updated = [...current, newTripPlace];
+      console.log('📝 Updated trip places:', updated);
       
       // Update localStorage
-      localStorage.setItem('tripPlaces', JSON.stringify(updated.map(({ addedAt, order, ...poi }) => poi)));
+      const forStorage = updated.map(({ addedAt, order, ...poi }) => poi);
+      console.log('💾 Saving to localStorage:', forStorage);
+      localStorage.setItem('tripPlaces', JSON.stringify(forStorage));
       
       // Dispatch event for other components
       window.dispatchEvent(new Event('tripUpdated'));

@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Bell,
   Calendar as CalendarIcon,
+  Check,
   CheckCircle2,
   ChevronDown,
   CircleX,
@@ -14,6 +15,7 @@ import {
   Plus,
   Search,
   Settings,
+  Star,
   Trash2,
   User,
   AlertTriangle,
@@ -1240,6 +1242,87 @@ export default function KitchenSinkDemo() {
                           </TableRow>
                         </TableBody>
                       </Table>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Interactive Lists */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium">Interactive Lists</h4>
+                    <div className="space-y-2">
+                      <h5 className="text-sm font-medium text-muted-foreground">POI List with Rounded Cards</h5>
+                      <div className="p-4">
+                        {/* POI List Items */}
+                        <div className="space-y-3">
+                          <div className="p-4 border-2 border-border hover:border-primary cursor-pointer transition-colors rounded-lg">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <h3 className="font-medium text-foreground mb-2">Golden Gate Bridge</h3>
+                                <Badge variant="secondary" className="mb-2">landmarks</Badge>
+                                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">An iconic suspension bridge connecting San Francisco to Marin County, famous for its stunning views and Art Deco architecture.</p>
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  <span className="text-sm font-medium text-foreground">4.6</span>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="w-8 h-8 p-0 rounded-full"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border-2 border-primary cursor-pointer transition-colors rounded-lg">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <h3 className="font-medium text-foreground mb-2">Fisherman's Wharf</h3>
+                                <Badge variant="secondary" className="mb-2">restaurants</Badge>
+                                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">A bustling waterfront area with seafood restaurants, street performers, and sea lions at Pier 39.</p>
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  <span className="text-sm font-medium text-foreground">4.2</span>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="w-8 h-8 p-0 rounded-full bg-accent hover:bg-accent/80"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border-2 border-border hover:border-primary cursor-pointer transition-colors rounded-lg">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <h3 className="font-medium text-foreground mb-2">Alcatraz Island</h3>
+                                <Badge variant="secondary" className="mb-2">historic</Badge>
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  <span className="text-sm font-medium text-foreground">4.4</span>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="w-8 h-8 p-0 rounded-full"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground mt-2">
+                        <strong>Pattern:</strong> Rounded cards with spacing using <code>space-y-3</code>, categories as badges, and border-only hover states. 
+                        Clean card design with <code>border-2 rounded-lg</code> and <code>hover:border-primary</code> transitions.
+                      </p>
                     </div>
                   </div>
 

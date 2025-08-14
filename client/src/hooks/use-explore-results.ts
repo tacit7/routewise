@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { POI, RouteResultsAPIResponse } from "@/types/api";
 import type { Poi } from "@/types/schema";
+import { useTripPlaces } from "./use-trip-places";
 
 interface ExploreData {
   startLocation: string;
@@ -43,8 +44,8 @@ async function fetchExploreResults(startLocation: string): Promise<RouteResultsA
 export function useExploreResults() {
   const [, setLocation] = useLocation();
   const [exploreData, setExploreData] = useState<ExploreData | null>(null);
-  const [selectedPoiIds, setSelectedPoiIds] = useState<number[]>([]);
   const [hoveredPoi, setHoveredPoi] = useState<POI | Poi | null>(null);
+  const { tripPlaces, isInTrip, addToTrip, removeFromTrip } = useTripPlaces();
 
   // Load location from query string or localStorage
   useEffect(() => {
@@ -108,8 +109,27 @@ export function useExploreResults() {
   };
 
   const handlePoiSelect = (poiId: number, selected: boolean) => {
-    setSelectedPoiIds((prev) => (selected ? [...prev, poiId] : prev.filter((id) => id !== poiId)));
+    const poi = pois.find(p => p.id === poiId);
+    if (!poi) {
+      console.log('❌ POI not found for ID:', poiId);
+      return;
+    }
+
+    console.log('🔄 POI selection:', { poiId, selected, poi: poi.name });
+    
+    if (selected) {
+      console.log('➕ Adding to trip:', poi);
+      addToTrip(poi);
+    } else {
+      console.log('➖ Removing from trip:', poiId);
+      removeFromTrip(poiId);
+    }
   };
+
+  // Derive selected POI IDs from trip places
+  const selectedPoiIds = useMemo(() => {
+    return tripPlaces.map(place => place.id);
+  }, [tripPlaces]);
 
   return {
     exploreData,

@@ -14,6 +14,7 @@ export function adaptApiPoiToComponent(
     category: apiPoi.category,
     rating: parseFloat(apiPoi.rating) || 0,
     address: apiPoi.address,
+    description: apiPoi.description,
     isInTrip: selectedPoiIds.includes(apiPoi.id),
   };
 }
@@ -38,5 +39,6 @@ export function adaptComponentPoiToApi(componentPoi: ComponentPOI): Partial<POI>
     category: componentPoi.category,
     rating: componentPoi.rating.toString(),
     address: componentPoi.address || "",
+    description: componentPoi.description,
   };
 }

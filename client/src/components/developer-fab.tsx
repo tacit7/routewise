@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bug, X, Monitor, Map, Database, Network, Settings, Clock, Zap, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -169,7 +169,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
   return (
     <>
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-[9999]">
+      <div className="fixed bottom-6 right-6 z-[99999]">
         <Button
           onClick={() => setIsOpen(true)}
           className="rounded-full w-14 h-14 shadow-xl text-white border-2 transition-all bg-purple-600 hover:bg-purple-700 border-purple-400 hover:border-purple-300 hover:scale-110"
@@ -204,7 +204,11 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
 
       {/* Debug Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogPortal>
+          <DialogOverlay className="z-[99998]" />
+          <DialogContent 
+            className="max-w-4xl max-h-[90vh] overflow-hidden z-[99999]" 
+          >
           <DialogHeader>
             <DialogTitle className="text-base font-semibold text-purple-700 flex items-center gap-2">
               <Bug className="h-5 w-5" />
@@ -1180,6 +1184,7 @@ export const DeveloperFab: React.FC<DeveloperFabProps> = ({ className = "", cach
           </Tabs>
           </div>
         </DialogContent>
+        </DialogPortal>
       </Dialog>
     </>
   );

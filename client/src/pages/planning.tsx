@@ -12,8 +12,9 @@ import { authenticatedApiCall, API_CONFIG } from "@/lib/api-config";
 import type { ItineraryPlace } from "@/types/itinerary";
 import { getIdentifier } from "@/utils/itinerary";
 import { DeveloperFab } from "@/components/developer-fab";
+import ItineraryHeader from "@/components/ItineraryHeader";
 
-export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: string }) {
+export default function PlanningPage({ mapsApiKey }: { mapsApiKey?: string }) {
   const [, setLocation] = useLocation();
 
   // Day-based itinerary state
@@ -40,6 +41,9 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { tripPlaces } = useTripPlaces();
+  
+  // Debug trip places
+  console.log('🎯 Planning page - trip places:', tripPlaces);
 
   // Load saved itinerary from localStorage
   useEffect(() => {
@@ -444,54 +448,14 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">Travel Itinerary Planner</h1>
-              <p className="text-sm text-muted-foreground">Drag locations to build your perfect trip</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {lastSavedAt && (
-              <span className="text-sm text-muted-foreground">
-                Saved {lastSavedAt.toLocaleTimeString()}
-              </span>
-            )}
-            {savedTripId && (
-              <Button variant="outline" size="sm" onClick={handleClearAll}>
-                Clear All
-              </Button>
-            )}
-            <Button
-              onClick={handleSaveTrip}
-              disabled={isSaving || !isAuthenticated}
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-            >
-              {isSaving ? (
-                <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
-                  {savedTripId ? 'Updating...' : 'Saving...'}
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Itinerary
-                </>
-              )}
-            </Button>
-            {!isAuthenticated && (
-              <Button variant="outline" size="sm">
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+      <ItineraryHeader
+        lastSavedAt={lastSavedAt}
+        savedTripId={savedTripId}
+        isSaving={isSaving}
+        isAuthenticated={isAuthenticated}
+        onSaveTrip={handleSaveTrip}
+        onClearAll={handleClearAll}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6">
@@ -522,23 +486,18 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 const isSelected = selectedDayId === day.id;
                 return (
                   <Card key={day.id} className={`p-4 transition-all cursor-pointer ${
-                    isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:shadow-md'
+                    isSelected ? 'ring-2 ring-primary bg-primary-50' : 'hover:shadow-md'
                   }`} onClick={() => setSelectedDayId(day.id)}>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <h2 className="text-lg font-semibold">{day.title}</h2>
                         {isSelected && (
-                          <Badge variant="default" className="bg-blue-600">
+                          <Badge variant="default">
                             Selected
                           </Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {day.places.length > 0 && (
-                          <Badge variant="secondary" className="bg-red-100 text-red-700">
-                            {day.places.length} stops
-                          </Badge>
-                        )}
                         {days.length > 1 && (
                           <Button
                             variant="ghost"
@@ -568,13 +527,13 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                   ) : (
                     <div className="space-y-3">
                       {day.places.map((place, placeIndex) => (
-                        <Card key={getIdentifier(place)} className="p-3 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                        <Card key={getIdentifier(place)} className="p-3 hover:shadow-md transition-shadow border-l-4 border-l-primary">
                           <div className="flex items-start gap-3">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                              placeIndex === 0 ? 'bg-blue-500' : 
-                              placeIndex === 1 ? 'bg-green-500' : 
-                              placeIndex === 2 ? 'bg-purple-500' :
-                              'bg-gray-500'
+                              placeIndex === 0 ? 'bg-green-600' : 
+                              placeIndex === 1 ? 'bg-emerald-600' : 
+                              placeIndex === 2 ? 'bg-teal-600' :
+                              'bg-slate-500'
                             }`}>
                               {placeIndex + 1}
                             </div>
@@ -586,7 +545,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                                 {place.address || 'No address'}
                               </p>
                               {place.category && (
-                                <Badge variant="outline" className="text-xs mt-1">
+                                <Badge variant="secondary" className="text-xs mt-1">
                                   {place.category}
                                 </Badge>
                               )}
@@ -678,7 +637,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                 <div>
                   <h2 className="text-lg font-medium">Available Destinations</h2>
                   <p className="text-sm text-muted-foreground">
-                    Adding to: <span className="font-medium text-blue-600">Day {selectedDayId}</span>
+                    Adding to: <span className="font-medium text-primary">Day {selectedDayId}</span>
                   </p>
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -701,7 +660,7 @@ export default function ItineraryPageShadcn({ mapsApiKey }: { mapsApiKey?: strin
                   {filteredAvailablePlaces.map((place) => (
                     <Card key={getIdentifier(place)} className="p-4 hover:shadow-md transition-all cursor-pointer group" onClick={() => handlePlaceAdd(place)}>
                       <div className="space-y-2">
-                        <h3 className="font-medium text-sm group-hover:text-blue-600 transition-colors">
+                        <h3 className="font-medium text-sm group-hover:text-primary transition-colors">
                           {place.name || 'Unnamed Location'}
                         </h3>
                         <p className="text-xs text-muted-foreground line-clamp-2">

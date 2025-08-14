@@ -12,19 +12,27 @@ This document defines the **single source of truth** for our UI styling. Every c
 
 ---
 
-## 2. Colors
-| Usage              | Token                  | Value (Example)        | Notes |
+## 2. Colors & Semantic Tokens
+Always use shadcn/ui semantic tokens for consistency and theme support:
+
+| Usage              | Semantic Token         | CSS Class              | Notes |
 |--------------------|------------------------|------------------------|-------|
-| Background         | `--bg`                 | `hsl(210, 20%, 98%)`    | App main background |
-| Surface            | `--surface`            | `hsl(0, 0%, 100%)`      | Cards, modals |
-| Surface Alt        | `--surface-alt`        | `hsl(210, 25%, 97%)`    | Subtle panels |
-| Border             | `--border`             | `hsl(214, 32%, 91%)`    | Borders, dividers |
-| Primary            | `--primary`            | `#059669`               | Actions & CTAs |
-| Primary Foreground | `--primary-foreground` | `#FFFFFF`               | Text on primary |
-| Error              | `--error`              | `#DC2626`               | Validation errors |
-| Success            | `--success`            | `#16A34A`               | Success messages |
-| Warning            | `--warning`            | `#FACC15`               | Alerts |
-| Info               | `--info`               | `#2563EB`               | Info messages |
+| Background         | `bg-background`        | Background color       | App main background |
+| Cards/Surfaces     | `bg-card`              | Card background        | Cards, modals, panels |
+| Text Primary       | `text-foreground`      | Primary text           | Main content text |
+| Text Secondary     | `text-muted-foreground`| Secondary text         | Captions, descriptions |
+| Borders            | `border-border`        | Border color           | All borders, dividers |
+| Primary Actions    | `bg-primary`           | Primary background     | CTAs, active states |
+| Primary Text       | `text-primary-foreground` | Text on primary     | Text on primary bg |
+| Success            | `bg-emerald-500`       | Success color          | Success states |
+| Warning            | `bg-yellow-500`        | Warning color          | Warning states |
+| Error/Destructive  | `bg-destructive`       | Error color            | Error states |
+| Accent             | `bg-accent`            | Accent background      | Hover states |
+| Muted Areas        | `bg-muted`             | Muted background       | Disabled, inactive |
+| Input              | `bg-input`             | Input background       | Form inputs |
+| Popover            | `bg-popover`           | Popover background     | Dropdowns, tooltips |
+
+**Key Principle**: Never use custom CSS variables or hex colors. Always use shadcn/ui semantic tokens for automatic theme support.
 
 ---
 
@@ -72,6 +80,32 @@ Sizes: `sm`, `md`, `lg`
 - **Active:** Pressed-down feel with reduced brightness.
 - **Disabled:** Reduced opacity, no pointer events.
 
+### List Item Hover Pattern
+For interactive list items (POI cards, search results, etc.), use **rounded cards with border-only highlights**:
+
+```tsx
+<div className="p-4 border-2 border-border hover:border-primary cursor-pointer transition-colors rounded-lg">
+  <div className="flex items-start justify-between gap-3">
+    <div className="flex-1">
+      <h3 className="font-medium text-foreground mb-2">Title</h3>
+      <Badge variant="secondary" className="mb-2">category</Badge>
+      {/* Content */}
+    </div>
+    <Button size="sm" className="w-8 h-8 p-0 rounded-full">
+      <Plus className="h-4 w-4" />
+    </Button>
+  </div>
+</div>
+```
+
+**Key characteristics:**
+- Rounded card design with `rounded-lg` and `border-2`
+- Maintains clean background (no background color changes)
+- Border-only hover states: `border-border` to `hover:border-primary`
+- Spacing between cards using `space-y-3` in container
+- Categories displayed as badges, not plain text
+- Provides subtle visual feedback without overwhelming the design
+
 ---
 
 ## 7. Responsive Breakpoints
@@ -92,7 +126,18 @@ Design mobile-first, then scale up.
 ---
 
 ## 9. Anti-Patterns
-❌ New color values in random components  
-❌ Inline font sizes  
-❌ Arbitrary breakpoints outside our scale  
-❌ Copy-pasting markup without reusing components
+❌ **Custom CSS variables instead of semantic tokens** (`--my-color` vs `bg-card`)  
+❌ **Hex colors in components** (`#ffffff` vs `text-foreground`)  
+❌ **Inline font sizes outside the scale** (`text-[17px]` vs `text-base`)  
+❌ **Arbitrary breakpoints** (`max-w-[850px]` vs `max-w-4xl`)  
+❌ **Copy-pasting markup without reusing components**  
+❌ **Transparent backgrounds for dropdowns/popovers** (use solid `bg-popover`)
+
+## 10. Migration Checklist
+When updating components to North Star UI:
+- ✅ Replace `var(--surface)` with `bg-card`
+- ✅ Replace `var(--border)` with `border-border`  
+- ✅ Replace `text-fg` with `text-foreground`
+- ✅ Replace `bg-blue-600` with `bg-primary`
+- ✅ Replace `bg-red-600` with `bg-destructive`
+- ✅ Ensure all dropdowns use `bg-popover` for solid backgrounds

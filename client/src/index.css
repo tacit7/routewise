@@ -35,6 +35,8 @@
   --warning: hsl(42 95% 45%); /* Rating star color */
   --focus: var(--primary); /* Focus ring */
   --dropdown: hsl(0 0% 100%); /* Dropdown/popover background */
+  --popover: hsl(0 0% 100%); /* Popover background - solid white */
+  --popover-foreground: var(--text); /* Popover text color */
 
   /* Legacy support - map to UX spec tokens */
   --background: var(--bg);

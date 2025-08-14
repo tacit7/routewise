@@ -11,6 +11,7 @@ export interface ComponentPOI {
   rating: number;
   isInTrip: boolean;
   address?: string;
+  description?: string;
 }
 
 interface POIListItemProps {

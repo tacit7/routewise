@@ -4,7 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/components/auth-context";
-import { useCityPrefetch } from "@/hooks/use-city-autocomplete";
 import { useEffect } from "react";
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -17,7 +16,7 @@ import DashboardTest from "@/pages/dashboard-test";
 import RouteResults from "@/pages/route-results";
 import ExploreResults from "@/pages/explore-results";
 import PlaceResults from "@/pages/place-results";
-import ItineraryPage from "@/pages/itinerary";
+import PlanningPage from "@/pages/planning";
 import TripWizardPage from "@/pages/trip-wizard";
 import PlacesExplorer from "@/pages/places-explorer";
 import InterestsDemo from "@/pages/interests-demo";
@@ -32,17 +31,7 @@ import { DeveloperFab } from "@/components/developer-fab";
 
 function AuthenticatedRouter() {
   const { isAuthenticated, isLoading } = useAuth();
-  const { prefetchPopularCities } = useCityPrefetch();
   const [location] = useLocation();
-
-  // Prefetch popular cities when router mounts (after QueryClient is available)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      prefetchPopularCities('us,ca,mx');
-    }, 2000); // Wait 2 seconds after app loads to avoid blocking initial render
-
-    return () => clearTimeout(timer);
-  }, [prefetchPopularCities]);
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -72,7 +61,8 @@ function AuthenticatedRouter() {
         <Route path="/route-results" component={RouteResults} />
         <Route path="/explore-results" component={ExploreResults} />
         <Route path="/place-results" component={PlaceResults} />
-        <Route path="/itinerary" component={ItineraryPage} />
+        <Route path="/planning" component={PlanningPage} />
+        <Route path="/itinerary" component={PlanningPage} />
         <Route path="/interests-demo" component={InterestsDemo} />
         {/* Suggested Trip Pages */}
         <Route path="/suggested-trip/:tripSlug" component={SuggestedTrip} />
