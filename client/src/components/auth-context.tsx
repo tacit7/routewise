@@ -46,7 +46,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const isAuthenticated = user !== null;
+  // 🚫 TESTING MODE: Always authenticated for Tailwind v4 testing
+  const isAuthenticated = true; // Override for testing - was: user !== null
 
   // Initialize GoogleAuth and check authentication on mount
   useEffect(() => {
@@ -72,55 +73,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const initializeAuth = async () => {
     try {
-      await googleAuth.initialize();
-      
-      // Check if user is already authenticated from stored credentials
-      const currentUser = googleAuth.getCurrentUser();
-      if (currentUser && googleAuth.isAuthenticated()) {
-        setUser(currentUser);
-      } else {
-        // DEV AUTH: Get JWT token from Phoenix backend
-        try {
-          const response = await fetch('/api/auth/dev-token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include', // Important: Include cookies for JWT
-            body: JSON.stringify({
-              username: 'test_user',
-              email: 'test@example.com',
-              full_name: 'Test User'
-            })
-          });
-
-          if (response.ok) {
-            const authData = await response.json();
-            console.log('🔐 Development JWT token obtained:', authData);
-            
-            // Use the user data from backend response
-            const devUser: User = {
-              id: authData.user.id.toString(),
-              email: authData.user.email,
-              name: authData.user.full_name,
-              picture: "https://via.placeholder.com/96",
-              email_verified: true,
-              given_name: authData.user.full_name.split(' ')[0],
-              family_name: authData.user.full_name.split(' ').slice(1).join(' ')
-            };
-            setUser(devUser);
-            console.log('🎭 Using development user with JWT token');
-          } else {
-            console.error('Failed to get dev token:', response.statusText);
-            setUser(null);
-          }
-        } catch (devError) {
-          console.error('Dev token request failed:', devError);
-          setUser(null);
-        }
-      }
+      // 🚫 TESTING MODE: Use mock user for Tailwind v4 testing
+      const mockUser: User = {
+        id: "test-user-123",
+        email: "test@routewise.com",
+        name: "Test User",
+        picture: "https://via.placeholder.com/96",
+        email_verified: true,
+        given_name: "Test",
+        family_name: "User"
+      };
+      setUser(mockUser);
+      console.log('🎭 Using mock user for testing - authentication disabled');
     } catch (error) {
-      console.error('Failed to initialize Google Auth:', error);
+      console.error('Failed to initialize auth:', error);
     } finally {
       setIsLoading(false);
     }
