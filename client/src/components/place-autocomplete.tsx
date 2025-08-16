@@ -58,7 +58,7 @@ export function PlaceAutocomplete({
 
   const handleSelect = (suggestion: PlaceSuggestion | null) => {
     if (suggestion) {
-      setInputValue(suggestion.main_text);
+      setInputValue(suggestion.description);
       clearSuggestions();
       onSelect(suggestion);
     }
@@ -108,6 +108,7 @@ export function PlaceAutocomplete({
       {/* Input trigger button */}
       <div className="relative">
         <Button
+          type="button"
           variant="outline"
           {...getToggleButtonProps()}
           className={cn(

@@ -36,7 +36,12 @@ export const API_CONFIG = {
     PLACES_DETAILS: '/api/places/details',
     
     // Routes
-    ROUTES: '/api/routes',
+    ROUTES_CALCULATE: '/api/routes/calculate',
+    ROUTES_WIZARD: '/api/routes/wizard', 
+    ROUTES_OPTIMIZE: '/api/routes/optimize',
+    ROUTES_ALTERNATIVES: '/api/routes/alternatives',
+    ROUTES_ESTIMATE: '/api/routes/estimate',
+    ROUTES_COSTS: '/api/routes/costs',
     ROUTE_RESULTS: '/api/route-results',
     
     // Places Autocomplete

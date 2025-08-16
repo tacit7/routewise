@@ -69,6 +69,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { TripPlannerWithTabs } from "@/components/trip/TripPlannerWithTabs";
+import type { MultiDayRouteData } from "@/types/schema";
 
 export default function KitchenSinkDemo() {
   const [progress, setProgress] = useState(36);
@@ -82,6 +84,108 @@ export default function KitchenSinkDemo() {
     setIsLoading(true);
     setTimeout(() => setIsLoading(false), 2000);
   };
+
+  // Sample multi-day route data for demo
+  const sampleRouteData: MultiDayRouteData = {
+    itinerary: {
+      itinerary: [
+        {
+          day: 1,
+          title: "Los Angeles to Santa Barbara",
+          waypoints: [
+            { lat: 34.0522, lng: -118.2437, name: "Los Angeles", address: "Los Angeles, CA, USA" },
+            { lat: 34.4208, lng: -119.6982, name: "Santa Barbara", address: "Santa Barbara, CA, USA" },
+          ],
+          route: {
+            encodedPolyline: "a{f~E~}sqTaBqCmEcI{CcFuC_F_CeE{BqDgFkIqC_FuCgFyC_FkCaFwBeEqFeJqDgGiCeE_CcE{BqDgDqGsHqMwNeVoPoYe[qe@yX}f@eIqN_H{LeIgPqUkf@qNoV{J}QgKsSeKySwKgWiO{^kN_\\kPa_@sQid@_Q{a@qWyr@mVos@eUuq@qTiq@sT_q@uVez@k\\eaAsSwt@iKsf@{Jce@mKae@qOio@mTa{@eKqc@aKmc@iQis@eTe|@",
+            totalDistance: "150.5 km",
+            totalDuration: "1h 45m",
+            waypointOrder: [0, 1],
+            startCoords: { lat: 34.0522, lng: -118.2437 },
+            endCoords: { lat: 34.4208, lng: -119.6982 },
+          },
+          pois: [],
+        },
+        {
+          day: 2,
+          title: "Santa Barbara to San Francisco",
+          waypoints: [
+            { lat: 34.4208, lng: -119.6982, name: "Santa Barbara", address: "Santa Barbara, CA, USA" },
+            { lat: 36.2048, lng: -121.0618, name: "Monterey", address: "Monterey, CA, USA" },
+            { lat: 37.7749, lng: -122.4194, name: "San Francisco", address: "San Francisco, CA, USA" },
+          ],
+          route: {
+            encodedPolyline: "g`x~EdlhbNnJmEpQoKbY{S~[kV~YyTpVuPbU_PlPsKzUcPf`@cV~SyMrNyInMoIvJkGnFkDbGaDfH_DzH}B|HwB|GqBdH_B|F}@pFu@hFs@bFo@pFm@lFk@tFs@dFeAzEuAbFkBfFoBbF}BpFgCfF{CbFeElFqFfFcHbFuIdFkK|EaM`FsN|EqP|EiR|EcT~EkVfEwXhEe[lEg]nEe_@~DiabAuT|v@{|@fU{z@dUsz@`Ukz@|Ti{@xTgz@pTiv@|Su{@vS_{@rS}z@nS{z@jSyz@fSuz@bSsz@|Rqz@vRoz@pRmz@jRkz@fRiz@|Qgz@vQez@pQcz@jQaz@fQ_{@|P}{@vP}{@pP}{@jP}{@fP}{@|O}{@vO}{@pO}{@jO}{@fO}{@",
+            totalDistance: "385.2 km",
+            totalDuration: "4h 15m",
+            waypointOrder: [0, 1, 2],
+            startCoords: { lat: 34.4208, lng: -119.6982 },
+            endCoords: { lat: 37.7749, lng: -122.4194 },
+          },
+          pois: [],
+        },
+        {
+          day: 3,
+          title: "San Francisco to Sacramento",
+          waypoints: [
+            { lat: 37.7749, lng: -122.4194, name: "San Francisco", address: "San Francisco, CA, USA" },
+            { lat: 38.5816, lng: -121.4944, name: "Sacramento", address: "Sacramento, CA, USA" },
+          ],
+          route: {
+            encodedPolyline: "s~w}FrqcgO_B{AuBuBkBaBcB_BaB_BcB{A_B}AuA}AuAy@wAu@yAm@oAi@uAc@wA]yAS}AS}AS}AQ}AO}AK}AIgBGgBEgBAgBAnBBnBFnBHnBNnBTlBZjB`@hBf@hBl@fBr@dBx@dB~@bB`AbB~@`B|@`Bz@_Bv@}At@}Ap@{Am@yAi@wAc@uA]}AS{AM{AK}AE}A?}A?}ABwADwAHuALsANqARoAVmAZkA^iAbAiAfAe@fAwA~@yA|@{Az@}Av@}At@_Br@aBp@cBl@eBj@eBf@gBd@gBb@iBZ_BV}A",
+            totalDistance: "175.8 km",
+            totalDuration: "2h 10m",
+            waypointOrder: [0, 1],
+            startCoords: { lat: 37.7749, lng: -122.4194 },
+            endCoords: { lat: 38.5816, lng: -121.4944 },
+          },
+          pois: [],
+        },
+      ],
+      totalDays: 3,
+      startLocation: "Los Angeles",
+      endLocation: "Sacramento",
+    },
+    routesByDay: {
+      1: {
+        encodedPolyline: "a{f~E~}sqTaBqCmEcI{CcFuC_F_CeE{BqDgFkIqC_FuCgFyC_FkCaFwBeEqFeJqDgGiCeE_CcE{BqDgDqGsHqMwNeVoPoYe[qe@yX}f@eIqN_H{LeIgPqUkf@qNoV{J}QgKsSeKySwKgWiO{^kN_\\kPa_@sQid@_Q{a@qWyr@mVos@eUuq@qTiq@sT_q@uVez@k\\eaAsSwt@iKsf@{Jce@mKae@qOio@mTa{@eKqc@aKmc@iQis@eTe|@",
+        totalDistance: "150.5 km",
+        totalDuration: "1h 45m",
+        waypointOrder: [0, 1],
+        startCoords: { lat: 34.0522, lng: -118.2437 },
+        endCoords: { lat: 34.4208, lng: -119.6982 },
+      },
+      2: {
+        encodedPolyline: "g`x~EdlhbNnJmEpQoKbY{S~[kV~YyTpVuPbU_PlPsKzUcPf`@cV~SyMrNyInMoIvJkGnFkDbGaDfH_DzH}B|HwB|GqBdH_B|F}@pFu@hFs@bFo@pFm@lFk@tFs@dFeAzEuAbFkBfFoBbF}BpFgCfF{CbFeElFqFfFcHbFuIdFkK|EaM`FsN|EqP|EiR|EcT~EkVfEwXhEe[lEg]nEe_@~DiabAuT|v@{|@fU{z@dUsz@`Ukz@|Ti{@xTgz@pTiv@|Su{@vS_{@rS}z@nS{z@jSyz@fSuz@bSsz@|Rqz@vRoz@pRmz@jRkz@fRiz@|Qgz@vQez@pQcz@jQaz@fQ_{@|P}{@vP}{@pP}{@jP}{@fP}{@|O}{@vO}{@pO}{@jO}{@fO}{@",
+        totalDistance: "385.2 km",
+        totalDuration: "4h 15m",
+        waypointOrder: [0, 1, 2],
+        startCoords: { lat: 34.4208, lng: -119.6982 },
+        endCoords: { lat: 37.7749, lng: -122.4194 },
+      },
+      3: {
+        encodedPolyline: "s~w}FrqcgO_B{AuBuBkBaBcB_BaB_BcB{A_B}AuA}AuAy@wAu@yAm@oAi@uAc@wA]yAS}AS}AS}AQ}AO}AK}AIgBGgBEgBAgBAnBBnBFnBHnBNnBTlBZjB`@hBf@hBl@fBr@dBx@dB~@bB`AbB~@`B|@`Bz@_Bv@}At@}Ap@{Am@yAi@wAc@uA]}AS{AM{AK}AE}A?}A?}ABwADwAHuALsANqARoAVmAZkA^iAbAiAfAe@fAwA~@yA|@{Az@}Av@}At@_Br@aBp@cBl@eBj@eBf@gBd@gBb@iBZ_BV}A",
+        totalDistance: "175.8 km",
+        totalDuration: "2h 10m",
+        waypointOrder: [0, 1],
+        startCoords: { lat: 37.7749, lng: -122.4194 },
+        endCoords: { lat: 38.5816, lng: -121.4944 },
+      },
+    },
+    allPois: [],
+  };
+
+  const MultiDayRouteDemo = () => (
+    <div className="space-y-4">
+      <div className="text-sm text-muted-foreground">
+        Demo of the multi-day route rendering system with tab navigation. Switch between days to see individual routes or view all days together.
+      </div>
+      <TripPlannerWithTabs 
+        routeData={sampleRouteData} 
+        mapHeight="400px" 
+      />
+    </div>
+  );
 
   return (
     <TooltipProvider>
@@ -1867,6 +1971,17 @@ export default function KitchenSinkDemo() {
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Multi-Day Route Rendering Demo */}
+              <Card>
+                <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
+                  <CardTitle>Multi-Day Route Rendering</CardTitle>
+                  <CardDescription>Interactive multi-day route visualization with tab navigation</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
+                  <MultiDayRouteDemo />
                 </CardContent>
               </Card>
               </div>

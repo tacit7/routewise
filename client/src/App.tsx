@@ -25,6 +25,7 @@ import InterestsPage from "@/pages/interests";
 import SettingsPage from "@/pages/settings";
 import KitchenSinkDemo from "@/pages/kitchen-sink";
 import SuggestedTrip from "@/pages/suggested-trip";
+import Blog from "@/pages/blog";
 import NotFound from "@/pages/not-found";
 import AuthSuccess from "@/pages/auth-success";
 import AuthError from "@/pages/auth-error";
@@ -74,6 +75,9 @@ function AuthenticatedRouter() {
         <Route path="/place-results" component={PlaceResults} />
         <Route path="/itinerary" component={ItineraryPage} />
         <Route path="/interests-demo" component={InterestsDemo} />
+        {/* Blog Pages */}
+        <Route path="/blog/:slug" component={Blog} />
+        <Route path="/blog" component={Blog} />
         {/* Suggested Trip Pages */}
         <Route path="/suggested-trip/:tripSlug" component={SuggestedTrip} />
         <Route path="/suggested-trip" component={SuggestedTrip} />
