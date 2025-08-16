@@ -84,13 +84,9 @@ export function useCityAutocomplete(
         input: normalizedQuery,
       });
 
-      console.log('🔍 API Request:', `/api/places/autocomplete?${params.toString()}`);
-
       const response = await fetch(
         `/api/places/autocomplete?${params.toString()}`
       );
-
-      console.log('📊 API Response status:', response.status);
 
       if (!response.ok) {
         let errorText;
@@ -99,25 +95,24 @@ export function useCityAutocomplete(
         } catch (e) {
           errorText = response.statusText;
         }
-        console.error('❌ API Error:', response.status, errorText);
         throw new Error(`API Error ${response.status}: ${errorText}`);
       }
 
       let data;
       try {
         data = await response.json();
-        console.log('✅ API Response data:', data);
       } catch (e) {
-        console.error('❌ Failed to parse JSON response:', e);
         throw new Error('Invalid response from server');
       }
       
       if (data.status === 'success' && data.data?.suggestions) {
         // Handle both old and new Phoenix backend response formats
-        return data.data.suggestions.map((suggestion: any) => {
+        const transformedSuggestions = data.data.suggestions.map((suggestion: any) => {
+          let transformedSuggestion;
+          
           // New format: Google Places API format with structured_formatting
           if (suggestion.structured_formatting) {
-            return {
+            transformedSuggestion = {
               place_id: suggestion.place_id,
               description: suggestion.description,
               main_text: suggestion.structured_formatting.main_text,
@@ -127,7 +122,7 @@ export function useCityAutocomplete(
           }
           // Old format: Custom Phoenix format
           else {
-            return {
+            transformedSuggestion = {
               place_id: suggestion.id || suggestion.place_id,
               description: `${suggestion.name}, ${suggestion.state}`,
               main_text: suggestion.name,
@@ -140,7 +135,12 @@ export function useCityAutocomplete(
               },
             };
           }
+          
+          
+          return transformedSuggestion;
         });
+        
+        return transformedSuggestions;
       } else {
         throw new Error(data.message || 'No suggestions available');
       }

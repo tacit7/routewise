@@ -64,7 +64,6 @@ export function usePlacesAutocomplete(options: UsePlacesAutocompleteOptions = {}
   }, [currentQuery, debounceMs]);
 
   const fetchSuggestions = useCallback((query: string) => {
-    console.log('🔍 Fetching suggestions for:', query);
     if (query.length < minLength) {
       setCurrentQuery('');
       setDebouncedQuery('');

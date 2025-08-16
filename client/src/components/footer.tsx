@@ -18,6 +18,7 @@ export default function Footer() {
           <div>
             <h5 className="font-semibold mb-4">Discover</h5>
             <ul className="space-y-2 text-slate-400">
+              <li><a href="/blog" className="hover:text-white transition-colors">Travel Blog</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Popular Routes</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Hidden Gems</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Local Favorites</a></li>

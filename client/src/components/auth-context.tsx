@@ -39,14 +39,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const isAuthenticated = user !== null;
+  // Check if auth is disabled for development
+  const isAuthDisabled = import.meta.env.VITE_DISABLE_AUTH === 'true';
+
+  const isAuthenticated = isAuthDisabled || user !== null;
 
   // Check authentication status on mount
   useEffect(() => {
-    checkAuth();
-  }, []);
+    if (isAuthDisabled) {
+      // Create a mock user for development
+      setUser({
+        id: 'dev-user',
+        email: 'dev@example.com',
+        name: 'Development User',
+        picture: 'https://via.placeholder.com/150',
+        email_verified: true,
+        given_name: 'Dev',
+        family_name: 'User'
+      });
+      setIsLoading(false);
+    } else {
+      checkAuth();
+    }
+  }, [isAuthDisabled]);
 
   const checkAuth = async (): Promise<void> => {
+    if (isAuthDisabled) {
+      return; // Skip auth check when disabled
+    }
+    
     try {
       const response = await fetch('/api/auth/me', {
         credentials: 'include' // Important: Include HTTP-only cookies
@@ -67,6 +88,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async (): Promise<void> => {
+    if (isAuthDisabled) {
+      // In no-auth mode, just show a message
+      toast({
+        title: "Auth Disabled",
+        description: "Authentication is disabled in development mode.",
+      });
+      return;
+    }
+    
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',

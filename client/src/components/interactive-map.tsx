@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap, Pin } from "@vis.gl/react-google-maps";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, Clock, Globe, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Poi } from "@/types/schema";
@@ -148,15 +148,80 @@ const PoiInfoWindow: React.FC<{
             className="w-full h-32 object-cover rounded mb-2"
           />
         )}
-        <h3 className="font-semibold text-base mb-1">{poi.name}</h3>
-        <p className="text-xs text-muted-foreground capitalize mb-2">{poi.category}</p>
+        
+        {/* Header with name and badges */}
+        <div className="mb-2">
+          <h3 className="font-semibold text-base mb-1 flex items-center gap-2">
+            {poi.name}
+            {poi.hiddenGem && (
+              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">💎 Hidden Gem</span>
+            )}
+          </h3>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-xs text-muted-foreground capitalize">{poi.category}</p>
+            {poi.placeTypes && poi.placeTypes.length > 0 && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                {poi.placeTypes[0]}
+              </span>
+            )}
+          </div>
+        </div>
+        
         {poi.description && (
           <p className="text-sm text-foreground mb-2">{poi.description}</p>
         )}
-        <div className="flex items-center text-xs mb-1">
+        
+        {/* Rating */}
+        <div className="flex items-center text-xs mb-2">
           <span className="text-yellow-500">⭐</span>
           <span className="ml-1 text-muted-foreground">{poi.rating} ({poi.reviewCount || 0} reviews)</span>
         </div>
+        
+        {/* Duration and Best Time */}
+        {(poi.durationSuggested || poi.bestTimeToVisit) && (
+          <div className="mb-2 flex flex-wrap gap-1">
+            {poi.durationSuggested && (
+              <span className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                <Clock className="h-3 w-3" />
+                {poi.durationSuggested}
+              </span>
+            )}
+            {poi.bestTimeToVisit && (
+              <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                <Globe className="h-3 w-3" />
+                {poi.bestTimeToVisit}
+              </span>
+            )}
+          </div>
+        )}
+        
+        {/* Accessibility */}
+        {poi.accessibility && (
+          <div className="mb-2">
+            <span className="inline-flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+              <MapPin className="h-3 w-3" />
+              {poi.accessibility}
+            </span>
+          </div>
+        )}
+        
+        {/* Tips */}
+        {poi.tips && poi.tips.length > 0 && (
+          <div className="mb-2">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="inline-flex items-center gap-1 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                <Search className="h-3 w-3" />
+                Tips
+              </span>
+            </div>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              {poi.tips.slice(0, 2).map((tip, index) => (
+                <li key={index}>• {tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
         {poi.address && (
           <p className="text-xs text-muted-foreground mb-3">{poi.address}</p>
         )}
