@@ -7,3 +7,5 @@ vite.config.ts.*
 .env
 logs/
 phoenix-backend
+.claude
+.claude/settings.local.json
