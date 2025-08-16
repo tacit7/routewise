@@ -1,6 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  /* Tailwind v4 Native Theming - Direct Values */
+  --radius: 1rem;
+  
+  /* Core colors using UX spec values */
+  --color-background: hsl(156 30% 96%);
+  --color-foreground: hsl(215 18% 18%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(215 18% 18%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(215 18% 18%);
+  
+  /* Brand colors */
+  --color-primary: hsl(160 84% 36%);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: hsl(215 16% 35%);
+  --color-secondary-foreground: #ffffff;
+  
+  /* UI states */
+  --color-muted: hsl(210 25% 97%);
+  --color-muted-foreground: hsl(215 16% 35%);
+  --color-accent: hsl(160 84% 32%);
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  /* Form elements */
+  --color-border: hsl(214 28% 88%);
+  --color-input: hsl(214 28% 88%);
+  --color-ring: hsl(160 84% 36%);
+  
+  /* Chart colors */
+  --color-chart-1: hsl(160 84% 36%);
+  --color-chart-2: hsl(42 95% 45%);
+  --color-chart-3: #3b82f6;
+  --color-chart-4: #22c55e;
+  --color-chart-5: #ef4444;
+  
+  /* Border radius scale */
+  --radius-lg: 1rem;
+  --radius-md: 0.875rem;
+  --radius-sm: 0.75rem;
+  
+  /* Custom breakpoints */
+  --breakpoint-xs: 480px;
+  
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
 
 /* Safe area utilities for mobile */
 .safe-area-padding {
